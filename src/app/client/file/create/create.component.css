@@ -759,7 +759,7 @@
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-top: 1px solid var(--ds-border);
-  box-shadow: 0 -4px 24px rgba(26, 26, 26, 0.08);
+  box-shadow: 0 -4px 24px rgba(29, 43, 48, 0.08);
   z-index: var(--ds-z-sticky);
 }
 .pb-mobile-bar { padding-bottom: 5rem; }

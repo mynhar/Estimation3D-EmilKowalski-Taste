@@ -124,7 +124,7 @@
 
 .avatar-overlay {
   position: absolute; inset: 0;
-  background: rgba(26, 20, 12, 0.52);
+  background: rgba(29, 43, 48, 0.52);
   border-radius: var(--ds-radius-circle);
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
@@ -275,7 +275,7 @@
 }
 .feedback-alert--danger {
   background: var(--ds-danger-soft); color: var(--ds-danger-ink);
-  border-color: rgba(161, 69, 69, 0.2);
+  border-color: rgba(179, 38, 30, 0.2);
 }
 
 /* Email solo lectura */

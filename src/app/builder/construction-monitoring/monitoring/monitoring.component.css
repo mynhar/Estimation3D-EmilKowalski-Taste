@@ -547,7 +547,7 @@
 }
 .mon-btn--primary:hover:not(:disabled)  { background: var(--ds-gold-hover); border-color: var(--ds-gold-hover); transform: translateY(-1px); box-shadow: var(--ds-shadow-gold); }
 .mon-btn--primary:active:not(:disabled) { background: var(--ds-gold-active); transform: translateY(0); box-shadow: none; }
-.mon-btn--primary .mon-spinner          { border: 2px solid rgba(26,26,26,.2); border-top-color: var(--ds-ink); }
+.mon-btn--primary .mon-spinner          { border: 2px solid rgba(29, 43, 48,.2); border-top-color: var(--ds-ink); }
 
 .mon-btn--outline {
   background: transparent;
@@ -582,7 +582,7 @@
   width: 16px;
   height: 16px;
   border-radius: var(--ds-radius-circle);
-  border: 2px solid rgba(26,26,26,.15);
+  border: 2px solid rgba(29, 43, 48,.15);
   border-top-color: var(--ds-ink);
   animation: mon-spin 0.6s linear infinite;
   flex-shrink: 0;
@@ -875,7 +875,7 @@
   height: 20px;
   border-radius: var(--ds-radius-sm);
   border: none;
-  background: rgba(26,26,26,.6);
+  background: rgba(29, 43, 48,.6);
   color: var(--ds-ink-inverse);
   display: flex;
   align-items: center;
@@ -886,7 +886,7 @@
   transition: opacity var(--ds-duration-fast) var(--ds-ease-out);
 }
 .mon-thumb:hover .mon-thumb__del { opacity: 1; }
-.mon-thumb__del:hover            { background: rgba(161,69,69,.85); }
+.mon-thumb__del:hover            { background: rgba(179, 38, 30,.85); }
 
 /* ── 25. Media viewer ────────────────────────────────────────── */
 

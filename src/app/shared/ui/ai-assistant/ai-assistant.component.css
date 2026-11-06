@@ -277,7 +277,7 @@
   background: var(--ds-gold-soft);
   border-radius: var(--ds-radius-circle);
 }
-.ai-msg__avatar--error { color: var(--ds-danger, #B3261E); background: var(--ds-bg-alt); }
+.ai-msg__avatar--error { color: var(--ds-danger); background: var(--ds-bg-alt); }
 .ai-msg__bubble {
   padding: var(--ds-space-3) var(--ds-space-4);
   border-radius: var(--ds-radius-lg);

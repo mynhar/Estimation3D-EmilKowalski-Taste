@@ -469,7 +469,7 @@ export class EstimatedFileComponent implements OnInit {
   <title>${t('file.exp_abbr')} ${d.numero} — Estimation3D</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,500;0,700;1,400&family=Sofia+Sans+Semi+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     @page { size: A4; margin: 2cm; }
@@ -477,17 +477,17 @@ export class EstimatedFileComponent implements OnInit {
        var(--ds-*) de la app. El hex aquí es intencional; los valores se
        mantienen alineados a la paleta canónica de src/styles/tokens.css. */
     :root {
-      --gold:        #D4B96E;  /* --ds-gold */
-      --gold-faint:  #F7EFD9;  /* --ds-gold-faint */
-      --gold-soft:   #EBD9A8;  /* --ds-gold-soft */
-      --ink:         #1A1A1A;  /* --ds-ink */
-      --ink-2:       #4A4A4A;  /* --ds-ink-secondary */
-      --ink-3:       #7A7770;  /* --ds-ink-muted */
-      --surface:     #FBFAF6;  /* --ds-surface */
-      --border:      #E8E5DC;  /* --ds-border */
-      --bg:          #F5F3EE;  /* --ds-bg */
-      --ff-display:  'Fraunces', Georgia, serif;
-      --ff-body:     'DM Sans', system-ui, sans-serif;
+      --gold:        #1E6A55;  /* --ds-action */
+      --gold-faint:  #E3F6F0;  /* --ds-scan-soft */
+      --gold-soft:   #CFE8DF;  /* --ds-action-soft */
+      --ink:         #1D2B30;  /* --ds-ink */
+      --ink-2:       #34444A;  /* --ds-ink-secondary */
+      --ink-3:       #56646A;  /* --ds-ink-muted */
+      --surface:     #FFFFFF;  /* --ds-surface */
+      --border:      #D3D7D2;  /* --ds-border */
+      --bg:          #FAFAF7;  /* --ds-bg */
+      --ff-display:  'Sofia Sans Semi Condensed', 'Arial Narrow', sans-serif;
+      --ff-body:     'Atkinson Hyperlegible Next', system-ui, sans-serif;
     }
     body {
       font-family: var(--ff-body);

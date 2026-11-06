@@ -1,6 +1,6 @@
 /* component: expediente-panel (acordeón por expediente)
  * Misma cabecera que /client/my-documents/list (.md-exp): carpeta dorada, número
- * en Fraunces, cifras a la derecha y chevron. Prefijo propio `xp-`.
+ * en la fuente display, cifras a la derecha y chevron. Prefijo propio `xp-`.
  * states: default · hover · focus-visible · active · abierto/cerrado
  * contrast: texto en --ds-ink / --ds-ink-secondary (AA) · tokens: --ds-* only
  */

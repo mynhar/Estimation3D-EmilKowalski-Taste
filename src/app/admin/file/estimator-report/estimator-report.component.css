@@ -60,7 +60,7 @@
 }
 .btn-save:hover:not(:disabled) { background: var(--ds-gold-hover); transform: translateY(-1px); box-shadow: var(--ds-shadow-gold); }
 .btn-save:active:not(:disabled) { background: var(--ds-gold-active); transform: translateY(0); box-shadow: none; }
-.btn-save:focus-visible { outline: var(--ds-focus-ring); outline-offset: 2px; }
+.btn-save:focus-visible { outline: var(--ds-focus-outline); outline-offset: 2px; }
 .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .save-msg { display: inline-flex; align-items: center; font-size: var(--ds-text-xs); font-weight: var(--ds-weight-medium); color: var(--ds-ink-muted); }
@@ -155,7 +155,7 @@
 .thumb-delete {
   position: absolute; top: 4px; right: 4px; width: 24px; height: 24px;
   display: flex; align-items: center; justify-content: center;
-  background: rgba(251,250,246,.92); border: 1px solid var(--ds-border-strong);
+  background: rgba(255, 255, 255,.92); border: 1px solid var(--ds-border-strong);
   border-radius: var(--ds-radius-circle); color: var(--ds-ink-secondary); cursor: pointer; padding: 0;
   opacity: 0; transition: opacity var(--ds-duration-fast) var(--ds-ease-out), color var(--ds-duration-fast) var(--ds-ease-out);
 }
@@ -205,10 +205,10 @@
 
 /* Lightbox */
 .lightbox-overlay {
-  position: fixed; inset: 0; z-index: var(--ds-z-modal); background: rgba(26,26,26,.88);
+  position: fixed; inset: 0; z-index: var(--ds-z-modal); background: rgba(29, 43, 48,.88);
   display: flex; align-items: center; justify-content: center;
 }
-.lightbox-img { max-width: 92vw; max-height: 90vh; border-radius: var(--ds-radius-md); box-shadow: 0 8px 32px rgba(26,26,26,.5); }
+.lightbox-img { max-width: 92vw; max-height: 90vh; border-radius: var(--ds-radius-md); box-shadow: 0 8px 32px rgba(29, 43, 48,.5); }
 .lightbox-close {
   position: absolute; top: var(--ds-space-4); right: var(--ds-space-4);
   width: 36px; height: 36px; border-radius: var(--ds-radius-circle);
@@ -238,7 +238,7 @@
               background var(--ds-duration-fast) var(--ds-ease-out);
 }
 .invite-row:hover { border-color: var(--ds-gold-soft); background: var(--ds-gold-faint); }
-.invite-row:focus-within { outline: var(--ds-focus-ring); outline-offset: 2px; }
+.invite-row:focus-within { outline: var(--ds-focus-outline); outline-offset: 2px; }
 .invite-row--selected { border-color: var(--ds-gold); background: var(--ds-gold-faint); }
 .invite-row--disabled { opacity: 0.55; cursor: not-allowed; }
 .invite-row--disabled:hover { border-color: var(--ds-border); background: var(--ds-surface); }
@@ -302,7 +302,7 @@
               transform var(--ds-duration-fast) var(--ds-ease-out),
               box-shadow var(--ds-duration-fast) var(--ds-ease-out);
 }
-.btn-invite:focus-visible { outline: var(--ds-focus-ring); outline-offset: 2px; }
+.btn-invite:focus-visible { outline: var(--ds-focus-outline); outline-offset: 2px; }
 .btn-invite:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .btn-invite--ghost {

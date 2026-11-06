@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Tema de Angular Material 22 (M3)
+   Tema de Angular Material 22 (M3) — Clarté
    --------------------------------------------------------------------------
    ÚNICO archivo SCSS del proyecto. Existe porque Material solo genera su
    tema con Sass. No pongas aquí estilos de componentes ni crees otros .scss:
@@ -11,19 +11,18 @@
      valores fijos.
    - `$roles-color` enlaza cada rol de color `--mat-sys-*` a un token --ds-*
      de tokens.css, y la tipografía usa var(--ds-font-*) / var(--ds-weight-*).
-     Si cambian los tokens (rediseño), Material cambia solo, sin tocar este
-     archivo.
-   - `$yellow-palette` solo se usa para generar el tema. Los colores que se
+     Si cambian los tokens, Material cambia solo, sin tocar este archivo.
+   - `$green-palette` solo se usa para generar el tema. Los colores que se
      ven son los de $roles-color.
-   - Radios y elevaciones siguen siendo los de Material por defecto; se
-     ajustarán cuando el rediseño fije la nueva dirección.
+   - Formas: 6 px controles (botones, campos, menús), 12 px tarjetas,
+     20 px hojas y diálogos. Elevaciones: las de Material por defecto.
    ========================================================================== */
 @use '@angular/material' as mat;
 
 $tema: mat.define-theme((
   color: (
     theme-type: light,
-    primary: mat.$yellow-palette,
+    primary: mat.$green-palette,
     use-system-variables: true,
     system-variables-prefix: mat-sys,
   ),
@@ -42,33 +41,36 @@ $tema: mat.define-theme((
 ));
 
 /* Roles de color M3 → tokens del sistema.
-   Ojo con el contraste: en M3 `primary` también es color de TEXTO (botón de
-   texto, etiqueta en foco, checkbox). El dorado da 1.7:1 sobre el fondo y no
-   pasa AA, así que `primary` es --ds-gold-ink (≥ 6:1 sobre toda superficie
-   clara) y el dorado va a `primary-container` con tinta encima (9:1).
-   `outline` es el borde de los campos: --ds-ink-faint (≥ 3.8:1, AA no-texto). */
+   - `primary` es el único color de acción (sapin). En M3 también es color de
+     TEXTO (botón de texto, etiqueta en foco, checkbox): 6.5:1 sobre blanco.
+   - `primary-container` es menthe, la firma del escaneo, siempre con tinta
+     encima (9.9:1). `inverse-primary` también es menthe: es el acento sobre
+     superficies oscuras (acción del snack-bar).
+   - `secondary-container` (botón tonal, chip seleccionado) es action-soft con
+     action-ink encima (7.0:1).
+   - `outline` es el borde de los campos: --ds-ink-faint (3.6:1, AA no-texto). */
 $roles-color: (
-  primary: var(--ds-gold-ink),
-  on-primary: var(--ds-ink-inverse),
-  primary-container: var(--ds-gold),
-  on-primary-container: var(--ds-ink-on-accent),
-  inverse-primary: var(--ds-gold),
-  primary-fixed: var(--ds-gold-soft),
-  primary-fixed-dim: var(--ds-gold),
+  primary: var(--ds-action),
+  on-primary: var(--ds-on-action),
+  primary-container: var(--ds-scan),
+  on-primary-container: var(--ds-ink),
+  inverse-primary: var(--ds-scan),
+  primary-fixed: var(--ds-scan-soft),
+  primary-fixed-dim: var(--ds-scan),
   on-primary-fixed: var(--ds-ink),
-  on-primary-fixed-variant: var(--ds-gold-ink),
-  surface-tint: var(--ds-gold),
+  on-primary-fixed-variant: var(--ds-action-ink),
+  surface-tint: var(--ds-action),
 
   secondary: var(--ds-ink-secondary),
   on-secondary: var(--ds-ink-inverse),
-  secondary-container: var(--ds-gold-soft),
-  on-secondary-container: var(--ds-gold-ink),
-  secondary-fixed: var(--ds-gold-faint),
-  secondary-fixed-dim: var(--ds-gold-soft),
+  secondary-container: var(--ds-action-soft),
+  on-secondary-container: var(--ds-action-ink),
+  secondary-fixed: var(--ds-scan-soft),
+  secondary-fixed-dim: var(--ds-action-soft),
   on-secondary-fixed: var(--ds-ink),
-  on-secondary-fixed-variant: var(--ds-gold-ink),
+  on-secondary-fixed-variant: var(--ds-action-ink),
 
-  tertiary: var(--ds-info-ink),
+  tertiary: var(--ds-info),
   on-tertiary: var(--ds-ink-inverse),
   tertiary-container: var(--ds-info-soft),
   on-tertiary-container: var(--ds-info-ink),
@@ -88,7 +90,7 @@ $roles-color: (
   on-surface: var(--ds-ink),
   surface-variant: var(--ds-bg-alt),
   on-surface-variant: var(--ds-ink-muted),
-  surface-dim: var(--ds-bg-alt),
+  surface-dim: var(--ds-stone),
   surface-bright: var(--ds-surface-elevated),
   surface-container-lowest: var(--ds-surface-elevated),
   surface-container-low: var(--ds-surface),
@@ -118,13 +120,30 @@ html {
 
 /* :root gana a html por especificidad, sin depender del orden. */
 :root {
-  /* CTA principal (design.md · CTA voice): relleno dorado + texto tinta.
-     Las declaraciones van antes de los @include: Sass desaconseja
-     declaraciones detrás de reglas anidadas (mixed-decls). */
-  --mat-button-filled-container-color: var(--ds-gold);
-  --mat-button-filled-label-text-color: var(--ds-ink-on-accent);
-  --mat-button-filled-state-layer-color: var(--ds-ink-on-accent);
-  --mat-button-filled-ripple-color: color-mix(in srgb, var(--ds-ink-on-accent) 12%, transparent);
+  /* Formas Clarté. Las declaraciones van antes de los @include: Sass
+     desaconseja declaraciones detrás de reglas anidadas (mixed-decls). */
+  /* Controles: 6 px */
+  --mat-button-filled-container-shape: var(--ds-radius-md);
+  --mat-button-outlined-container-shape: var(--ds-radius-md);
+  --mat-button-text-container-shape: var(--ds-radius-md);
+  --mat-button-tonal-container-shape: var(--ds-radius-md);
+  --mat-button-protected-container-shape: var(--ds-radius-md);
+  --mat-button-toggle-shape: var(--ds-radius-md);
+  --mat-form-field-outlined-container-shape: var(--ds-radius-md);
+  --mat-form-field-filled-container-shape: var(--ds-radius-md);
+  --mat-menu-container-shape: var(--ds-radius-md);
+  --mat-autocomplete-container-shape: var(--ds-radius-md);
+  --mat-snack-bar-container-shape: var(--ds-radius-md);
+  /* Tarjetas: 12 px */
+  --mat-card-elevated-container-shape: var(--ds-radius-lg);
+  --mat-card-outlined-container-shape: var(--ds-radius-lg);
+  --mat-card-filled-container-shape: var(--ds-radius-lg);
+  --mat-expansion-container-shape: var(--ds-radius-lg);
+  --mat-datepicker-calendar-container-shape: var(--ds-radius-lg);
+  /* Hojas y diálogos: 20 px */
+  --mat-dialog-container-shape: var(--ds-radius-xl);
+  --mat-bottom-sheet-container-shape: var(--ds-radius-xl);
+  --mat-datepicker-calendar-container-touch-shape: var(--ds-radius-xl);
 
   @include mat.system-level-colors($tema, $roles-color);
   @include mat.system-level-typography($tema);

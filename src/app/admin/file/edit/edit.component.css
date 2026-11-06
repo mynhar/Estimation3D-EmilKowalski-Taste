@@ -188,7 +188,7 @@
               background var(--ds-duration-fast) var(--ds-ease-out);
 }
 .edit-tab:hover { color: var(--ds-ink-secondary); }
-.edit-tab:focus-visible { outline: var(--ds-focus-ring); outline-offset: -2px; }
+.edit-tab:focus-visible { outline: var(--ds-focus-outline); outline-offset: -2px; }
 .edit-tab--active {
   color: var(--ds-ink);
   background: var(--ds-gold-faint);
@@ -315,7 +315,7 @@
   background: var(--ds-info); border-color: var(--ds-info);
   color: var(--ds-ink-inverse); box-shadow: var(--ds-shadow-sm);
 }
-.addr-source__btn:focus-visible { outline: var(--ds-focus-ring); outline-offset: 2px; }
+.addr-source__btn:focus-visible { outline: var(--ds-focus-outline); outline-offset: 2px; }
 .addr-source__btn:active:not(:disabled) { transform: translateY(1px); }
 .addr-source__btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -389,7 +389,7 @@
 }
 .btn-save:hover:not(:disabled) { background: var(--ds-gold-hover); transform: translateY(-1px); box-shadow: var(--ds-shadow-gold); }
 .btn-save:active:not(:disabled) { background: var(--ds-gold-active); transform: translateY(0); box-shadow: none; }
-.btn-save:focus-visible { outline: var(--ds-focus-ring); outline-offset: 2px; }
+.btn-save:focus-visible { outline: var(--ds-focus-outline); outline-offset: 2px; }
 .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .save-msg { display: inline-flex; align-items: center; font-size: var(--ds-text-xs); font-weight: var(--ds-weight-medium); color: var(--ds-ink-muted); }
@@ -412,7 +412,7 @@
               color var(--ds-duration-fast) var(--ds-ease-out);
 }
 .btn-outline-action:hover:not(:disabled) { border-color: var(--ds-ink-muted); background: var(--ds-bg-alt); color: var(--ds-ink); }
-.btn-outline-action:focus-visible { outline: var(--ds-focus-ring); outline-offset: 2px; }
+.btn-outline-action:focus-visible { outline: var(--ds-focus-outline); outline-offset: 2px; }
 
 /* ════════════════════════════════════════════════════════════════════════════
    GESTIÓN DE ARCHIVOS (tours / fotos / documentos)

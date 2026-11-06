@@ -33,7 +33,7 @@
   display: flex;
   align-items: center;
   gap: var(--ds-space-4);
-  background: rgba(251, 250, 246, 0.92);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--ds-border);

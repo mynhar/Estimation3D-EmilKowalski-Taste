@@ -1,69 +1,71 @@
 /* ══════════════════════════════════════════════════════════════════════════
-   DESIGN SYSTEM — Estimation3D
-   Paleta: beige cálido · crema · acento dorado
-   Tipografía: DM Sans (cuerpo) + Fraunces (títulos)
+   DESIGN SYSTEM — Estimation3D · Clarté
+   Las variables de abajo son ALIAS LEGADOS de pantallas anteriores al
+   rediseño: cada una apunta a un token --ds-* de src/styles/tokens.css.
+   No las uses en código nuevo; desaparecen cuando ninguna pantalla las lea.
 ══════════════════════════════════════════════════════════════════════════ */
 
-/* ── Tokens de diseño ────────────────────────────────────────────────────── */
+/* ── Alias legados → tokens --ds-* ───────────────────────────────────────── */
 :root {
   /* Fondos */
-  --warm-bg:         #F5F3EE;
-  --warm-surface:    #FBFAF6;
-  --warm-surface-2:  #F2EFE6;
-  --warm-border:     #EAE7DF;
-  --warm-border-2:   #D9D5CB;
+  --warm-bg:         var(--ds-bg);
+  --warm-surface:    var(--ds-surface);
+  --warm-surface-2:  var(--ds-bg-alt);
+  --warm-border:     var(--ds-border-subtle);
+  --warm-border-2:   var(--ds-border);
 
   /* Tinta */
-  --ink-900:         #1A1A1A;
-  --ink-700:         #3D3830;
-  --ink-500:         #5C5750;
-  --ink-400:         var(--ds-ink-muted);      /* antes #7A7470 (3.9:1 sobre bg-alt) */
-  --ink-300:         #9A938C;
+  --ink-900:         var(--ds-ink);
+  --ink-700:         var(--ds-ink-secondary);
+  --ink-500:         var(--ds-ink-muted);
+  --ink-400:         var(--ds-ink-muted);
+  --ink-300:         var(--ds-ink-muted);      /* se usa como texto: antes #9A938C (2.9:1) */
 
-  /* Acento dorado */
-  --gold:            #D4B96E;
-  --gold-dark:       #C4A55A;
-  --gold-darker:     #B89348;
-  --gold-bg:         #FAF3E0;
-  --gold-border:     #EFE0B3;
+  /* Antiguo acento dorado → acción (sapin) */
+  --gold:            var(--ds-action);
+  --gold-dark:       var(--ds-action-hover);
+  --gold-darker:     var(--ds-action-pressed);
+  --gold-bg:         var(--ds-scan-soft);
+  --gold-border:     var(--ds-action-soft);
 
-  /* Semánticos (variantes cálidas) */
-  --success:         #5C8A6B;
-  --success-bg:      #EBF5EE;
-  --success-border:  #A8D4B5;
-  --success-dark:    #3D6B52;
+  /* Semánticos */
+  --success:         var(--ds-success);
+  --success-bg:      var(--ds-success-soft);
+  --success-border:  color-mix(in srgb, var(--ds-success) 35%, var(--ds-surface));
+  --success-dark:    var(--ds-success-ink);
 
-  --warning:         #C27B2E;
-  --warning-bg:      #FDF3E3;
-  --warning-border:  #F0C98A;
+  --warning:         var(--ds-warning);
+  --warning-bg:      var(--ds-warning-soft);
+  --warning-border:  color-mix(in srgb, var(--ds-warning) 35%, var(--ds-surface));
 
-  --danger:          #A84A46;
-  --danger-bg:       #FBF0EF;
-  --danger-border:   #E8B0AE;
+  --danger:          var(--ds-danger);
+  --danger-bg:       var(--ds-danger-soft);
+  --danger-border:   color-mix(in srgb, var(--ds-danger) 35%, var(--ds-surface));
 
-  --info:            #4A7BBF;
-  --info-bg:         #EEF4FB;
-  --info-border:     #A8C5E8;
+  --info:            var(--ds-info);
+  --info-bg:         var(--ds-info-soft);
+  --info-border:     color-mix(in srgb, var(--ds-info) 35%, var(--ds-surface));
 
-  --purple:          #7C5CBF;
-  --purple-bg:       #F3EFFA;
-  --purple-border:   #C4B0E0;
+  /* Antiguo morado: Clarté no tiene morado; pasa a info */
+  --purple:          var(--ds-info);
+  --purple-bg:       var(--ds-info-soft);
+  --purple-border:   color-mix(in srgb, var(--ds-info) 35%, var(--ds-surface));
 
-  --neutral:         var(--ds-ink-secondary);  /* texto de insignia neutra; antes #7A7470 */
-  --neutral-bg:      #EEEDE9;
-  --neutral-border:  #D9D5CB;
+  --neutral:         var(--ds-ink-secondary);
+  --neutral-bg:      var(--ds-bg-alt);
+  --neutral-border:  var(--ds-border);
 
   /* Tipografía */
-  --font-body:    'DM Sans', system-ui, -apple-system, sans-serif;
-  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-body:    var(--ds-font-body);
+  --font-display: var(--ds-font-display);
 
   /* Sombras */
-  --shadow-sm:    0 1px 3px rgba(26,20,12,.08), 0 0 0 1px rgba(26,20,12,.04);
-  --shadow-md:    0 4px 12px rgba(26,20,12,.1),  0 0 0 1px rgba(26,20,12,.04);
-  --shadow-lg:    0 8px 24px rgba(26,20,12,.12);
-  --shadow-hover: 0 8px 24px rgba(26,20,12,.15);
+  --shadow-sm:    var(--ds-shadow-sm);
+  --shadow-md:    var(--ds-shadow-md);
+  --shadow-lg:    var(--ds-shadow-lg);
+  --shadow-hover: var(--ds-shadow-lg);
 
-  --page-max-width: 1280px;
+  --page-max-width: var(--ds-container-xl);
 }
 
 /* ── Base global ─────────────────────────────────────────────────────────── */
@@ -99,16 +101,16 @@ a:hover { color: var(--ds-ink); }
 .btn-sm { border-radius: 0.25rem; }
 
 .btn-primary {
-  --bs-btn-color: #1A1A1A;
+  --bs-btn-color: var(--ds-on-action);
   --bs-btn-bg: var(--gold);
   --bs-btn-border-color: var(--gold);
-  --bs-btn-hover-color: #1A1A1A;
+  --bs-btn-hover-color: var(--ds-on-action);
   --bs-btn-hover-bg: var(--gold-dark);
   --bs-btn-hover-border-color: var(--gold-dark);
-  --bs-btn-active-color: #1A1A1A;
+  --bs-btn-active-color: var(--ds-on-action);
   --bs-btn-active-bg: var(--gold-darker);
   --bs-btn-active-border-color: var(--gold-darker);
-  --bs-btn-focus-shadow-rgb: 212,185,110;
+  --bs-btn-focus-shadow-rgb: 30,106,85;
   --bs-btn-disabled-bg: var(--gold);
   --bs-btn-disabled-border-color: var(--gold);
   font-weight: 600;
@@ -116,13 +118,13 @@ a:hover { color: var(--ds-ink); }
 .btn-outline-primary {
   --bs-btn-color: var(--gold-dark);
   --bs-btn-border-color: var(--gold);
-  --bs-btn-hover-color: var(--ink-900);
+  --bs-btn-hover-color: var(--ds-on-action);
   --bs-btn-hover-bg: var(--gold);
   --bs-btn-hover-border-color: var(--gold);
-  --bs-btn-active-color: var(--ink-900);
+  --bs-btn-active-color: var(--ds-on-action);
   --bs-btn-active-bg: var(--gold-dark);
   --bs-btn-active-border-color: var(--gold-dark);
-  --bs-btn-focus-shadow-rgb: 212,185,110;
+  --bs-btn-focus-shadow-rgb: 30,106,85;
   font-weight: 500;
 }
 .btn-secondary {
@@ -145,7 +147,7 @@ a:hover { color: var(--ds-ink); }
 .btn-success {
   --bs-btn-bg: var(--ds-success);
   --bs-btn-border-color: var(--ds-success);
-  --bs-btn-color: #fff;
+  --bs-btn-color: var(--ds-ink-inverse);
   --bs-btn-hover-bg: var(--ds-success-ink);
   --bs-btn-hover-border-color: var(--ds-success-ink);
   --bs-btn-active-bg: var(--ds-success-ink);
@@ -157,30 +159,30 @@ a:hover { color: var(--ds-ink); }
   --bs-btn-border-color: var(--ds-success);
   --bs-btn-hover-bg: var(--ds-success);
   --bs-btn-hover-border-color: var(--ds-success);
-  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-color: var(--ds-ink-inverse);
   --bs-btn-active-bg: var(--ds-success-ink);
   --bs-btn-active-border-color: var(--ds-success-ink);
-  --bs-btn-active-color: #fff;
+  --bs-btn-active-color: var(--ds-ink-inverse);
 }
 .btn-danger {
   --bs-btn-bg: var(--danger);
   --bs-btn-border-color: var(--danger);
-  --bs-btn-color: #fff;
+  --bs-btn-color: var(--ds-ink-inverse);
   font-weight: 600;
 }
-/* Mostaza con tinta, como el dorado primario: el blanco sobre mostaza se queda en 3.4:1. */
+/* Ámbar Clarté con blanco encima (6.4:1). */
 .btn-warning {
-  --bs-btn-color: var(--ds-ink);
+  --bs-btn-color: var(--ds-ink-inverse);
   --bs-btn-bg: var(--ds-warning);
   --bs-btn-border-color: var(--ds-warning);
-  --bs-btn-hover-color: var(--ds-ink);
-  --bs-btn-hover-bg: var(--ds-warning);
-  --bs-btn-hover-border-color: var(--ds-warning-ink);
-  --bs-btn-active-color: #fff;
-  --bs-btn-active-bg: var(--ds-warning-ink);
-  --bs-btn-active-border-color: var(--ds-warning-ink);
-  --bs-btn-disabled-color: var(--ds-ink);
-  --bs-btn-focus-shadow-rgb: 184,134,46;
+  --bs-btn-hover-color: var(--ds-ink-inverse);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--ds-warning) 85%, var(--ds-ink));
+  --bs-btn-hover-border-color: color-mix(in srgb, var(--ds-warning) 85%, var(--ds-ink));
+  --bs-btn-active-color: var(--ds-ink-inverse);
+  --bs-btn-active-bg: color-mix(in srgb, var(--ds-warning) 75%, var(--ds-ink));
+  --bs-btn-active-border-color: color-mix(in srgb, var(--ds-warning) 75%, var(--ds-ink));
+  --bs-btn-disabled-color: var(--ds-ink-inverse);
+  --bs-btn-focus-shadow-rgb: 138,82,0;
   font-weight: 600;
 }
 .btn-outline-warning {
@@ -199,20 +201,20 @@ a:hover { color: var(--ds-ink); }
   --bs-btn-border-color: var(--ds-danger);
   --bs-btn-hover-bg: var(--ds-danger);
   --bs-btn-hover-border-color: var(--ds-danger);
-  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-color: var(--ds-ink-inverse);
   --bs-btn-active-bg: var(--ds-danger-ink);
   --bs-btn-active-border-color: var(--ds-danger-ink);
-  --bs-btn-active-color: #fff;
+  --bs-btn-active-color: var(--ds-ink-inverse);
   --bs-btn-disabled-color: var(--ds-danger);
   --bs-btn-disabled-border-color: var(--ds-danger);
-  --bs-btn-focus-shadow-rgb: 161,69,69;
+  --bs-btn-focus-shadow-rgb: 179,38,30;
 }
 
 /* ── Bootstrap: color utilities ──────────────────────────────────────────── */
 .text-primary   { color: var(--ds-gold-ink) !important; }
 .bg-primary     { background-color: var(--gold) !important; }
 .border-primary { border-color: var(--gold) !important; }
-.text-bg-primary { background-color: var(--gold) !important; color: var(--ink-900) !important; }
+.text-bg-primary { background-color: var(--gold) !important; color: var(--ds-on-action) !important; }
 .text-muted     { color: var(--ink-400) !important; }
 .text-secondary { color: var(--ink-500) !important; }
 .text-dark      { color: var(--ink-900) !important; }
@@ -249,7 +251,7 @@ hr { border-color: var(--warm-border); opacity: 1; }
   background-color: var(--warm-surface);
   border-color: var(--gold);
   color: var(--ink-900);
-  box-shadow: 0 0 0 0.2rem rgba(212,185,110,.22);
+  box-shadow: var(--ds-focus-ring);
 }
 .form-label {
   font-size: 0.82rem;
@@ -267,7 +269,7 @@ hr { border-color: var(--warm-border); opacity: 1; }
   background-color: var(--gold);
   border-color: var(--gold);
 }
-.form-check-input:focus { box-shadow: 0 0 0 0.2rem rgba(212,185,110,.22); }
+.form-check-input:focus { box-shadow: var(--ds-focus-ring); }
 
 /* ── Bootstrap: cards ────────────────────────────────────────────────────── */
 .card {
@@ -291,25 +293,23 @@ hr { border-color: var(--warm-border); opacity: 1; }
 .table {
   --bs-table-bg: transparent;
   --bs-table-border-color: var(--warm-border);
-  --bs-table-striped-bg: rgba(26,20,12,.025);
-  --bs-table-hover-bg: rgba(212,185,110,.06);
+  --bs-table-striped-bg: rgba(29,43,48,.025);
+  --bs-table-hover-bg: color-mix(in srgb, var(--ds-gold) 6%, transparent);
   color: var(--ink-900);
 }
 .table thead th {
   background-color: var(--warm-surface-2);
   border-bottom-color: var(--warm-border-2);
   color: var(--ink-400);
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-size: 0.875rem;
   font-weight: 600;
 }
 .table-dark {
   --bs-table-bg: var(--warm-surface-2);
   --bs-table-border-color: var(--warm-border);
   --bs-table-color: var(--ink-700);
-  --bs-table-striped-bg: rgba(26,20,12,.03);
-  --bs-table-hover-bg: rgba(212,185,110,.06);
+  --bs-table-striped-bg: rgba(29,43,48,.03);
+  --bs-table-hover-bg: color-mix(in srgb, var(--ds-gold) 6%, transparent);
 }
 .table-dark thead th {
   background-color: var(--warm-surface-2) !important;
@@ -326,15 +326,15 @@ hr { border-color: var(--warm-border); opacity: 1; }
 .badge.bg-secondary { background-color: var(--neutral-bg) !important; color: var(--neutral) !important; }
 .badge.bg-success   { background-color: var(--success-bg) !important; color: var(--success-dark) !important; }
 .badge.bg-danger    { background-color: var(--danger-bg)  !important; color: var(--danger) !important; }
-.badge.bg-warning   { background-color: var(--gold-bg) !important;    color: var(--ds-warning-ink) !important; }
+.badge.bg-warning   { background-color: var(--warning-bg) !important;    color: var(--ds-warning-ink) !important; }
 .badge.bg-info      { background-color: var(--info-bg) !important;    color: var(--ds-info-ink) !important; }
-.badge.bg-dark      { background-color: var(--ink-700) !important;    color: #EDE4D6 !important; }
+.badge.bg-dark      { background-color: var(--ink-700) !important;    color: var(--ds-ink-inverse) !important; }
 /* text-bg-* variants */
 .text-bg-success  { background-color: var(--success-bg) !important; color: var(--success-dark) !important; }
 .text-bg-danger   { background-color: var(--danger-bg)  !important; color: var(--danger)       !important; }
-.text-bg-warning  { background-color: var(--gold-bg)    !important; color: var(--ds-warning-ink) !important; }
+.text-bg-warning  { background-color: var(--warning-bg) !important; color: var(--ds-warning-ink) !important; }
 .text-bg-secondary{ background-color: var(--neutral-bg) !important; color: var(--neutral)      !important; }
-.text-bg-dark     { background-color: var(--ink-700)    !important; color: #EDE4D6             !important; }
+.text-bg-dark     { background-color: var(--ink-700)    !important; color: var(--ds-ink-inverse) !important; }
 .text-bg-info     { background-color: var(--info-bg)    !important; color: var(--ds-info-ink)    !important; }
 
 /* ── Bootstrap: spinner ──────────────────────────────────────────────────── */
@@ -381,7 +381,7 @@ hr { border-color: var(--warm-border); opacity: 1; }
 
 /* Franja de encabezado compartida entre páginas */
 .page-header {
-  background: linear-gradient(135deg, var(--warm-surface) 0%, var(--warm-surface-2) 60%, #EDE7DA 100%);
+  background: var(--ds-surface);
   border: 1px solid var(--warm-border);
   border-radius: 0.875rem;
 }
@@ -416,8 +416,7 @@ hr { border-color: var(--warm-border); opacity: 1; }
 .table-card { border: 0; box-shadow: var(--shadow-sm); }
 .table-card .table { margin-bottom: 0; }
 .table-card thead th {
-  font-size: .8rem; text-transform: uppercase;
-  letter-spacing: .04em; color: var(--ink-400); font-weight: 600;
+  font-size: .875rem; color: var(--ink-400); font-weight: 600;
 }
 
 /* ── Sidebar sticky de contenido ─────────────────────────────────────────── */
@@ -425,14 +424,13 @@ hr { border-color: var(--warm-border); opacity: 1; }
 
 /* ── Campos de información ───────────────────────────────────────────────── */
 .info-label {
-  font-size: 0.72rem; color: var(--ink-300);
-  margin-bottom: 0.2rem; letter-spacing: 0.04em;
-  text-transform: uppercase; font-weight: 600;
+  font-size: 0.8125rem; color: var(--ink-300);
+  margin-bottom: 0.2rem; font-weight: 600;
 }
 .info-value { font-size: 0.9rem; font-weight: 600; color: var(--ink-900); margin-bottom: 0; }
 .section-label {
-  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.09em;
-  text-transform: uppercase; color: var(--ink-300); margin-bottom: 0.75rem;
+  font-size: 0.875rem; font-weight: 700;
+  color: var(--ink-300); margin-bottom: 0.75rem;
 }
 
 /* ── Upload vacío ────────────────────────────────────────────────────────── */
@@ -441,7 +439,7 @@ hr { border-color: var(--warm-border); opacity: 1; }
 /* ── Marcas de formulario ────────────────────────────────────────────────── */
 .req-mark { color: var(--danger); margin-left: 2px; }
 .opt-mark { font-size: 0.72rem; color: var(--ink-300); font-weight: 400; }
-.text-label { font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-400); font-weight: 600; }
+.text-label { font-size: .8125rem; color: var(--ink-400); font-weight: 600; }
 
 /* ── Botón volver ────────────────────────────────────────────────────────── */
 .btn-back { display: inline-flex; align-items: center; gap: .35rem; }
@@ -449,7 +447,7 @@ hr { border-color: var(--warm-border); opacity: 1; }
 /* ── Lightbox ────────────────────────────────────────────────────────────── */
 .lightbox-overlay {
   position: fixed; inset: 0;
-  background: rgba(26,20,12,.9); z-index: 1055;
+  background: color-mix(in srgb, var(--ds-dark-surface-deep) 92%, transparent); z-index: 1055;
   display: flex; align-items: center; justify-content: center;
   cursor: zoom-out;
 }
@@ -470,7 +468,7 @@ hr { border-color: var(--warm-border); opacity: 1; }
 .photo-thumb__delete {
   position: absolute; top: 5px; right: 5px;
   width: 24px; height: 24px; border-radius: 50%;
-  background: rgba(26,20,12,.5); color: #fff;
+  background: color-mix(in srgb, var(--ds-dark-surface-deep) 60%, transparent); color: var(--ds-ink-inverse);
   border: none; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   font-size: 0.55rem; opacity: 0; transition: opacity 0.15s;
@@ -509,21 +507,21 @@ hr { border-color: var(--warm-border); opacity: 1; }
 .video-player:last-child { border-bottom: none; }
 .video-player__el {
   width: 100%; max-height: 360px;
-  border-radius: 0.625rem; background: #1A1510; display: block;
+  border-radius: 0.625rem; background: var(--ds-dark-surface-deep); display: block;
 }
 
 /* ── Badges de estado de expediente ──────────────────────────────────────── */
 .badge-estado-nuevo        { background: var(--info-bg);    color: var(--info);         }
 .badge-estado-estimacion   { background: var(--purple-bg);  color: var(--purple);       }
 .badge-estado-estimado     { background: var(--success-bg); color: var(--success-dark); }
-.badge-estado-oferta       { background: var(--gold-bg);    color: var(--warning);      }
-.badge-estado-adjudicado   { background: #FDF0E6;           color: #B86830;             }
-.badge-estado-contratado   { background: #DCF0E4;           color: var(--success-dark); font-weight: 700; }
+.badge-estado-oferta       { background: var(--gold-bg);    color: var(--ds-action-ink); }
+.badge-estado-adjudicado   { background: var(--warning-bg); color: var(--ds-warning-ink); }
+.badge-estado-contratado   { background: var(--success-bg); color: var(--success-dark); font-weight: 700; }
 .badge-estado-cancelado    { background: var(--neutral-bg); color: var(--neutral);      }
 
 /* ── Badges de competencia ───────────────────────────────────────────────── */
 .badge-competition-low  { background: var(--success-bg); color: var(--success-dark); }
-.badge-competition-mid  { background: var(--gold-bg);    color: var(--warning);      }
+.badge-competition-mid  { background: var(--warning-bg); color: var(--ds-warning-ink); }
 .badge-competition-high { background: var(--danger-bg);  color: var(--danger);       }
 
 /* ── Fila "ya ofertada" ──────────────────────────────────────────────────── */

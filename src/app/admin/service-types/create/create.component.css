@@ -95,7 +95,7 @@
   vertical-align: middle;
 }
 .lang-badge--fr { background: var(--ds-info-soft);    color: var(--ds-info-ink);        border: 1px solid rgba(74,107,122,.2); }
-.lang-badge--en { background: var(--ds-gold-faint);   color: var(--ds-gold-ink); border: 1px solid rgba(212,185,110,.3); }
+.lang-badge--en { background: var(--ds-gold-faint);   color: var(--ds-gold-ink); border: 1px solid color-mix(in srgb, var(--ds-gold) 30%, transparent); }
 .lang-badge--es { background: var(--ds-success-soft); color: var(--ds-success-ink);     border: 1px solid rgba(91,122,79,.2); }
 
 /* ── Textarea ─────────────────────────────────────────────────────────────── */

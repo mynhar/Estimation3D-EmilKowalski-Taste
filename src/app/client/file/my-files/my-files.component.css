@@ -303,14 +303,14 @@
 
 /* Estado en oferta — pulso dorado de atención */
 @keyframes mf-pulse-oferta {
-  0%, 100% { box-shadow: 0 0 0 2px rgba(212,185,110,.28), var(--ds-shadow-xs); }
-  50%      { box-shadow: 0 0 0 3px rgba(212,185,110,.48), var(--ds-shadow-sm); }
+  0%, 100% { box-shadow: 0 0 0 2px color-mix(in srgb, var(--ds-gold) 28%, transparent), var(--ds-shadow-xs); }
+  50%      { box-shadow: 0 0 0 3px color-mix(in srgb, var(--ds-gold) 48%, transparent), var(--ds-shadow-sm); }
 }
 .mf-card--oferta {
   animation: mf-pulse-oferta 2.8s var(--ds-ease-in-out) infinite;
 }
 .mf-card--oferta:hover {
-  box-shadow: 0 0 0 2px rgba(212,185,110,.55), var(--ds-shadow-md);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ds-gold) 55%, transparent), var(--ds-shadow-md);
   animation: none;
 }
 
@@ -558,7 +558,7 @@
 .mf-pipe-node--current .mf-pipe-dot {
   background: var(--ds-gold-active);
   outline-color: var(--ds-gold-active);
-  box-shadow: 0 0 0 4px rgba(212, 185, 110, 0.25);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ds-gold) 25%, transparent);
 }
 
 .mf-pipe-check { font-size: 0.55rem; color: var(--ds-ink); line-height: 1; }

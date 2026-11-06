@@ -2,7 +2,7 @@
 
 Guía de diseño y código para este proyecto. Aplica también si usas Claude Code, Copilot u otra IA para generar componentes.
 
-> **Sistema de diseño desbloqueado: rediseño completo en curso.** La sección 2 (identidad visual) describe el sistema **actual**, que es el punto de partida del rediseño, no una restricción: paleta, tipografías, radios, iconos, sombras y motion pueden cambiar. Siguen vigentes las convenciones técnicas (secciones 3–6, 9–11), el uso de tokens `var(--ds-...)` y el contraste WCAG AA. Cuando el rediseño fije la nueva dirección, actualiza esta guía, `design.md` y `src/styles/tokens.css`.
+> **Dirección aprobada: Clarté** (6-nov-2026). El rediseño completo avanza por fases: la fase 0 (tokens, fuentes, tema de Material y docs) está hecha; las pantallas se rediseñan una a una en las fases 1–4 (ver `design.md`). Mientras tanto, las pantallas antiguas ya se ven con los colores y fuentes Clarté porque los tokens dorados son alias de los nuevos. Siguen vigentes las convenciones técnicas (secciones 3–6, 9–11), el uso de tokens `var(--ds-...)` y el contraste WCAG AA.
 
 ---
 
@@ -12,133 +12,141 @@ Guía de diseño y código para este proyecto. Aplica también si usas Claude Co
 - **Estilos**: CSS plano (NO SCSS, NO Tailwind). Única excepción: `src/styles/material-theme.scss`, el tema de Material. Bootstrap desinstalado: ver sección 4
 - **Componentes**: Angular Material 22 (M3), con su tema enlazado a los tokens `--ds-*`: ver sección 4
 - **Sistema de diseño**: tokens CSS en `src/styles/tokens.css`
-- **Tipografías**: Fraunces (serif) para títulos, DM Sans para cuerpo
-- **Iconos**: estilo line/stroke (Lucide o Phosphor recomendados), NUNCA filled
+- **Tipografías**: Sofia Sans Semi Condensed para títulos y cifras, Atkinson Hyperlegible Next para cuerpo e interfaz
+- **Iconos**: Material Symbols Outlined vía `mat-icon` a partir de la fase 1; bootstrap-icons line en las pantallas aún no rediseñadas. Nunca filled
 
 ---
 
-## 2. Identidad visual (sistema actual)
+## 2. Identidad visual — Clarté
 
-> Desbloqueada para el rediseño. Las prohibiciones de identidad de esta sección (fondos negros, fuentes Inter/Roboto/Arial, radios > 12px, iconos filled, sombras en negro puro, usos restringidos del dorado y la tinta) describen el sistema actual y pueden cambiar. Las reglas de contraste (texto `-ink` sobre fondos `-soft`, tokens de borde nunca como texto, colores claros nunca como texto sobre fondo claro) siguen vigentes y se adaptan a la nueva paleta.
+Claro y medido: superficies de cal y blanco, tinta pizarra, **un único color de acción** (sapin) y una firma, la **cota arquitectónica** en menthe. El público son propietarios con un problema en casa (moho, agua, amianto, aislamiento, cimientos): la interfaz transmite calma y precisión, no alarma.
 
 ### Paleta completa
 
-La fuente de verdad es `src/styles/tokens.css`. Las tablas siguientes documentan **todos** los tokens de color disponibles. Usa siempre el token, nunca el hex suelto.
+La fuente de verdad es `src/styles/tokens.css`. Usa siempre el token, nunca el hex suelto. Contrastes WCAG 2.x calculados.
 
 **Superficies**
 
 | Token CSS | Hex | Uso |
 |-----------|-----|-----|
-| `--ds-bg` | `#F5F3EE` | Fondo principal de la app (beige cálido) |
-| `--ds-bg-alt` | `#EFEDE6` | Secciones alternas |
-| `--ds-surface` | `#FBFAF6` | Tarjetas, paneles (crema) |
-| `--ds-surface-elevated` | `#FFFFFF` | Modales, overlays (máxima elevación) |
-| `--ds-overlay` | `rgba(26,26,26,0.4)` | Backdrops detrás de modales |
+| `--ds-bg` | `#FAFAF7` | Chaux: fondo de página |
+| `--ds-bg-alt` | `#F0F2EE` | Secciones alternas, hover de filas, rellenos sutiles |
+| `--ds-stone` | `#E4E6E1` | Pierre grise: bandas de sección |
+| `--ds-surface` | `#FFFFFF` | Blanc: tarjetas, paneles, campos |
+| `--ds-surface-elevated` | `#FFFFFF` | Modales, overlays (se distinguen por sombra) |
+| `--ds-overlay` | `rgba(29,43,48,0.45)` | Backdrops detrás de modales |
 
 **Tinta / Texto**
 
 | Token CSS | Hex | Uso |
 |-----------|-----|-----|
-| `--ds-ink` | `#1A1A1A` | Texto principal |
-| `--ds-ink-secondary` | `#4A4A4A` | Texto secundario |
-| `--ds-ink-muted` | `#615E58` | Texto terciario, captions, hints, placeholders (≥ 4.6:1 sobre cualquier fondo claro o `-soft`) |
-| `--ds-ink-faint` | `#7A7770` | **Solo gráficos decorativos**: iconos de estado vacío, separadores «·», flechas (≥ 3.2:1). Nunca texto |
-| `--ds-ink-on-accent` | `#1A1A1A` | Texto sobre fondo dorado |
-| `--ds-ink-inverse` | `#FBFAF6` | Texto sobre fondos oscuros (raro) |
+| `--ds-ink` | `#1D2B30` | Ardoise: texto principal (13.9:1 sobre `--ds-bg`) |
+| `--ds-ink-secondary` | `#34444A` | Texto secundario (9.0:1 sobre `--ds-bg-alt`) |
+| `--ds-ink-muted` | `#56646A` | Texto terciario, captions, placeholders (6.1:1 sobre blanco, 4.9:1 sobre `--ds-stone`) |
+| `--ds-ink-faint` | `#7C8A8D` | **Solo gráficos** y contorno de campos (3.6:1). Nunca texto |
+| `--ds-ink-inverse` | `#FFFFFF` | Texto sobre superficies oscuras (14.6:1 sobre ardoise) |
 
-**Acento dorado (premium)**
-
-| Token CSS | Hex | Uso |
-|-----------|-----|-----|
-| `--ds-gold` | `#D4B96E` | Dorado principal: CTAs, focus, realces |
-| `--ds-gold-hover` | `#C2A85C` | Hover de botones dorados |
-| `--ds-gold-active` | `#B0964A` | Rellenos y bordes activos/pressed. **No para texto ni iconos** (2.5:1): usar `--ds-gold-ink` |
-| `--ds-gold-soft` | `#EBD9A8` | Fondos sutiles, highlights |
-| `--ds-gold-faint` | `#F7EFD9` | Backgrounds muy suaves |
-
-**Bordes y separadores**
+**Acción (sapin)** — el único color de acción: botones principales, enlaces, foco, selección
 
 | Token CSS | Hex | Uso |
 |-----------|-----|-----|
-| `--ds-border` | `#E8E5DC` | Borde estándar |
-| `--ds-border-strong` | `#D4D0C2` | Bordes de énfasis |
-| `--ds-border-subtle` | `#EFEDE6` | Separadores muy sutiles |
+| `--ds-action` | `#1E6A55` | Relleno del CTA, enlaces, foco (6.5:1 sobre blanco) |
+| `--ds-action-hover` | `#185846` | Hover |
+| `--ds-action-pressed` | `#134A3B` | Active / pressed |
+| `--ds-on-action` | `#FFFFFF` | Texto sobre `--ds-action` (6.5:1) |
+| `--ds-action-soft` | `#CFE8DF` | Bordes de selección, realces |
+| `--ds-action-ink` | `#17523F` | Texto sobre `--ds-action-soft` (7.0:1) y `--ds-scan-soft` (8.1:1) |
 
-**Estados semánticos** (en armonía con la paleta, NO usar los de Bootstrap)
+**Escaneo (menthe)** — la firma: cotas, línea de progreso, medidas reales
 
 | Token CSS | Hex | Uso |
 |-----------|-----|-----|
-| `--ds-success` | `#5B7A4F` | Verde oliva (éxito) |
-| `--ds-success-soft` | `#E4ECDF` | Fondo de alertas de éxito |
-| `--ds-warning` | `#B8862E` | Mostaza (advertencia) |
-| `--ds-warning-soft` | `#F4E8CC` | Fondo de advertencias |
-| `--ds-danger` | `#A14545` | Borgoña (error) |
-| `--ds-danger-soft` | `#EFD9D9` | Fondo de errores |
-| `--ds-info` | `#4A6B7A` | Azul pizarra (información) |
-| `--ds-info-soft` | `#DBE5E9` | Fondo de avisos informativos |
+| `--ds-scan` | `#9BE3CF` | Cotas y progreso; acento sobre ardoise (9.9:1); relleno con tinta encima (9.9:1). **Nunca texto sobre claro** (1.4:1) |
+| `--ds-scan-hover` | `#B7ECDD` | Hover de rellenos menthe (superficies oscuras) |
+| `--ds-scan-soft` | `#E3F6F0` | Fondos de selección y estados suaves |
 
-**Texto sobre fondos suaves** (insignias, chips, pastillas, alertas, estados activos)
+**Bordes y separadores (filets)**
 
-El color semántico base no llega a AA sobre su propio fondo suave (mostaza 2.7:1, dorado 2.5:1, oliva 4.0:1, pizarra 4.5:1). Para **texto** sobre un fondo `-soft` / `-faint` se usa siempre la variante `-ink`: mismo tono, ≥ 5:1 sobre su fondo suave y también sobre `--ds-bg`, `--ds-bg-alt` y `--ds-surface`.
+| Token CSS | Hex | Uso |
+|-----------|-----|-----|
+| `--ds-border` | `#D3D7D2` | Filet estándar |
+| `--ds-border-strong` | `#B6BEB9` | Bordes de énfasis, botón secundario |
+| `--ds-border-subtle` | `#E8EBE6` | Separadores muy sutiles |
 
-| Token CSS | Hex | Va sobre | Contraste |
-|-----------|-----|----------|-----------|
-| `--ds-success-ink` | `#4C6A40` | `--ds-success-soft` | 5.0:1 |
-| `--ds-warning-ink` | `#8A5700` | `--ds-warning-soft` | 5.0:1 |
-| `--ds-danger-ink` | `#993E3E` | `--ds-danger-soft` | 5.0:1 |
-| `--ds-info-ink` | `#426372` | `--ds-info-soft` | 5.0:1 |
-| `--ds-gold-ink` | `#70540C` | `--ds-gold-faint` / `--ds-gold-soft` | 6.2:1 / 5.1:1 |
+**Estados semánticos**. Las bases ya pasan AA como texto sobre blanco y sobre su `-soft`; `-ink` coincide con la base salvo en danger.
 
-Insignias neutras (cancelado, inactivo, contadores) sobre `--ds-bg-alt`: texto en `--ds-ink-secondary` (7.6:1).
+| Token CSS | Hex | `-soft` | Texto sobre `-soft` |
+|-----------|-----|---------|---------------------|
+| `--ds-success` / `-ink` | `#17623F` | `#E2F1E8` | 6.3:1 |
+| `--ds-warning` / `-ink` | `#8A5200` | `#FFF0D9` | 5.7:1 |
+| `--ds-danger` · `--ds-danger-ink` | `#B3261E` · `#A3231C` | `#FBE6E4` | 6.2:1 (`-ink`) |
+| `--ds-info` / `-ink` | `#245B78` | `#E2EEF4` | 6.3:1 |
+
+Con blanco encima, las cuatro bases pasan AA (6.4–7.4:1), así que sirven de relleno de botón.
 
 ```css
 /* Insignia de estado */
-.badge--ok   { background: var(--ds-success-soft); color: var(--ds-success-ink); }
-.badge--gold { background: var(--ds-gold-faint);   color: var(--ds-gold-ink); border-color: var(--ds-gold-soft); }
+.badge--ok     { background: var(--ds-success-soft); color: var(--ds-success-ink); }
+.badge--select { background: var(--ds-scan-soft);    color: var(--ds-action-ink); border-color: var(--ds-action-soft); }
 ```
 
-Con las utilidades heredadas de `ui-base.css`: `bg-success-subtle text-success-emphasis` (nunca `text-success` ni `text-primary` sobre `-subtle`); las variables `--bs-*-text-emphasis` ya apuntan a los tokens `-ink`.
+Con las utilidades heredadas de `ui-base.css`: `bg-success-subtle text-success-emphasis`; las variables `--bs-*-text-emphasis` ya apuntan a los tokens `-ink`.
 
-El color base (`--ds-success`, `--ds-gold-active`…) se mantiene para rellenos, barras y bordes.
+**Superficies oscuras** (sidebar, panel del login, grabador de vídeo)
 
-**Dorado y mostaza como texto o icono, sobre cualquier fondo claro** → `--ds-gold-ink` / `--ds-warning-ink`. El dorado claro (`--ds-gold`, `--ds-gold-hover`, `--ds-gold-active`) no llega a 3:1 sobre beige ni crema (1.6–2.8:1): ni siquiera sirve para iconos o texto grande. El texto verde va en `--ds-success-ink` (el base cae a 4.1:1 sobre `--ds-bg-alt`). Excepción: sobre superficies oscuras (sidebar, panel del login) el dorado claro sí se usa como texto.
+| Token CSS | Hex | Uso |
+|-----------|-----|-----|
+| `--ds-dark-surface` | `#1D2B30` | Ardoise |
+| `--ds-dark-surface-deep` | `#152024` | Variante profunda |
+| `--ds-danger-on-dark` · `-hover` | `#F4A39D` · `#F9C6C2` | Acción peligro sobre oscuro (7.3 / 9.6:1) |
 
-### Reglas de color (sistema actual)
+Sobre ardoise el acento es **menthe** (`--ds-scan`): sapin solo da 2.3:1. Las pantallas aún no rediseñadas con islas oscuras redirigen localmente `--ds-gold*` → `--ds-scan*` y `--ds-ink-on-accent` → `--ds-ink` (ver `login.component.css` y `grabador-video.component.css`).
 
-- **PROHIBIDO** usar fondos negros (`#000`, `#0a0a0a`, etc.)
-- **PROHIBIDO** usar Bootstrap defaults sin override (azul `#0d6efd`, gris `#6c757d`)
-- **PROHIBIDO** gradientes morado-rosa o estilos "AI por defecto"
-- El dorado se usa **solo** en elementos premium, hovers, focus rings y CTAs primarios
-- El negro tinta `#1A1A1A` aparece **solo** como texto y bordes de botones secundarios
-- Texto sobre fondo `-soft` / `-faint` → token `-ink` (`--ds-success-ink`, `--ds-gold-ink`…). **PROHIBIDO** `color: var(--ds-success)` / `var(--ds-gold-active)` sobre su fondo suave: no pasa AA
-- **PROHIBIDO** usar tokens de borde (`--ds-border*`, `--ds-gold-soft`, `--ds-gold-faint`) como `color` de texto o icono (1.2–1.3:1): texto → `--ds-ink-muted`, adorno → `--ds-ink-faint`
-- Texto e iconos dorados o mostaza sobre fondo claro → `--ds-gold-ink` / `--ds-warning-ink`. **PROHIBIDO** `color: var(--ds-gold | --ds-gold-hover | --ds-gold-active | --ds-warning)` sobre fondo claro
+**Legado dorado (alias temporales, no usar en código nuevo)**
+
+| Alias | Apunta a |
+|-------|----------|
+| `--ds-gold` · `-hover` · `-active` | `--ds-action` · `-hover` · `-pressed` |
+| `--ds-gold-soft` · `--ds-gold-faint` · `--ds-gold-ink` | `--ds-action-soft` · `--ds-scan-soft` · `--ds-action-ink` |
+| `--ds-ink-on-accent` | `#FFFFFF` (texto sobre el antiguo dorado, hoy sapin) |
+| `--ds-shadow-gold` | `--ds-shadow-action` |
+
+Igual con las variables sin prefijo de `src/styles.css` (`--gold`, `--ink-900`, `--warm-*`, `--purple`…) y las `--bs-*` de `bootstrap-overrides.css`: todas apuntan a `--ds-*`. Se borran en la fase 4.
+
+### Reglas de color
+
+- **Un solo color de acción**: CTA, enlaces, foco y selección van en sapin. Nada de CTAs en menthe, ámbar ni ardoise
+- **Menthe solo para la firma**: cotas, progreso, medidas reales y acento sobre ardoise. Nunca como texto ni como única señal sobre fondo claro
+- Texto sobre fondo `-soft` → su `-ink` (`--ds-success-ink`, `--ds-action-ink`…)
+- **PROHIBIDO** usar tokens de borde (`--ds-border*`, `--ds-action-soft`) como color de texto o icono: texto → `--ds-ink-muted`, adorno → `--ds-ink-faint`
+- **PROHIBIDO** fondos negros (`#000`), sombras `rgba(0,0,0,…)`, gradientes decorativos (en especial morado-rosa) y la combinación amarillo/negro de señal de peligro
+- **PROHIBIDO** Bootstrap defaults sin override (azul `#0d6efd`, gris `#6c757d`)
 
 ### Tipografía
 
-- **Títulos** (`h1`–`h6`, `.display-*`, `.card-title`): Fraunces serif
-- **Cuerpo** (texto general, botones, formularios): DM Sans
-- **Monoespaciada** (código, datos tabulares): DM Mono (`--ds-font-mono`)
-- **NUNCA**: Inter, Roboto, Arial, Open Sans, system fonts como principales
-- **Eyebrow** (etiquetas pequeñas sobre títulos): DM Sans uppercase, `letter-spacing: 0.18em`, dorado de texto `--ds-gold-ink`
+- **Títulos y cifras** (`h1`–`h6`, `.display-*`, importes, medidas): Sofia Sans Semi Condensed, 600/700/800
+- **Cuerpo e interfaz** (texto, botones, formularios, etiquetas): Atkinson Hyperlegible Next, 400/500/700 + itálica 400
+- **Monoespaciada**: no hay de marca. `--ds-font-mono` es la del sistema, solo para código o identificadores técnicos
+- **Sentence case siempre**. Sin etiquetas en mayúsculas espaciadas, sin etiquetas monoespaciadas, sin cadenas «A · B · C», sin numeración entre corchetes, sin resaltar una sola palabra de un título (cursiva, negrita o color)
+- **Eyebrow**: solo si aporta contexto real (p. ej. el nombre del dossier sobre el título de una subpágina), en `--ds-text-sm`, peso 500, `--ds-ink-muted`
 
 **Familias**
 
 | Token CSS | Valor | Uso |
 |-----------|-------|-----|
-| `--ds-font-display` | `'Fraunces', ...serif` | Títulos |
-| `--ds-font-body` | `'DM Sans', ...sans-serif` | Cuerpo, UI |
-| `--ds-font-mono` | `'DM Mono', ...monospace` | Código, datos |
+| `--ds-font-display` | `'Sofia Sans Semi Condensed', ...sans-serif` | Títulos, cifras |
+| `--ds-font-body` | `'Atkinson Hyperlegible Next', ...sans-serif` | Cuerpo, UI |
+| `--ds-font-mono` | `ui-monospace, ...monospace` | Código |
 
-**Escala tipográfica** (base 16px)
+**Escala tipográfica**. Objetivo Clarté: ratio 1.25 sobre 17px en móvil y 1.333 sobre 18px en escritorio, **mínimo 14px**. La fase 0 conserva los tamaños de los tokens para no romper pantallas; cada pantalla adopta la escala al rediseñarse.
 
 | Token CSS | Tamaño | px | Uso típico |
 |-----------|--------|----|----|
-| `--ds-text-2xs` | `0.6875rem` | 11px | Eyebrows, labels |
-| `--ds-text-xs` | `0.75rem` | 12px | Captions |
-| `--ds-text-sm` | `0.875rem` | 14px | Texto auxiliar |
+| `--ds-text-2xs` | `0.6875rem` | 11px | Legado: no usar en código nuevo |
+| `--ds-text-xs` | `0.75rem` | 12px | Legado: no usar en código nuevo |
+| `--ds-text-sm` | `0.875rem` | 14px | Mínimo: captions, texto auxiliar |
 | `--ds-text-base` | `1rem` | 16px | Cuerpo |
-| `--ds-text-lg` | `1.125rem` | 18px | Lead |
+| `--ds-text-lg` | `1.125rem` | 18px | Lead, cuerpo en escritorio |
 | `--ds-text-xl` | `1.375rem` | 22px | h5 |
 | `--ds-text-2xl` | `1.75rem` | 28px | h4, card-title |
 | `--ds-text-3xl` | `2.25rem` | 36px | h3 |
@@ -146,28 +154,30 @@ El color base (`--ds-success`, `--ds-gold-active`…) se mantiene para rellenos,
 | `--ds-text-5xl` | `4rem` | 64px | h1 |
 | `--ds-text-display` | `5.5rem` | 88px | Hero |
 
-**Pesos**: `--ds-weight-regular` (400) · `--ds-weight-medium` (500) · `--ds-weight-semibold` (600) · `--ds-weight-bold` (700)
+**Pesos**: `--ds-weight-regular` (400) · `--ds-weight-medium` (500) · `--ds-weight-semibold` (600) · `--ds-weight-bold` (700) · `--ds-weight-black` (800, solo títulos). Sofia Sans solo se carga en 600/700/800: un título en 400 se pinta en 600.
 
 **Interlineado**: `--ds-leading-tight` (1.1, títulos) · `--ds-leading-snug` (1.25) · `--ds-leading-normal` (1.5, cuerpo) · `--ds-leading-relaxed` (1.65)
 
-**Tracking**: `--ds-tracking-tight` (-0.02em) · `--ds-tracking-normal` (0) · `--ds-tracking-wide` (0.04em) · `--ds-tracking-widest` (0.18em, eyebrows)
+**Tracking**: `--ds-tracking-tight` (-0.02em) · `--ds-tracking-normal` (0) · `--ds-tracking-wide` (0.04em) · `--ds-tracking-widest` (0.18em, legado de las mayúsculas espaciadas)
 
 ### Bordes y radios
 
-- **Botones e inputs**: `6px` (`var(--ds-radius-md)`)
-- **Cards**: `8px` (`var(--ds-radius-lg)`)
-- **Modales**: `12px` (`var(--ds-radius-xl)`)
-- **Tags, chips, badges**: pill (`var(--ds-radius-pill)`)
-- **PROHIBIDO**: radios mayores a 12px en elementos UI (no botones blob, no cards muy redondeadas)
+Tres radios con jerarquía, no uno para todo:
+
+- **Botones, campos, menús**: `6px` (`var(--ds-radius-md)`)
+- **Tarjetas**: `12px` (`var(--ds-radius-lg)`)
+- **Hojas y diálogos**: `20px` (`var(--ds-radius-xl)`)
+- **Insignias pequeñas**: `4px` · **Chips y tags**: pill
+- **PROHIBIDO**: radios fuera de esta escala
 
 | Token CSS | Valor | Uso |
 |-----------|-------|-----|
 | `--ds-radius-none` | `0` | Sin redondeo |
-| `--ds-radius-sm` | `4px` | Elementos compactos |
-| `--ds-radius-md` | `6px` | Botones, inputs (default) |
-| `--ds-radius-lg` | `8px` | Cards |
-| `--ds-radius-xl` | `12px` | Modales (máximo en UI) |
-| `--ds-radius-pill` | `999px` | Tags, chips, badges |
+| `--ds-radius-sm` | `4px` | Insignias, elementos compactos |
+| `--ds-radius-md` | `6px` | Botones, campos, menús |
+| `--ds-radius-lg` | `12px` | Tarjetas |
+| `--ds-radius-xl` | `20px` | Hojas, diálogos |
+| `--ds-radius-pill` | `999px` | Tags, chips |
 | `--ds-radius-circle` | `50%` | Avatares |
 
 ### Espaciado
@@ -189,16 +199,15 @@ El color base (`--ds-success`, `--ds-gold-active`…) se mantiene para rellenos,
 
 ### Iconos
 
-- Estilo line/stroke únicamente, `stroke-width: 1.5`
-- Recomendado: **Lucide Angular** (`npm install lucide-angular`)
-- Tamaños: 16, 20, 24 px según contexto
+- **Material Symbols Outlined** vía `mat-icon`, a partir de la fase 1 (la fuente se añade con la primera pantalla que los use)
+- Hasta que una pantalla se rediseñe sigue con bootstrap-icons line. **Nunca** mezclar los dos sets en una misma pantalla
+- Tamaños: 20 y 24 px; 16 px solo dentro de texto
 - **PROHIBIDO**: iconos rellenos (filled), emojis decorativos en UI
 
 ### Sombras
 
-- Suaves y cálidas. Usar tokens `--ds-shadow-*` que ya están basados en `rgba(26, 26, 26, ...)`, NO en negro puro.
+- Suaves, teñidas de ardoise (`rgba(29, 43, 48, …)`), nunca negro puro.
 - En cards: shadow-xs por defecto, shadow-md en hover.
-- Botones primarios en hover: `var(--ds-shadow-gold)`.
 
 | Token CSS | Uso |
 |-----------|-----|
@@ -207,11 +216,13 @@ El color base (`--ds-success`, `--ds-gold-active`…) se mantiene para rellenos,
 | `--ds-shadow-md` | Hover de cards, dropdowns |
 | `--ds-shadow-lg` | Popovers, paneles flotantes |
 | `--ds-shadow-xl` | Modales |
-| `--ds-shadow-gold` | Hover de botón primario (resplandor dorado) |
-| `--ds-focus-ring` | Anillo de foco dorado accesible (`:focus-visible`) |
+| `--ds-shadow-action` | Hover del botón primario (alias legado: `--ds-shadow-gold`) |
+| `--ds-focus-ring` | Foco para `box-shadow`: doble anillo superficie 2px + sapin 2px, visible sobre claro y sobre ardoise |
+| `--ds-focus-outline` | Foco para `outline`: `2px solid` sapin. **Nunca** `outline: var(--ds-focus-ring)` (es sintaxis de sombra y anula el foco) |
 
 ### Motion y transiciones
 
+- Sobrio. Un solo momento orquestado por pantalla (en la landing: el barrido del escaneo). El movimiento que responde a una acción (abrir, expandir, confirmar) sí; entradas en cascada por reflejo, no.
 - Usa siempre los tokens, nunca `300ms ease` por reflejo.
 - Curvas: `--ds-ease-out` (entradas, la mayoría) · `--ds-ease-in-out` (bucles, ida y vuelta).
 - Duraciones: `--ds-duration-fast` (150ms) · `--ds-duration-base` (250ms) · `--ds-duration-slow` (400ms).
@@ -221,7 +232,7 @@ El color base (`--ds-success`, `--ds-gold-active`…) se mantiene para rellenos,
 ### Elevación y layout (z-index, containers)
 
 - **z-index** — usa la escala, nunca números mágicos: `--ds-z-base` (1) · `--ds-z-dropdown` (100) · `--ds-z-sticky` (200) · `--ds-z-overlay` (900) · `--ds-z-modal` (1000) · `--ds-z-toast` (1100).
-- **Anchos de container**: `--ds-container-sm` (640px) · `--ds-container-md` (768px) · `--ds-container-lg` (1024px) · `--ds-container-xl` (1280px) · `--ds-container-2xl` (1440px). El `.container` de Bootstrap limita a 1200px para el contenido general.
+- **Anchos de container**: `--ds-container-sm` (640px) · `--ds-container-md` (768px) · `--ds-container-lg` (1024px) · `--ds-container-xl` (1280px) · `--ds-container-2xl` (1440px). El `.container` heredado limita a 1200px para el contenido general.
 
 ---
 
@@ -300,7 +311,8 @@ export class ProductCardComponent {
 }
 
 .product-card__price {
-  color: var(--ds-gold-ink);
+  font-family: var(--ds-font-display);
+  color: var(--ds-ink);
   font-weight: var(--ds-weight-semibold);
 }
 ```
@@ -318,25 +330,26 @@ Angular Material 22 (M3) es la librería de componentes del rediseño. Botones, 
 
 | Rol M3 | Token | Dónde se ve |
 |---|---|---|
-| `primary` | `--ds-gold-ink` | Botón de texto y de contorno, foco de campos, checkbox, switch, tabs, progreso |
-| `on-primary` | `--ds-ink-inverse` | Texto e iconos sobre `primary` |
-| `primary-container` · `on-primary-container` | `--ds-gold` · `--ds-ink-on-accent` | FAB, rango del datepicker |
-| `secondary-container` · `on-secondary-container` | `--ds-gold-soft` · `--ds-gold-ink` | Botón tonal, chips seleccionados |
+| `primary` | `--ds-action` | Botón relleno (CTA), botón de texto y de contorno, foco de campos, checkbox, switch, tabs, progreso |
+| `on-primary` | `--ds-on-action` | Texto e iconos sobre `primary` (6.5:1) |
+| `primary-container` · `on-primary-container` | `--ds-scan` · `--ds-ink` | FAB, rango del datepicker (9.9:1) |
+| `secondary-container` · `on-secondary-container` | `--ds-action-soft` · `--ds-action-ink` | Botón tonal, chips seleccionados (7.0:1) |
 | `surface` · `surface-container` | `--ds-surface` | Menús, diálogos, cards |
 | `surface-container-high` · `-lowest` | `--ds-surface-elevated` | Datepicker, capas elevadas |
 | `surface-container-highest` | `--ds-bg-alt` | Fondo del campo `fill` |
+| `surface-dim` | `--ds-stone` | Bandas |
 | `on-surface` · `on-surface-variant` | `--ds-ink` · `--ds-ink-muted` | Texto · etiquetas, ayudas, iconos |
-| `outline` · `outline-variant` | `--ds-ink-faint` · `--ds-border` | Borde de campos y botón de contorno (≥ 3:1) · divisores |
+| `outline` · `outline-variant` | `--ds-ink-faint` · `--ds-border` | Borde de campos y botón de contorno (3.6:1) · divisores |
 | `error` · `error-container` | `--ds-danger` · `--ds-danger-soft` | Errores de campos |
-| `inverse-surface` · `inverse-primary` | `--ds-dark-surface` · `--ds-gold` | Snackbar, tooltip, acción del snackbar |
+| `inverse-surface` · `inverse-primary` | `--ds-dark-surface` · `--ds-scan` | Snackbar, tooltip, acción del snackbar (menthe sobre ardoise, 9.9:1) |
 
-  `primary` es `--ds-gold-ink` y no `--ds-gold` porque en M3 `primary` también es color de **texto**. El dorado da 1.7:1 sobre el fondo, lo que no pasa AA; `--ds-gold-ink` da ≥ 6:1.
-- **CTA**: `mat-flat-button` es el CTA principal, con relleno `--ds-gold` y texto `--ds-ink` (ajuste en el tema, ver «CTA voice» en `design.md`). `mat-stroked-button` es el secundario y `mat-button` el de texto.
+  En M3 `primary` también es color de **texto**: sapin da 6.5:1 sobre blanco y 5.7:1 sobre `--ds-bg-alt`, así que sirve para las dos cosas.
+- **CTA**: `mat-flat-button` es el CTA principal: relleno `primary` (sapin) y texto `on-primary` (blanco), sin ajustes en el tema. `mat-stroked-button` es el secundario y `mat-button` el de texto.
+- **Formas** (en el tema): botones, campos, menús, autocomplete y snack-bar `--ds-radius-md` (6px) · tarjetas, expansion y datepicker `--ds-radius-lg` (12px) · diálogos y bottom sheet `--ds-radius-xl` (20px). Elevaciones: las de Material.
 - **Imports**: cada componente standalone importa solo los módulos de Material que usa (`MatButtonModule`, `MatFormFieldModule`, `MatInputModule`…).
 - **Ajustes por componente**: sobrescribe las variables `--mat-*` del componente de Material (p. ej. `--mat-button-filled-container-color`) en el CSS del componente, siempre con `var(--ds-...)`. Las variables `--mdc-*` ya no existen desde Material 20. Nunca `::ng-deep` ni selectores contra clases internas (`.mdc-*`, `.mat-mdc-*`).
 - **Sin `color="primary|accent|warn"`**: en M3 ese input no cambia el color (necesitaría el mixin de compatibilidad M2). El color sale del tema.
-- **Radios y elevaciones**: de momento, los de Material (botones pill, diálogo de 28 px, sombras de Material). El rediseño los fijará con `--ds-radius-*` / `--ds-shadow-*`.
-- **No ejecutes `ng add @angular/material`**: Material ya está instalado, y el schematic añadiría Roboto, Material Icons y un tema precompilado. Los iconos siguen siendo bootstrap-icons.
+- **No ejecutes `ng add @angular/material`**: Material ya está instalado, y el schematic añadiría Roboto, Material Icons y un tema precompilado. Los iconos Material Symbols Outlined se añadirán a mano en la fase 1.
 - **Animaciones**: `provideAnimations()` sigue en `app.config.ts`, pero `@angular/animations` está deprecado desde v20.2 y se eliminará en v23. En código nuevo, usa CSS, WAAPI o `animate.enter` / `animate.leave`.
 - **CDK directo**: solo para comportamiento sin estilo que Material no cubre (drag & drop, virtual scroll…). El `CdkMenu` del menú ⋮ de `presentacion-videos` puede pasar a `mat-menu` cuando se rediseñe esa pantalla.
 
@@ -354,13 +367,13 @@ Los ejemplos siguientes documentan el marcado existente: sirven de referencia du
 ### Botones
 
 ```html
-<!-- Primario: dorado con tinta oscura. Para CTAs principales -->
+<!-- Primario: sapin con texto blanco. Para CTAs principales -->
 <button class="btn btn-primary">Reservar</button>
 
 <!-- Secundario: borde tinta, fondo transparente. Para acciones alternas -->
 <button class="btn btn-secondary">Ver detalles</button>
 
-<!-- Outline primario: borde dorado, fondo transparente -->
+<!-- Outline primario: borde sapin, fondo transparente -->
 <button class="btn btn-outline-primary">Suscribirme</button>
 
 <!-- Link con underline animado -->
@@ -378,7 +391,7 @@ Los ejemplos siguientes documentan el marcado existente: sirven de referencia du
   </div>
 </div>
 
-<!-- Card premium con barra dorada superior -->
+<!-- Card premium con barra de acento superior (legado) -->
 <div class="card card-premium">
   <div class="card-body">
     <span class="tag tag-gold">Destacado</span>
@@ -404,9 +417,9 @@ Los ejemplos siguientes documentan el marcado existente: sirven de referencia du
 Utilidades propias del sistema:
 
 ### Texto
-- `.eyebrow` — etiqueta uppercase dorada sobre títulos
-- `.title-editorial em` — palabra acentuada en cursiva dorada dentro de un título
-- `.text-ink`, `.text-ink-secondary`, `.text-ink-muted`, `.text-gold`
+- `.eyebrow` / `.page-eyebrow` — contexto sobre un título, en sentence case (14px, peso 500, `--ds-ink-muted`). Solo si aporta información
+- `.title-editorial em` — legado: Clarté no resalta palabras sueltas en los títulos. No usar en código nuevo
+- `.text-ink`, `.text-ink-secondary`, `.text-ink-muted`, `.text-gold` (legado: color de acción)
 - `.font-display`, `.font-body`
 - `.tracking-tight`, `.tracking-wide`, `.tracking-widest`
 
@@ -415,11 +428,11 @@ Utilidades propias del sistema:
 - `.section-alt` — fondo `--ds-bg-alt` para secciones alternas
 
 ### Componentes
-- `.tag`, `.tag-gold` — chips/etiquetas pill
+- `.tag`, `.tag-gold` — chips/etiquetas pill (`.tag-gold` es legado: tono de acción)
 - `.stat`, `.stat__value`, `.stat__label` — números grandes con etiqueta
-- `.divider-dot` — separador con punto dorado central
+- `.divider-dot` — legado: separador con punto central
 - `.link-underline` — enlace con animación de subrayado
-- `.card-premium` — card con barra dorada superior
+- `.card-premium` — legado: card con barra de acento superior
 - `.icon` — wrapper para SVG line (fuerza stroke, no fill)
 - `.fade-up` — animación de entrada con `--delay` configurable
 
@@ -455,10 +468,10 @@ Antes de cerrar un componente, verifica que:
 
 ### Hero
 
-- Asimetría preferida sobre composición centrada perfecta.
-- Una palabra clave del título en `<em>` para destacarla en cursiva dorada.
-- Eyebrow + título grande + lead + CTAs (primario + secundario).
-- Animación `fade-up` escalonada con `--delay` incremental (0, 100ms, 250ms, 400ms).
+- Alineado a la izquierda; asimetría preferida sobre composición centrada perfecta.
+- Abre con lo más característico del dominio: el escaneo de una vivienda real, con sus cotas.
+- Título grande + lead + un CTA primario (sapin) y, si hace falta, uno secundario. Sin eyebrow decorativo ni palabras resaltadas.
+- Un solo momento de motion (el barrido del escaneo); nada de `fade-up` en cascada por reflejo.
 
 ### Grids
 
@@ -470,8 +483,8 @@ Antes de cerrar un componente, verifica que:
 
 ## 8. Animación
 
-- **Animaciones de entrada**: usa `.fade-up` con `--delay` escalonado en elementos del hero o secciones destacadas. No abuses: máximo 4-6 elementos animados por vista.
-- **Hover en botones primarios**: `transform: translateY(-1px)` + sombra dorada. Ya viene en el sistema.
+- **Animaciones de entrada**: un solo momento orquestado por pantalla. `.fade-up` es legado; en código nuevo, CSS del componente o `animate.enter` / `animate.leave`, con los tokens `--ds-ease-*` / `--ds-duration-*`.
+- **Hover en botones primarios**: cambio de color a `--ds-action-hover`; `:active` con `--ds-action-pressed` y `scale(0.98)`.
 - **Hover en cards**: `box-shadow: var(--ds-shadow-md)`. Ya viene en el sistema.
 - **View Transitions** del router: activarlas en `app.config.ts` con `withViewTransitions()`.
 - **PROHIBIDO**: animaciones de `300ms ease` por reflejo. Usa `var(--ds-ease-out)` y duraciones de los tokens.
@@ -572,7 +585,12 @@ ng test
 - Sombras con valores sueltos — usa los tokens `--ds-shadow-*`
 - Densidad agresiva (`padding: 0.25rem`) sin justificación
 
-Desbloqueadas para el rediseño (eran reglas de la identidad actual): fondos negros, fuentes Inter / Roboto / Arial, iconos filled, `border-radius` mayor a 12px y sombras en negro puro.
+- Fondos negros (`#000`), sombras en negro puro, iconos filled
+- Más de un color de acción; menthe como texto sobre fondo claro
+- Etiquetas en mayúsculas espaciadas o monoespaciadas, cadenas «A · B · C», palabras resaltadas en títulos
+- Radios fuera de la escala 4 / 6 / 12 / 20 / pill
+- `outline: var(--ds-focus-ring)` (usa `--ds-focus-outline`)
+- Tokens legados (`--ds-gold*`, `--gold`, `--ink-900`, `--bs-*`…) en código nuevo
 
 ---
 
@@ -580,4 +598,4 @@ Desbloqueadas para el rediseño (eran reglas de la identidad actual): fondos neg
 
 Si trabajas con asistentes de IA en este proyecto, dales este archivo como contexto. Una buena instrucción inicial sería:
 
-> "Trabajo en un proyecto Angular 22 con Angular Material 22 y CSS plano (Bootstrap desinstalado). Sigue las reglas de `DESIGN_GUIDELINES.md`; la identidad visual está desbloqueada para un rediseño completo. Antes de generar código, identifica qué tokens CSS y componentes del sistema vas a usar o a cambiar. No uses gradientes morados, no uses `*ngIf`/`*ngFor`, no uses NgModules. Usa standalone components con OnPush, signals, nuevo control flow, y los tokens del sistema."
+> "Trabajo en un proyecto Angular 22 con Angular Material 22 y CSS plano (Bootstrap desinstalado). Sigue las reglas de `DESIGN_GUIDELINES.md`; la identidad visual es Clarté (sapin como único color de acción, menthe para la firma del escaneo). Antes de generar código, identifica qué tokens CSS y componentes del sistema vas a usar o a cambiar. No uses gradientes morados, no uses `*ngIf`/`*ngFor`, no uses NgModules. Usa standalone components con OnPush, signals, nuevo control flow, y los tokens del sistema."

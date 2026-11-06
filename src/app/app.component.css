@@ -1,7 +1,8 @@
 /* ── Shell variables ──────────────────────────────────────────────────────── */
 /*
-   Sidebar uses an intentional dark-surface inversion (warm espresso)
-   against the light content area. These local vars consolidate ALL
+   Sidebar uses an intentional dark-surface inversion (ardoise)
+   against the light content area. On ardoise the accent is menthe
+   (--ds-scan, 9.9:1); sapin would only reach 2.3:1. These local vars consolidate ALL
    sidebar-specific color decisions in one place; the rest of the file
    uses only var(--sb-*) or var(--ds-*) — never raw hex.
 */
@@ -16,15 +17,15 @@
   --sb-bg-deep:          var(--ds-dark-surface-deep);
 
   /* Text layers on dark surface */
-  --sb-text:             rgba(251, 250, 246, 0.46);
-  --sb-text-hover:       rgba(251, 250, 246, 0.88);
-  --sb-text-active:      rgba(251, 250, 246, 0.97);
-  --sb-text-muted:       rgba(251, 250, 246, 0.24);
+  --sb-text:             rgba(255, 255, 255, 0.46);
+  --sb-text-hover:       rgba(255, 255, 255, 0.88);
+  --sb-text-active:      rgba(255, 255, 255, 0.97);
+  --sb-text-muted:       rgba(255, 255, 255, 0.24);
 
   /* Interactive states */
   --sb-item-hover:       rgba(255, 255, 255, 0.05);
-  --sb-item-active-bg:   rgba(212, 185, 110, 0.13);
-  --sb-item-active-brd:  var(--ds-gold);
+  --sb-item-active-bg:   color-mix(in srgb, var(--ds-scan) 13%, transparent);
+  --sb-item-active-brd:  var(--ds-scan);
 
   /* Structural */
   --sb-divider:          rgba(255, 255, 255, 0.07);
@@ -33,7 +34,7 @@
   /* Danger action (logout) — lightened for dark surface */
   --sb-danger:           var(--ds-danger-on-dark);
   --sb-danger-hover:     var(--ds-danger-on-dark-hover);
-  --sb-danger-hover-bg:  rgba(168, 74, 70, 0.10);
+  --sb-danger-hover-bg:  rgba(179, 38, 30, 0.10);
 }
 
 /* ── Shell layout ─────────────────────────────────────────────────────────── */
@@ -104,11 +105,11 @@
   flex: 1;
   transition: color var(--sb-transition);
 }
-.sidebar-brand:hover { color: var(--ds-gold); text-decoration: none; }
+.sidebar-brand:hover { color: var(--ds-scan); text-decoration: none; }
 
 .sidebar-brand__icon {
   font-size: 1.1rem;
-  color: var(--ds-gold);
+  color: var(--ds-scan);
   flex-shrink: 0;
   transition: transform var(--sb-transition);
 }
@@ -236,7 +237,7 @@
   transform: translateX(-50%);
   width: 4px; height: 4px;
   border-radius: var(--ds-radius-circle);
-  background: var(--ds-gold);
+  background: var(--ds-scan);
 }
 
 .sidebar-item__icon {
@@ -314,11 +315,11 @@
   width: 32px; height: 32px;
   border-radius: var(--ds-radius-circle);
   object-fit: cover;
-  border: 1.5px solid rgba(212, 185, 110, 0.35);
+  border: 1.5px solid color-mix(in srgb, var(--ds-scan) 35%, transparent);
   flex-shrink: 0;
   transition: border-color var(--sb-transition);
 }
-.sidebar-user:hover .sidebar-user__avatar { border-color: var(--ds-gold); }
+.sidebar-user:hover .sidebar-user__avatar { border-color: var(--ds-scan); }
 
 .sidebar-user__info {
   min-width: 0;
@@ -364,7 +365,7 @@
   position: fixed;
   top: 0; left: 0; right: 0;
   height: var(--topbar-h);
-  background: rgba(251, 250, 246, 0.94);
+  background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--ds-border);

@@ -1,5 +1,5 @@
 /* Fix: tour chrome (traffic-light dots) → editorial header bar
- * WCAG: rgba(212,185,110,.3) → var(--ds-gold-soft) · lightbox rgba fix
+ * WCAG: color-mix(in srgb, var(--ds-gold) 30%, transparent) → var(--ds-gold-soft) · lightbox rgba fix
  */
 
 /* ── Layout ──────────────────────────────────────────────────────────────── */
@@ -274,7 +274,7 @@
 }
 .exp-step--done .exp-step__circle { background: var(--ds-gold-faint); color: var(--ds-gold-ink); }
 .exp-step--done .exp-step__label  { color: var(--ds-gold-ink); }
-.exp-step--active .exp-step__circle { background: var(--ds-gold); color: var(--ds-ink); box-shadow: 0 0 0 4px rgba(212,185,110,.22); }
+.exp-step--active .exp-step__circle { background: var(--ds-gold); color: var(--ds-ink); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ds-gold) 22%, transparent); }
 .exp-step--active .exp-step__label  { color: var(--ds-gold-ink); font-weight: var(--ds-weight-bold); }
 
 .exp-steps__cancelled {
@@ -422,7 +422,7 @@
     background  var(--ds-duration-base) var(--ds-ease-out);
 }
 .photo-thumb:hover .photo-thumb__overlay {
-  background: rgba(26,26,26,.5);
+  background: rgba(29, 43, 48,.5);
   opacity: 1;
 }
 
@@ -585,7 +585,7 @@
   transform: translateY(0);
   box-shadow: none;
 }
-.offer-cta:focus-visible { outline: var(--ds-focus-ring); outline-offset: 2px; }
+.offer-cta:focus-visible { outline: var(--ds-focus-outline); outline-offset: 2px; }
 
 /* ════════════════════════════════════════════════════════════════════════════
    LIGHTBOX
@@ -593,13 +593,13 @@
 .lightbox-overlay {
   position: fixed; inset: 0;
   z-index: var(--ds-z-modal);
-  background: rgba(26, 26, 26, 0.88);
+  background: rgba(29, 43, 48, 0.88);
   display: flex; align-items: center; justify-content: center;
 }
 .lightbox-img {
   max-width: 92vw; max-height: 90vh;
   border-radius: var(--ds-radius-md);
-  box-shadow: 0 8px 32px rgba(26,26,26,.5);
+  box-shadow: 0 8px 32px rgba(29, 43, 48,.5);
   cursor: default;
 }
 .lightbox-close {
@@ -639,7 +639,7 @@
   background: var(--ds-bg-alt);
   color: var(--ds-ink);
 }
-.btn-outline-action:focus-visible { outline: var(--ds-focus-ring); outline-offset: 2px; }
+.btn-outline-action:focus-visible { outline: var(--ds-focus-outline); outline-offset: 2px; }
 
 /* ── Botón de acción para documentos ─────────────────────────────────────── */
 .btn-file-open {
@@ -722,7 +722,7 @@
   position: absolute; top: 4px; right: 4px;
   width: 24px; height: 24px;
   display: flex; align-items: center; justify-content: center;
-  background: var(--ds-surface-overlay, rgba(251,250,246,.90));
+  background: var(--ds-surface-overlay, rgba(255, 255, 255,.90));
   border: 1px solid var(--ds-border-strong);
   border-radius: var(--ds-radius-circle);
   color: var(--ds-ink-secondary);

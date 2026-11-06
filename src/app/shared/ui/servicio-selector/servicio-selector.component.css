@@ -37,7 +37,7 @@
   white-space: nowrap;
 }
 .srv-all:focus-visible {
-  outline: var(--ds-focus-ring);
+  outline: var(--ds-focus-outline);
   outline-offset: 2px;
 }
 .srv-all:disabled { color: var(--ds-ink-muted); }
@@ -70,7 +70,7 @@
   box-shadow: var(--ds-shadow-sm);
 }
 .srv-card:has(:focus-visible) {
-  outline: var(--ds-focus-ring);
+  outline: var(--ds-focus-outline);
   outline-offset: 2px;
 }
 .srv-card:active:not(:has(:disabled)) { transform: translateY(1px); }

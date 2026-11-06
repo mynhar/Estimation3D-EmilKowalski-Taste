@@ -1,8 +1,20 @@
 /* component: recorder (dialog + recording overlay)
  * states: default · hover · focus · active · disabled · loading · error · success
- * contrast: pass — texto claro sólo sobre --ds-dark-surface (chrome espresso, como la sidebar)
+ * contrast: pass — texto claro sólo sobre --ds-dark-surface (ardoise, como la sidebar)
  */
 :host { display: contents; }
+
+/* Islas oscuras (burbuja, barra y ventana flotante sobre ardoise): el acento
+   es menthe (9.9:1); sapin solo da 2.3:1 sobre ardoise. Se redirige aquí el
+   alias legado --ds-gold* y la tinta sobre acento. */
+.rec-bubble,
+.rec-bar,
+.rec-float {
+  --ds-gold: var(--ds-scan);
+  --ds-gold-hover: var(--ds-scan-hover);
+  --ds-gold-active: var(--ds-scan);
+  --ds-ink-on-accent: var(--ds-ink);
+}
 
 /* ── Diálogos ─────────────────────────────────────────────────────────────── */
 .rec-dialog {

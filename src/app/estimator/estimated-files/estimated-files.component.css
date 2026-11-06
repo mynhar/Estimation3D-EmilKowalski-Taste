@@ -771,7 +771,7 @@
 /* Spinner inside button */
 .ef-spinner {
   width: 12px; height: 12px;
-  border: 2px solid rgba(161, 69, 69, 0.25);
+  border: 2px solid rgba(179, 38, 30, 0.25);
   border-top-color: var(--ds-danger);
   border-radius: var(--ds-radius-circle);
   display: inline-block;

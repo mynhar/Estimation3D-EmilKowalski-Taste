@@ -35,17 +35,15 @@
   .page-header { padding: var(--ds-space-4) var(--ds-space-5); }
 }
 .page-eyebrow {
-  font-size: var(--ds-text-2xs);
-  font-weight: var(--ds-weight-semibold);
-  letter-spacing: var(--ds-tracking-widest);
-  text-transform: uppercase;
-  color: var(--ds-gold-ink);
+  font-size: var(--ds-text-sm);
+  font-weight: var(--ds-weight-medium);
+  color: var(--ds-ink-muted);
   display: flex;
   align-items: center;
   gap: var(--ds-space-1);
   margin-bottom: var(--ds-space-2);
 }
-.page-eyebrow i { font-size: 0.7rem; }
+.page-eyebrow i { font-size: 0.875rem; color: var(--ds-action); }
 
 /* ============================================================
    STATUS BADGE — Sistema unificado de badges de estado
@@ -68,7 +66,7 @@
 .status-badge--nuevo         { background: var(--ds-info-soft);    color: var(--ds-info-ink);    border-color: var(--ds-info-soft); }
 .status-badge--en_estimacion { background: var(--ds-warning-soft); color: var(--ds-warning-ink); border-color: var(--ds-warning-soft); }
 .status-badge--estimado      { background: var(--ds-gold-faint);   color: var(--ds-gold-ink); border-color: var(--ds-gold-soft); }
-.status-badge--en_oferta     { background: var(--ds-primary-bg-subtle, #F7EFD9); color: var(--ds-ink); border-color: var(--ds-gold-soft); }
+.status-badge--en_oferta     { background: var(--ds-gold-faint); color: var(--ds-ink); border-color: var(--ds-gold-soft); }
 .status-badge--adjudicado    { background: var(--ds-success-soft); color: var(--ds-success-ink); border-color: var(--ds-success-soft); }
 .status-badge--contratado    { background: var(--ds-success-soft); color: var(--ds-success-ink); border-color: var(--ds-success-soft); }
 .status-badge--cancelado     { background: var(--ds-danger-soft);  color: var(--ds-danger-ink);  border-color: var(--ds-danger-soft); }
@@ -272,17 +270,17 @@
 .btn-clear-filters:hover { color: var(--ds-danger-ink); background: var(--ds-danger-soft); }
 
 /* ============================================================
-   EYEBROW (etiqueta sobre títulos)
-   <span class="eyebrow">Sección 01</span>
+   EYEBROW (contexto sobre un título, en minúsculas de frase)
+   Clarté no usa etiquetas en mayúsculas espaciadas. Úsalo solo
+   cuando el contexto aporte información (p. ej. el nombre del
+   dossier sobre el título de una subpágina).
    ============================================================ */
 .eyebrow {
   display: inline-block;
   font-family: var(--ds-font-body);
-  font-size: var(--ds-text-2xs);
-  font-weight: var(--ds-weight-semibold);
-  letter-spacing: var(--ds-tracking-widest);
-  text-transform: uppercase;
-  color: var(--ds-gold-ink);
+  font-size: var(--ds-text-sm);
+  font-weight: var(--ds-weight-medium);
+  color: var(--ds-ink-muted);
   margin-bottom: var(--ds-space-3);
 }
 
@@ -499,8 +497,6 @@
 .stat__label {
   display: block;
   margin-top: var(--ds-space-2);
-  font-size: var(--ds-text-xs);
-  letter-spacing: var(--ds-tracking-widest);
-  text-transform: uppercase;
+  font-size: var(--ds-text-sm);
   color: var(--ds-ink-muted);
 }

@@ -242,7 +242,7 @@
 @media(max-width:620px){ .form-grid{ grid-template-columns:1fr; } .field.full{ grid-column:auto; } .form-wrap{ padding:26px 20px; } }
 .field label, .field legend{ font-family:var(--mono); font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--white-faint); }
 .field legend{ margin-bottom:8px; }
-.field input, .field textarea, .field select{ font-family:var(--disp); font-size:1rem; color:var(--white); background:var(--void-2); border:1px solid var(--line); border-radius:0; padding:13px 15px; transition:border-color .25s; }
+.field input, .field textarea, .field select{ font-family:var(--ds-font-body); font-size:1rem; color:var(--white); background:var(--void-2); border:1px solid var(--line); border-radius:0; padding:13px 15px; transition:border-color .25s; }
 .field input:focus, .field textarea:focus, .field select:focus{ outline:none; border-color:var(--gold); }
 .field select{ appearance:none; -webkit-appearance:none; cursor:pointer; background-image:linear-gradient(45deg,transparent 50%,var(--gold) 50%),linear-gradient(135deg,var(--gold) 50%,transparent 50%); background-position:calc(100% - 18px) 19px, calc(100% - 12px) 19px; background-size:6px 6px,6px 6px; background-repeat:no-repeat; padding-right:38px; }
 .field select option{ background:var(--void-2); color:var(--white); }
@@ -256,7 +256,7 @@
 .addr-city{ grid-column:span 2; } .addr-prov{ grid-column:span 2; } .addr-postal{ grid-column:span 2; }
 .addr-grid label{ font-family:var(--mono); font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--white-faint); }
 .addr-grid .opt{ text-transform:none; letter-spacing:.02em; }
-.addr-grid input, .addr-grid select{ font-family:var(--disp); font-size:1rem; color:var(--white); background:var(--void-2); border:1px solid var(--line); border-radius:0; padding:13px 15px; transition:border-color .25s; }
+.addr-grid input, .addr-grid select{ font-family:var(--ds-font-body); font-size:1rem; color:var(--white); background:var(--void-2); border:1px solid var(--line); border-radius:0; padding:13px 15px; transition:border-color .25s; }
 .addr-grid input:focus, .addr-grid select:focus{ outline:none; border-color:var(--gold); }
 .addr-grid select{ appearance:none; -webkit-appearance:none; cursor:pointer; background-image:linear-gradient(45deg,transparent 50%,var(--gold) 50%),linear-gradient(135deg,var(--gold) 50%,transparent 50%); background-position:calc(100% - 18px) 19px, calc(100% - 12px) 19px; background-size:6px 6px,6px 6px; background-repeat:no-repeat; padding-right:38px; }
 .addr-grid select option{ background:var(--void-2); color:var(--white); }

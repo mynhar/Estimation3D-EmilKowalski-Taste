@@ -112,7 +112,7 @@
 @media(max-width:620px){ .form-grid{ grid-template-columns:1fr; } .field.full{ grid-column:auto; } .form-wrap{ padding:28px 22px; } }
 .field label, .field legend{ font-family:var(--mono); font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--white-faint); }
 .field legend{ margin-bottom:8px; }
-.field input, .field textarea{ font-family:var(--disp); font-size:1rem; color:var(--white); background:var(--void-2); border:1px solid var(--line); border-radius:0; padding:13px 15px; transition:border-color .25s; }
+.field input, .field textarea{ font-family:var(--ds-font-body); font-size:1rem; color:var(--white); background:var(--void-2); border:1px solid var(--line); border-radius:0; padding:13px 15px; transition:border-color .25s; }
 .field input:focus, .field textarea:focus{ outline:none; border-color:var(--gold); }
 .field textarea{ min-height:110px; resize:vertical; }
 .field .is-invalid{ border-color:var(--burgundy-bright); }

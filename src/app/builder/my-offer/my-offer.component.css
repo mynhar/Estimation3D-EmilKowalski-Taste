@@ -59,7 +59,7 @@
 }
 .estado-badge--pending  { background: var(--ds-warning-soft); color: var(--ds-warning-ink);  border-color: rgba(184, 134, 46, 0.3); }
 .estado-badge--accepted { background: var(--ds-success-soft); color: var(--ds-success-ink);  border-color: rgba(91, 122, 79, 0.3); }
-.estado-badge--rejected { background: var(--ds-danger-soft);  color: var(--ds-danger-ink);   border-color: rgba(161, 69, 69, 0.3); }
+.estado-badge--rejected { background: var(--ds-danger-soft);  color: var(--ds-danger-ink);   border-color: rgba(179, 38, 30, 0.3); }
 .estado-badge--archived { background: var(--ds-bg-alt);       color: var(--ds-ink-secondary); border-color: var(--ds-border-strong); }
 
 /* ── Header state variants ──────────────────────────────────────────── */
@@ -232,7 +232,7 @@
   transition: opacity var(--ds-duration-base) var(--ds-ease-out),
               background var(--ds-duration-base) var(--ds-ease-out);
 }
-.photo-thumb:hover .photo-thumb__overlay { background: rgba(26,26,26,.5); opacity: 1; }
+.photo-thumb:hover .photo-thumb__overlay { background: rgba(29, 43, 48,.5); opacity: 1; }
 
 /* ── Tour label ─────────────────────────────────────────────────────── */
 .tour-label {
@@ -427,7 +427,7 @@
 ══════════════════════════════════════════════════════════════════════ */
 .lightbox-overlay {
   position: fixed; inset: 0; z-index: 1055;
-  background: rgba(26, 26, 26, 0.88);
+  background: rgba(29, 43, 48, 0.88);
   display: flex; align-items: center; justify-content: center;
   padding: var(--ds-space-4); cursor: pointer;
 }
@@ -443,7 +443,7 @@
   background: var(--ds-surface); border: none; border-radius: 50%;
   width: 32px; height: 32px; font-size: 14px; line-height: 1;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 2px 8px rgba(26,26,26,.35); padding: 0; color: var(--ds-ink);
+  box-shadow: 0 2px 8px rgba(29, 43, 48,.35); padding: 0; color: var(--ds-ink);
   transition: background var(--ds-duration-fast) var(--ds-ease-out);
 }
 .lightbox-close:hover { background: var(--ds-bg-alt); }

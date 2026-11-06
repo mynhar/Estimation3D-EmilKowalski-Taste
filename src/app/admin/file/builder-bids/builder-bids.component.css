@@ -71,7 +71,7 @@
 }
 .btn-save:hover:not(:disabled) { background: var(--ds-gold-hover); transform: translateY(-1px); box-shadow: var(--ds-shadow-gold); }
 .btn-save:active:not(:disabled) { background: var(--ds-gold-active); transform: translateY(0); box-shadow: none; }
-.btn-save:focus-visible { outline: var(--ds-focus-ring); outline-offset: 2px; }
+.btn-save:focus-visible { outline: var(--ds-focus-outline); outline-offset: 2px; }
 .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .save-msg { display: inline-flex; align-items: center; font-size: var(--ds-text-xs); font-weight: var(--ds-weight-medium); color: var(--ds-ink-muted); }
@@ -96,7 +96,7 @@
               transform var(--ds-duration-fast) var(--ds-ease-out);
 }
 .offer-card:hover { border-color: var(--ds-gold); box-shadow: var(--ds-shadow-md); transform: translateY(-1px); }
-.offer-card:focus-visible { outline: var(--ds-focus-ring); outline-offset: 2px; }
+.offer-card:focus-visible { outline: var(--ds-focus-outline); outline-offset: 2px; }
 .offer-card--selected { border-color: var(--ds-gold); box-shadow: 0 0 0 3px var(--ds-gold-soft); }
 .offer-card--aceptada { border-color: var(--ds-success); }
 .offer-card--rechazada { opacity: 0.62; }

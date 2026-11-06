@@ -72,8 +72,8 @@
      sobre --void da 3,08:1 y no llega al 4,5:1 que pide un texto de error. */
   --danger-text:var(--ds-danger-on-dark);
 
-  --disp:"Archivo", "Helvetica Neue", sans-serif;
-  --mono:"IBM Plex Mono", ui-monospace, monospace;
+  --disp:var(--ds-font-display);   /* Sofia Sans Semi Condensed (Clarté) */
+  --mono:var(--ds-font-body);      /* Clarté no usa monoespaciada: las etiquetas pasan al cuerpo */
 
   --maxw:1320px;
   --pad-x:40px;
@@ -85,7 +85,7 @@
 
   display:block; position:relative; isolation:isolate;
   background:var(--void); color:var(--white);
-  font-family:var(--disp); font-weight:400; font-size:17px; line-height:1.6;
+  font-family:var(--ds-font-body); font-weight:400; font-size:17px; line-height:1.6;
   -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
   /* Sin `overflow` aquí a propósito: recortaría la cabecera y los conmutadores,
      todos `position:fixed`. El desbordamiento horizontal lo contiene el
@@ -97,38 +97,37 @@
    apunta al token del design system (`src/styles/tokens.css`). El oscuro
    conserva la paleta cinematográfica, exclusiva del sitio público. */
 :host([data-theme="light"]){
-  --void:var(--ds-bg);                    /* #F5F3EE papel principal      */
-  --void-2:var(--ds-bg-alt);              /* #EFEDE6 secciones alternas   */
-  --panel:var(--ds-surface);              /* #FBFAF6 tarjetas, paneles    */
-  --panel-2:var(--ds-surface-elevated);   /* #FFFFFF superficie elevada   */
+  --void:var(--ds-bg);                    /* Chaux: fondo de página       */
+  --void-2:var(--ds-bg-alt);              /* secciones alternas           */
+  --panel:var(--ds-surface);              /* Blanc: tarjetas, paneles     */
+  --panel-2:var(--ds-surface-elevated);   /* superficie elevada           */
 
-  --white:var(--ds-ink);                  /* #1A1A1A texto principal      */
-  --white-dim:var(--ds-ink-secondary);    /* #4A4A4A texto secundario     */
-  --white-faint:var(--ds-ink-muted);      /* #615E58 captions, datos      */
+  --white:var(--ds-ink);                  /* Ardoise: texto principal     */
+  --white-dim:var(--ds-ink-secondary);    /* texto secundario             */
+  --white-faint:var(--ds-ink-muted);      /* captions, datos              */
 
-  --line:var(--ds-border);                /* #E8E5DC borde estándar       */
-  --line-2:var(--ds-border-subtle);       /* #EFEDE6 separador sutil      */
+  --line:var(--ds-border);                /* filet estándar               */
+  --line-2:var(--ds-border-subtle);       /* separador sutil              */
 
-  --gold:var(--ds-gold-active);           /* #B0964A filetes y rellenos   */
-  --gold-bright:var(--ds-gold-hover);     /* #C2A85C realce / hover       */
-  --gold-deep:var(--ds-gold);             /* #D4B96E extremo claro        */
-  --on-gold:var(--ds-ink);                /* tinta sobre relleno dorado   */
-  /* Texto e iconos dorados: bronce del design system (≥ 6:1 sobre papel). El
-     dorado claro sigue para filetes, rellenos y halos (--gold). */
-  --gold-text:var(--ds-gold-ink);         /* #70540C texto/iconos dorados */
+  --gold:var(--ds-gold-active);           /* acción (sapin): filetes, rellenos */
+  --gold-bright:var(--ds-gold-hover);     /* hover                        */
+  --gold-deep:var(--ds-gold);             /* extremo claro                */
+  --on-gold:var(--ds-on-action);          /* blanco sobre sapin (≥ 6.5:1) */
+  /* Texto e iconos de acento: --ds-action-ink (≥ 7:1 sobre papel). */
+  --gold-text:var(--ds-gold-ink);         /* texto/iconos de acción      */
   --gold-text-hi:var(--ds-gold-ink);      /* realce / hover de texto      */
-  --gold-rgb:212,185,110;
+  --gold-rgb:30,106,85;                   /* --ds-action en canal RGB   */
   --pulse-a:.9;                           /* el anillo pierde fuerza sobre papel*/
 
-  --shadow-rgb:26,26,26;                  /* sombras de tinta, nunca negro*/
+  --shadow-rgb:29,43,48;                  /* sombras de tinta, nunca negro*/
   --shadow-a:.16;
   --shadow-a-soft:.12;
 
-  --burgundy:var(--ds-danger);            /* #A14545                      */
+  --burgundy:var(--ds-danger);            /* danger                       */
   --burgundy-bright:var(--ds-danger);
-  --danger-text:var(--ds-danger);         /* 5,48:1 sobre papel           */
+  --danger-text:var(--ds-danger);         /* 6,2:1 sobre papel           */
 
-  --scrim:245,243,238;                    /* --ds-bg en canal RGB         */
+  --scrim:250,250,247;                    /* --ds-bg en canal RGB         */
 
   /* Medios: polaridad invertida. Sobre papel, bajar el brillo y velar con
      beige produce gris sucio; la foto va a brillo pleno y saturación intacta. */

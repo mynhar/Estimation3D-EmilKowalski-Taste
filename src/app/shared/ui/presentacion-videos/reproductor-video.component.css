@@ -18,7 +18,7 @@
 }
 .pl-dialog::backdrop { background: var(--ds-overlay); }
 
-/* ── Cabecera: título editable en Fraunces ───────────────────────────────── */
+/* ── Cabecera: título editable en la fuente display ───────────────────────────────── */
 .pl-head {
   display: flex;
   align-items: flex-start;

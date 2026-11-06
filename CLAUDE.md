@@ -6,15 +6,15 @@ Este archivo se carga automáticamente al abrir el proyecto en Claude Code. Defi
 
 ## Regla principal
 
-El sistema de diseño está **desbloqueado**: se hará un **rediseño completo de la aplicación**. La paleta, las tipografías, los radios, las sombras, los iconos y el motion actuales son el punto de partida, no una restricción. Para el trabajo de UI usa la skill **`frontend-design`**. **No uses la skill `hallmark` en este proyecto.**
+Se está haciendo un **rediseño completo de la aplicación** con la dirección aprobada **Clarté** (6-nov-2026): superficies claras, tinta ardoise, **sapin como único color de acción** y menthe como firma del escaneo (cotas, progreso). Avanza por fases (0 base → 1 cara al cliente → 2 resto del cliente y páginas públicas → 3 contratista → 4 estimador/admin; ver `design.md`). Para el trabajo de UI usa la skill **`frontend-design`**. **No uses la skill `hallmark` en este proyecto.**
 
 Siguen vigentes las reglas técnicas: Angular 22, Angular Material 22 como librería de componentes, CSS plano, tokens `var(--ds-...)` y contraste WCAG AA.
 
-Referencias del sistema **actual** (se actualizan cuando el rediseño fije la nueva dirección):
+Referencias del sistema (ya describen Clarté):
 
 1. **[`./DESIGN_GUIDELINES.md`](./DESIGN_GUIDELINES.md)** — guía detallada: tokens, paleta, utilidades, patrones, convenciones.
-2. **[`./design.md`](./design.md)** — resumen del sistema actual.
-3. `src/styles/tokens.css` — los tokens reales viven aquí con nombres `var(--ds-...)`. Para cambiar la identidad, cambia el valor de los tokens (o añade tokens `--ds-*` nuevos); nunca inventes nombres `--color-*` ni pongas hex sueltos en los componentes.
+2. **[`./design.md`](./design.md)** — resumen del sistema y fases del rediseño.
+3. `src/styles/tokens.css` — los tokens reales viven aquí con nombres `var(--ds-...)`. Código nuevo: `--ds-action*`, `--ds-scan*`, `--ds-stone`… Los `--ds-gold*` son alias legados (no usar en código nuevo). Nunca inventes nombres `--color-*` ni pongas hex sueltos en los componentes.
 
 ---
 
@@ -27,9 +27,9 @@ Referencias del sistema **actual** (se actualizan cuando el rediseño fije la nu
 - **Capa de transición**: `src/styles/ui-base.css` sirve las clases heredadas de Bootstrap (`.btn`, `.row`, `.col-*`, `.form-control`…) que las plantillas aún usan
 - **Menús / overlays / diálogos**: Angular Material (`mat-menu`, `mat-dialog`, `mat-snack-bar`…), construido sobre `@angular/cdk`
 - **Sistema de diseño**: tokens CSS en `src/styles/tokens.css`
-- **Tipografías actuales**: Fraunces (títulos) + DM Sans (cuerpo) — pueden cambiar en el rediseño
-- **Iconos actuales**: bootstrap-icons line/stroke — pueden cambiar en el rediseño
-- **Sistema de diseño**: desbloqueado para el rediseño completo
+- **Tipografías**: Sofia Sans Semi Condensed (títulos, cifras) + Atkinson Hyperlegible Next (cuerpo, UI)
+- **Iconos**: Material Symbols Outlined vía `mat-icon` desde la fase 1; bootstrap-icons line en las pantallas aún no rediseñadas (nunca los dos en una pantalla)
+- **Sistema de diseño**: Clarté (rediseño en curso por fases)
 - **Skill de diseño**: `frontend-design` (plugin de Anthropic, instalado solo en este proyecto)
 - **Skill de Angular**: `angular-developer` (oficial de Angular, en `.claude/skills/`, instalada solo en este proyecto)
 - **Skills de Emil Kowalski**: 13 skills de pulido de UI y motion (en `.claude/skills/`, instaladas solo en este proyecto)
@@ -96,9 +96,9 @@ Referencias del sistema **actual** (se actualizan cuando el rediseño fije la nu
 
 - Usa componentes de Material (botones, campos, selects, menús, diálogos, tabs…) antes que marcado propio o las clases heredadas.
 - Importa en cada componente standalone solo los módulos de Material que usa (`MatButtonModule`, `MatFormFieldModule`…).
-- El color y la tipografía salen del tema: `primary` = `--ds-gold-ink` (en M3 también es color de texto; el dorado no pasa AA), `primary-container` = `--ds-gold`, `mat-flat-button` = CTA dorado. Tabla completa en `DESIGN_GUIDELINES.md` §4.
+- El color y la tipografía salen del tema: `primary` = `--ds-action` (sapin, 6.5:1, sirve también como texto), `primary-container` = `--ds-scan` (menthe con tinta encima), `mat-flat-button` = CTA sapin con texto blanco. Tabla completa en `DESIGN_GUIDELINES.md` §4.
 - Para ajustar un componente, sobrescribe sus variables `--mat-*` en el CSS del componente con `var(--ds-...)` (p. ej. `--mat-button-filled-container-color`). Las `--mdc-*` ya no existen desde Material 20. Nunca `::ng-deep`, selectores a clases internas (`.mdc-*`, `.mat-mdc-*`) ni `color="primary|accent|warn"` (sin efecto en M3).
-- Radios y elevaciones de Material siguen por defecto hasta que el rediseño los fije.
+- Formas fijadas en el tema: 6px botones/campos/menús, 12px tarjetas, 20px diálogos y hojas. Elevaciones: las de Material.
 - No ejecutes `ng add @angular/material`: ya está instalado, y añadiría Roboto, Material Icons y un tema precompilado.
 
 ---
@@ -106,15 +106,15 @@ Referencias del sistema **actual** (se actualizan cuando el rediseño fije la nu
 ## Trabajo de UI
 
 - Entrega SIEMPRE **componentes Angular 22 standalone**, no markup suelto ni JSX.
-- Rediseñar: se puede cambiar paleta, tipografía, radios, iconos, layout e identidad. Conserva rutas, copy y comportamiento salvo que se pida lo contrario.
-- Cuando el rediseño fije la nueva dirección, actualiza `src/styles/tokens.css`, `design.md` y `DESIGN_GUIDELINES.md` para que la reflejen.
+- Rediseñar: aplica Clarté pantalla a pantalla (layout, iconos, escala tipográfica, sustituir clases heredadas). Conserva rutas, copy y comportamiento salvo que se pida lo contrario. Excepción acordada: en la landing se puede fusionar, reordenar y recortar el copy (9 → 6 secciones) y proponer textos nuevos, marcándolos siempre para revisión.
+- Si cambias o añades tokens, actualiza `src/styles/tokens.css`, `design.md` y `DESIGN_GUIDELINES.md`.
 
 ---
 
 ## Antes de generar código
 
-1. Lee `DESIGN_GUIDELINES.md` y `design.md` para conocer el sistema actual si vas a tocar UI.
-2. Antes de cambiar la identidad visual (paleta, tipografía, etc.), acuerda la nueva dirección estética con el usuario.
+1. Lee `DESIGN_GUIDELINES.md` y `design.md` para conocer el sistema si vas a tocar UI.
+2. La dirección es Clarté. Antes de desviarte de ella (paleta, tipografía, etc.), acuérdalo con el usuario.
 3. Identifica qué tokens CSS (`var(--ds-...)`) y qué utilidades vas a usar o a cambiar.
 4. Si la tarea es ambigua, pregunta antes de asumir una dirección estética.
 
@@ -135,17 +135,19 @@ Referencias del sistema **actual** (se actualizan cuando el rediseño fije la nu
 - Bootstrap está desinstalado. No uses las clases heredadas de `ui-base.css` en código nuevo ni añadas reglas a ese archivo
 - Al rediseñar una pantalla, sustituye sus clases heredadas por CSS del componente; cuando ninguna plantilla use una clase, borra sus reglas de `ui-base.css`
 
-### Identidad visual actual (punto de partida, se puede cambiar)
-- Fondo beige `#F5F3EE`, alterno `#EFEDE6`, tarjetas crema `#FBFAF6`, tinta `#1A1A1A`, acento dorado `#D4B96E`
-- Tipografía: Fraunces para títulos, DM Sans para cuerpo
-- Iconos line/stroke
-- Bordes redondeados sutiles (4–12 px)
-- Espaciado generoso
+### Identidad visual: Clarté
+- Página chaux `#FAFAF7`, superficies blancas `#FFFFFF`, bandas pierre grise `#E4E6E1`, tinta ardoise `#1D2B30`
+- **Un único color de acción**: sapin `#1E6A55` con texto blanco. Menthe `#9BE3CF` solo para la firma (cotas, progreso, medidas reales) y como acento sobre ardoise; nunca texto sobre claro
+- Tipografía: Sofia Sans Semi Condensed (títulos, cifras) + Atkinson Hyperlegible Next (cuerpo). Mínimo 14px. Sentence case: sin etiquetas en mayúsculas espaciadas, sin etiquetas mono, sin «A · B · C», sin resaltar una sola palabra de un título
+- Radios: 6 controles · 12 tarjetas · 20 hojas y diálogos
+- Foco: `--ds-focus-ring` (box-shadow) o `--ds-focus-outline` (outline), nunca `outline: var(--ds-focus-ring)`
+- Espaciado generoso, contenido alineado a la izquierda
 
 ### Prohibiciones
 - Reinstalar Bootstrap o `@ng-bootstrap` (para menús, overlays y diálogos usa Angular Material)
 - Crear otros archivos `.scss` aparte de `material-theme.scss`
-- Gradientes morado-rosa
+- Gradientes decorativos (en especial morado-rosa) y amarillo/negro de señal de peligro
+- Más de un color de acción; tokens legados (`--ds-gold*`, `--gold`, `--bs-*`…) en código nuevo
 - Emojis decorativos en UI
 - NgModules nuevos
 - `*ngIf` / `*ngFor` / `*ngSwitch` en código nuevo
@@ -203,5 +205,5 @@ ng generate component shared/ui/nombre \
 - [ ] Contraste WCAG AA (4.5:1)
 - [ ] Iconos de un solo estilo, coherentes en toda la app
 - [ ] Sin emojis decorativos
-- [ ] Conforme a la dirección acordada del rediseño; si cambió la identidad, `tokens.css`, `design.md` y `DESIGN_GUIDELINES.md` actualizados
+- [ ] Conforme a Clarté (un solo color de acción, sentence case, radios 6/12/20); si cambiaron tokens, `tokens.css`, `design.md` y `DESIGN_GUIDELINES.md` actualizados
 - [ ] Dirección estética intencional, no genérica

@@ -28,7 +28,7 @@
   font-weight: var(--ds-weight-bold);
   padding: 0.3em 0.9em;
   border-radius: var(--ds-radius-pill);
-  border: 1px solid rgba(212, 185, 110, 0.35);
+  border: 1px solid color-mix(in srgb, var(--ds-gold) 35%, transparent);
 }
 .kpi-pill__total {
   opacity: 0.6;
@@ -63,7 +63,7 @@
   padding: var(--ds-space-3) var(--ds-space-4);
   background: var(--ds-danger-soft);
   color: var(--ds-danger-ink);
-  border: 1px solid rgba(161, 69, 69, 0.2);
+  border: 1px solid rgba(179, 38, 30, 0.2);
   border-radius: var(--ds-radius-md);
   font-size: var(--ds-text-sm);
 }
@@ -141,7 +141,7 @@
 .filter-chip--active-no {
   background: var(--ds-danger-soft);
   color: var(--ds-danger-ink);
-  border-color: rgba(161, 69, 69, 0.35);
+  border-color: rgba(179, 38, 30, 0.35);
   font-weight: var(--ds-weight-semibold);
 }
 
@@ -208,7 +208,7 @@
   letter-spacing: 0.05em;
   background: var(--ds-gold-faint);
   color: var(--ds-gold-ink);
-  border: 1px solid rgba(212, 185, 110, 0.3);
+  border: 1px solid color-mix(in srgb, var(--ds-gold) 30%, transparent);
   padding: 0.15em 0.55em;
   border-radius: var(--ds-radius-sm);
   white-space: nowrap;

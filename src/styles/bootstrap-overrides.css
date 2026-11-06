@@ -21,48 +21,48 @@
   /* ----------------------------------------------------------
      Bootstrap — Colores principales (mapeo a paleta)
      ---------------------------------------------------------- */
-  --bs-primary:               #D4B96E;
-  --bs-primary-rgb:           212, 185, 110;
-  --bs-primary-text-emphasis: #1A1A1A;
-  --bs-primary-bg-subtle:     #F7EFD9;
-  --bs-primary-border-subtle: #EBD9A8;
+  --bs-primary:               var(--ds-action);
+  --bs-primary-rgb:           30, 106, 85;
+  --bs-primary-text-emphasis: var(--ds-action-ink);
+  --bs-primary-bg-subtle:     var(--ds-scan-soft);
+  --bs-primary-border-subtle: var(--ds-action-soft);
 
-  --bs-secondary:             #1A1A1A;
-  --bs-secondary-rgb:         26, 26, 26;
-  --bs-secondary-bg-subtle:   #FBFAF6;
-  --bs-secondary-border-subtle: #E8E5DC;
+  --bs-secondary:             var(--ds-ink);
+  --bs-secondary-rgb:         29, 43, 48;
+  --bs-secondary-bg-subtle:   var(--ds-bg-alt);
+  --bs-secondary-border-subtle: var(--ds-border);
 
-  --bs-success:               #5B7A4F;
-  --bs-success-rgb:           91, 122, 79;
-  --bs-success-bg-subtle:     #E4ECDF;
+  --bs-success:               var(--ds-success);
+  --bs-success-rgb:           23, 98, 63;
+  --bs-success-bg-subtle:     var(--ds-success-soft);
   --bs-success-text-emphasis: var(--ds-success-ink);  /* texto sobre -subtle (AA) */
 
-  --bs-warning:               #B8862E;
-  --bs-warning-rgb:           184, 134, 46;
-  --bs-warning-bg-subtle:     #F4E8CC;
+  --bs-warning:               var(--ds-warning);
+  --bs-warning-rgb:           138, 82, 0;
+  --bs-warning-bg-subtle:     var(--ds-warning-soft);
   --bs-warning-text-emphasis: var(--ds-warning-ink);
 
-  --bs-danger:                #A14545;
-  --bs-danger-rgb:            161, 69, 69;
-  --bs-danger-bg-subtle:      #EFD9D9;
+  --bs-danger:                var(--ds-danger);
+  --bs-danger-rgb:            179, 38, 30;
+  --bs-danger-bg-subtle:      var(--ds-danger-soft);
   --bs-danger-text-emphasis:  var(--ds-danger-ink);
 
-  --bs-info:                  #4A6B7A;
-  --bs-info-rgb:              74, 107, 122;
-  --bs-info-bg-subtle:        #DBE5E9;
+  --bs-info:                  var(--ds-info);
+  --bs-info-rgb:              36, 91, 120;
+  --bs-info-bg-subtle:        var(--ds-info-soft);
   --bs-info-text-emphasis:    var(--ds-info-ink);
 
-  --bs-light:                 #FBFAF6;
-  --bs-light-rgb:             251, 250, 246;
+  --bs-light:                 var(--ds-surface);
+  --bs-light-rgb:             255, 255, 255;
 
-  --bs-dark:                  #1A1A1A;
-  --bs-dark-rgb:              26, 26, 26;
+  --bs-dark:                  var(--ds-ink);
+  --bs-dark-rgb:              29, 43, 48;
 
   /* ----------------------------------------------------------
      Bootstrap — Bordes y radios
      ---------------------------------------------------------- */
   --bs-border-color:          var(--ds-border);
-  --bs-border-color-translucent: rgba(26, 26, 26, 0.08);
+  --bs-border-color-translucent: rgba(29, 43, 48, 0.10);
 
   --bs-border-radius:         var(--ds-radius-md);
   --bs-border-radius-sm:      var(--ds-radius-sm);
@@ -74,28 +74,28 @@
      Bootstrap — Enlaces
      ---------------------------------------------------------- */
   --bs-link-color:            var(--ds-ink);
-  --bs-link-color-rgb:        26, 26, 26;
-  --bs-link-hover-color:      var(--ds-gold-active);
-  --bs-link-hover-color-rgb:  176, 150, 74;
+  --bs-link-color-rgb:        29, 43, 48;
+  --bs-link-hover-color:      var(--ds-action);
+  --bs-link-hover-color-rgb:  30, 106, 85;
   --bs-link-decoration:       underline;
   --bs-link-hover-decoration: underline;
 
   /* ----------------------------------------------------------
      Bootstrap — Focus
      ---------------------------------------------------------- */
-  --bs-focus-ring-color:      rgba(212, 185, 110, 0.4);
-  --bs-focus-ring-width:      3px;
+  --bs-focus-ring-color:      var(--ds-action);
+  --bs-focus-ring-width:      2px;
 }
 
 /* ============================================================
-   HEADINGS — Fraunces serif para títulos
+   HEADINGS — fuente display (Sofia Sans Semi Condensed) para títulos
    ============================================================ */
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6,
 .display-1, .display-2, .display-3,
 .display-4, .display-5, .display-6 {
   font-family: var(--ds-font-display);
-  font-weight: var(--ds-weight-regular);
+  font-weight: var(--ds-weight-semibold);  /* Sofia Sans se carga en 600/700/800 */
   line-height: var(--ds-leading-tight);
   letter-spacing: var(--ds-tracking-tight);
   color: var(--ds-ink);

@@ -1,6 +1,6 @@
 /* component: panel (data ficha)
  * states: default · hover · focus · active · disabled · loading · error · success
- * contrast: pass (tinta #1A1A1A / #4A4A4A / #7A7770 sobre crema #FBFAF6)
+ * contrast: pass (--ds-ink / --ds-ink-secondary / --ds-ink-muted sobre --ds-surface, ≥ 6:1)
  * Todo color y tipografía sale de var(--ds-*).
  */
 

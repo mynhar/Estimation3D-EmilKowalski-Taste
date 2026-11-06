@@ -1,5 +1,5 @@
 /* Ranura de video de presentación, compartida
- * Miniatura 16:9 con duración, título en Fraunces, vacío · error · esqueleto.
+ * Miniatura 16:9 con duración, título en la fuente display, vacío · error · esqueleto.
  * La usan app-video-expediente (el propio, editable) y
  * app-videos-expediente-lectura (los de otros, sólo para ver).
  * contrast: textos en --ds-ink / --ds-ink-secondary / --ds-ink-muted sobre papel (AA);
