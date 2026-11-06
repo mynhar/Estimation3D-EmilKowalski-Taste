@@ -1,8 +1,7 @@
-/* Hallmark · ranura de video de presentación, compartida
+/* Ranura de video de presentación, compartida
  * Miniatura 16:9 con duración, título en Fraunces, vacío · error · esqueleto.
  * La usan app-video-expediente (el propio, editable) y
  * app-videos-expediente-lectura (los de otros, sólo para ver).
- * theme: locked (design.md · warm editorial · beige paper · gold accent)
  * contrast: textos en --ds-ink / --ds-ink-secondary / --ds-ink-muted sobre papel (AA);
  *           duración en crema sobre espresso; error en --ds-danger-ink sobre -soft
  */

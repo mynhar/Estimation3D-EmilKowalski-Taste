@@ -1,7 +1,4 @@
-/* Hallmark · macrostructure: Catalogue-Grid · genre: editorial (warm-paper)
- * design-system: design.md · designed-as-app
- * pre-emit critique: P5 H5 E5 S5 R5 V5
- * Changes: filter-bar merged into header; 4-col grid at xl; mf-empty scoped;
+/* Changes: filter-bar merged into header; 4-col grid at xl; mf-empty scoped;
  * chip variant overrides via CSS classes (no inline styles).
  * ══════════════════════════════════════════════════════════════════════════ */
 

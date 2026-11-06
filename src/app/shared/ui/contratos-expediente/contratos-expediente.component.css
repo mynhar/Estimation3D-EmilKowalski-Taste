@@ -1,12 +1,11 @@
-/* Hallmark · component: ledger (contratos del expediente) · genre: editorial (warm-paper)
- * design-system: design.md (locked) · parent: client/dashboard (Workbench)
+/* component: ledger (contratos del expediente)
+ * parent: client/dashboard
  * states: default · hover · focus · active · disabled (n/a: sin controles deshabilitables) ·
  *         loading (lo cubre el padre: no se pinta hasta tener datos) · error (n/a) ·
  *         success (contrato completado → barra verde)
  * contrast: texto pequeño en --ds-ink / --ds-ink-secondary (AA). El dorado vive en barra,
  *           fondos y bordes, nunca en texto pequeño. Insignias con los tokens -ink
  *           del sistema (≥ 5:1 sobre su fondo suave).
- * pre-emit critique: P5 H5 E5 S5 R5 V4
  *
  * Lista tipo libro de cuentas: una fila por contrato separada por filetes (sin
  * tarjetas dentro de la tarjeta) y el costo total como línea de cierre, igual

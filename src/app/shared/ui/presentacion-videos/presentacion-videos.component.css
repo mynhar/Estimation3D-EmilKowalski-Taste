@@ -1,8 +1,6 @@
-/* Hallmark · component: presentation-video library (card + grid + dialogs) · genre: editorial
- * theme: locked (design.md · warm editorial · beige paper · gold accent)
+/* component: presentation-video library (card + grid + dialogs)
  * states: default · hover · focus · active · disabled · loading · error · success
  * contrast: pass (texto sobre -soft → -ink; duración en crema sobre espresso)
- * pre-emit critique: P4 H4 E4 S4 R5 V4
  */
 :host { display: block; }
 
@@ -264,7 +262,8 @@
 .pv-more:focus-visible { outline: none; border-color: var(--ds-gold); box-shadow: var(--ds-focus-ring); }
 .pv-more:active,
 .pv-more[aria-expanded='true'] { color: var(--ds-ink); background: var(--ds-bg-alt); border-color: var(--ds-border); }
-.pv-menu__list { min-width: 12rem; }
+/* El menú vive en el overlay del CDK, que ya lo posiciona: sin absolute propio. */
+.pv-menu__list { position: static; min-width: 12rem; }
 .pv-menu__list .dropdown-item { display: flex; align-items: center; gap: var(--ds-space-2); }
 .pv-menu__list .dropdown-item .bi { color: var(--ds-ink-muted); }
 .pv-menu__list .pv-menu__danger,

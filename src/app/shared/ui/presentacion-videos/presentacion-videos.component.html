@@ -114,26 +114,29 @@
                 </p>
               </div>
 
-              <div ngbDropdown placement="bottom-end" container="body" class="pv-menu">
-                <button type="button" class="pv-more" ngbDropdownToggle
+              <div class="pv-menu">
+                <button type="button" class="pv-more"
+                        [cdkMenuTriggerFor]="pvMenu" [cdkMenuPosition]="menuPosiciones"
                         [attr.aria-label]="'presentation_videos.actions.options' | translate:{ titulo: v.titulo }">
                   <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
                 </button>
-                <div ngbDropdownMenu class="pv-menu__list">
-                  <button type="button" ngbDropdownItem (click)="pedirRenombrar(v)">
-                    <i class="bi bi-pencil" aria-hidden="true"></i>
-                    {{ 'presentation_videos.actions.rename' | translate }}
-                  </button>
-                  <button type="button" ngbDropdownItem (click)="descargar(v)">
-                    <i class="bi bi-download" aria-hidden="true"></i>
-                    {{ 'presentation_videos.actions.download' | translate }}
-                  </button>
-                  <div class="dropdown-divider"></div>
-                  <button type="button" ngbDropdownItem class="pv-menu__danger" (click)="pedirEliminar(v)">
-                    <i class="bi bi-trash3" aria-hidden="true"></i>
-                    {{ 'presentation_videos.actions.delete' | translate }}
-                  </button>
-                </div>
+                <ng-template #pvMenu>
+                  <div cdkMenu class="dropdown-menu show pv-menu__list">
+                    <button type="button" cdkMenuItem class="dropdown-item" (cdkMenuItemTriggered)="pedirRenombrar(v)">
+                      <i class="bi bi-pencil" aria-hidden="true"></i>
+                      {{ 'presentation_videos.actions.rename' | translate }}
+                    </button>
+                    <button type="button" cdkMenuItem class="dropdown-item" (cdkMenuItemTriggered)="descargar(v)">
+                      <i class="bi bi-download" aria-hidden="true"></i>
+                      {{ 'presentation_videos.actions.download' | translate }}
+                    </button>
+                    <div class="dropdown-divider" role="separator"></div>
+                    <button type="button" cdkMenuItem class="dropdown-item pv-menu__danger" (cdkMenuItemTriggered)="pedirEliminar(v)">
+                      <i class="bi bi-trash3" aria-hidden="true"></i>
+                      {{ 'presentation_videos.actions.delete' | translate }}
+                    </button>
+                  </div>
+                </ng-template>
               </div>
             </div>
           </li>

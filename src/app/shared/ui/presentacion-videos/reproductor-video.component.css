@@ -1,8 +1,7 @@
-/* Hallmark · component: video player dialog · genre: editorial
- * theme: locked (design.md · warm editorial) · ficha técnica como hoja de especificaciones
+/* component: video player dialog
+ * ficha técnica como hoja de especificaciones
  * states: default · hover · focus · active · disabled · loading · error · success
  * contrast: pass
- * pre-emit critique: P4 H5 E4 S4 R5 V4
  */
 :host { display: contents; }
 

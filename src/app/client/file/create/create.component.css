@@ -1,8 +1,4 @@
-/* Hallmark · macrostructure: Workbench · genre: editorial (warm-paper)
- * design-system: design.md · designed-as-app · scope: component
- * pre-emit critique: P5 H5 E5 S5 R5 V5
- *
- * Rediseño completo de client/file/create.
+/* Rediseño completo de client/file/create.
  * · Ancho: el lienzo ocupa el 100 % de la página (.page-wrapper) y el ancho lo
  *   consume el contenido — rejilla de servicios auto-fill y filas de campos por
  *   container-query — en vez de un ancho fijo con aire muerto a los lados.

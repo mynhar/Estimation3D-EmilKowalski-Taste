@@ -175,8 +175,6 @@
       "PowerShell(foreach \\($f in @\\('es','fr','en'\\)\\) { try { $null = Get-Content \"src/assets/i18n/$f.json\" -Raw | ConvertFrom-Json; Write-Output \"$f.json OK\" } catch { Write-Output \"$f.json INVALID: $_\" } })",
       "Bash(grep -n -i \"localizacionForm\\\\|perfil\\\\|direccion\\\\|user\\\\$\\\\|usuario\\\\|cargarPerfil\" src/app/client/file/create/create.component.ts)",
       "PowerShell(foreach \\($f in @\\('es','fr','en'\\)\\) { try { $null = Get-Content \"src/assets/i18n/$f.json\" -Raw | ConvertFrom-Json; Write-Output \"$f.json OK\" } catch { Write-Output \"$f.json INVALID: $_\" } }; npx ng build --configuration development 2>&1 | Select-Object -Last 8)",
-      "PowerShell(try { $null = Get-Content \".hallmark/log.json\" -Raw | ConvertFrom-Json; \"log.json OK\" } catch { \"INVALID: $_\" })",
-      "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('.hallmark/log.json','utf8'\\)\\); console.log\\('log.json OK'\\)\")",
       "Bash(grep -n \"^\\\\.fte-[a-z-]*\\\\\\(,\\\\| \\\\|:\\\\|{\\\\\\)\" \"c:/desarrollo/estimation3d-A18-v01/src/app/estimator/file-to-be-estimated/file-to-be-estimated.component.css\")",
       "PowerShell(npx supabase functions deploy enviar-invitacion --project-ref ckdksfvxjimxuqceoeyr)",
       "Bash(grep -n \"^\\\\.fue[a-z-]*[ ,:{]\" file-under-estimation.component.css)",

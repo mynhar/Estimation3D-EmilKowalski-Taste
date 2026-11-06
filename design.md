@@ -1,16 +1,16 @@
 # Design — Proyecto Angular 18 (warm editorial)
 
-Locked design system. Future Hallmark runs read this file first; pages defer
-to it. Amend intentionally — the file is the rule.
+> **UNLOCKED — rediseño completo en curso.** Este archivo describe el sistema
+> **actual**, que es el punto de partida del rediseño, no una restricción.
+> Paleta, tipografías, radios, sombras, iconografía, motion y los bans de
+> identidad pueden cambiar. Siguen vigentes: el contrato de stack, el uso de
+> tokens `--ds-*` (sin hex sueltos ni nombres `--color-*`) y el contraste AA.
+> Cuando el rediseño fije la nueva dirección, actualiza este archivo,
+> `DESIGN_GUIDELINES.md` y `src/styles/tokens.css`.
 
-> **No theme-picking.** This system is LOCKED. Hallmark must NOT pick a new
-> theme, palette, or font. It applies its quality discipline (slop-test gates,
-> structural variety, anti-AI-slop rules) ON TOP of the system below.
-> The detailed spec lives in `DESIGN_GUIDELINES.md`; this file is the lock.
-
-## System
+## System (actual)
 - Genre · editorial (warm-paper)
-- Macrostructure · pick per brief; vary structure, keep the system
+- Macrostructure · pick per brief
 - Theme · custom (vibe: "warm editorial · beige paper · gold premium accent")
 - Axes · light paper-band / serif display / warm gold accent-hue
 
@@ -66,6 +66,8 @@ referencian vía su capa local `--sb-*` / `--lg-*` (nunca hex crudo):
 - Primary · fill `--ds-gold` · texto `--ds-ink` · radius 4–6px · hover translateY(-1px) + shadow-gold
 - Secondary · borde tinta, fondo transparente · mismo radius
 - Outline-primary · borde dorado, fondo transparente
+- En Angular Material: Primary = `mat-flat-button` · Secondary = `mat-stroked-button` · texto = `mat-button`
+  (radios de Material por defecto hasta que el rediseño los fije)
 
 ## Iconography
 - **bootstrap-icons** (`bi-*`), variantes line/stroke únicamente. Nunca filled.
@@ -78,25 +80,42 @@ referencian vía su capa local `--sb-*` / `--lg-*` (nunca hex crudo):
 - Reduced-motion · ya cubierto globalmente; crossfade ≤150ms.
 - PROHIBIDO: `300ms ease` por reflejo — usar tokens de duración.
 
-## Hard bans (gates adicionales heredados del proyecto)
+## Reglas de contraste (vigentes; se adaptan si cambia la paleta)
 - Texto en color semántico base sobre su propio fondo suave (`--ds-success` sobre
   `--ds-success-soft`, `--ds-gold-active` sobre `--ds-gold-faint`…): usar `-ink`
 - Tokens de borde (`--ds-border*`, `--ds-gold-soft`) como color de texto/icono:
   texto → `--ds-ink-muted`, adorno → `--ds-ink-faint`
 - Dorado claro o mostaza como texto/icono sobre fondo claro (1.6–3.1:1): usar
   `--ds-gold-ink` / `--ds-warning-ink`. Solo sobre superficies oscuras va el dorado claro
-- Fondos negros (#000) · Bootstrap defaults sin override (#0d6efd, #6c757d)
-- Gradientes morado-rosa · Inter/Roboto/Arial como principal
-- Iconos filled · emojis decorativos · sombras rgba(0,0,0,..)
-- border-radius > 12px en UI · UI genérica sin postura estética
+- En Material, el rol `primary` también es color de texto: por eso es `--ds-gold-ink`, nunca `--ds-gold`
+
+## Bans vigentes
+- Gradientes morado-rosa · reinstalar Bootstrap / ng-bootstrap
+- Emojis decorativos · UI genérica sin postura estética
+
+## Bans de identidad del sistema actual (desbloqueados para el rediseño)
+- Fondos negros (#000) · Inter/Roboto/Arial como principal · iconos filled
+- Sombras rgba(0,0,0,..) · border-radius > 12px en UI
+
+## Angular Material (M3)
+Librería de componentes. Tema en `src/styles/material-theme.scss` (único `.scss`), con
+`use-system-variables`: cada rol `--mat-sys-*` apunta a un token `--ds-*`, así que Material
+sigue a los tokens sin tocar el tema.
+- `primary` → `--ds-gold-ink` · `primary-container` → `--ds-gold` · `secondary-container` → `--ds-gold-soft`
+- `surface` / `surface-container` → `--ds-surface` · `surface-container-highest` → `--ds-bg-alt`
+- `on-surface` → `--ds-ink` · `on-surface-variant` → `--ds-ink-muted` · `outline` → `--ds-ink-faint`
+- `error` → `--ds-danger` · `inverse-surface` → `--ds-dark-surface` · fuentes → `--ds-font-body` / `--ds-font-display`
+- Tabla completa y reglas de uso: `DESIGN_GUIDELINES.md` §4.
 
 ## Stack output contract
 - Componentes **Angular 18 standalone**, `OnPush`, signals (`input()`/`signal()`),
   nuevo control flow (`@if`/`@for` con `track`). NUNCA `*ngIf`/`*ngFor`, NgModules,
   ni `@Input()`/`@Output()`.
-- CSS plano por componente con `:host` (no SCSS, no Tailwind).
-- Bootstrap 5.3 personalizado primero (`.btn`, `.card`, `.row`...); CSS con tokens
-  para el resto. **NO** HTML suelto ni JSX.
+- CSS plano por componente con `:host` (no SCSS salvo el tema `material-theme.scss`, no Tailwind).
+- Bootstrap desinstalado. Las clases heredadas (`.btn`, `.card`, `.row`...) las sirve
+  `src/styles/ui-base.css` solo durante la transición; el CSS nuevo va en cada
+  componente con tokens. Controles, menús, overlays y diálogos con **Angular Material 18**.
+  **NO** HTML suelto ni JSX.
 
 ## Exports
 `tokens.css` (`--ds-*`) es la fuente de verdad. El detalle completo (tabla de

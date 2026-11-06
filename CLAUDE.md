@@ -6,42 +6,115 @@ Este archivo se carga automáticamente al abrir el proyecto en Claude Code. Defi
 
 ## Regla principal
 
-Para construir, auditar o rediseñar UI, usa la skill **`hallmark`**. Hallmark aplica su disciplina de diseño (slop-test gates, variedad estructural, reglas anti-AI-slop) **sobre** el sistema de este proyecto, que está **bloqueado**.
+El sistema de diseño está **desbloqueado**: se hará un **rediseño completo de la aplicación**. La paleta, las tipografías, los radios, las sombras, los iconos y el motion actuales son el punto de partida, no una restricción. Para el trabajo de UI usa la skill **`frontend-design`**. **No uses la skill `hallmark` en este proyecto.**
 
-Fuentes de verdad, en orden:
+Siguen vigentes las reglas técnicas: Angular 18, Angular Material 18 como librería de componentes, CSS plano, tokens `var(--ds-...)` y contraste WCAG AA.
 
-1. **[`./DESIGN_GUIDELINES.md`](./DESIGN_GUIDELINES.md)** — guía detallada: tokens, paleta, utilidades, patrones, convenciones. Léela antes de cualquier trabajo de UI.
-2. **[`./design.md`](./design.md)** — archivo de bloqueo que Hallmark lee primero. Defiere a él: **no** elegir temas, paletas ni tipografías nuevas.
-3. `src/styles/tokens.css` — los tokens reales viven aquí con nombres `var(--ds-...)`. Úsalos; nunca inventes nombres `--color-*`.
+Referencias del sistema **actual** (se actualizan cuando el rediseño fije la nueva dirección):
+
+1. **[`./DESIGN_GUIDELINES.md`](./DESIGN_GUIDELINES.md)** — guía detallada: tokens, paleta, utilidades, patrones, convenciones.
+2. **[`./design.md`](./design.md)** — resumen del sistema actual.
+3. `src/styles/tokens.css` — los tokens reales viven aquí con nombres `var(--ds-...)`. Para cambiar la identidad, cambia el valor de los tokens (o añade tokens `--ds-*` nuevos); nunca inventes nombres `--color-*` ni pongas hex sueltos en los componentes.
 
 ---
 
 ## Stack del proyecto
 
 - **Framework**: Angular 18 (standalone components, signals, nuevo control flow)
-- **Estilos**: Bootstrap 5.3 + CSS plano (NO SCSS, NO Tailwind)
+- **Estilos**: CSS plano por componente (NO SCSS, NO Tailwind). Única excepción: `src/styles/material-theme.scss`. **Bootstrap desinstalado.**
+- **Componentes**: **Angular Material 18 (M3)**. Su tema (`src/styles/material-theme.scss`) enlaza los roles `--mat-sys-*` a los tokens `--ds-*`
+- **Capa de transición**: `src/styles/ui-base.css` sirve las clases heredadas de Bootstrap (`.btn`, `.row`, `.col-*`, `.form-control`…) que las plantillas aún usan
+- **Menús / overlays / diálogos**: Angular Material (`mat-menu`, `mat-dialog`, `mat-snack-bar`…), construido sobre `@angular/cdk`
 - **Sistema de diseño**: tokens CSS en `src/styles/tokens.css`
-- **Tipografías**: Fraunces (títulos) + DM Sans (cuerpo)
-- **Iconos**: line/stroke (Lucide / Phosphor recomendados)
-- **Skill de diseño**: `hallmark` (bloqueada a `design.md` + `DESIGN_GUIDELINES.md`)
+- **Tipografías actuales**: Fraunces (títulos) + DM Sans (cuerpo) — pueden cambiar en el rediseño
+- **Iconos actuales**: bootstrap-icons line/stroke — pueden cambiar en el rediseño
+- **Sistema de diseño**: desbloqueado para el rediseño completo
+- **Skill de diseño**: `frontend-design` (plugin de Anthropic, instalado solo en este proyecto)
+- **Skill de Angular**: `angular-developer` (oficial de Angular, en `.claude/skills/`, instalada solo en este proyecto)
+- **Skills de Emil Kowalski**: 13 skills de pulido de UI y motion (en `.claude/skills/`, instaladas solo en este proyecto)
+- **Skill Taste**: `design-taste-frontend` v2.5.0 (en `.claude/skills/`, instalada solo en este proyecto; solo para páginas públicas)
 
 ---
 
-## Skill de diseño: Hallmark
+## Skill de diseño: frontend-design
 
-- Por defecto: pedir construir/diseñar algo → Hallmark sigue su flujo ciñéndose a `design.md` y `DESIGN_GUIDELINES.md`.
-- `hallmark audit <archivo>` → revisa UI existente contra anti-patrones, sin editar.
-- `hallmark redesign <archivo>` → rediseña dentro de los límites del proyecto, conservando rutas, copy e identidad.
-- **Importante**: Hallmark genera HTML/CSS por defecto. En este proyecto SIEMPRE debe entregar **componentes Angular 18 standalone**, no markup suelto ni JSX.
-- No emitir un nuevo `design.md`: ya existe y el sistema está bloqueado.
+- Úsala para el rediseño y para cualquier UI nueva o reformada.
+- Su plan de diseño (paleta, tipografías, layout, principios) se presenta y se acuerda con el usuario **antes** de escribir código.
+- La paleta y la tipografía acordadas se trasladan a `src/styles/tokens.css` como tokens `--ds-*`; los componentes nunca llevan hex sueltos.
+- Entrega SIEMPRE componentes Angular 18 standalone (reglas de abajo), nunca HTML suelto ni JSX.
+
+---
+
+## Skill de Angular: angular-developer
+
+- Úsala como guía de Angular (componentes, signals, DI, routing, formularios, testing).
+- Está escrita para la última versión de Angular. Este proyecto es **Angular 18** y las reglas de este archivo mandan sobre la skill. No apliques lo que exige v19 o posterior:
+  - `linkedSignal`, `resource` / `rxResource`, `httpResource` y `afterRenderEffect` (v19+)
+  - `animate.enter` / `animate.leave` (v20.2+); los nombres de archivo sin sufijo `.component` del style guide v20 (aquí se mantiene `nombre.component.ts`)
+  - Signal Forms y Angular Aria (v21+); Vitest (aquí se usan Karma + Jasmine)
+  - En v18, `standalone: true` es obligatorio; no es el valor por defecto.
+- Formularios: Reactive Forms (`references/reactive-forms.md`) o template-driven, según lo que ya use la pantalla.
+- Ignora su guía de Tailwind (prohibido en este proyecto).
+
+---
+
+## Skills de Emil Kowalski (pulido de UI y motion)
+
+- Instaladas desde `emilkowalski/skill`:
+  - `emil-design-eng`: filosofía de pulido y detalles;
+  - motion: `animate`, `choreograph`, `review-animations`, `improve-animations`, `remove-animations`, `find-animation-opportunities`, `animation-performance`, `animation-vocabulary`;
+  - otras: `apple-design`, `mobile-native`, `break-ui`, `prototype`.
+- No se instalaron `animate-expo` (React Native), `write-swift` (Swift), `ask-sonner` ni `pick-ui-library` (librerías de React).
+- `frontend-design` fija la dirección estética. Estas skills afinan la interacción, el motion y los detalles dentro de esa dirección.
+- Sus ejemplos usan React, Motion / Framer Motion, Sonner, Vaul y Tailwind. Aquí se traducen a Angular 18:
+  - transiciones y keyframes en el CSS del componente, WAAPI o `@angular/animations`;
+  - nada de Motion, Framer Motion, Sonner, Vaul ni Tailwind;
+  - `animate.enter` / `animate.leave` no existen en v18.
+- Curvas y duraciones con los tokens `--ds-ease-*` / `--ds-duration-*`. No copies sus `--ease-out` / `--ease-in-out` / `--ease-drawer`. Si hace falta una curva nueva, añádela a `tokens.css` como `--ds-ease-*`.
+- Con `prototype` y `break-ui`, las variantes y los datos de prueba también se entregan como componentes Angular standalone.
+
+---
+
+## Skill Taste: design-taste-frontend
+
+- Instalada desde `Leonxlnx/taste-skill` (v2.5.0, commit `9b4bf93`).
+- Está pensada para sitios web estáticos de empresa. Aquí solo se aplica a las **páginas públicas** (`/`, `/journal`, `/entrepreneurs`, `/login`), no a las pantallas de la aplicación.
+- `frontend-design` sigue fijando la dirección estética. De Taste se toman sus criterios (una sección por pantalla, bordes iguales, fotos reales, sin pies de foto, un solo sistema de botones y cards, contraste) y su verificador.
+- Su método se adapta a las reglas de este archivo:
+  - No uses `starter.html` ni copies sus `assets/`, `system.css` o `system.js` al proyecto. Todo se entrega como componentes Angular 18 standalone con CSS del componente.
+  - Las paletas y tipografías que reparte `start.mjs deal` son propuestas para acordar con el usuario. Si se aceptan, pasan a `tokens.css` como `--ds-*`; nunca uses su bloque `:root` tal cual.
+  - No reescribas el copy. El rediseño conserva textos, rutas y comportamiento salvo que el usuario pida otra cosa.
+  - Las fotos que descarga `photos.mjs` son provisionales; las reales las aporta el cliente.
+- Seguridad: skills.sh la marca «Critical» (Gen) y «Med» (Snyk) por una auditoría del 2-nov-2026 de la versión anterior, que traía `library/sites.json` con 2 URLs en listas negras y scripts que leían texto de webs externas. Esos archivos no existen en la v2.5.0 instalada. Aun así:
+  - Pide confirmación al usuario antes de ejecutar sus scripts (`consistency.mjs`, `shoot.mjs`, `perf.mjs`, `photos.mjs`, `icons.mjs`…), y ejecútalos solo contra páginas locales (build de `dist/` o `ng serve`).
+  - No la actualices (`npx skills update`) sin revisar de nuevo su contenido y el informe de skills.sh.
+
+---
+
+## Angular Material
+
+- Usa componentes de Material (botones, campos, selects, menús, diálogos, tabs…) antes que marcado propio o las clases heredadas.
+- Importa en cada componente standalone solo los módulos de Material que usa (`MatButtonModule`, `MatFormFieldModule`…).
+- El color y la tipografía salen del tema: `primary` = `--ds-gold-ink` (en M3 también es color de texto; el dorado no pasa AA), `primary-container` = `--ds-gold`, `mat-flat-button` = CTA dorado. Tabla completa en `DESIGN_GUIDELINES.md` §4.
+- Para ajustar un componente, sobrescribe sus variables `--mdc-*` / `--mat-*` en el CSS del componente con `var(--ds-...)`. Nunca `::ng-deep`, selectores a clases internas (`.mdc-*`, `.mat-mdc-*`) ni `color="primary|accent|warn"` (sin efecto en M3).
+- Radios y elevaciones de Material siguen por defecto hasta que el rediseño los fije.
+- No ejecutes `ng add @angular/material`: ya está instalado, y añadiría Roboto, Material Icons y un tema precompilado.
+
+---
+
+## Trabajo de UI
+
+- Entrega SIEMPRE **componentes Angular 18 standalone**, no markup suelto ni JSX.
+- Rediseñar: se puede cambiar paleta, tipografía, radios, iconos, layout e identidad. Conserva rutas, copy y comportamiento salvo que se pida lo contrario.
+- Cuando el rediseño fije la nueva dirección, actualiza `src/styles/tokens.css`, `design.md` y `DESIGN_GUIDELINES.md` para que la reflejen.
 
 ---
 
 ## Antes de generar código
 
-1. Lee `DESIGN_GUIDELINES.md` y `design.md` si vas a tocar UI.
-2. Usa la skill `hallmark` para el trabajo de interfaz.
-3. Identifica qué tokens CSS (`var(--ds-...)`) y qué utilidades del sistema vas a usar.
+1. Lee `DESIGN_GUIDELINES.md` y `design.md` para conocer el sistema actual si vas a tocar UI.
+2. Antes de cambiar la identidad visual (paleta, tipografía, etc.), acuerda la nueva dirección estética con el usuario.
+3. Identifica qué tokens CSS (`var(--ds-...)`) y qué utilidades vas a usar o a cambiar.
 4. Si la tarea es ambigua, pregunta antes de asumir una dirección estética.
 
 ---
@@ -57,29 +130,27 @@ Fuentes de verdad, en orden:
 
 ### Estilos
 - Usa tokens CSS del sistema (`var(--ds-...)`), nunca hex sueltos
-- CSS plano por componente (no SCSS), selector raíz `:host`
-- Bootstrap personalizado: usa sus clases (`.btn`, `.card`, `.row`, etc.) sin sobrescribirlas innecesariamente
+- CSS plano por componente (no SCSS; el único `.scss` es `src/styles/material-theme.scss`), selector raíz `:host`
+- Bootstrap está desinstalado. No uses las clases heredadas de `ui-base.css` en código nuevo ni añadas reglas a ese archivo
+- Al rediseñar una pantalla, sustituye sus clases heredadas por CSS del componente; cuando ninguna plantilla use una clase, borra sus reglas de `ui-base.css`
 
-### Identidad visual
+### Identidad visual actual (punto de partida, se puede cambiar)
 - Fondo beige `#F5F3EE`, alterno `#EFEDE6`, tarjetas crema `#FBFAF6`, tinta `#1A1A1A`, acento dorado `#D4B96E`
 - Tipografía: Fraunces para títulos, DM Sans para cuerpo
-- Iconos line/stroke, nunca filled
-- Bordes redondeados sutiles (4–12 px máximo)
+- Iconos line/stroke
+- Bordes redondeados sutiles (4–12 px)
 - Espaciado generoso
 
 ### Prohibiciones
-- Fondos negros / `#000`
-- Bootstrap defaults sin override (`#0d6efd`, `#6c757d`)
+- Reinstalar Bootstrap o `@ng-bootstrap` (para menús, overlays y diálogos usa Angular Material)
+- Crear otros archivos `.scss` aparte de `material-theme.scss`
 - Gradientes morado-rosa
-- Fuentes Inter, Roboto, Arial como principales
-- Iconos filled / emojis decorativos en UI
-- Sombras con `rgba(0,0,0,..)` (usar `rgba(26,26,26,..)` o tokens)
-- `border-radius` > 12px en UI
+- Emojis decorativos en UI
 - NgModules nuevos
 - `*ngIf` / `*ngFor` / `*ngSwitch` en código nuevo
 - Decoradores `@Input()` / `@Output()` en código nuevo
 - UI genérica sin postura estética
-- Que Hallmark elija un tema/paleta nuevos (sistema bloqueado en `design.md`)
+- Usar la skill `hallmark` en este proyecto
 
 ---
 
@@ -90,8 +161,10 @@ src/
 ├── index.html                  ← fuentes de Google aquí
 ├── styles.css                  ← overrides puntuales (mantener mínimo)
 ├── styles/
+│   ├── material-theme.scss     ← tema de Angular Material (único .scss): --mat-sys-* → --ds-*
 │   ├── tokens.css              ← sistema de tokens
-│   ├── bootstrap-overrides.css
+│   ├── ui-base.css             ← capa de transición: clases heredadas de Bootstrap aún en uso
+│   ├── bootstrap-overrides.css ← mapea las variables --bs-* de ui-base.css a los tokens
 │   └── components.css          ← utilidades propias del sistema
 └── app/
     ├── core/                   ← servicios singleton, interceptors, guards
@@ -122,10 +195,11 @@ ng generate component shared/ui/nombre \
 - [ ] `input()` / `signal()` (no `@Input()`)
 - [ ] `@if` / `@for` con `track` (no `*ngIf` / `*ngFor`)
 - [ ] Tokens CSS `var(--ds-...)` (no hex sueltos)
+- [ ] Componentes de Angular Material cuando existan para el caso, ajustados solo con sus variables `--mdc-*` / `--mat-*`
 - [ ] HTML semántico
 - [ ] Estados: hover, focus, active, disabled, loading
 - [ ] Contraste WCAG AA (4.5:1)
-- [ ] Iconos line/stroke
-- [ ] Sin fondos negros, sin emojis decorativos
-- [ ] Conforme a `design.md` y `DESIGN_GUIDELINES.md` (sistema bloqueado)
+- [ ] Iconos de un solo estilo, coherentes en toda la app
+- [ ] Sin emojis decorativos
+- [ ] Conforme a la dirección acordada del rediseño; si cambió la identidad, `tokens.css`, `design.md` y `DESIGN_GUIDELINES.md` actualizados
 - [ ] Dirección estética intencional, no genérica

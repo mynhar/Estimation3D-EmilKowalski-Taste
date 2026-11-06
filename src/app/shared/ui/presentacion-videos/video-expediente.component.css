@@ -1,10 +1,8 @@
-/* Hallmark · component: file presentation video (slot + actions + picker dialog) · genre: editorial
- * theme: locked (design.md · warm editorial · beige paper · gold accent)
+/* component: file presentation video (slot + actions + picker dialog)
  * states: default · hover · focus · active · disabled (mientras guarda) · loading (esqueleto,
  *         subiendo) · error (carga) · success (video en el expediente) · empty (sin video)
  * contrast: textos en --ds-ink / --ds-ink-secondary / --ds-ink-muted sobre papel (AA);
  *           duración en crema sobre espresso; error en --ds-danger-ink sobre -soft
- * pre-emit critique: P4 H4 E4 S4 R5 V4
  *
  * La ranura, la miniatura y los estados vacío · error · esqueleto están en
  * video-slot.css (compartida con app-videos-expediente-lectura).

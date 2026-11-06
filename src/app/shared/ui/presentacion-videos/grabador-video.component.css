@@ -1,8 +1,6 @@
-/* Hallmark · component: recorder (dialog + recording overlay) · genre: editorial
- * theme: locked (design.md · warm editorial · beige paper · gold accent)
+/* component: recorder (dialog + recording overlay)
  * states: default · hover · focus · active · disabled · loading · error · success
  * contrast: pass — texto claro sólo sobre --ds-dark-surface (chrome espresso, como la sidebar)
- * pre-emit critique: P4 H4 E4 S4 R5 V4
  */
 :host { display: contents; }
 

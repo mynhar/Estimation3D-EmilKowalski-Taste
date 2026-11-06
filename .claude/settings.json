@@ -114,12 +114,6 @@
       "Bash(Select-String -Pattern \"environment\")",
       "Bash(git rm *)",
       "PowerShell(git -C \"c:\\\\desarrollo\\\\estimation3d-A18-v01\" rm --cached src/environments/environment.ts src/environments/environment.production.ts 2>&1)",
-      "Read(//c/Users/Harold Bonilla Lopez/.claude/skills/hallmark/references/verbs/**)",
-      "Read(//c/Users/Harold Bonilla Lopez/.agents/skills/hallmark/references/verbs/**)",
-      "Read(//c/Users/Harold Bonilla Lopez/.claude/skills/hallmark/references/genres/**)",
-      "Read(//c/Users/Harold Bonilla Lopez/.agents/skills/hallmark/references/genres/**)",
-      "Read(//c/Users/Harold Bonilla Lopez/.claude/skills/hallmark/references/**)",
-      "Read(//c/Users/Harold Bonilla Lopez/.agents/skills/hallmark/references/**)",
       "Bash(npm --version)",
       "Bash(node -e \"const a=require\\('./angular.json'\\); const b=a.projects['estimation3d-a18-v01'].architect.build; console.log\\('defaultConfiguration:', b.defaultConfiguration\\); console.log\\('configurations:', Object.keys\\(b.configurations || {}\\)\\);\")",
       "Bash(node -e \"const a=require\\('./angular.json'\\); console.log\\(Object.keys\\(a.projects\\)\\);\")",
@@ -160,7 +154,6 @@
       "Bash(xargs wc -l)",
       "Bash(echo \"EXIT: $?\")",
       "Bash(awk 'NR>=256 && /^  \"[a-z]/ {print NR\": \"$0}' src/assets/i18n/fr.json)",
-      "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('.hallmark/log.json','utf8'\\)\\); console.log\\('log.json OK'\\)\")",
       "Bash(grep -nE \"#[0-9A-Fa-f]{3,8}\\\\b\" src/app/admin/contract/edit/edit.component.css)",
       "Bash(grep -nB2 \"border-radius: 20px\" src/app/admin/contract/edit/edit.component.css src/app/admin/offer/list/list.component.css)",
       "Bash(grep -viE \"supabase|//|environment\")",
@@ -204,5 +197,9 @@
       "c:\\desarrollo\\estimation3d-A18-v01",
       "c:\\desarrollo\\estimation3d-A18-v01\\src\\app\\types"
     ]
+  },
+  "enabledPlugins": {
+    "frontend-design@claude-plugins-official": true,
+    "ui-ux-pro-max@ui-ux-pro-max-skill": false
   }
 }

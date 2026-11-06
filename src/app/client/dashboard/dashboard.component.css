@@ -1,7 +1,4 @@
-/* Hallmark · macrostructure: Workbench · genre: editorial (warm-paper)
- * design-system: design.md · designed-as-app
- * pre-emit critique: P5 H5 E5 S5 R5 V4
- * Redesign pass 1: media-card → aspect-ratio 16/9 viewer (-30% height);
+/* Redesign pass 1: media-card → aspect-ratio 16/9 viewer (-30% height);
  *   grid → align-items:start, removed viewport-relative min-height.
  *   Playlist → pill tabs; header → top-accent + refined button.
  * Redesign pass 2 (UX/UI specialist): module cards → ::before gradient accent

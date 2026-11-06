@@ -1,6 +1,4 @@
-/* Hallmark · genre: editorial · macrostructure: Workbench · design-system: design.md · designed-as-app
- * pre-emit critique: P5 H5 E4 S5 R4 V4
- * Lienzo a ancho completo: el ancho lo consume el contenido (rejilla de servicios
+/* Lienzo a ancho completo: el ancho lo consume el contenido (rejilla de servicios
  * auto-fill + filas de campos por container-query), no un `max-width` fijo.
  */
 

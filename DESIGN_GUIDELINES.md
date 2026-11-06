@@ -1,20 +1,25 @@
 # DESIGN_GUIDELINES.md
 
-Guía de diseño y código para este proyecto. Cualquier UI nueva o modificada debe respetar lo que aquí se define. Aplica también si usas Claude Code, Copilot u otra IA para generar componentes.
+Guía de diseño y código para este proyecto. Aplica también si usas Claude Code, Copilot u otra IA para generar componentes.
+
+> **Sistema de diseño desbloqueado: rediseño completo en curso.** La sección 2 (identidad visual) describe el sistema **actual**, que es el punto de partida del rediseño, no una restricción: paleta, tipografías, radios, iconos, sombras y motion pueden cambiar. Siguen vigentes las convenciones técnicas (secciones 3–6, 9–11), el uso de tokens `var(--ds-...)` y el contraste WCAG AA. Cuando el rediseño fije la nueva dirección, actualiza esta guía, `design.md` y `src/styles/tokens.css`.
 
 ---
 
 ## 1. Stack del proyecto
 
 - **Framework**: Angular 18 (standalone components, signals, nuevo control flow)
-- **Estilos**: Bootstrap 5.3 + CSS plano (NO SCSS, NO Tailwind)
+- **Estilos**: CSS plano (NO SCSS, NO Tailwind). Única excepción: `src/styles/material-theme.scss`, el tema de Material. Bootstrap desinstalado: ver sección 4
+- **Componentes**: Angular Material 18 (M3), con su tema enlazado a los tokens `--ds-*`: ver sección 4
 - **Sistema de diseño**: tokens CSS en `src/styles/tokens.css`
 - **Tipografías**: Fraunces (serif) para títulos, DM Sans para cuerpo
 - **Iconos**: estilo line/stroke (Lucide o Phosphor recomendados), NUNCA filled
 
 ---
 
-## 2. Identidad visual
+## 2. Identidad visual (sistema actual)
+
+> Desbloqueada para el rediseño. Las prohibiciones de identidad de esta sección (fondos negros, fuentes Inter/Roboto/Arial, radios > 12px, iconos filled, sombras en negro puro, usos restringidos del dorado y la tinta) describen el sistema actual y pueden cambiar. Las reglas de contraste (texto `-ink` sobre fondos `-soft`, tokens de borde nunca como texto, colores claros nunca como texto sobre fondo claro) siguen vigentes y se adaptan a la nueva paleta.
 
 ### Paleta completa
 
@@ -92,13 +97,13 @@ Insignias neutras (cancelado, inactivo, contadores) sobre `--ds-bg-alt`: texto e
 .badge--gold { background: var(--ds-gold-faint);   color: var(--ds-gold-ink); border-color: var(--ds-gold-soft); }
 ```
 
-Con utilidades de Bootstrap: `bg-success-subtle text-success-emphasis` (nunca `text-success` ni `text-primary` sobre `-subtle`); las variables `--bs-*-text-emphasis` ya apuntan a los tokens `-ink`.
+Con las utilidades heredadas de `ui-base.css`: `bg-success-subtle text-success-emphasis` (nunca `text-success` ni `text-primary` sobre `-subtle`); las variables `--bs-*-text-emphasis` ya apuntan a los tokens `-ink`.
 
 El color base (`--ds-success`, `--ds-gold-active`…) se mantiene para rellenos, barras y bordes.
 
 **Dorado y mostaza como texto o icono, sobre cualquier fondo claro** → `--ds-gold-ink` / `--ds-warning-ink`. El dorado claro (`--ds-gold`, `--ds-gold-hover`, `--ds-gold-active`) no llega a 3:1 sobre beige ni crema (1.6–2.8:1): ni siquiera sirve para iconos o texto grande. El texto verde va en `--ds-success-ink` (el base cae a 4.1:1 sobre `--ds-bg-alt`). Excepción: sobre superficies oscuras (sidebar, panel del login) el dorado claro sí se usa como texto.
 
-### Reglas no negociables de color
+### Reglas de color (sistema actual)
 
 - **PROHIBIDO** usar fondos negros (`#000`, `#0a0a0a`, etc.)
 - **PROHIBIDO** usar Bootstrap defaults sin override (azul `#0d6efd`, gris `#6c757d`)
@@ -278,7 +283,7 @@ export class ProductCardComponent {
 
 ### Estilos del componente
 
-- Un archivo `.css` por componente (NO SCSS).
+- Un archivo `.css` por componente (NO SCSS; el único `.scss` del proyecto es el tema de Material).
 - Usa siempre tokens CSS (`var(--ds-...)`), no hex sueltos.
 - El selector raíz es `:host` (no el nombre del componente).
 
@@ -303,25 +308,49 @@ export class ProductCardComponent {
 
 ---
 
-## 4. Uso de Bootstrap 5
+## 4. Componentes: Angular Material y la capa de transición
 
-Bootstrap está **personalizado** mediante `src/styles/bootstrap-overrides.css`. Sus clases nativas heredan automáticamente la identidad visual.
+### Angular Material 18 (librería de componentes)
 
-### Clases de Bootstrap que SÍ debes usar
+Angular Material 18 (M3) es la librería de componentes del rediseño. Botones, campos, selects, checkboxes, menús, diálogos, snackbars, tabs y tooltips salen de Material antes que de marcado propio o de las clases heredadas.
 
-- **Grid**: `.container`, `.row`, `.col-*`, `.g-*`
-- **Flexbox**: `.d-flex`, `.align-items-*`, `.justify-content-*`, `.gap-*`
-- **Spacing**: `.m-*`, `.p-*`, `.mt-*`, etc.
-- **Componentes base**: `.btn`, `.card`, `.form-control`, `.alert`, `.navbar`, `.table`, `.modal`, `.dropdown`, `.badge`
-- **Responsive**: `.d-md-flex`, `.col-lg-*`, etc.
+- **Tema**: `src/styles/material-theme.scss`, el único `.scss` del proyecto. Con `use-system-variables`, los componentes leen color y tipografía de variables `--mat-sys-*`, y el tema enlaza cada rol a un token `--ds-*` (fuentes: `--ds-font-body` y `--ds-font-display`). Al cambiar los tokens, Material cambia solo: no hace falta tocar el tema.
+- **Roles de color**:
 
-### Clases de Bootstrap que NO debes usar
+| Rol M3 | Token | Dónde se ve |
+|---|---|---|
+| `primary` | `--ds-gold-ink` | Botón de texto y de contorno, foco de campos, checkbox, switch, tabs, progreso |
+| `on-primary` | `--ds-ink-inverse` | Texto e iconos sobre `primary` |
+| `primary-container` · `on-primary-container` | `--ds-gold` · `--ds-ink-on-accent` | FAB, rango del datepicker |
+| `secondary-container` · `on-secondary-container` | `--ds-gold-soft` · `--ds-gold-ink` | Botón tonal, chips seleccionados |
+| `surface` · `surface-container` | `--ds-surface` | Menús, diálogos, cards |
+| `surface-container-high` · `-lowest` | `--ds-surface-elevated` | Datepicker, capas elevadas |
+| `surface-container-highest` | `--ds-bg-alt` | Fondo del campo `fill` |
+| `on-surface` · `on-surface-variant` | `--ds-ink` · `--ds-ink-muted` | Texto · etiquetas, ayudas, iconos |
+| `outline` · `outline-variant` | `--ds-ink-faint` · `--ds-border` | Borde de campos y botón de contorno (≥ 3:1) · divisores |
+| `error` · `error-container` | `--ds-danger` · `--ds-danger-soft` | Errores de campos |
+| `inverse-surface` · `inverse-primary` | `--ds-dark-surface` · `--ds-gold` | Snackbar, tooltip, acción del snackbar |
 
-- `.bg-dark` (rompe la regla de no fondos negros)
-- `.text-white` excepto sobre `--ds-ink` (raro)
-- `.bg-primary` como fondo grande de sección (el dorado es acento, no fondo)
-- `.rounded-circle` excepto en avatares
-- `.shadow-lg` de Bootstrap (usa los tokens propios)
+  `primary` es `--ds-gold-ink` y no `--ds-gold` porque en M3 `primary` también es color de **texto**. El dorado da 1.7:1 sobre el fondo, lo que no pasa AA; `--ds-gold-ink` da ≥ 6:1.
+- **CTA**: `mat-flat-button` es el CTA principal, con relleno `--ds-gold` y texto `--ds-ink` (ajuste en el tema, ver «CTA voice» en `design.md`). `mat-stroked-button` es el secundario y `mat-button` el de texto.
+- **Imports**: cada componente standalone importa solo los módulos de Material que usa (`MatButtonModule`, `MatFormFieldModule`, `MatInputModule`…).
+- **Ajustes por componente**: sobrescribe las variables `--mdc-*` / `--mat-*` del componente de Material en el CSS del componente, siempre con `var(--ds-...)`. Nunca `::ng-deep` ni selectores contra clases internas (`.mdc-*`, `.mat-mdc-*`).
+- **Sin `color="primary|accent|warn"`**: en M3 ese input no cambia el color (necesitaría el mixin de compatibilidad M2). El color sale del tema.
+- **Radios y elevaciones**: de momento, los de Material (botones pill, diálogo de 28 px, sombras de Material). El rediseño los fijará con `--ds-radius-*` / `--ds-shadow-*`.
+- **No ejecutes `ng add @angular/material`**: Material ya está instalado, y el schematic añadiría Roboto, Material Icons y un tema precompilado. Los iconos siguen siendo bootstrap-icons.
+- **Animaciones**: `provideAnimations()` ya está en `app.config.ts`.
+- **CDK directo**: solo para comportamiento sin estilo que Material no cubre (drag & drop, virtual scroll…). El `CdkMenu` del menú ⋮ de `presentacion-videos` puede pasar a `mat-menu` cuando se rediseñe esa pantalla.
+
+### Bootstrap (desinstalado) y `ui-base.css`
+
+Bootstrap, `@ng-bootstrap` y Popper ya no están instalados. Las clases heredadas que las plantillas todavía usan (`.row`, `.col-*`, `.btn`, `.form-control`, `.d-flex`, `.mb-3`, `.spinner-border`…) las sirve `src/styles/ui-base.css`: solo las reglas de las clases en uso, extraídas de Bootstrap 5.3.8, en el mismo orden de cascada. `src/styles/bootstrap-overrides.css` mapea sus variables `--bs-*` a los tokens.
+
+- **No** uses clases heredadas en código nuevo ni añadas reglas a `ui-base.css`: el CSS nuevo va en cada componente, con tokens.
+- Al rediseñar una pantalla, sustituye sus clases heredadas por CSS del componente. Cuando ninguna plantilla use ya una clase, borra sus reglas de `ui-base.css` (y sus ajustes en `bootstrap-overrides.css` / `styles.css`).
+- Menús, overlays, diálogos y tooltips: Angular Material (ver arriba). Nunca de vuelta a ng-bootstrap.
+- Si una plantilla compone una clase heredada en ejecución (p. ej. `'text-bg-' + tipo` en el toast), esa clase debe figurar en `ui-base.css`.
+
+Los ejemplos siguientes documentan el marcado existente: sirven de referencia durante la transición, no como patrón para código nuevo.
 
 ### Botones
 
@@ -373,7 +402,7 @@ Bootstrap está **personalizado** mediante `src/styles/bootstrap-overrides.css`.
 
 ## 5. Utilidades del sistema (en `components.css`)
 
-Además de Bootstrap, tienes estas utilidades propias:
+Utilidades propias del sistema:
 
 ### Texto
 - `.eyebrow` — etiqueta uppercase dorada sobre títulos
@@ -423,7 +452,7 @@ Antes de cerrar un componente, verifica que:
 
 - Usa `<section class="section">` o `section-lg` para bloques de página.
 - Alterna `.section-alt` con `.section` plana para crear ritmo visual.
-- Usa el `.container` de Bootstrap para limitar ancho a 1200px.
+- Limita el ancho con los tokens `--ds-container-*` (el `.container` heredado de `ui-base.css`, solo en pantallas aún no rediseñadas).
 
 ### Hero
 
@@ -434,9 +463,9 @@ Antes de cerrar un componente, verifica que:
 
 ### Grids
 
-- Grid Bootstrap de 12 columnas como base.
-- Rompe la simetría a veces: combina `col-lg-5 + col-lg-7`, no siempre `4-4-4`.
-- `gap` generoso entre items: `g-4` mínimo, `g-5` en secciones amplias.
+- CSS Grid / Flexbox propios del componente (la rejilla `.row` / `.col-*` heredada, solo en pantallas aún no rediseñadas).
+- Rompe la simetría a veces: columnas 5 + 7, no siempre 4-4-4.
+- `gap` generoso entre items: `--ds-space-5` mínimo, `--ds-space-6` o más en secciones amplias.
 
 ---
 
@@ -489,8 +518,10 @@ src/
 ├── index.html              ← fuentes de Google aquí
 ├── styles.css              ← overrides puntuales (mantener mínimo)
 ├── styles/
+│   ├── material-theme.scss ← tema de Angular Material (único .scss): --mat-sys-* → --ds-*
 │   ├── tokens.css          ← variables del sistema
-│   ├── bootstrap-overrides.css
+│   ├── ui-base.css         ← capa de transición: clases heredadas de Bootstrap aún en uso
+│   ├── bootstrap-overrides.css ← mapea las variables --bs-* de ui-base.css a los tokens
 │   └── components.css      ← utilidades propias
 └── app/
     ├── core/               ← servicios singleton, interceptors, guards
@@ -526,22 +557,23 @@ ng test
 
 ## 12. Lo que NUNCA hacemos en este proyecto
 
-- Fondos negros o `#000`
 - Gradientes morado-rosa
-- Fuentes Inter / Roboto / Arial como principales
-- Iconos filled o emojis decorativos
+- Emojis decorativos
 - `*ngIf` / `*ngFor` / `*ngSwitch` en código nuevo
 - Decoradores `@Input()` / `@Output()` en código nuevo
 - NgModules nuevos (todo standalone)
 - Componentes sin `OnPush`
 - Estilos sin tokens CSS (no `color: #1A1A1A`, sí `color: var(--ds-ink)`)
 - UI genérica sin postura estética
-- Hex de Bootstrap defaults (`#0d6efd`, `#6c757d`, etc.)
-- Colores de estado de Bootstrap (`.text-success`, `.bg-danger`...) — usa los tokens `--ds-success/warning/danger/info`
+- Reinstalar Bootstrap / ng-bootstrap — componentes con Angular Material
+- Otros archivos `.scss` aparte de `material-theme.scss`
+- Colores fijos en Material: ni hex en las variables `--mdc-*` / `--mat-*`, ni `color="primary|accent|warn"`. El color sale de los roles `--mat-sys-*`
+- Clases heredadas de `ui-base.css` (`.btn`, `.row`, `.text-success`, `.bg-danger`…) en código nuevo — CSS del componente con los tokens `--ds-*`
 - `z-index` con números mágicos — usa la escala `--ds-z-*`
-- `border-radius` mayor a 12px en elementos UI
-- Sombras con `rgba(0, 0, 0, ...)` — usa `rgba(26, 26, 26, ...)` o los tokens
+- Sombras con valores sueltos — usa los tokens `--ds-shadow-*`
 - Densidad agresiva (`padding: 0.25rem`) sin justificación
+
+Desbloqueadas para el rediseño (eran reglas de la identidad actual): fondos negros, fuentes Inter / Roboto / Arial, iconos filled, `border-radius` mayor a 12px y sombras en negro puro.
 
 ---
 
@@ -549,4 +581,4 @@ ng test
 
 Si trabajas con asistentes de IA en este proyecto, dales este archivo como contexto. Una buena instrucción inicial sería:
 
-> "Trabajo en un proyecto Angular 18 con Bootstrap 5 y CSS plano. Sigue estrictamente las reglas de `DESIGN_GUIDELINES.md`. Antes de generar código, identifica qué tokens CSS y componentes del sistema vas a usar. No uses fondos negros, no uses gradientes morados, no uses Inter/Roboto, no uses `*ngIf`/`*ngFor`, no uses NgModules. Usa standalone components con OnPush, signals, nuevo control flow, y los tokens del sistema."
+> "Trabajo en un proyecto Angular 18 con Angular Material 18 y CSS plano (Bootstrap desinstalado). Sigue las reglas de `DESIGN_GUIDELINES.md`; la identidad visual está desbloqueada para un rediseño completo. Antes de generar código, identifica qué tokens CSS y componentes del sistema vas a usar o a cambiar. No uses gradientes morados, no uses `*ngIf`/`*ngFor`, no uses NgModules. Usa standalone components con OnPush, signals, nuevo control flow, y los tokens del sistema."

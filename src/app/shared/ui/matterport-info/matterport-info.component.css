@@ -1,8 +1,7 @@
-/* Hallmark · component: panel (data ficha) · genre: editorial · theme: locked (design.md)
- * pre-emit critique: P5 H5 E5 S4 R5 V4
+/* component: panel (data ficha)
  * states: default · hover · focus · active · disabled · loading · error · success
  * contrast: pass (tinta #1A1A1A / #4A4A4A / #7A7770 sobre crema #FBFAF6)
- * Sistema bloqueado: todo color y tipografía sale de var(--ds-*).
+ * Todo color y tipografía sale de var(--ds-*).
  */
 
 :host {

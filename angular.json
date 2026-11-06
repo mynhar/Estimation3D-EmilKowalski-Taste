@@ -16,7 +16,7 @@
             "outputPath": "dist/estimation3d-a18-v01",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "polyfills": ["zone.js", "@angular/localize/init"],
+            "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "assets": [
               {
@@ -30,17 +30,15 @@
               }
             ],
             "styles": [
-              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "src/styles/material-theme.scss",
+              "src/styles/ui-base.css",
               "node_modules/bootstrap-icons/font/bootstrap-icons.css",
               "src/styles/tokens.css",
               "src/styles/bootstrap-overrides.css",
               "src/styles/components.css",
               "src/styles.css"
             ],
-            "scripts": [
-              "node_modules/@popperjs/core/dist/umd/popper.min.js",
-              "node_modules/bootstrap/dist/js/bootstrap.min.js"
-            ]
+            "scripts": []
           },
           "configurations": {
             "production": {
@@ -99,7 +97,8 @@
               }
             ],
             "styles": [
-              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "src/styles/material-theme.scss",
+              "src/styles/ui-base.css",
               "node_modules/bootstrap-icons/font/bootstrap-icons.css",
               "src/styles/tokens.css",
               "src/styles/bootstrap-overrides.css",

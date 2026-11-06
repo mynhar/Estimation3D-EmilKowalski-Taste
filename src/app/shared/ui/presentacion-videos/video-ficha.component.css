@@ -1,10 +1,8 @@
-/* Hallmark · component: presentation video card, read-only (full slot | compact row) · genre: editorial
- * theme: locked (design.md · warm editorial · beige paper · gold accent)
+/* component: presentation video card, read-only (full slot | compact row)
  * states: default · hover · focus-visible · active (ranura y fila compacta); sin disabled,
  *         loading ni error propios: los lleva quien la usa (la lista o la página)
  * contrast: título en --ds-ink, rótulo y meta en --ds-ink-muted sobre --ds-bg (AA);
  *           duración en crema sobre espresso (ver video-slot.css)
- * pre-emit critique: P4 H4 E4 S4 R5 V4
  *
  * La ranura grande es la de video-slot.css. La compacta es una fila de
  * miniatura pequeña + título, para tarjetas de ~300 px como las de oferta.

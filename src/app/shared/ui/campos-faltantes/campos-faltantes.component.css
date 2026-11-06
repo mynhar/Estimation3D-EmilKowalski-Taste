@@ -1,4 +1,4 @@
-/* Hallmark · component: error-summary · genre: editorial · theme: locked (design.md)
+/* component: error-summary
  * states: default · hover · focus · active · disabled (sin destino: texto, no enlace)
  *         · loading (n/a: se calcula al momento) · error (= default)
  *         · success (lista vacía: el resumen desaparece)

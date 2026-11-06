@@ -22,14 +22,14 @@ for (const m of tokensCss.matchAll(/(--ds-[a-z0-9-]+)\s*:/gi)) {
   defined.add(m[1]);
 }
 
-// 2. Recorrer recursivamente los .css y comprobar cada var(--ds-*)
+// 2. Recorrer recursivamente los .css (y el .scss del tema de Material) y comprobar cada var(--ds-*)
 function walk(dir) {
   const out = [];
   for (const entry of readdirSync(dir)) {
     const full = join(dir, entry);
     const st = statSync(full);
     if (st.isDirectory()) out.push(...walk(full));
-    else if (entry.endsWith('.css')) out.push(full);
+    else if (entry.endsWith('.css') || entry.endsWith('.scss')) out.push(full);
   }
   return out;
 }
