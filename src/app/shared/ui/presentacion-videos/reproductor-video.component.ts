@@ -89,7 +89,7 @@ export class ReproductorVideoComponent {
         if (!v) { if (this.idAbierto) this.dialogo().nativeElement.close(); return; }
         if (v.id !== this.idAbierto) void this.abrir(v);
       });
-    }, { allowSignalWrites: true });
+    });
   }
 
   private async abrir(v: DbPerfilVideo): Promise<void> {

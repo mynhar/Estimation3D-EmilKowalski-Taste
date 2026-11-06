@@ -92,7 +92,7 @@ export class MyOffersComponent implements OnInit {
       this.busqueda();
       this.filtroEstado();
       this.paginaActual.set(1);
-    }, { allowSignalWrites: true });
+    });
   }
 
   // ── Ciclo de vida ─────────────────────────────────────────────────────────

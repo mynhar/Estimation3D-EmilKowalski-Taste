@@ -113,7 +113,7 @@ export class AvailableFilesComponent implements OnInit {
       this.filtroCompetencia();
       this.filtroOferta();
       this.paginaActual.set(1);
-    }, { allowSignalWrites: true });
+    });
   }
 
   // ── Ciclo de vida ─────────────────────────────────────────────────────────

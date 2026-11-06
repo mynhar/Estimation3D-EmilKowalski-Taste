@@ -100,7 +100,7 @@ export class EstimatorConstructionMonitoringListComponent implements OnInit {
       this.filtroEstado();
       this.busqueda();
       this.paginaActual.set(1);
-    }, { allowSignalWrites: true });
+    });
   }
 
   setBusqueda(e: Event) {

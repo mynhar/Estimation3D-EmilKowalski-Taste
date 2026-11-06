@@ -101,7 +101,7 @@ export class EstimatedFilesComponent implements OnInit {
       this.busqueda();
       this.filtroEstado();
       this.paginaActual.set(1);
-    }, { allowSignalWrites: true });
+    });
   }
 
   contarEstado(estado: string): number {

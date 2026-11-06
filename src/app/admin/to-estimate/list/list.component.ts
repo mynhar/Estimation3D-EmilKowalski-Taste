@@ -103,7 +103,7 @@ export class AdminToEstimateListComponent implements OnInit {
       this.busqueda();
       this.filtroEstado();
       this.paginaActual.set(1);
-    }, { allowSignalWrites: true });
+    });
   }
 
   async ngOnInit() {

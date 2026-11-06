@@ -75,7 +75,7 @@ export class EstimatorClientListComponent implements OnInit {
       this.filtroProveedor();
       this.filtroActivo();
       this.paginaActual.set(1);
-    }, { allowSignalWrites: true });
+    });
   }
 
   async ngOnInit(): Promise<void> {

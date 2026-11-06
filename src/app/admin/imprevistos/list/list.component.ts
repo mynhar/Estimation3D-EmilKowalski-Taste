@@ -60,7 +60,7 @@ export class AdminImprevistosListComponent implements OnInit {
       this.busqueda();
       this.filtroActivo();
       this.paginaActual.set(1);
-    }, { allowSignalWrites: true });
+    });
   }
 
   async ngOnInit() {

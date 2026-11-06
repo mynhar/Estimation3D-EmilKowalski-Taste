@@ -96,7 +96,7 @@ export class AdminConstructionMonitoringListComponent implements OnInit {
       this.busqueda();
       this.filtroEstado();
       this.paginaActual.set(1);
-    }, { allowSignalWrites: true });
+    });
   }
 
   setBusqueda(e: Event) {

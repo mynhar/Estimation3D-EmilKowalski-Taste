@@ -78,7 +78,7 @@ export class MyFilesComponent implements OnInit {
     effect(() => {
       this.filtro();
       this.paginaActual.set(1);
-    }, { allowSignalWrites: true });
+    });
   }
 
   // ── Counts ─────────────────────────────────────────────────────────────────

@@ -74,7 +74,7 @@ export class ConstructionMonitoringListComponent implements OnInit {
     effect(() => {
       this.filtroEstado();
       this.paginaActual.set(1);
-    }, { allowSignalWrites: true });
+    });
   }
 
   async ngOnInit() {

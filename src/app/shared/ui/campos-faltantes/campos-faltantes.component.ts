@@ -155,7 +155,7 @@ export class CamposFaltantesComponent {
         this.version.update(v => v + 1); // el DOM ya puede tener etiquetas nuevas
         afterNextRender(() => this.enfocarResumen(), { injector: this.injector });
       });
-    }, { allowSignalWrites: true });
+    });
   }
 
   irA(f: Faltante): void {

@@ -162,7 +162,7 @@ export class ObraCardComponent implements OnDestroy {
       this.fechaSel.set(o.partesUltimoDia[0] ? this.soloFecha(o.partesUltimoDia[0].reporte.fecha) : null);
       this.partesDia.set(o.partesUltimoDia);
       this.cargandoDia.set(false);
-    }, { allowSignalWrites: true });
+    });
 
     // Re-suscribe el canal de media a los partes del día elegido, para reflejar
     // en vivo las fotos/vídeos/documentos que sube o elimina el constructor.

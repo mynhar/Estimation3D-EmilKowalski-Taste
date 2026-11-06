@@ -62,7 +62,7 @@ export class AdminAiEventsListComponent implements OnInit {
       this.filtroTipo();
       this.filtroResuelto();
       this.paginaActual.set(1);
-    }, { allowSignalWrites: true });
+    });
   }
 
   async ngOnInit() {

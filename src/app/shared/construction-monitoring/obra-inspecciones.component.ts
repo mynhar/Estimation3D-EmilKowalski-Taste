@@ -112,7 +112,7 @@ export class ObraInspeccionesComponent implements OnInit, OnDestroy {
       if (this.esEstimador() && !this.tipoTocado) {
         this.nuevaTipo.set('estimador');
       }
-    }, { allowSignalWrites: true });
+    });
   }
 
   async ngOnInit(): Promise<void> {
