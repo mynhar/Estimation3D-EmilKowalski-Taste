@@ -6,7 +6,6 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
  */
 @Component({
   selector: 'app-claude-icon',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"

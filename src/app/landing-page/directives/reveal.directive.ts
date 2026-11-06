@@ -9,7 +9,6 @@ import { Directive, ElementRef, NgZone, OnDestroy, afterNextRender, inject, inpu
  */
 @Directive({
   selector: '[e3Reveal]',
-  standalone: true,
   host: { '[class.rv]': 'true', '[class.rv-d1]': 'delay() === 1', '[class.rv-d2]': 'delay() === 2', '[class.rv-d3]': 'delay() === 3' },
 })
 export class RevealDirective implements OnDestroy {

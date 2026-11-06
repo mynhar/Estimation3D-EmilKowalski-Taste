@@ -13,7 +13,6 @@ import { ContratoListItem, nombreServicio, serviciosParaContrato } from '../../.
 
 @Component({
   selector: 'app-contract-list',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe, NgTemplateOutlet, ExpedientePanelComponent, AvisoArchivadoComponent],
   templateUrl: './list.component.html',

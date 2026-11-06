@@ -28,7 +28,6 @@ import { CampoExtra, CamposFaltantesComponent, listaEstable } from '../../../sha
 
 @Component({
   selector: 'app-admin-offer-edit',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, TranslatePipe, DecimalPipe, OfertaRepartoComponent, ServicioSelectorComponent, AvisoArchivadoComponent, ArchivarExpedienteComponent, BotonArchivarComponent, CamposFaltantesComponent],
   templateUrl: './edit.component.html',

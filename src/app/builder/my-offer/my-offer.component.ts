@@ -22,7 +22,6 @@ const ESTADO_ICON: Record<string, string> = {
 
 @Component({
   selector: 'app-my-offer',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe, AvisoArchivadoComponent, VideoExpedienteComponent, VideosExpedienteLecturaComponent],
   templateUrl: './my-offer.component.html',

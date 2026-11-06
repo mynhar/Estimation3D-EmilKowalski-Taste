@@ -29,7 +29,6 @@ interface ModeloVM {
  */
 @Component({
   selector: 'app-matterport-info',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe],
   templateUrl: './matterport-info.component.html',

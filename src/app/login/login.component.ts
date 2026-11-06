@@ -10,7 +10,6 @@ import { CAMPOS_FALTANTES } from '../shared/ui/campos-faltantes/campos-faltantes
 
 @Component({
   selector: 'app-login',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ReactiveFormsModule, TranslatePipe, RouterLink, ...CAMPOS_FALTANTES],
   templateUrl: './login.component.html',

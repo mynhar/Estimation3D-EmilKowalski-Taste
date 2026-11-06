@@ -49,7 +49,6 @@ const CONTRATO_PCT: Record<string, number> = {
 
 @Component({
   selector: 'app-admin-file-edit',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ReactiveFormsModule, FormsModule, TranslatePipe, AdminFileEstimatorReportComponent, AdminFileBuilderBidsComponent, ServicioSelectorComponent, AvisoArchivadoComponent, ArchivarExpedienteComponent, BotonArchivarComponent, ...CAMPOS_FALTANTES],
   templateUrl: './edit.component.html',

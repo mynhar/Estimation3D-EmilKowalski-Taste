@@ -22,7 +22,6 @@ const ESTADOS_OBRA = ['firmado', 'en_ejecucion', 'completado'];
 
 @Component({
   selector: 'app-client-construction-monitoring-list',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe, ObraCardComponent, ExpedientePanelComponent],
   templateUrl: './list.component.html',

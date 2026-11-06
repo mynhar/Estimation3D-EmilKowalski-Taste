@@ -23,7 +23,6 @@ interface Servicio {
 
 @Component({
   selector: 'app-admin-service-type-edit',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ReactiveFormsModule, TranslatePipe, ...CAMPOS_FALTANTES],
   templateUrl: './edit.component.html',

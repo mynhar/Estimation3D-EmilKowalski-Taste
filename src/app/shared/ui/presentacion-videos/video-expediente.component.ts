@@ -30,7 +30,6 @@ type Tarea = { tipo: 'subiendo'; titulo: string } | { tipo: 'guardando' } | { ti
  */
 @Component({
   selector: 'app-video-expediente',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe, GrabadorVideoComponent, ReproductorVideoComponent],
   templateUrl: './video-expediente.component.html',

@@ -25,7 +25,6 @@ type VistaExpedientes = 'tabla' | 'tarjetas';
 
 @Component({
   selector: 'app-my-files',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, TranslatePipe, PaginationComponent, ClaudeIconComponent],
   templateUrl: './my-files.component.html',

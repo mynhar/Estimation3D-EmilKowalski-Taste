@@ -21,7 +21,6 @@ interface CalDia { num: number; tipo: 'vacio' | 'normal' | 'trabajado' | 'hoy' |
 
 @Component({
   selector: 'app-obra-inspecciones',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe],
   templateUrl: './obra-inspecciones.component.html',

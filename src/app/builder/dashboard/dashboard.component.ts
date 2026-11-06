@@ -47,7 +47,6 @@ interface ObraResumen {
 
 @Component({
   selector: 'app-builder-dashboard',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, TranslatePipe],
   templateUrl: './dashboard.component.html',

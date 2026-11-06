@@ -16,7 +16,6 @@ interface FunnelItem { estado: string; count: number }
 
 @Component({
   selector: 'app-admin-dashboard',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe, PaginationComponent, RouterLink],
   templateUrl: './dashboard.component.html',

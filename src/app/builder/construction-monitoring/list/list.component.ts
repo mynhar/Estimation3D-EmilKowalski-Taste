@@ -22,7 +22,6 @@ type VistaContratos = 'tabla' | 'tarjetas';
 
 @Component({
   selector: 'app-construction-monitoring-list',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe, PaginationComponent],
   templateUrl: './list.component.html',

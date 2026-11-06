@@ -4,7 +4,7 @@ import { Directive, ElementRef, NgZone, OnDestroy, afterNextRender, inject } fro
  * Activa la animación de barrido sólo mientras el elemento está en pantalla.
  * Reemplaza el bloque `[data-sweep]` de assets/site.js.
  */
-@Directive({ selector: '[e3Sweep]', standalone: true })
+@Directive({ selector: '[e3Sweep]' })
 export class SweepDirective implements OnDestroy {
   private el = inject(ElementRef<HTMLElement>).nativeElement as HTMLElement;
   private zone = inject(NgZone);

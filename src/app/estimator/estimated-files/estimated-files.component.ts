@@ -21,7 +21,6 @@ type VistaExpedientes = 'tabla' | 'tarjetas';
 
 @Component({
   selector: 'app-estimated-files',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, TranslatePipe, PaginationComponent],
   templateUrl: './estimated-files.component.html',

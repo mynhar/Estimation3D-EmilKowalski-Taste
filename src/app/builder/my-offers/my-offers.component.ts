@@ -19,7 +19,6 @@ type VistaOfertas = 'tabla' | 'tarjetas';
 
 @Component({
   selector: 'app-my-offers',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, FormsModule, TranslatePipe, PaginationComponent],
   templateUrl: './my-offers.component.html',

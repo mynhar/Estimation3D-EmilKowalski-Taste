@@ -15,7 +15,6 @@ import { VideoFichaComponent } from './video-ficha.component';
  */
 @Component({
   selector: 'app-videos-expediente-lectura',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe, VideoFichaComponent],
   templateUrl: './videos-expediente-lectura.component.html',

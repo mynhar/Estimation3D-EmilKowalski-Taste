@@ -15,7 +15,6 @@ let siguienteId = 0;
  */
 @Component({
   selector: 'app-expediente-panel',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe],
   templateUrl: './expediente-panel.component.html',

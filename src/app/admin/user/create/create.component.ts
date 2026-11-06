@@ -15,7 +15,6 @@ import { CAMPOS_FALTANTES } from '../../../shared/ui/campos-faltantes/campos-fal
 
 @Component({
   selector: 'app-admin-user-create',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ReactiveFormsModule, TranslatePipe, ...CAMPOS_FALTANTES],
   templateUrl: './create.component.html',

@@ -45,7 +45,6 @@ type Burbuja = ChatMensaje | BurbujaError;
  */
 @Component({
   selector: 'app-ai-assistant',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe, FormsModule],
   templateUrl: './ai-assistant.component.html',

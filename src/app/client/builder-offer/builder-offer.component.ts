@@ -29,7 +29,6 @@ import { VideoFichaComponent } from '../../shared/ui/presentacion-videos/video-f
 
 @Component({
   selector: 'app-builder-offer',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe, AvisoArchivadoComponent, VideoFichaComponent],
   templateUrl: './builder-offer.component.html',

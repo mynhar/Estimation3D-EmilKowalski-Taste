@@ -23,7 +23,6 @@ function passwordOpcionalValidator(ctrl: AbstractControl): ValidationErrors | nu
 
 @Component({
   selector: 'app-admin-user-edit',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DatePipe, ReactiveFormsModule, TranslatePipe, PresentacionVideosComponent, ...CAMPOS_FALTANTES],
   templateUrl: './edit.component.html',

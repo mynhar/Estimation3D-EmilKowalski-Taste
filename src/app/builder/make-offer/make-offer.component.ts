@@ -22,7 +22,6 @@ import { VideoExpedienteComponent } from '../../shared/ui/presentacion-videos/vi
 
 @Component({
   selector: 'app-make-offer',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, TranslatePipe, DecimalPipe, MatterportInfoComponent, ServicioSelectorComponent, CamposFaltantesComponent, VideoExpedienteComponent],
   templateUrl: './make-offer.component.html',

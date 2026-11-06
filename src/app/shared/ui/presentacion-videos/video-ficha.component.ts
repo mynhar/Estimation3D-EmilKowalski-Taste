@@ -14,7 +14,6 @@ import { formatoDuracion, formatoRelativo } from './grabacion';
  */
 @Component({
   selector: 'app-video-ficha',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe, ReproductorVideoComponent],
   templateUrl: './video-ficha.component.html',

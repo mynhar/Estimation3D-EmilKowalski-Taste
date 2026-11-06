@@ -27,7 +27,6 @@ type FiltroTipo = 'todos' | TipoArchivo;
 
 @Component({
   selector: 'app-client-my-documents-list',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe, NgTemplateOutlet, ReproductorVideoComponent],
   templateUrl: './list.component.html',

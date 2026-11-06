@@ -21,7 +21,6 @@ import {
 
 @Component({
   selector: 'app-estimated-file',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, TranslatePipe, MatterportInfoComponent, VideoExpedienteComponent],
   templateUrl: './estimated-file.component.html',

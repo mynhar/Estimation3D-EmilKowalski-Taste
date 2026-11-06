@@ -13,7 +13,6 @@ type Grupo = 'todos' | 'creados' | 'en_estimacion' | 'estimados';
 
 @Component({
   selector: 'app-estimator-file-list',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, RouterLink, TranslatePipe],
   templateUrl: './list.component.html',

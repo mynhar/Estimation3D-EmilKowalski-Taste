@@ -55,7 +55,6 @@ let siguienteId = 0;
  */
 @Component({
   selector: 'app-campos-faltantes',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe],
   templateUrl: './campos-faltantes.component.html',

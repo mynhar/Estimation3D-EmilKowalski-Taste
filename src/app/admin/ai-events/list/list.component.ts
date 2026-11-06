@@ -9,7 +9,6 @@ type FiltroResuelto = 'todos' | 'pendiente' | 'resuelto';
 
 @Component({
   selector: 'app-admin-ai-events-list',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe, PaginationComponent],
   templateUrl: './list.component.html',

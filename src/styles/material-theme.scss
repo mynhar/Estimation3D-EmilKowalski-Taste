@@ -103,9 +103,12 @@ $roles-color: (
   scrim: var(--ds-ink),
 );
 
-/* Estilos base de Material: ripple, overlay de CDK (sustituye a
-   @angular/cdk/overlay-prebuilt.css), visually-hidden y autofill. */
-@include mat.core();
+/* Desde Material 19, `mat.core()` está vacío: cada componente carga sus
+   estilos base (ripple, overlay de CDK, visually-hidden, autofill).
+   Estas dos mixins sustituyen a `mat.core()` (las puso `ng update`): clases
+   `.mat-elevation-z*` y `.mat-app-background`. */
+@include mat.elevation-classes();
+@include mat.app-background();
 
 /* Tokens de cada componente (leen --mat-sys-*). */
 html {
@@ -114,12 +117,14 @@ html {
 
 /* :root gana a html por especificidad, sin depender del orden. */
 :root {
-  @include mat.system-level-colors($tema, $roles-color);
-  @include mat.system-level-typography($tema);
-
-  /* CTA principal (design.md · CTA voice): relleno dorado + texto tinta. */
+  /* CTA principal (design.md · CTA voice): relleno dorado + texto tinta.
+     Las declaraciones van antes de los @include: Sass desaconseja
+     declaraciones detrás de reglas anidadas (mixed-decls). */
   --mdc-filled-button-container-color: var(--ds-gold);
   --mdc-filled-button-label-text-color: var(--ds-ink-on-accent);
   --mat-filled-button-state-layer-color: var(--ds-ink-on-accent);
   --mat-filled-button-ripple-color: color-mix(in srgb, var(--ds-ink-on-accent) 12%, transparent);
+
+  @include mat.system-level-colors($tema, $roles-color);
+  @include mat.system-level-typography($tema);
 }

@@ -20,7 +20,6 @@ type FiltroActivo = 'todos' | 'activo' | 'inactivo';
 
 @Component({
   selector: 'app-admin-service-type-list',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, TranslatePipe, PaginationComponent],
   templateUrl: './list.component.html',

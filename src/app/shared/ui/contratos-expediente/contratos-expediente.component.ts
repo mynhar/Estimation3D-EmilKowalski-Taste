@@ -21,7 +21,6 @@ function fueraDeObra(estado: string): boolean {
 
 @Component({
   selector: 'app-contratos-expediente',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, TranslatePipe],
   templateUrl: './contratos-expediente.component.html',

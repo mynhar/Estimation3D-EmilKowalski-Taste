@@ -18,7 +18,6 @@ import { ClaudeIconComponent } from './shared/ui/claude-icon/claude-icon.compone
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterOutlet, RouterLink, RouterLinkActive, ToastComponent, TranslatePipe, LangToggleComponent, AppFooterComponent, ClaudeIconComponent],
   templateUrl: './app.component.html',

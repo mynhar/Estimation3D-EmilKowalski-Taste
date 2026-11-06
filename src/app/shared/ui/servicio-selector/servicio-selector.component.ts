@@ -48,7 +48,6 @@ let secuencia = 0;
  */
 @Component({
   selector: 'app-servicio-selector',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe],
   templateUrl: './servicio-selector.component.html',

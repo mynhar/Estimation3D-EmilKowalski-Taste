@@ -11,7 +11,6 @@ interface ServicioOpcion { id: number; nombre: string; }
 
 @Component({
   selector: 'app-admin-imprevistos-edit',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ReactiveFormsModule, TranslatePipe, ...CAMPOS_FALTANTES],
   templateUrl: './edit.component.html',

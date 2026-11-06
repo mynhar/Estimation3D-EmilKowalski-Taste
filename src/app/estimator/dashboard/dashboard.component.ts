@@ -52,7 +52,6 @@ interface ObraResumen {
 
 @Component({
   selector: 'app-estimator-dashboard',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, TranslatePipe],
   templateUrl: './dashboard.component.html',

@@ -19,7 +19,6 @@ import { JOURNAL_CARDS, JOURNAL_CATS, JournalCat } from './journal.data';
  */
 @Component({
   selector: 'app-journal',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.Emulated,
   imports: [RouterLink, TranslatePipe, RevealDirective, SweepDirective],

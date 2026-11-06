@@ -17,7 +17,6 @@ type VistaExpedientes = 'tabla' | 'tarjetas';
 
 @Component({
   selector: 'app-offers-received',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe, NgTemplateOutlet],
   templateUrl: './offers-received.component.html',

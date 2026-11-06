@@ -9,7 +9,6 @@ import { CAMPOS_FALTANTES } from '../../../shared/ui/campos-faltantes/campos-fal
 
 @Component({
   selector: 'app-admin-fichas-edit',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ReactiveFormsModule, TranslatePipe, ...CAMPOS_FALTANTES],
   templateUrl: './edit.component.html',

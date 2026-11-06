@@ -28,7 +28,6 @@ interface ClienteRow {
 
 @Component({
   selector: 'app-estimator-file-create',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ReactiveFormsModule, RouterLink, TranslatePipe, ServicioSelectorComponent, ...CAMPOS_FALTANTES],
   templateUrl: './create.component.html',

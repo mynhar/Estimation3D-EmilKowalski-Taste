@@ -18,7 +18,6 @@ import {
 
 @Component({
   selector: 'app-admin-construction-monitoring-list',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe, PaginationComponent],
   templateUrl: './list.component.html',

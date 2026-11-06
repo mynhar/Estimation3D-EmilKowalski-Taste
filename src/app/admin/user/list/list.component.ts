@@ -16,7 +16,6 @@ const ROL_BADGE_CLASS: Record<string, string> = {
 
 @Component({
   selector: 'app-admin-user-list',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, TranslatePipe, PaginationComponent],
   templateUrl: './list.component.html',

@@ -21,7 +21,6 @@ import { CampoExtra, CamposFaltantesComponent, listaEstable } from '../../../sha
  */
 @Component({
   selector: 'app-admin-file-builder-bids',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, TranslatePipe, OfertaRepartoComponent, CamposFaltantesComponent],
   templateUrl: './builder-bids.component.html',

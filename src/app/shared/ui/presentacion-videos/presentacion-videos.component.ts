@@ -38,7 +38,6 @@ interface Pendiente { clave: string; titulo: string; }
  */
 @Component({
   selector: 'app-presentacion-videos',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     TranslatePipe, CdkMenuTrigger, CdkMenu, CdkMenuItem,

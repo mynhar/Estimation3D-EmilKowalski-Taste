@@ -21,7 +21,6 @@ import { DbPerfilVideo } from '../../../types/supabase';
 
 @Component({
   selector: 'app-my-file',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, TranslatePipe, NgTemplateOutlet, MatterportInfoComponent, ContratosExpedienteComponent, AvisoArchivadoComponent, VideoFichaComponent],
   templateUrl: './my-file.component.html',

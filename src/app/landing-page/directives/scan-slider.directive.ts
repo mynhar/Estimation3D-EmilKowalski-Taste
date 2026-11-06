@@ -13,7 +13,6 @@ const MAX = 0.96;
  */
 @Directive({
   selector: '[e3ScanSlider]',
-  standalone: true,
   host: {
     'role': 'slider',
     'tabindex': '0',

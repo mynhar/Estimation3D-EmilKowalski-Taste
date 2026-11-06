@@ -21,7 +21,6 @@ import { VideoExpedienteComponent } from '../../shared/ui/presentacion-videos/vi
 
 @Component({
   selector: 'app-file-under-estimation',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, TranslatePipe, MatterportInfoComponent, CamposFaltantesComponent, VideoExpedienteComponent],
   templateUrl: './file-under-estimation.component.html',

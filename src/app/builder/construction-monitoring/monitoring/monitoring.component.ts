@@ -37,7 +37,6 @@ interface CalDia { num: number; tipo: 'vacio' | 'normal' | 'trabajado' | 'hoy' |
 
 @Component({
   selector: 'app-construction-monitoring',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe, AvisoArchivadoComponent, ArchivarExpedienteComponent, BotonArchivarComponent],
   templateUrl: './monitoring.component.html',

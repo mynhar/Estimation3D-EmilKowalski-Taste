@@ -22,7 +22,6 @@ export type AmbitoArchivado = 'expediente' | 'oferta' | 'contrato' | 'obra' | 'a
  */
 @Component({
   selector: 'app-aviso-archivado',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe, DatePipe],
   templateUrl: './aviso-archivado.component.html',

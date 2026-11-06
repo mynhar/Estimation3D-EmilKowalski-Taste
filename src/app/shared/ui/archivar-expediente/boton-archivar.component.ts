@@ -10,7 +10,6 @@ import { ArchivarExpedienteComponent } from './archivar-expediente.component';
  */
 @Component({
   selector: 'app-boton-archivar',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe],
   templateUrl: './boton-archivar.component.html',

@@ -18,7 +18,6 @@ import {
 
 @Component({
   selector: 'app-admin-contract-list',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, TranslatePipe, PaginationComponent],
   templateUrl: './list.component.html',

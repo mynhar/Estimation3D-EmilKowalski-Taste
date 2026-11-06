@@ -35,7 +35,6 @@ export class RegistroCampos {
  */
 @Directive({
   selector: '[formControlName],[formControl]',
-  standalone: true,
 })
 export class CampoFormularioDirective implements OnDestroy {
   private registro = inject(RegistroCampos);

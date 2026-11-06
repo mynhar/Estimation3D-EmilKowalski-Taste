@@ -21,7 +21,6 @@ import { extensionDeMime, formatoDuracion, formatoTamano } from './grabacion';
  */
 @Component({
   selector: 'app-reproductor-video',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe],
   templateUrl: './reproductor-video.component.html',

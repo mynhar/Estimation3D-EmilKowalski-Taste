@@ -47,7 +47,6 @@ function especialidadRequerida(ctrl: AbstractControl): ValidationErrors | null {
  */
 @Component({
   selector: 'app-entrepreneurs',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.Emulated,
   imports: [RouterLink, TranslatePipe, ReactiveFormsModule, RevealDirective, SweepDirective, ...CAMPOS_FALTANTES],

@@ -18,7 +18,6 @@ import { VideoExpedienteComponent } from '../../shared/ui/presentacion-videos/vi
 
 @Component({
   selector: 'app-file-to-be-estimated',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, TranslatePipe, CamposFaltantesComponent, VideoExpedienteComponent],
   templateUrl: './file-to-be-estimated.component.html',

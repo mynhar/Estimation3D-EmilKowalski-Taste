@@ -28,7 +28,6 @@ const BUCKET   = 'archivos';
 
 @Component({
   selector: 'app-perfil',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, TranslatePipe, CamposFaltantesComponent, PresentacionVideosComponent],
   templateUrl: './perfil.component.html',

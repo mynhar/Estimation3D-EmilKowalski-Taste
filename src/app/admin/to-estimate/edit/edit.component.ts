@@ -24,7 +24,6 @@ import { CampoExtra, CamposFaltantesComponent, listaEstable } from '../../../sha
 
 @Component({
   selector: 'app-admin-to-estimate-edit',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, TranslatePipe, MatterportInfoComponent, AvisoArchivadoComponent, ArchivarExpedienteComponent, BotonArchivarComponent, CamposFaltantesComponent],
   templateUrl: './edit.component.html',

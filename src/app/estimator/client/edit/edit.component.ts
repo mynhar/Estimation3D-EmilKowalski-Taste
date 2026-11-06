@@ -22,7 +22,6 @@ function passwordOpcionalValidator(ctrl: AbstractControl): ValidationErrors | nu
 
 @Component({
   selector: 'app-estimator-client-edit',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DatePipe, ReactiveFormsModule, TranslatePipe, ...CAMPOS_FALTANTES],
   templateUrl: './edit.component.html',

@@ -4,7 +4,6 @@ import { LangService } from '../../services/lang.service';
 
 @Component({
   selector: 'app-lang-toggle',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe],
   templateUrl: './lang-toggle.component.html',

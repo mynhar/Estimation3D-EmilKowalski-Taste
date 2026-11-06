@@ -36,7 +36,6 @@ interface DiaObra {
 
 @Component({
   selector: 'app-obra-card',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe, ObraInspeccionesComponent, AvisoArchivadoComponent],
   templateUrl: './obra-card.component.html',

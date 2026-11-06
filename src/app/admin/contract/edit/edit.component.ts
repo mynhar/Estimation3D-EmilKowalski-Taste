@@ -22,7 +22,6 @@ type LangPdf = 'es' | 'en' | 'fr';
 
 @Component({
   selector: 'app-admin-contract-edit',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe, AvisoArchivadoComponent, ArchivarExpedienteComponent, BotonArchivarComponent],
   templateUrl: './edit.component.html',

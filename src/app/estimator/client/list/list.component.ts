@@ -12,7 +12,6 @@ type RolExterno = Extract<RolUsuario, 'cliente' | 'constructor'>;
 
 @Component({
   selector: 'app-estimator-client-list',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, TranslatePipe, PaginationComponent],
   templateUrl: './list.component.html',

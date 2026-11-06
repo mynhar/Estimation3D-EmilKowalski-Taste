@@ -25,7 +25,6 @@ const FASES = ['creado', 'estimado', 'adjudicado', 'contratado', 'obra', 'comple
 
 @Component({
   selector: 'app-client-history',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe],
   templateUrl: './history.component.html',

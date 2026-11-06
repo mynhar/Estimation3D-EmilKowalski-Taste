@@ -43,7 +43,6 @@ function normalizar(texto: string): string {
  */
 @Component({
   selector: 'app-admin-archived-list',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, TranslatePipe],
   templateUrl: './list.component.html',

@@ -91,7 +91,6 @@ function copiarEstilos(origen: Document, destino: Document): void {
  */
 @Component({
   selector: 'app-grabador-video',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe],
   templateUrl: './grabador-video.component.html',

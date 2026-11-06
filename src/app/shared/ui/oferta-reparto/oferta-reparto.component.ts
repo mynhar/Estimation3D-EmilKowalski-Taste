@@ -25,7 +25,6 @@ export type AccionReparto = 'rechazar' | 'reactivar';
  */
 @Component({
   selector: 'app-oferta-reparto',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe],
   templateUrl: './oferta-reparto.component.html',

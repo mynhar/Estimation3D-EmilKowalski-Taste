@@ -24,7 +24,6 @@ import { CampoExtra, CamposFaltantesComponent, listaEstable } from '../../../sha
  */
 @Component({
   selector: 'app-admin-file-estimator-report',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, TranslatePipe, MatterportInfoComponent, CamposFaltantesComponent],
   templateUrl: './estimator-report.component.html',

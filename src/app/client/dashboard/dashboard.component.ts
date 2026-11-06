@@ -80,7 +80,6 @@ function estadoPriority(e: ExpedienteCliente): number {
 
 @Component({
   selector: 'app-dashboard',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, TranslatePipe, ContratosExpedienteComponent, VideoFichaComponent],
   templateUrl: './dashboard.component.html',

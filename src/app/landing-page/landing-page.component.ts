@@ -26,7 +26,6 @@ const CA_POSTAL_RE = /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/;
 
 @Component({
   selector: 'app-landing-page',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   // Encapsulación emulada (la de por defecto): Angular prefija cada selector, lo que
   // aísla los ~1000 selectores de la landing de Bootstrap y del design system de la app.

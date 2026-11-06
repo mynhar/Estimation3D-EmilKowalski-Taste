@@ -47,7 +47,6 @@ const TEXTOS: Record<AccionArchivo, {
  */
 @Component({
   selector: 'app-archivar-expediente',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe],
   templateUrl: './archivar-expediente.component.html',

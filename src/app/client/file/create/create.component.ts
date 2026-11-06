@@ -24,7 +24,6 @@ interface PerfilDireccion {
 
 @Component({
   selector: 'app-file-create',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ReactiveFormsModule, TranslatePipe, ServicioSelectorComponent, ...CAMPOS_FALTANTES],
   templateUrl: './create.component.html',

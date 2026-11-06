@@ -18,7 +18,6 @@ import { ObraCardComponent } from '../../../shared/construction-monitoring/obra-
 
 @Component({
   selector: 'app-estimator-construction-monitoring',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TranslatePipe, RouterLink, ObraCardComponent],
   templateUrl: './monitoring.component.html',
