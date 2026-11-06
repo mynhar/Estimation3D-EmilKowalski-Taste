@@ -6,9 +6,9 @@
       @if (miniatura(); as src) {
         <img [src]="src" alt="">
       } @else {
-        <i class="bi bi-camera-video ve-thumb__fallback"></i>
+        <mat-icon class="ve-thumb__fallback">videocam</mat-icon>
       }
-      <span class="ve-thumb__play"><i class="bi bi-play"></i></span>
+      <span class="ve-thumb__play"><mat-icon>play_arrow</mat-icon></span>
       <span class="ve-thumb__dur">{{ duracion() }}</span>
     </span>
     <span class="vf-compacta__text">
@@ -29,9 +29,9 @@
       @if (miniatura(); as src) {
         <img [src]="src" alt="">
       } @else {
-        <i class="bi bi-camera-video ve-thumb__fallback" aria-hidden="true"></i>
+        <mat-icon class="ve-thumb__fallback" aria-hidden="true">videocam</mat-icon>
       }
-      <span class="ve-thumb__play" aria-hidden="true"><i class="bi bi-play"></i></span>
+      <span class="ve-thumb__play" aria-hidden="true"><mat-icon>play_arrow</mat-icon></span>
       <span class="ve-thumb__dur">{{ duracion() }}</span>
     </button>
 

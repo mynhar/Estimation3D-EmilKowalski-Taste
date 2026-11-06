@@ -1,0 +1,31 @@
+/* component: status chip
+ * states: info · accion · atencion · ok · neutro · error
+ * contrast: texto -ink sobre su -soft (≥ 6.2:1); neutro ink-secondary sobre bg-alt (9.0:1)
+ */
+:host {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  min-height: 28px;
+  padding: 2px var(--ds-space-3);
+  border-radius: var(--ds-radius-pill);
+  font-size: var(--ds-text-sm);
+  font-weight: var(--ds-weight-medium);
+  line-height: 1.2;
+  white-space: nowrap;
+  background: var(--ds-bg-alt);
+  color: var(--ds-ink-secondary);
+}
+
+:host([data-tono='info'])     { background: var(--ds-info-soft);    color: var(--ds-info-ink); }
+:host([data-tono='accion'])   { background: var(--ds-scan-soft);    color: var(--ds-action-ink); }
+:host([data-tono='atencion']) { background: var(--ds-warning-soft); color: var(--ds-warning-ink); }
+:host([data-tono='ok'])       { background: var(--ds-success-soft); color: var(--ds-success-ink); }
+:host([data-tono='error'])    { background: var(--ds-danger-soft);  color: var(--ds-danger-ink); }
+
+.chip__icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-left: -2px;
+}

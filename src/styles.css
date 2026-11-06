@@ -534,3 +534,14 @@ hr { border-color: var(--warm-border); opacity: 1; }
   .photo-thumb { width: 88px; height: 88px; }
   .photo-thumb__delete { opacity: 1; }
 }
+
+/* ── Visor 3D / vídeo a pantalla completa (MatDialog, panelClass) ────────── */
+/* El panel vive en el overlay del CDK, fuera de cualquier componente: por eso
+   su ajuste va aquí, solo con variables --mat-* de Material. */
+.e3d-viewer-pane {
+  --mat-dialog-container-shape: 0;
+  --mat-dialog-container-color: var(--ds-dark-surface-deep);
+  --mat-dialog-container-max-width: 100vw;
+  --mat-dialog-container-small-max-width: 100vw;
+  --mat-dialog-container-elevation-shadow: none;
+}

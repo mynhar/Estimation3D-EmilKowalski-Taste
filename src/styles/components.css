@@ -11,13 +11,13 @@
    ============================================================ */
 .page-wrapper {
   width: 100%;
-  padding: var(--ds-space-4) var(--ds-space-3);
+  padding: var(--ds-space-5) var(--ds-space-4);
 }
 @media (min-width: 768px) {
-  .page-wrapper { padding: var(--ds-space-4) var(--ds-space-4); }
+  .page-wrapper { padding: var(--ds-space-6) var(--ds-space-5); }
 }
 @media (min-width: 1200px) {
-  .page-wrapper { padding: var(--ds-space-5) var(--ds-space-5); }
+  .page-wrapper { padding: var(--ds-space-7) var(--ds-space-6); }
 }
 
 /* ============================================================

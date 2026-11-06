@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe } from '@ngx-translate/core';
 import { LangService } from '../../../services/lang.service';
 import { DbPerfilVideo } from '../../../types/supabase';
@@ -15,7 +16,7 @@ import { formatoDuracion, formatoRelativo } from './grabacion';
 @Component({
   selector: 'app-video-ficha',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, ReproductorVideoComponent],
+  imports: [TranslatePipe, MatIconModule, ReproductorVideoComponent],
   templateUrl: './video-ficha.component.html',
   styleUrls: ['./video-slot.css', './video-ficha.component.css'],
 })

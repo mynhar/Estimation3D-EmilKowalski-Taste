@@ -1,12 +1,13 @@
 import {
-  ChangeDetectionStrategy, Component, ElementRef, OnInit,
-  computed, inject, signal, viewChild,
+  ChangeDetectionStrategy, Component, OnInit, computed, inject, signal,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { AuthSupabaseService } from '../../services/auth-supabase.service';
 import { ExpedienteService } from '../../services/expediente.service';
 import { ArchivoService } from '../../services/archivo.service';
@@ -17,53 +18,27 @@ import { ArchivoRow, ContratoPanelCliente, ExpedienteCliente, ExpedienteVistaCli
 import { ContratosExpedienteComponent } from '../../shared/ui/contratos-expediente/contratos-expediente.component';
 import { VideoFichaComponent } from '../../shared/ui/presentacion-videos/video-ficha.component';
 import { OfertaHistorialItem } from '../../services/expediente.service';
-
-// ── 5 visual phases for the progress bar ─────────────────────────────────────
-
-export const FASES = [
-  { key: 'nuevo',         icon: 'bi-inbox'            },
-  { key: 'en_estimacion', icon: 'bi-search'            },
-  { key: 'estimado',      icon: 'bi-clipboard-check'   },
-  { key: 'en_oferta',     icon: 'bi-chat-square-quote' },
-  { key: 'contratado',    icon: 'bi-check-circle'      },
-] as const;
-
-// Maps DB estado to 1-based phase index (adjudicado → 5, cancelado → 0)
-const FASE_MAP: Record<string, number> = {
-  nuevo:         1,
-  en_estimacion: 2,
-  estimado:      3,
-  en_oferta:     4,
-  adjudicado:    5,
-  contratado:    5,
-  cancelado:     0,
-  archivado:     0,
-};
-
-// Token-based CSS class per estado
-const ESTADO_CLASE: Record<string, string> = {
-  nuevo:         'estado-badge--nuevo',
-  en_estimacion: 'estado-badge--en-estimacion',
-  estimado:      'estado-badge--estimado',
-  en_oferta:     'estado-badge--en-oferta',
-  adjudicado:    'estado-badge--adjudicado',
-  contratado:    'estado-badge--contratado',
-  cancelado:     'estado-badge--cancelado',
-  archivado:     'badge-archivado',
-};
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../shared/ui/empty-state/empty-state.component';
+import { StatusChipComponent } from '../../shared/ui/status-chip/status-chip.component';
+import { StageLineComponent } from '../../shared/ui/stage-line/stage-line.component';
+import { DossierCardComponent } from '../../shared/ui/dossier-card/dossier-card.component';
+import { TourPosterComponent } from '../../shared/ui/tour-poster/tour-poster.component';
+import { abrirVisor } from '../../shared/ui/media-viewer/media-viewer.component';
+import { etapaDossier } from '../../shared/util/etapas';
 
 // Último hito de un contrato según su estado. Fechado con `actualizado_en`:
 // la base no guarda cuándo empezó la ejecución ni cuándo terminó.
-const CONTRATO_EVENTO_FIN: Record<string, { tipo: string; icon: string; titulo: string }> = {
-  en_ejecucion: { tipo: 'ejecucion_iniciada',  icon: 'bi-play-circle', titulo: 'timeline.execution_started'  },
-  completado:   { tipo: 'contrato_completado', icon: 'bi-check2-all',  titulo: 'timeline.contract_completed' },
-  cancelado:    { tipo: 'contrato_cancelado',  icon: 'bi-x-circle',    titulo: 'timeline.contract_cancelled' },
-  archivado:    { tipo: 'contrato_archivado',  icon: 'bi-archive',     titulo: 'timeline.contract_archived' },
+const CONTRATO_EVENTO_FIN: Record<string, { tipo: string; matIcon: string; titulo: string }> = {
+  en_ejecucion: { tipo: 'ejecucion_iniciada',  matIcon: 'play_circle', titulo: 'timeline.execution_started'  },
+  completado:   { tipo: 'contrato_completado', matIcon: 'done_all',    titulo: 'timeline.contract_completed' },
+  cancelado:    { tipo: 'contrato_cancelado',  matIcon: 'cancel',      titulo: 'timeline.contract_cancelled' },
+  archivado:    { tipo: 'contrato_archivado',  matIcon: 'archive',     titulo: 'timeline.contract_archived' },
 };
 
 export interface TimelineEvento {
   fecha:      string;
-  icon:       string;
+  matIcon:    string;
   titulo:     string;
   subtitulo?: string;
   tipo:       string;
@@ -81,21 +56,23 @@ function estadoPriority(e: ExpedienteCliente): number {
 @Component({
   selector: 'app-dashboard',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, TranslatePipe, ContratosExpedienteComponent, VideoFichaComponent],
+  imports: [
+    RouterLink, TranslatePipe, MatButtonModule, MatIconModule,
+    ContratosExpedienteComponent, VideoFichaComponent,
+    PageHeaderComponent, EmptyStateComponent, StatusChipComponent, StageLineComponent,
+    DossierCardComponent, TourPosterComponent,
+  ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })
 export class DashboardComponent implements OnInit {
-  private matterportIframe = viewChild<ElementRef<HTMLIFrameElement>>('matterportIframe');
-  private mediaVideo       = viewChild<ElementRef<HTMLVideoElement>>('mediaVideo');
-
   private auth               = inject(AuthSupabaseService);
   private expedienteService  = inject(ExpedienteService);
   private archivoService     = inject(ArchivoService);
   private documentosService  = inject(DocumentosClienteService);
   private contratoService    = inject(ContratoService);
   private translate          = inject(TranslateService);
-  private sanitizer          = inject(DomSanitizer);
+  private dialog             = inject(MatDialog);
 
   user        = toSignal(this.auth.user$);
   currentLang = toSignal(
@@ -109,12 +86,10 @@ export class DashboardComponent implements OnInit {
   idSeleccionado  = signal<string | null>(null);
   detalleActivo   = signal<ExpedienteVistaCliente | null>(null);
   cargandoDetalle = signal(false);
-  matterportTip   = signal(false);
 
-  // Media zone — index: 0..tourUrls.length-1 = tours, then videos
+  // Medios del expediente activo: tours 3D (Matterport) y videos
   tourUrls    = signal<string[]>([]);
   videos      = signal<ArchivoRow[]>([]);
-  mediaActiva = signal<number>(0);
 
   // Historia del expediente activo (los contratos salen de `contratos`)
   ofertasHistorial  = signal<OfertaHistorialItem[]>([]);
@@ -133,19 +108,7 @@ export class DashboardComponent implements OnInit {
   contratos        = signal<ContratoPanelCliente[]>([]);
   eliminando       = signal<string | null>(null);
 
-  readonly FASES = FASES;
-
-  // ── KPI computed ──────────────────────────────────────────────────────────
-
-  total       = computed(() => this.expedientes().length);
-  enProceso   = computed(() =>
-    this.expedientes().filter(e => ['nuevo','en_estimacion','estimado'].includes(e.estado)).length);
-  conOfertas  = computed(() =>
-    this.expedientes().filter(e => e.estado === 'en_oferta').length);
-  completados = computed(() =>
-    this.expedientes().filter(e => e.estado === 'contratado').length);
-
-  // ── Active expediente ─────────────────────────────────────────────────────
+  // ── Expediente activo ─────────────────────────────────────────────────
 
   expedienteActivo = computed(() =>
     this.expedientes().find(e => this.expId(e) === this.idSeleccionado())
@@ -153,40 +116,33 @@ export class DashboardComponent implements OnInit {
     ?? null
   );
 
-  faseActual = computed((): number => {
+  /** Etapa 1–6 del expediente activo; los contratos pueden adelantarla. 0 = fuera del flujo. */
+  etapaActiva = computed(() => {
     const exp = this.expedienteActivo();
-    return exp ? (FASE_MAP[exp.estado] ?? 1) : 0;
+    return exp ? etapaDossier(exp.estado, this.contratos()) : 0;
   });
 
-  estadoClase = computed((): string => {
-    const exp = this.expedienteActivo();
-    return exp ? (ESTADO_CLASE[exp.estado] ?? 'estado-badge--nuevo') : 'estado-badge--nuevo';
+  /** Otros expedientes (no el activo) que tienen ofertas por revisar. */
+  ofertasEnOtros = computed(() => {
+    const activo = this.expedienteActivo();
+    return this.expedientes().filter(e => e.estado === 'en_oferta' && e !== activo).length;
   });
 
-  faseActualPct = computed((): number => {
-    const exp = this.expedienteActivo();
-    return exp ? Math.round((FASE_MAP[exp.estado] ?? 0) / 5 * 100) : 0;
+  /** Nombre para el saludo: perfil, metadatos de la cuenta o el correo. */
+  nombre = computed(() => {
+    const p = this.perfil();
+    if (p?.nombre) return [p.nombre, p.apellido].filter(Boolean).join(' ');
+    const u = this.user();
+    return u?.user_metadata?.['full_name'] ?? u?.email?.split('@')[0] ?? '';
   });
 
-  matterportUrl = computed((): SafeResourceUrl | null => {
-    if (!this.activaEsTour()) return null;
-    const url = this.tourUrls()[this.mediaActiva()];
-    return url ? this.sanitizer.bypassSecurityTrustResourceUrl(url) : null;
-  });
+  // ── Medios ────────────────────────────────────────────────────────────────
 
-  // ── Media zone computed ───────────────────────────────────────────────────
-
-  activaEsTour = computed(() => this.mediaActiva() < this.tourUrls().length);
   tieneTour    = computed(() => this.tourUrls().length > 0);
   tieneVideos  = computed(() => this.videos().length > 0);
   tieneMedia   = computed(() => this.tieneTour() || this.tieneVideos());
 
-  tieneEstimacion = computed(() => !!this.detalleActivo()?.estimador_nombre);
-  tieneContrato   = computed(() => this.contratos().length > 0);
-
-  // ── Avance computed ───────────────────────────────────────────────────────
-
-  expCancelado = computed(() => this.expedienteActivo()?.estado === 'cancelado');
+  // ── Avance de los contratos ───────────────────────────────────────────────
 
   /** Los cancelados no cuentan ni en el avance ni en el costo. */
   contratosVigentes = computed(() => this.contratos().filter(c => c.estado !== 'cancelado'));
@@ -201,20 +157,8 @@ export class DashboardComponent implements OnInit {
     return vs.length ? Math.round(vs.reduce((s, c) => s + c.avance_obra, 0) / vs.length) : 0;
   });
 
-  /** Fechas clave: los contratos en el orden en que se adjudicaron. */
-  contratosCronologicos = computed(() =>
-    [...this.contratos()].sort((a, b) =>
-      new Date(a.generado_en).getTime() - new Date(b.generado_en).getTime()));
-
   obrasCompletadas = computed(() =>
     this.contratosVigentes().filter(c => c.obra_estado === 'completada').length);
-
-  videoActivoUrl = computed((): string | null => {
-    if (this.activaEsTour()) return null;
-    const vidIdx = this.mediaActiva() - this.tourUrls().length;
-    const v = this.videos()[vidIdx];
-    return v ? this.archivoService.publicUrl(v.url_storage) : null;
-  });
 
   // ── Timeline computed ─────────────────────────────────────────────────────
 
@@ -225,12 +169,12 @@ export class DashboardComponent implements OnInit {
     const events: TimelineEvento[] = [];
 
     // ── 1. Expediente creado ──────────────────────────────────────────────
-    events.push({ fecha: d.creado_en, tipo: 'creacion', icon: 'bi-folder-plus', titulo: 'timeline.created' });
+    events.push({ fecha: d.creado_en, tipo: 'creacion', matIcon: 'create_new_folder', titulo: 'timeline.created' });
 
     // ── 2. Estimador asignado ─────────────────────────────────────────────
     if (d.estimador_nombre) {
       events.push({
-        fecha: d.fecha_visita, tipo: 'asignacion', icon: 'bi-person-check',
+        fecha: d.fecha_visita, tipo: 'asignacion', matIcon: 'how_to_reg',
         titulo: 'timeline.estimator_assigned', subtitulo: d.estimador_nombre,
       });
     }
@@ -239,12 +183,12 @@ export class DashboardComponent implements OnInit {
     if (d.fecha_visita_real) {
       events.push({
         fecha: d.fecha_visita_real, tipo: 'visita_real',
-        icon: 'bi-calendar-check', titulo: 'timeline.visit_done',
+        matIcon: 'event_available', titulo: 'timeline.visit_done',
       });
     } else if (d.fecha_visita && d.estimador_nombre) {
       events.push({
         fecha: d.fecha_visita, tipo: 'visita_prog',
-        icon: 'bi-calendar-check', titulo: 'timeline.visit_scheduled',
+        matIcon: 'event', titulo: 'timeline.visit_scheduled',
       });
     }
 
@@ -252,7 +196,7 @@ export class DashboardComponent implements OnInit {
     if (this.tourUrls().length > 0 || this.videos().length > 0) {
       events.push({
         fecha: d.fecha_visita_real ?? d.fecha_visita, tipo: 'tour',
-        icon: 'bi-camera-video', titulo: 'timeline.tour_available',
+        matIcon: 'view_in_ar', titulo: 'timeline.tour_available',
       });
     }
 
@@ -262,7 +206,7 @@ export class DashboardComponent implements OnInit {
       events.push({
         fecha: ofertas[i].creado_en,
         tipo:  `oferta_${i}`,
-        icon:  'bi-chat-square-quote',
+        matIcon: 'request_quote',
         titulo: 'timeline.offer_received',
         subtitulo: `#${i + 1}`,
       });
@@ -275,20 +219,20 @@ export class DashboardComponent implements OnInit {
       const quien = c.constructor_nombre;
       events.push({
         fecha: c.generado_en, tipo: `oferta_aceptada_${c.id}`,
-        icon: 'bi-handshake', titulo: 'timeline.offer_accepted', subtitulo: quien,
+        matIcon: 'handshake', titulo: 'timeline.offer_accepted', subtitulo: quien,
       });
 
       if (c.firmado_en) {
         events.push({
           fecha: c.firmado_en, tipo: `contrato_firmado_${c.id}`,
-          icon: 'bi-pen', titulo: 'timeline.contract_signed', subtitulo: quien,
+          matIcon: 'draw', titulo: 'timeline.contract_signed', subtitulo: quien,
         });
       }
 
       if (c.fecha_inicio) {
         events.push({
           fecha: c.fecha_inicio, tipo: `inicio_obras_${c.id}`,
-          icon: 'bi-hammer', titulo: 'timeline.works_started', subtitulo: quien,
+          matIcon: 'construction', titulo: 'timeline.works_started', subtitulo: quien,
         });
       }
 
@@ -296,7 +240,7 @@ export class DashboardComponent implements OnInit {
       if (fin) {
         events.push({
           fecha: c.actualizado_en, tipo: `${fin.tipo}_${c.id}`,
-          icon: fin.icon, titulo: fin.titulo, subtitulo: quien,
+          matIcon: fin.matIcon, titulo: fin.titulo, subtitulo: quien,
         });
       }
     }
@@ -446,23 +390,11 @@ export class DashboardComponent implements OnInit {
 
   // ── Helpers ───────────────────────────────────────────────────────────────
 
-  get bienvenida(): string {
-    const p = this.perfil();
-    if (p?.nombre) {
-      return [p.nombre, p.apellido].filter(Boolean).join(' ');
-    }
-    const u = this.user();
-    return u?.user_metadata?.['full_name'] ?? u?.email?.split('@')[0] ?? '';
-  }
-
   expId(exp: ExpedienteCliente): string { return exp.id; }
 
-  progresoPct(exp: ExpedienteCliente): number {
-    return Math.round((FASE_MAP[exp.estado] ?? 0) / 5 * 100);
-  }
-
-  estadoClaseFor(estado: string): string {
-    return ESTADO_CLASE[estado] ?? 'estado-badge--nuevo';
+  /** Etapa de un expediente de la lista (sin sus contratos: solo se cargan los del activo). */
+  etapaLista(exp: ExpedienteCliente): number {
+    return exp === this.expedienteActivo() ? this.etapaActiva() : etapaDossier(exp.estado);
   }
 
   servicioNombre(s: ExpedienteCliente['servicio']): string {
@@ -480,9 +412,6 @@ export class DashboardComponent implements OnInit {
     return d.servicio_nombre;
   }
 
-  isFaseDone(idx: number): boolean   { return this.faseActual() > idx + 1; }
-  isFaseActive(idx: number): boolean { return this.faseActual() === idx + 1; }
-
   formatFecha(valor: string | null | undefined): string {
     if (!valor) return '—';
     const d = new Date(valor.includes('T') ? valor : `${valor}T00:00:00`);
@@ -497,39 +426,36 @@ export class DashboardComponent implements OnInit {
       : `${p['day']} ${p['month']} ${p['year']}`;
   }
 
-  seleccionarMedia(idx: number) {
-    this.mediaActiva.set(idx);
-  }
-
   formatPrecio(precio: number): string {
     return new Intl.NumberFormat('fr-CA', {
       style: 'currency', currency: 'CAD', maximumFractionDigits: 0,
     }).format(precio);
   }
 
-  mimeIcon(mime: string): string {
-    if (mime.startsWith('image/')) return 'bi-image';
-    if (mime.includes('pdf'))      return 'bi-file-earmark-pdf';
-    return 'bi-file-earmark';
+  /** Tipo de documento, para elegir su icono en la plantilla. */
+  tipoDoc(mime: string): 'imagen' | 'pdf' | 'otro' {
+    if (mime.startsWith('image/')) return 'imagen';
+    if (mime.includes('pdf'))      return 'pdf';
+    return 'otro';
   }
 
   docUrl(archivo: ArchivoRow): string {
     return this.archivoService.publicUrl(archivo.url_storage);
   }
 
-  solicitarFullscreen() {
-    if (this.activaEsTour()) {
-      const el = this.matterportIframe()?.nativeElement as HTMLIFrameElement & { requestFullscreen?: () => void };
-      if (el?.requestFullscreen) el.requestFullscreen();
-    } else {
-      const el = this.mediaVideo()?.nativeElement;
-      if (el?.requestFullscreen) el.requestFullscreen();
-    }
+  /** Título de un tour: «Tour virtuel 3D du site», numerado si hay varios. */
+  tituloTour(i: number): string {
+    const base = this.translate.instant('file.tour_title');
+    return this.tourUrls().length > 1 ? `${base} ${i + 1}` : base;
   }
 
-  dismissMatterportTip() {
-    this.matterportTip.set(false);
-    localStorage.setItem('matterport_tip_shown', '1');
+  /** Abre un video del expediente en el visor a pantalla completa. */
+  verVideo(v: ArchivoRow, i: number): void {
+    abrirVisor(this.dialog, {
+      tipo: 'video',
+      url: this.archivoService.publicUrl(v.url_storage),
+      titulo: `${this.translate.instant('dashboard_client.video_label')} ${i + 1}`,
+    });
   }
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
@@ -553,9 +479,6 @@ export class DashboardComponent implements OnInit {
       if (exps.length > 0) {
         this.idSeleccionado.set(this.expId(exps[0]));
         await this.cargarDetalle(this.expId(exps[0]));
-        if (!localStorage.getItem('matterport_tip_shown')) {
-          this.matterportTip.set(true);
-        }
       }
     } catch (e: any) {
       console.error('[Dashboard]', e.message);
@@ -643,7 +566,6 @@ export class DashboardComponent implements OnInit {
 
   private async cargarDetalle(id: string) {
     this.cargandoDetalle.set(true);
-    this.mediaActiva.set(0);
 
     const [detalleResult, vidsResult, contratoResult] = await Promise.allSettled([
       this.expedienteService.getVistaParaCliente(id),

@@ -1,935 +1,444 @@
-<div class="page-wrapper dash-root">
+<div class="page-wrapper dash">
 
-  <!-- ══════════════════════════════════════════════════════════
-       HEADER EDITORIAL
-       ══════════════════════════════════════════════════════════ -->
-  <header class="dash-header">
-    <div class="dash-header__left">
-      <p class="page-eyebrow">
-        <i class="bi bi-person-circle" aria-hidden="true"></i>
-        {{ 'role.client' | translate }}
-      </p>
-      <h1 class="dash-header__title">
-        {{ 'dashboard_client.welcome' | translate }}<em class="dash-header__name">{{ bienvenida ? ', ' + bienvenida : '' }}</em>
-      </h1>
-    </div>
-    <a routerLink="/client/file/create" class="btn btn-primary">
-      <i class="bi bi-plus" aria-hidden="true"></i>
-      {{ 'file.new_file' | translate }}
-    </a>
-  </header>
+  <app-page-header
+    [titulo]="('dashboard_client.welcome' | translate) + (nombre() ? ', ' + nombre() : '')">
+    @if (!cargando() && expedientes().length > 0) {
+      <a actions mat-flat-button routerLink="/client/file/create">
+        <mat-icon>add</mat-icon>
+        {{ 'file.new_file' | translate }}
+      </a>
+    }
+  </app-page-header>
 
-  <!-- ══════════════════════════════════════════════════════════
-       CARGANDO
-       ══════════════════════════════════════════════════════════ -->
+  <!-- ── Cargando ────────────────────────────────────────────────────────── -->
   @if (cargando()) {
-    <div class="dash-skeleton">
-      <div class="skel skel--strip"></div>
-      <div class="dash-skel-grid">
-        <div class="skel skel--media-col"></div>
-        <div class="skel skel--detail-col"></div>
-      </div>
-      <div class="dash-skel-modules">
-        <div class="skel skel--module"></div>
-        <div class="skel skel--module"></div>
-        <div class="skel skel--module"></div>
-      </div>
-      <div class="skel skel--tl"></div>
+    <div class="dash-skel" aria-hidden="true">
+      <span class="skel skel--sheet"></span>
+      <span class="skel skel--next"></span>
+      <span class="skel skel--media"></span>
     </div>
 
-  <!-- ══════════════════════════════════════════════════════════
-       SIN EXPEDIENTES
-       ══════════════════════════════════════════════════════════ -->
-  } @else if (total() === 0) {
-    <div class="dash-empty">
-      <div class="dash-empty__rings" aria-hidden="true">
-        <div class="dash-empty__ring dash-empty__ring--3"></div>
-        <div class="dash-empty__ring dash-empty__ring--2"></div>
-        <div class="dash-empty__ring dash-empty__ring--1"></div>
-        <div class="dash-empty__icon">
-          <i class="bi bi-folder2-open"></i>
-        </div>
-      </div>
-      <div class="dash-empty__copy">
-        <h2 class="dash-empty__title">{{ 'dashboard_client.no_files' | translate }}</h2>
-        <p class="dash-empty__desc">{{ 'dashboard_client.no_files_text' | translate }}</p>
-      </div>
-      <a routerLink="/client/file/create" class="btn btn-primary">
-        <i class="bi bi-plus" aria-hidden="true"></i>
+  <!-- ── Sin expedientes: los tres pasos y una sola acción ──────────────── -->
+  } @else if (expedientes().length === 0) {
+    <app-empty-state class="dash-empty"
+                     matIcon="create_new_folder"
+                     [titulo]="'dashboard_client.no_files' | translate"
+                     [texto]="'dashboard_client.no_files_text' | translate">
+      <ol steps class="dash-steps">
+        <li class="dash-steps__item">
+          <span class="dash-steps__n" aria-hidden="true">1</span>
+          <span class="dash-steps__text">
+            <strong>{{ 'dashboard_client.matterport_step1' | translate }}</strong>
+            {{ 'dashboard_client.empty_step1_text' | translate }}
+          </span>
+        </li>
+        <li class="dash-steps__item">
+          <span class="dash-steps__n" aria-hidden="true">2</span>
+          <span class="dash-steps__text">
+            <strong>{{ 'dashboard_client.matterport_step2' | translate }}</strong>
+            {{ 'dashboard_client.empty_step2_text' | translate }}
+          </span>
+        </li>
+        <li class="dash-steps__item">
+          <span class="dash-steps__n" aria-hidden="true">3</span>
+          <span class="dash-steps__text">
+            <strong>{{ 'dashboard_client.matterport_step3' | translate }}</strong>
+            {{ 'dashboard_client.empty_step3_text' | translate }}
+          </span>
+        </li>
+      </ol>
+      <a actions mat-flat-button class="dash-cta" routerLink="/client/file/create">
+        <mat-icon>add</mat-icon>
         {{ 'dashboard_client.create_first' | translate }}
       </a>
-    </div>
+    </app-empty-state>
 
-  <!-- ══════════════════════════════════════════════════════════
-       CON EXPEDIENTES
-       ══════════════════════════════════════════════════════════ -->
+  <!-- ── Con expedientes ─────────────────────────────────────────────────── -->
   } @else {
 
-    <!-- Resumen del portafolio -->
-    <div class="dash-kpi-strip" [attr.aria-label]="'dashboard_client.activity_summary' | translate">
-      <div class="dash-kpi">
-        <span class="dash-kpi__num">{{ total() }}</span>
-        <span class="dash-kpi__lbl">{{ 'common.files_count' | translate }}</span>
-      </div>
-      <span class="dash-kpi__sep" aria-hidden="true"></span>
-      <div class="dash-kpi">
-        <span class="dash-kpi__num">{{ enProceso() }}</span>
-        <span class="dash-kpi__lbl">{{ 'dashboard_client.in_progress' | translate }}</span>
-      </div>
-      <span class="dash-kpi__sep" aria-hidden="true"></span>
-      <div class="dash-kpi">
-        <span class="dash-kpi__num" [class.dash-kpi__num--gold]="conOfertas() > 0">{{ conOfertas() }}</span>
-        <span class="dash-kpi__lbl">{{ 'dashboard_client.pending_offers' | translate }}</span>
-      </div>
-      <span class="dash-kpi__sep" aria-hidden="true"></span>
-      <div class="dash-kpi">
-        <span class="dash-kpi__num" [class.dash-kpi__num--success]="completados() > 0">{{ completados() }}</span>
-        <span class="dash-kpi__lbl">{{ 'dashboard_client.completed' | translate }}</span>
-      </div>
-    </div>
-
-    <!-- Banner de ofertas pendientes -->
-    @if (conOfertas() > 0) {
-      <div class="dash-offers-banner" role="alert">
-        <div class="dash-offers-banner__icon" aria-hidden="true">
-          <i class="bi bi-bell"></i>
-        </div>
-        <p class="dash-offers-banner__msg">
-          @if (conOfertas() === 1) {
+    <!-- Otro expediente tiene ofertas: aviso con su acción -->
+    @if (ofertasEnOtros() > 0) {
+      <aside class="dash-notice" role="status">
+        <mat-icon class="dash-notice__icon" aria-hidden="true">notifications</mat-icon>
+        <p class="dash-notice__text">
+          @if (ofertasEnOtros() === 1) {
             {{ 'dashboard_client.banner_single' | translate }}
           } @else {
-            {{ 'dashboard_client.banner_plural' | translate: { count: conOfertas() } }}
+            {{ 'dashboard_client.banner_plural' | translate: { count: ofertasEnOtros() } }}
           }
         </p>
-        <a routerLink="/client/offers-received" class="btn btn-primary btn-sm dash-offers-banner__cta">
+        <a mat-stroked-button class="dash-notice__cta" routerLink="/client/offers-received">
           {{ 'dashboard_client.review_offers' | translate }}
         </a>
+      </aside>
+    }
+
+    <!-- Selector de expedientes -->
+    @if (expedientes().length > 1) {
+      <div class="dash-switch" role="group" [attr.aria-label]="'nav.mes_dossiers' | translate">
+        @for (exp of expedientes(); track expId(exp)) {
+          <button type="button" class="dash-switch__item"
+                  [attr.aria-pressed]="exp === expedienteActivo()"
+                  (click)="seleccionarExpediente(expId(exp))">
+            <app-dossier-card [numero]="exp.numero"
+                              [servicio]="servicioNombre(exp.servicio)"
+                              [estado]="exp.estado"
+                              [etapa]="etapaLista(exp)"
+                              [seleccionado]="exp === expedienteActivo()" />
+          </button>
+        }
       </div>
     }
 
-    <!-- Selector horizontal de expedientes -->
-    <div class="dash-exp-strip" role="tablist" aria-label="Expedientes">
-      @for (exp of expedientes(); track expId(exp)) {
-        <button class="dash-exp-card"
-                [class.dash-exp-card--active]="expId(exp) === idSeleccionado()"
-                (click)="seleccionarExpediente(expId(exp))"
-                role="tab"
-                [attr.aria-selected]="expId(exp) === idSeleccionado()">
-          <div class="dash-exp-card__top">
-            <span class="dash-exp-card__num">{{ exp.numero }}</span>
-            <span [class]="'estado-badge ' + estadoClaseFor(exp.estado)">
-              {{ ('state.' + exp.estado) | translate }}
-            </span>
-          </div>
-          @if (servicioNombre(exp.servicio)) {
-            <p class="dash-exp-card__svc">{{ servicioNombre(exp.servicio) }}</p>
-          }
-          <div class="dash-exp-card__prog">
-            <div class="dash-exp-card__prog-track">
-              <div class="dash-exp-card__prog-fill" [style.width.%]="progresoPct(exp)"></div>
-            </div>
-            <span class="dash-exp-card__prog-pct">{{ progresoPct(exp) }}%</span>
-          </div>
-        </button>
-      }
-    </div>
-
-    <!-- ══════════════════════════════════════════════════════
-         GRID PRINCIPAL: izquierda (media) | derecha (detalle)
-         ══════════════════════════════════════════════════════ -->
-    <div class="dash-main-grid">
-
-      <!-- ── COLUMNA IZQUIERDA — zona de media ────────── -->
-      <div class="dash-left-col">
-
-        @if (cargandoDetalle()) {
-          <div class="skel skel--fill"></div>
-
-        } @else if (tieneMedia()) {
-
-          <div class="dash-media-card">
-
-            <!-- Header del media -->
-            <div class="dash-media-card__header">
-              <span class="dash-media-card__label">
-                <i class="bi bi-camera-video" aria-hidden="true"></i>
-                @if (activaEsTour()) {
-                  {{ 'file.tour_title' | translate }}
-                  @if (tourUrls().length > 1) { &nbsp;{{ mediaActiva() + 1 }} }
-                } @else {
-                  {{ 'dashboard_client.video_label' | translate }}&nbsp;{{ mediaActiva() - tourUrls().length + 1 }}
-                }
-                @if (activaEsTour() && tieneTour()) {
-                  <span class="tag tag-gold ms-2">{{ 'file.immersive_badge' | translate }}</span>
-                }
-              </span>
-              <button class="dash-btn-fullscreen"
-                      (click)="solicitarFullscreen()"
-                      [attr.aria-label]="'dashboard_client.matterport_fullscreen' | translate">
-                <i class="bi bi-fullscreen" aria-hidden="true"></i>
-                <span class="d-none d-sm-inline ms-1">{{ 'dashboard_client.matterport_fullscreen' | translate }}</span>
-              </button>
-            </div>
-
-            <!-- Playlist de medios -->
-            @if (tourUrls().length > 1 || videos().length > 0) {
-              <div class="dash-playlist" role="tablist">
-                @for (url of tourUrls(); track url; let i = $index) {
-                  <button class="dash-pl-item"
-                          [class.dash-pl-item--active]="mediaActiva() === i"
-                          (click)="seleccionarMedia(i)"
-                          role="tab"
-                          [attr.aria-selected]="mediaActiva() === i">
-                    <div class="dash-pl-thumb dash-pl-thumb--tour" aria-hidden="true">
-                      <i class="bi bi-badge-3d"></i>
-                    </div>
-                    <div class="dash-pl-info">
-                      <span class="dash-pl-label">{{ 'dashboard_client.tour_label' | translate }}
-                        @if (tourUrls().length > 1) { &nbsp;{{ i + 1 }} }
-                      </span>
-                    </div>
-                  </button>
-                }
-                @for (v of videos(); track v.id; let i = $index) {
-                  @if (v.subido_por === user()?.id) {
-                    <div class="dash-pl-row">
-                      <button class="dash-pl-item"
-                              [class.dash-pl-item--active]="mediaActiva() === tourUrls().length + i"
-                              (click)="seleccionarMedia(tourUrls().length + i)"
-                              role="tab"
-                              [attr.aria-selected]="mediaActiva() === tourUrls().length + i">
-                        <div class="dash-pl-thumb" aria-hidden="true">
-                          <i class="bi bi-camera-video"></i>
-                        </div>
-                        <div class="dash-pl-info">
-                          <span class="dash-pl-label">{{ 'dashboard_client.video_label' | translate }}&nbsp;{{ i + 1 }}</span>
-                          <span class="dash-pl-sub">{{ v.nombre_archivo }}</span>
-                        </div>
-                      </button>
-                      <button type="button" class="dash-pl-del"
-                              [disabled]="eliminando() !== null"
-                              (click)="eliminarArchivo(v)"
-                              [title]="'common.delete' | translate">
-                        @if (eliminando() === v.id) {
-                          <span class="dash-del-spinner" aria-hidden="true"></span>
-                        } @else {
-                          <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
-                               fill="none" stroke="currentColor" stroke-width="2"
-                               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <polyline points="3 6 5 6 21 6"/>
-                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-                          </svg>
-                        }
-                      </button>
-                    </div>
-                  } @else {
-                    <button class="dash-pl-item"
-                            [class.dash-pl-item--active]="mediaActiva() === tourUrls().length + i"
-                            (click)="seleccionarMedia(tourUrls().length + i)"
-                            role="tab"
-                            [attr.aria-selected]="mediaActiva() === tourUrls().length + i">
-                      <div class="dash-pl-thumb" aria-hidden="true">
-                        <i class="bi bi-camera-video"></i>
-                      </div>
-                      <div class="dash-pl-info">
-                        <span class="dash-pl-label">{{ 'dashboard_client.video_label' | translate }}&nbsp;{{ i + 1 }}</span>
-                        <span class="dash-pl-sub">{{ v.nombre_archivo }}</span>
-                      </div>
-                    </button>
-                  }
-                }
-              </div>
-            }
-
-            <!-- Visor -->
-            <div class="dash-media-viewer">
-              @if (matterportTip() && activaEsTour()) {
-                <div class="dash-matterport-tip">
-                  <i class="bi bi-info-circle" aria-hidden="true"></i>
-                  <span>{{ 'dashboard_client.matterport_tooltip' | translate }}</span>
-                  <button class="dash-tip-close" (click)="dismissMatterportTip()"
-                          [attr.aria-label]="'common.close' | translate">
-                    <i class="bi bi-x-lg" aria-hidden="true"></i>
-                  </button>
-                </div>
-              }
-              @if (activaEsTour() && matterportUrl()) {
-                <iframe #matterportIframe
-                        class="dash-iframe"
-                        [src]="matterportUrl()!"
-                        allow="vr; fullscreen; xr-spatial-tracking"
-                        allowfullscreen
-                        title="Tour Matterport 3D">
-                </iframe>
-              }
-              @if (!activaEsTour() && videoActivoUrl()) {
-                <video #mediaVideo
-                       class="dash-video"
-                       controls
-                       preload="metadata"
-                       [attr.src]="videoActivoUrl()">
-                </video>
-              }
-            </div>
-
-          </div>
-
-        } @else {
-
-          <!-- Placeholder: visita 3D en preparación -->
-          <div class="dash-media-placeholder">
-            <div class="dash-ph-rings" aria-hidden="true">
-              <div class="dash-ph-ring dash-ph-ring--3"></div>
-              <div class="dash-ph-ring dash-ph-ring--2"></div>
-              <div class="dash-ph-ring dash-ph-ring--1"></div>
-              <div class="dash-ph-icon">
-                <i class="bi bi-camera-video"></i>
-                <span class="dash-ph-badge">3D</span>
-              </div>
-            </div>
-            <h3 class="dash-ph-title">{{ 'dashboard_client.matterport_coming' | translate }}</h3>
-            @if (expedienteActivo(); as exp) {
-              <p class="dash-ph-text">
-                {{ 'dashboard_client.matterport_pending' | translate: { date: formatFecha(exp.fecha_visita) } }}
-              </p>
-            }
-            <div class="dash-ph-steps">
-              <div class="dash-ph-step">
-                <div class="dash-ph-step__num">01</div>
-                <span class="dash-ph-step__lbl">{{ 'dashboard_client.matterport_step1' | translate }}</span>
-              </div>
-              <div class="dash-ph-arrow" aria-hidden="true"><i class="bi bi-arrow-right"></i></div>
-              <div class="dash-ph-step">
-                <div class="dash-ph-step__num">02</div>
-                <span class="dash-ph-step__lbl">{{ 'dashboard_client.matterport_step2' | translate }}</span>
-              </div>
-              <div class="dash-ph-arrow" aria-hidden="true"><i class="bi bi-arrow-right"></i></div>
-              <div class="dash-ph-step">
-                <div class="dash-ph-step__num">03</div>
-                <span class="dash-ph-step__lbl">{{ 'dashboard_client.matterport_step3' | translate }}</span>
-              </div>
-            </div>
-          </div>
-
-        }
-
-      </div><!-- /dash-left-col -->
-
-      <!-- ── COLUMNA DERECHA — panel de detalle (sin módulos) ───── -->
-      <div class="dash-right-col">
-
-        @if (expedienteActivo(); as exp) {
-          <div class="dash-detail-card">
-
-            <!-- Acento superior -->
-            <div class="dash-detail-card__accent" aria-hidden="true"></div>
-
-            <!-- Top: número + estado -->
-            <div class="dash-detail-card__head">
-              <div>
-                <p class="page-eyebrow" style="margin-bottom:var(--ds-space-1)">
-                  {{ 'file.exp_abbr' | translate }}
-                </p>
-                <h2 class="dash-detail-card__num">{{ exp.numero }}</h2>
-              </div>
-              <span [class]="'estado-badge ' + estadoClase()">
-                {{ ('state.' + exp.estado) | translate }}
-              </span>
-            </div>
-
-            <!-- Cliente + Servicio + fecha -->
-            <div class="dash-detail-card__meta">
-              @if (detalleActivo(); as d) {
-                @if (d.cliente_nombre) {
-                  <span class="dash-meta-item">
-                    <i class="bi bi-person" aria-hidden="true"></i>
-                    {{ d.cliente_nombre }}
-                  </span>
-                }
-                <span class="dash-meta-item">
-                  <i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>
-                  {{ servicioNombreVista(d) }}
-                </span>
-              } @else if (servicioNombre(exp.servicio)) {
-                <span class="dash-meta-item">
-                  <i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>
-                  {{ servicioNombre(exp.servicio) }}
-                </span>
-              }
-              <span class="dash-meta-item">
-                <i class="bi bi-calendar3" aria-hidden="true"></i>
-                {{ formatFecha(exp.fecha_visita) }}
-              </span>
-            </div>
-
-            <div class="dash-divider"></div>
-
-            <!-- Progress % -->
-            <div class="dash-detail-card__pct-row">
-              <span class="dash-detail-card__pct-label">{{ 'dashboard_client.progress' | translate }}</span>
-              <span class="dash-detail-card__pct-value">{{ faseActualPct() }}%</span>
-            </div>
-            <div class="dash-pct-track">
-              <div class="dash-pct-fill" [style.width.%]="faseActualPct()"></div>
-            </div>
-
-            <!-- Fase stepper compacto -->
-            <div class="dash-fases"
-                 role="list"
-                 [attr.aria-label]="'dashboard_client.progress_label' | translate">
-              @for (fase of FASES; track fase.key; let i = $index) {
-                <div class="dash-fase"
-                     [class.dash-fase--done]="isFaseDone(i)"
-                     [class.dash-fase--active]="isFaseActive(i)"
-                     role="listitem">
-                  <div class="dash-fase__dot">
-                    @if (isFaseDone(i)) {
-                      <i class="bi bi-check-lg" aria-hidden="true"></i>
-                    } @else {
-                      <i class="bi {{ fase.icon }}" aria-hidden="true"></i>
-                    }
-                  </div>
-                  <span class="dash-fase__label">{{ ('state.' + fase.key) | translate }}</span>
-                </div>
-                @if (i < FASES.length - 1) {
-                  <div class="dash-fase__connector"
-                       [class.dash-fase__connector--done]="faseActual() > i + 1"
-                       aria-hidden="true"></div>
-                }
-              }
-            </div>
-
-            <!-- Descripción del estado -->
-            <div class="dash-state-desc">
-              <i class="bi bi-info-circle" aria-hidden="true"></i>
-              {{ ('state_desc.' + exp.estado) | translate }}
-            </div>
-
-            <div class="dash-divider"></div>
-
-            <!-- Fechas clave -->
-            <p class="dash-dates-label">{{ 'dashboard_client.key_dates' | translate }}</p>
-            <div class="dash-dates">
-
-              <div class="dash-date">
-                <span class="dash-date__key">
-                  <i class="bi bi-folder-plus" aria-hidden="true"></i>
-                  {{ 'timeline.created' | translate }}
-                </span>
-                <span class="dash-date__val">{{ formatFecha(exp.creado_en) }}</span>
-              </div>
-
-              <div class="dash-date">
-                <span class="dash-date__key">
-                  <i class="bi bi-calendar3" aria-hidden="true"></i>
-                  {{ 'file.visit_date' | translate }}
-                </span>
-                <span class="dash-date__val">{{ formatFecha(exp.fecha_visita) }}</span>
-              </div>
-
-              @if (detalleActivo(); as d) {
-                @if (d.fecha_visita_real) {
-                  <div class="dash-date">
-                    <span class="dash-date__key">
-                      <i class="bi bi-calendar-check" aria-hidden="true"></i>
-                      {{ 'timeline.visit_done' | translate }}
-                    </span>
-                    <span class="dash-date__val">{{ formatFecha(d.fecha_visita_real) }}</span>
-                  </div>
-                }
-              }
-
-              <!-- Un bloque por contrato, en el orden en que se adjudicaron -->
-              @for (c of contratosCronologicos(); track c.id) {
-                <p class="dash-date-group">
-                  <i class="bi bi-building" aria-hidden="true"></i>
-                  {{ c.constructor_nombre }}
-                </p>
-
-                <div class="dash-date">
-                  <span class="dash-date__key">
-                    <i class="bi bi-handshake" aria-hidden="true"></i>
-                    {{ 'timeline.offer_accepted' | translate }}
-                  </span>
-                  <span class="dash-date__val">{{ formatFecha(c.generado_en) }}</span>
-                </div>
-
-                @if (c.firmado_en) {
-                  <div class="dash-date">
-                    <span class="dash-date__key">
-                      <i class="bi bi-pen" aria-hidden="true"></i>
-                      {{ 'timeline.contract_signed' | translate }}
-                    </span>
-                    <span class="dash-date__val">{{ formatFecha(c.firmado_en) }}</span>
-                  </div>
-                }
-
-                @if (c.fecha_inicio) {
-                  <div class="dash-date">
-                    <span class="dash-date__key">
-                      <i class="bi bi-hammer" aria-hidden="true"></i>
-                      {{ 'timeline.works_started' | translate }}
-                    </span>
-                    <span class="dash-date__val">{{ formatFecha(c.fecha_inicio) }}</span>
-                  </div>
-                }
-
-                @if (c.estado === 'en_ejecucion' || c.estado === 'completado' || c.estado === 'cancelado') {
-                  <div class="dash-date">
-                    <span class="dash-date__key">
-                      @switch (c.estado) {
-                        @case ('en_ejecucion') {
-                          <i class="bi bi-play-circle" aria-hidden="true"></i>
-                          {{ 'timeline.execution_started' | translate }}
-                        }
-                        @case ('completado') {
-                          <i class="bi bi-check2-all" aria-hidden="true"></i>
-                          {{ 'timeline.contract_completed' | translate }}
-                        }
-                        @case ('cancelado') {
-                          <i class="bi bi-x-circle" aria-hidden="true"></i>
-                          {{ 'timeline.contract_cancelled' | translate }}
-                        }
-                      }
-                    </span>
-                    <span class="dash-date__val">{{ formatFecha(c.actualizado_en) }}</span>
-                  </div>
-                }
-              }
-
-            </div><!-- /dash-dates -->
-
-          </div><!-- /dash-detail-card -->
-        }
-
-      </div><!-- /dash-right-col -->
-
-    </div><!-- /dash-main-grid -->
-
-    <!-- ══════════════════════════════════════════════════════
-         AVANCE — expediente + contrato
-         ══════════════════════════════════════════════════════ -->
     @if (expedienteActivo(); as exp) {
-      <div class="dash-avance-grid">
+      <div class="dash-grid">
 
-        <!-- Avance Expediente -->
-        <div class="dash-avance-card">
-          <div class="dash-avance-head">
-            <div class="dash-avance-head__text">
-              <p class="page-eyebrow">{{ 'dashboard_client.avance_expediente' | translate }}</p>
-              @if (!expCancelado()) {
-                <p class="dash-avance-desc">{{ ('state_desc.' + exp.estado) | translate }}</p>
+        <!-- ════ Columna principal ════ -->
+        <div class="dash-col">
+
+          <!-- Hoja del expediente: qué es, dónde está, en qué etapa va -->
+          <section class="dash-sheet" aria-labelledby="dash-exp-title">
+            <div class="dash-sheet__head">
+              <h2 id="dash-exp-title" class="dash-sheet__title">
+                @if (detalleActivo(); as d) {
+                  {{ servicioNombreVista(d) || exp.numero }}
+                } @else {
+                  {{ servicioNombre(exp.servicio) || exp.numero }}
+                }
+              </h2>
+              <app-status-chip [estado]="exp.estado" />
+            </div>
+
+            <ul class="dash-meta">
+              <li>
+                <mat-icon aria-hidden="true">folder</mat-icon>
+                {{ 'file.exp_abbr' | translate }} {{ exp.numero }}
+              </li>
+              @if (detalleActivo()?.direccion; as dir) {
+                <li>
+                  <mat-icon aria-hidden="true">location_on</mat-icon>
+                  {{ dir }}
+                </li>
               }
-            </div>
-            @if (expCancelado()) {
-              <span class="dash-avance-tag--cancelado">{{ 'state.cancelado' | translate }}</span>
-            } @else {
-              <span class="dash-avance-pct">{{ faseActualPct() }}<span class="dash-avance-pct__unit">%</span></span>
-            }
-          </div>
-
-          @if (expCancelado()) {
-            <div class="dash-avance-cancelled">
-              <i class="bi bi-x-circle" aria-hidden="true"></i>
-              <p>{{ 'state_desc.cancelado' | translate }}</p>
-            </div>
-          } @else {
-            <div class="dash-avance-stepper"
-                 role="list"
-                 [attr.aria-label]="'dashboard_client.avance_expediente' | translate">
-              @for (fase of FASES; track fase.key; let i = $index; let last = $last) {
-                <div class="dash-avance-step"
-                     role="listitem"
-                     [class.dash-avance-step--done]="isFaseDone(i)"
-                     [class.dash-avance-step--active]="isFaseActive(i)">
-                  <div class="dash-avance-node">
-                    @if (isFaseDone(i)) {
-                      <i class="bi bi-check-lg" aria-hidden="true"></i>
-                    } @else {
-                      <i class="bi {{ fase.icon }}" aria-hidden="true"></i>
-                    }
-                  </div>
-                  <span class="dash-avance-label">{{ ('state.' + fase.key) | translate }}</span>
-                </div>
-                @if (!last) {
-                  <div class="dash-avance-connector"
-                       [class.dash-avance-connector--done]="isFaseDone(i)"
-                       aria-hidden="true"></div>
-                }
-              }
-            </div>
-            <div class="dash-avance-bar">
-              <div class="dash-avance-bar__fill" [style.width.%]="faseActualPct()"></div>
-            </div>
-          }
-        </div>
-
-        <!-- Avance de los contratos: media del avance de obra de los vigentes -->
-        @if (contratos().length > 0) {
-          <div class="dash-avance-card dash-avance-card--obra">
-            <div class="dash-avance-head">
-              <div class="dash-avance-head__text">
-                <p class="page-eyebrow">{{ 'dashboard_client.avance_contratos' | translate }}</p>
-                @if (contratosVigentes().length > 0) {
-                  <p class="dash-avance-desc">{{ 'dashboard_client.avance_contratos_desc' | translate }}</p>
-                }
-              </div>
-              @if (contratosVigentes().length === 0) {
-                <span class="dash-avance-tag--cancelado">{{ 'state.cancelado' | translate }}</span>
-              } @else {
-                <span class="dash-avance-pct dash-avance-pct--obra">{{ avanceContratos() }}<span class="dash-avance-pct__unit">%</span></span>
-              }
-            </div>
-
-            @if (contratosVigentes().length === 0) {
-              <div class="dash-avance-cancelled">
-                <i class="bi bi-x-circle" aria-hidden="true"></i>
-                <p>{{ 'dashboard_client.contratos_cancelados' | translate }}</p>
-              </div>
-            } @else {
-              <div class="dash-avance-bar"
-                   role="progressbar"
-                   aria-valuemin="0"
-                   aria-valuemax="100"
-                   [attr.aria-valuenow]="avanceContratos()"
-                   [attr.aria-label]="'dashboard_client.avance_contratos' | translate">
-                <div class="dash-avance-bar__fill dash-avance-bar__fill--obra" [style.width.%]="avanceContratos()"></div>
-              </div>
-
-              <div class="dash-obra-foot">
-                <span class="dash-obra-when">
-                  <i class="bi bi-house-check" aria-hidden="true"></i>
-                  {{ 'dashboard_client.obras_completadas' | translate: { done: obrasCompletadas(), total: contratosVigentes().length } }}
-                </span>
-                <a routerLink="/client/construction-monitoring/list" class="dash-obra-cta">
-                  {{ 'dashboard_client.view_monitoring' | translate }}
-                  <i class="bi bi-arrow-right" aria-hidden="true"></i>
-                </a>
-              </div>
-            }
-          </div>
-        } @else if (!cargandoDetalle()) {
-          <div class="dash-avance-card dash-avance-card--empty">
-            <div class="dash-avance-head">
-              <p class="page-eyebrow">{{ 'dashboard_client.avance_contratos' | translate }}</p>
-            </div>
-            <div class="dash-avance-empty">
-              <i class="bi bi-file-earmark-text" aria-hidden="true"></i>
-              <p>{{ 'dashboard_client.contrato_pendiente' | translate }}</p>
-            </div>
-          </div>
-        }
-
-      </div>
-    }
-
-    <!-- ══════════════════════════════════════════════════════
-         ESTIMADOR — informe + estimación
-         ══════════════════════════════════════════════════════ -->
-    @if (detalleActivo(); as d) {
-      <section class="dash-info-card" aria-labelledby="sec-estimador">
-        <div class="dash-info-card__head">
-          <div class="dash-info-card__head-icon" aria-hidden="true">
-            <i class="bi bi-person-badge"></i>
-          </div>
-          <h2 id="sec-estimador" class="dash-info-card__title">
-            {{ 'dashboard_client.estimator_report' | translate }}
-          </h2>
-        </div>
-        <div class="dash-info-card__body">
-
-          <!-- Estimador -->
-          <div class="dash-person-col">
-            <div class="dash-person-avatar" aria-hidden="true">
-              <i class="bi bi-person-circle"></i>
-            </div>
-            <div class="dash-person-details">
-              <p class="page-eyebrow">{{ 'dashboard_client.estimator_label' | translate }}</p>
-              @if (d.estimador_nombre) {
-                <h3 class="dash-person-name">{{ d.estimador_nombre }}</h3>
-              } @else {
-                <p class="dash-person-name dash-person-name--empty">—</p>
-              }
-              @if (d.fecha_visita_real) {
-                <span class="dash-person-meta">
-                  <i class="bi bi-calendar-check" aria-hidden="true"></i>
-                  {{ 'timeline.visit_done' | translate }}&nbsp;{{ formatFecha(d.fecha_visita_real) }}
-                </span>
-              } @else {
-                @if (expedienteActivo().fecha_visita) {
-                  <span class="dash-person-meta dash-person-meta--pending">
-                    <i class="bi bi-calendar3" aria-hidden="true"></i>
-                    {{ 'file.visit_date' | translate }}&nbsp;{{ formatFecha(expedienteActivo().fecha_visita) }}
-                  </span>
-                }
-              }
-            </div>
-          </div>
-
-          <!-- Estimación -->
-          <div class="dash-estimation-col">
-            @if (d.costo_estimado) {
-              <div class="dash-estimate-price">
-                <p class="page-eyebrow">{{ 'dashboard_client.cost_estimate' | translate }}</p>
-                <div class="dash-price-range">
-                  <span class="dash-price-val">{{ formatPrecio(d.costo_estimado) }}</span>
-                  @if (d.costo_estimado_max && d.costo_estimado_max > d.costo_estimado) {
-                    <span class="dash-price-sep">–</span>
-                    <span class="dash-price-val">{{ formatPrecio(d.costo_estimado_max) }}</span>
-                  }
-                </div>
-              </div>
-            }
-            @if (d.descripcion_problemas) {
-              <div class="dash-report-block">
-                <p class="page-eyebrow">{{ 'dashboard_client.estimator_notes' | translate }}</p>
-                <p class="dash-report-text">{{ d.descripcion_problemas }}</p>
-              </div>
-            }
-            @if (!d.estimador_nombre && !d.costo_estimado && !d.descripcion_problemas) {
-              <div class="dash-pending-state">
-                <i class="bi bi-hourglass-split" aria-hidden="true"></i>
-                <p>{{ 'dashboard_client.estimation_pending' | translate }}</p>
-              </div>
-            }
-          </div>
-
-        </div>
-      </section>
-    }
-
-    <!-- ══════════════════════════════════════════════════════
-         CONTRATOS DEL EXPEDIENTE — uno por constructor, avance de
-         obra de cada uno y costo total
-         ══════════════════════════════════════════════════════ -->
-    @if (contratos().length > 0) {
-      <app-contratos-expediente [contratos]="contratos()" />
-    }
-
-    <!-- ══════════════════════════════════════════════════════
-         MÓDULOS: próximo paso | mis documentos
-         ══════════════════════════════════════════════════════ -->
-    <div class="dash-modules">
-
-      <!-- Próximo paso -->
-      <div class="dash-module dash-module--action">
-        <div class="dash-module__header">
-          <div class="dash-module__icon dash-module__icon--action" aria-hidden="true">
-            <i class="bi bi-arrow-right-circle"></i>
-          </div>
-          <span class="dash-module__title">{{ 'dashboard_client.next_step' | translate }}</span>
-        </div>
-        <div class="dash-module__body">
-          @if (expedienteActivo(); as exp) {
-            <div class="dash-next-step">
-              <div class="dash-next-step__icon" aria-hidden="true">
-                @switch (exp.estado) {
-                  @case ('nuevo')         { <i class="bi bi-inbox"></i> }
-                  @case ('en_estimacion') { <i class="bi bi-search"></i> }
-                  @case ('estimado')      { <i class="bi bi-clipboard-check"></i> }
-                  @case ('en_oferta')     { <i class="bi bi-chat-square-quote"></i> }
-                  @case ('adjudicado')    { <i class="bi bi-handshake"></i> }
-                  @case ('contratado')    { <i class="bi bi-check-circle"></i> }
-                  @default               { <i class="bi bi-info-circle"></i> }
-                }
-              </div>
-              <div class="dash-next-step__body">
-                <p class="dash-module__desc">{{ ('state_desc.' + exp.estado) | translate }}</p>
-                @if (exp.estado === 'en_oferta') {
-                  <a routerLink="/client/offers-received" class="btn btn-primary btn-sm">
-                    <i class="bi bi-eye" aria-hidden="true"></i>
-                    {{ 'dashboard_client.review_offers' | translate }}
-                  </a>
-                }
-                @if (exp.estado === 'adjudicado') {
-                  <a routerLink="/client/contracts" class="btn btn-primary btn-sm">
-                    <i class="bi bi-file-earmark-text" aria-hidden="true"></i>
-                    {{ 'dashboard_client.view_contract' | translate }}
-                  </a>
-                }
-              </div>
-            </div>
-          }
-        </div>
-      </div>
-
-      <!-- Mis documentos -->
-      <div class="dash-module dash-module--docs">
-        <div class="dash-module__header">
-          <div class="dash-module__icon dash-module__icon--docs" aria-hidden="true">
-            <i class="bi bi-folder2"></i>
-          </div>
-          <span class="dash-module__title">{{ 'dashboard_client.my_documents' | translate }}</span>
-          @if (totalDocumentos() > 0) {
-            <span class="dash-docs-count">{{ totalDocumentos() }}</span>
-          }
-        </div>
-        <div class="dash-module__body">
-          <!-- Arriba, los videos de presentación del estimador y de los constructores
-               (sólo para ver). Debajo, los documentos del expediente de TODAS las
-               fuentes (expediente, estimación, oferta, contrato, obra) y roles;
-               fotos y demás videos NO. -->
-          @if (presentacionesVM().length > 0) {
-            <ul class="dash-pres-list" [class.dash-pres-list--solo]="documentosVM().length === 0">
-              @for (p of presentacionesVM(); track p.id) {
-                @if (p.presentacion; as video) {
-                  <li>
-                    <app-video-ficha [video]="video" [miniatura]="p.miniatura" [compacta]="true"
-                                     [etiqueta]="'my_documents.role_' + p.subidoPorRol"
-                                     [autor]="p.subidoPorNombre" />
-                  </li>
-                }
-              }
-            </ul>
-          }
-          @if (totalDocumentos() === 0) {
-            <div class="dash-module__body--empty">
-              <i class="bi bi-folder2 dash-module__empty-icon" aria-hidden="true"></i>
-              <p class="dash-module__empty-text">{{ 'dashboard_client.no_documents' | translate }}</p>
-            </div>
-          } @else if (documentosVM().length > 0) {
-            <ul class="dash-doc-list">
-              @for (doc of documentosVM(); track doc.id) {
-                <li class="dash-doc-item">
-                  <i class="bi {{ mimeIcon(doc.mimeType) }}" aria-hidden="true"></i>
-                  <a [href]="doc.url" target="_blank" rel="noopener" class="dash-doc-link">
-                    {{ doc.nombre }}
-                  </a>
-                  @if (doc.esPropio) {
-                    <button type="button" class="dash-doc-del"
-                            [disabled]="eliminando() !== null"
-                            (click)="eliminarDocumento(doc)"
-                            [title]="'common.delete' | translate">
-                      @if (eliminando() === doc.id) {
-                        <span class="dash-del-spinner" aria-hidden="true"></span>
-                      } @else {
-                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
-                             fill="none" stroke="currentColor" stroke-width="2"
-                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                          <polyline points="3 6 5 6 21 6"/>
-                          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                          <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-                        </svg>
-                      }
-                    </button>
-                  }
+              @if (exp.fecha_visita) {
+                <li>
+                  <mat-icon aria-hidden="true">event</mat-icon>
+                  {{ 'file.visit_date' | translate }} {{ formatFecha(exp.fecha_visita) }}
                 </li>
               }
             </ul>
-          }
-        </div>
-      </div>
 
-    </div><!-- /dash-modules -->
-
-    <!-- ══════════════════════════════════════════════════════
-         HISTORIAL — calendario semanal full-width + eventos
-         ══════════════════════════════════════════════════════ -->
-    <div class="dash-tl-card">
-
-      <!-- Header del historial -->
-      <div class="dash-tl-head">
-        <div class="dash-tl-head__left">
-          <div class="dash-tl-head__icon" aria-hidden="true">
-            <i class="bi bi-calendar3"></i>
-          </div>
-          <div>
-            <h2 class="dash-tl-title">{{ 'dashboard_client.timeline_title' | translate }}</h2>
-          </div>
-        </div>
-
-        <!-- Navegación calendario -->
-        <nav class="dash-cal-nav" aria-label="Navegación del calendario">
-          @if (calExpandido()) {
-            <button class="dash-cal-btn" type="button" (click)="calPrevYear()" aria-label="Année précédente">
-              <i class="bi bi-chevron-double-left" aria-hidden="true"></i>
-            </button>
-          }
-          <button class="dash-cal-btn" type="button" (click)="calPrev()"
-                  [attr.aria-label]="calExpandido() ? 'Mois précédent' : 'Semaine précédente'">
-            <i class="bi bi-chevron-left" aria-hidden="true"></i>
-          </button>
-          <span class="dash-cal-label">{{ calMesLabel() }}</span>
-          <button class="dash-cal-btn" type="button" (click)="calNext()"
-                  [attr.aria-label]="calExpandido() ? 'Mois suivant' : 'Semaine suivante'">
-            <i class="bi bi-chevron-right" aria-hidden="true"></i>
-          </button>
-          @if (calExpandido()) {
-            <button class="dash-cal-btn" type="button" (click)="calNextYear()" aria-label="Année suivante">
-              <i class="bi bi-chevron-double-right" aria-hidden="true"></i>
-            </button>
-          }
-          <button class="dash-cal-btn dash-cal-btn--toggle" type="button"
-                  (click)="calToggleExpand()"
-                  [attr.aria-label]="calExpandido() ? 'Voir la semaine' : 'Voir le mois complet'">
-            <i class="bi" aria-hidden="true"
-               [class.bi-arrows-angle-expand]="!calExpandido()"
-               [class.bi-arrows-angle-contract]="calExpandido()"></i>
-          </button>
-        </nav>
-      </div>
-
-      @if (timelineEventos().length === 0) {
-        <div class="dash-tl-empty">
-          <div class="dash-tl-empty__icon" aria-hidden="true">
-            <i class="bi bi-clock-history"></i>
-          </div>
-          <p>{{ 'dashboard_client.timeline_empty' | translate }}</p>
-        </div>
-
-      } @else {
-
-        <!-- Calendario full-width (semaine ou mois) -->
-        <div class="dash-cal-strip">
-          <div class="dash-cal-weekdays">
-            @for (wd of calWeekdays(); track $index) {
-              <div class="dash-cal-wd">{{ wd }}</div>
+            @if (etapaActiva() > 0) {
+              <app-stage-line class="dash-sheet__line" [actual]="etapaActiva()" />
             }
-          </div>
-          <div class="dash-cal-grid" [class.dash-cal-grid--week]="!calExpandido()">
-            @for (dia of calDias(); track $index) {
-              <div class="dash-cal-day"
-                   [class.dash-cal-day--other]="!dia.inMonth"
-                   [class.dash-cal-day--today]="dia.isToday && !dia.isAnchor"
-                   [class.dash-cal-day--event]="dia.eventos.length > 0 && !dia.isAnchor"
-                   [class.dash-cal-day--anchor]="dia.isAnchor">
-                <span class="dash-cal-day__num">{{ dia.day }}</span>
-                @if (dia.eventos.length > 0) {
-                  <span class="dash-cal-dot" aria-hidden="true"></span>
+          </section>
+
+          <!-- Prochaine étape: una sola acción -->
+          <section class="dash-next" [class.is-off]="etapaActiva() === 0"
+                   aria-labelledby="dash-next-title">
+            <h2 id="dash-next-title" class="dash-h2">{{ 'dashboard_client.next_step' | translate }}</h2>
+            @switch (exp.estado) {
+              @case ('en_oferta') {
+                <p class="dash-next__text">
+                  @if (ofertasHistorial().length > 1) {
+                    {{ 'dashboard_client.banner_plural' | translate: { count: ofertasHistorial().length } }}
+                  } @else if (ofertasHistorial().length === 1) {
+                    {{ 'dashboard_client.banner_single' | translate }}
+                  } @else {
+                    {{ 'state_desc.en_oferta' | translate }}
+                  }
+                  {{ 'dashboard_client.compare_text' | translate }}
+                </p>
+                <a mat-flat-button class="dash-next__cta" routerLink="/client/offers-received">
+                  <mat-icon>request_quote</mat-icon>
+                  {{ 'dashboard_client.review_offers' | translate }}
+                </a>
+              }
+              @case ('adjudicado') {
+                <p class="dash-next__text">{{ 'state_desc.adjudicado' | translate }}</p>
+                <a mat-flat-button class="dash-next__cta" routerLink="/client/contracts">
+                  <mat-icon>contract</mat-icon>
+                  {{ 'dashboard_client.view_contract' | translate }}
+                </a>
+              }
+              @case ('contratado') {
+                <p class="dash-next__text">{{ 'state_desc.contratado' | translate }}</p>
+                <a mat-flat-button class="dash-next__cta" routerLink="/client/construction-monitoring/list">
+                  <mat-icon>construction</mat-icon>
+                  {{ 'dashboard_client.view_monitoring' | translate }}
+                </a>
+              }
+              @default {
+                <p class="dash-next__text">{{ ('state_desc.' + exp.estado) | translate }}</p>
+              }
+            }
+          </section>
+
+          <!-- Visita 3D y videos -->
+          <section class="dash-media" aria-labelledby="dash-media-title">
+            <h2 id="dash-media-title" class="dash-h2">{{ 'file.tour_title' | translate }}</h2>
+
+            @if (cargandoDetalle()) {
+              <span class="skel skel--media" aria-hidden="true"></span>
+            } @else if (tieneMedia()) {
+              @for (url of tourUrls(); track url; let i = $index) {
+                <app-tour-poster [url]="url" [titulo]="tituloTour(i)" />
+              }
+
+              @if (tieneVideos()) {
+                <ul class="dash-videos">
+                  @for (v of videos(); track v.id; let i = $index) {
+                    <li class="dash-videos__row">
+                      <button type="button" class="dash-videos__open" (click)="verVideo(v, i)">
+                        <mat-icon class="dash-videos__play" aria-hidden="true">play_circle</mat-icon>
+                        <span class="dash-videos__text">
+                          <span class="dash-videos__title">{{ 'dashboard_client.video_label' | translate }} {{ i + 1 }}</span>
+                          <span class="dash-videos__file">{{ v.nombre_archivo }}</span>
+                        </span>
+                      </button>
+                      @if (v.subido_por === user()?.id) {
+                        <button mat-icon-button type="button" class="dash-del"
+                                [disabled]="eliminando() !== null"
+                                (click)="eliminarArchivo(v)"
+                                [attr.aria-label]="('common.delete' | translate) + ' ' + v.nombre_archivo">
+                          @if (eliminando() === v.id) {
+                            <span class="dash-spinner" aria-hidden="true"></span>
+                          } @else {
+                            <mat-icon>delete</mat-icon>
+                          }
+                        </button>
+                      }
+                    </li>
+                  }
+                </ul>
+              }
+            } @else {
+              <!-- Aún sin visita 3D: lo que viene y cuándo -->
+              <div class="dash-pending">
+                <h3 class="dash-pending__title">{{ 'dashboard_client.matterport_coming' | translate }}</h3>
+                @if (exp.fecha_visita) {
+                  <p class="dash-pending__text">
+                    {{ 'dashboard_client.matterport_pending' | translate: { date: formatFecha(exp.fecha_visita) } }}
+                  </p>
                 }
+                <ol class="dash-pending__steps">
+                  <li>{{ 'dashboard_client.matterport_step1' | translate }}</li>
+                  <li>{{ 'dashboard_client.matterport_step2' | translate }}</li>
+                  <li>{{ 'dashboard_client.matterport_step3' | translate }}</li>
+                </ol>
               </div>
             }
-          </div>
-        </div>
+          </section>
 
-        <!-- Historial: lista de eventos debajo del calendario -->
-        <div class="dash-tl-events">
-          <p class="dash-tl-events__label">{{ 'dashboard_client.timeline_title' | translate }}</p>
-          <ol class="dash-evt-list">
-            @for (evt of timelineEventos(); track evt.tipo) {
-              <li class="dash-evt">
-                <div class="dash-evt__icon">
-                  <i class="bi {{ evt.icon }}" aria-hidden="true"></i>
-                </div>
-                <div class="dash-evt__body">
-                  <p class="dash-evt__title">
-                    {{ evt.titulo | translate }}
-                    @if (evt.subtitulo) {
-                      <span class="dash-evt__sub"> — {{ evt.subtitulo }}</span>
+          <!-- Informe del estimador -->
+          @if (detalleActivo(); as d) {
+            <section class="dash-card" aria-labelledby="dash-report-title">
+              <h2 id="dash-report-title" class="dash-h2">{{ 'dashboard_client.estimator_report' | translate }}</h2>
+
+              <div class="dash-report">
+                <div class="dash-person">
+                  <span class="dash-person__avatar" aria-hidden="true"><mat-icon>person</mat-icon></span>
+                  <span class="dash-person__text">
+                    <span class="dash-label">{{ 'dashboard_client.estimator_label' | translate }}</span>
+                    <span class="dash-person__name">{{ d.estimador_nombre || '—' }}</span>
+                    @if (d.fecha_visita_real) {
+                      <span class="dash-person__meta">{{ 'timeline.visit_done' | translate }} {{ formatFecha(d.fecha_visita_real) }}</span>
+                    } @else if (exp.fecha_visita) {
+                      <span class="dash-person__meta">{{ 'file.visit_date' | translate }} {{ formatFecha(exp.fecha_visita) }}</span>
                     }
-                  </p>
-                  <time class="dash-evt__date">{{ formatFecha(evt.fecha) }}</time>
+                  </span>
                 </div>
-              </li>
+
+                @if (d.costo_estimado) {
+                  <div class="dash-cost">
+                    <span class="dash-label">{{ 'dashboard_client.cost_estimate' | translate }}</span>
+                    <span class="dash-cost__value">
+                      {{ formatPrecio(d.costo_estimado) }}
+                      @if (d.costo_estimado_max && d.costo_estimado_max > d.costo_estimado) {
+                        <span class="dash-cost__sep">–</span>
+                        {{ formatPrecio(d.costo_estimado_max) }}
+                      }
+                    </span>
+                  </div>
+                }
+              </div>
+
+              @if (d.descripcion_problemas) {
+                <div class="dash-notes">
+                  <h3 class="dash-label">{{ 'dashboard_client.estimator_notes' | translate }}</h3>
+                  <p class="dash-notes__text">{{ d.descripcion_problemas }}</p>
+                </div>
+              }
+
+              @if (!d.estimador_nombre && !d.costo_estimado && !d.descripcion_problemas) {
+                <p class="dash-muted">
+                  <mat-icon aria-hidden="true">hourglass_top</mat-icon>
+                  {{ 'dashboard_client.estimation_pending' | translate }}
+                </p>
+              }
+            </section>
+          }
+
+          <!-- Contratos: avance medio (si hay varios) y la lista -->
+          @if (contratos().length > 0) {
+            @if (contratosVigentes().length > 1) {
+              <section class="dash-card dash-progress" aria-labelledby="dash-progress-title">
+                <div class="dash-progress__head">
+                  <h2 id="dash-progress-title" class="dash-h2">{{ 'dashboard_client.avance_contratos' | translate }}</h2>
+                  <span class="dash-progress__pct">{{ avanceContratos() }} %</span>
+                </div>
+                <p class="dash-muted">{{ 'dashboard_client.avance_contratos_desc' | translate }}</p>
+                <div class="dash-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+                     [attr.aria-valuenow]="avanceContratos()"
+                     aria-labelledby="dash-progress-title">
+                  <span class="dash-bar__fill" [style.width.%]="avanceContratos()"></span>
+                </div>
+                <div class="dash-progress__foot">
+                  <span>{{ 'dashboard_client.obras_completadas' | translate: { done: obrasCompletadas(), total: contratosVigentes().length } }}</span>
+                  <a class="dash-link" routerLink="/client/construction-monitoring/list">{{ 'dashboard_client.view_monitoring' | translate }}</a>
+                </div>
+              </section>
+            } @else if (contratosVigentes().length === 0) {
+              <p class="dash-muted">
+                <mat-icon aria-hidden="true">cancel</mat-icon>
+                {{ 'dashboard_client.contratos_cancelados' | translate }}
+              </p>
             }
-          </ol>
+            <app-contratos-expediente [contratos]="contratos()" />
+          }
         </div>
 
-      }
+        <!-- ════ Columna lateral ════ -->
+        <div class="dash-col dash-col--aside">
 
-    </div><!-- /dash-tl-card -->
+          <!-- Mis documentos -->
+          <section class="dash-card" aria-labelledby="dash-docs-title">
+            <div class="dash-card__head">
+              <h2 id="dash-docs-title" class="dash-h2">{{ 'dashboard_client.my_documents' | translate }}</h2>
+              @if (totalDocumentos() > 0) {
+                <span class="dash-count">{{ totalDocumentos() }}</span>
+              }
+            </div>
 
-  }<!-- /con expedientes -->
+            <!-- Arriba, los videos de presentación del estimador y de los constructores
+                 (sólo para ver). Debajo, los documentos del expediente de TODAS las
+                 fuentes (expediente, estimación, oferta, contrato, obra) y roles. -->
+            @if (presentacionesVM().length > 0) {
+              <ul class="dash-pres">
+                @for (p of presentacionesVM(); track p.id) {
+                  @if (p.presentacion; as video) {
+                    <li>
+                      <app-video-ficha [video]="video" [miniatura]="p.miniatura" [compacta]="true"
+                                       [etiqueta]="'my_documents.role_' + p.subidoPorRol"
+                                       [autor]="p.subidoPorNombre" />
+                    </li>
+                  }
+                }
+              </ul>
+            }
 
+            @if (totalDocumentos() === 0) {
+              <p class="dash-muted">{{ 'dashboard_client.no_documents' | translate }}</p>
+            } @else if (documentosVM().length > 0) {
+              <ul class="dash-docs">
+                @for (doc of documentosVM(); track doc.id) {
+                  <li class="dash-docs__row">
+                    <a class="dash-docs__link" [href]="doc.url" target="_blank" rel="noopener">
+                      @switch (tipoDoc(doc.mimeType)) {
+                        @case ('imagen') { <mat-icon aria-hidden="true">image</mat-icon> }
+                        @case ('pdf')    { <mat-icon aria-hidden="true">picture_as_pdf</mat-icon> }
+                        @default         { <mat-icon aria-hidden="true">draft</mat-icon> }
+                      }
+                      <span class="dash-docs__name">{{ doc.nombre }}</span>
+                    </a>
+                    @if (doc.esPropio) {
+                      <button mat-icon-button type="button" class="dash-del"
+                              [disabled]="eliminando() !== null"
+                              (click)="eliminarDocumento(doc)"
+                              [attr.aria-label]="('common.delete' | translate) + ' ' + doc.nombre">
+                        @if (eliminando() === doc.id) {
+                          <span class="dash-spinner" aria-hidden="true"></span>
+                        } @else {
+                          <mat-icon>delete</mat-icon>
+                        }
+                      </button>
+                    }
+                  </li>
+                }
+              </ul>
+            }
+          </section>
+
+          <!-- Historial: calendario y lista de eventos -->
+          <section class="dash-card" aria-labelledby="dash-tl-title">
+            <div class="dash-card__head">
+              <h2 id="dash-tl-title" class="dash-h2">{{ 'dashboard_client.timeline_title' | translate }}</h2>
+            </div>
+
+            @if (timelineEventos().length === 0) {
+              <p class="dash-muted">{{ 'dashboard_client.timeline_empty' | translate }}</p>
+            } @else {
+              <div class="dash-cal">
+                <div class="dash-cal__nav">
+                  @if (calExpandido()) {
+                    <button mat-icon-button type="button" (click)="calPrevYear()" aria-label="Année précédente">
+                      <mat-icon>keyboard_double_arrow_left</mat-icon>
+                    </button>
+                  }
+                  <button mat-icon-button type="button" (click)="calPrev()"
+                          [attr.aria-label]="calExpandido() ? 'Mois précédent' : 'Semaine précédente'">
+                    <mat-icon>chevron_left</mat-icon>
+                  </button>
+                  <span class="dash-cal__label" aria-live="polite">{{ calMesLabel() }}</span>
+                  <button mat-icon-button type="button" (click)="calNext()"
+                          [attr.aria-label]="calExpandido() ? 'Mois suivant' : 'Semaine suivante'">
+                    <mat-icon>chevron_right</mat-icon>
+                  </button>
+                  @if (calExpandido()) {
+                    <button mat-icon-button type="button" (click)="calNextYear()" aria-label="Année suivante">
+                      <mat-icon>keyboard_double_arrow_right</mat-icon>
+                    </button>
+                  }
+                  <button mat-icon-button type="button" class="dash-cal__toggle" (click)="calToggleExpand()"
+                          [attr.aria-label]="calExpandido() ? 'Voir la semaine' : 'Voir le mois complet'"
+                          [attr.aria-expanded]="calExpandido()">
+                    @if (calExpandido()) { <mat-icon>unfold_less</mat-icon> } @else { <mat-icon>unfold_more</mat-icon> }
+                  </button>
+                </div>
+
+                <div class="dash-cal__grid" aria-hidden="true">
+                  @for (wd of calWeekdays(); track $index) {
+                    <span class="dash-cal__wd">{{ wd }}</span>
+                  }
+                  @for (dia of calDias(); track $index) {
+                    <span class="dash-cal__day"
+                          [class.is-other]="!dia.inMonth"
+                          [class.is-today]="dia.isToday"
+                          [class.has-event]="dia.eventos.length > 0"
+                          [class.is-anchor]="dia.isAnchor">{{ dia.day }}</span>
+                  }
+                </div>
+              </div>
+
+              <ol class="dash-events">
+                @for (evt of timelineEventos(); track evt.tipo) {
+                  <li class="dash-events__item">
+                    <mat-icon class="dash-events__icon" aria-hidden="true">{{ evt.matIcon }}</mat-icon>
+                    <span class="dash-events__body">
+                      <span class="dash-events__title">
+                        {{ evt.titulo | translate }}
+                        @if (evt.subtitulo) { <span class="dash-events__sub">{{ evt.subtitulo }}</span> }
+                      </span>
+                      <time class="dash-events__date" [attr.datetime]="evt.fecha">{{ formatFecha(evt.fecha) }}</time>
+                    </span>
+                  </li>
+                }
+              </ol>
+            }
+          </section>
+        </div>
+
+      </div>
+    }
+  }
 </div>

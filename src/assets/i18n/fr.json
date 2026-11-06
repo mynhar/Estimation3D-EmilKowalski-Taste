@@ -153,7 +153,9 @@
     "imprevistos": "Imprévus",
     "fiches_normatives": "Fiches normatives",
     "evenements_ia": "Événements IA",
-    "archivados": "Archivés"
+    "archivados": "Archivés",
+    "skip": "Aller au contenu",
+    "plus": "Plus"
   },
   "ai_assistant": {
     "eyebrow": "Espace client",
@@ -520,7 +522,10 @@
     "avance_contratos": "Avancement des contrats",
     "avance_contratos_desc": "Moyenne de l’avancement des chantiers des contrats en vigueur.",
     "contratos_cancelados": "Tous les contrats de ce dossier ont été annulés.",
-    "obras_completadas": "Chantiers terminés : {{done}}/{{total}}"
+    "obras_completadas": "Chantiers terminés : {{done}}/{{total}}",
+    "empty_step1_text": "Une visite de documentation à tarif fixe de 399 $.",
+    "empty_step2_text": "Toute la propriété, mesurée en une seule fois.",
+    "empty_step3_text": "Votre tour 3D, 24–48 h après la visite."
   },
   "timeline": {
     "created": "Dossier créé",
@@ -3030,5 +3035,8 @@
     "reason_range": "valeur hors limites",
     "reason_below_min": "inférieur au minimum",
     "reason_invalid": "valeur invalide"
+  },
+  "stage": {
+    "step_of": "Étape {{n}} sur {{total}}"
   }
 }

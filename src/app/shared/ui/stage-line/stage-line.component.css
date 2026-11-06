@@ -1,0 +1,159 @@
+/* component: stage line (cota de etapas)
+ * states: done · current · upcoming · compact
+ * contrast: texto ink / ink-secondary / ink-muted (≥ 5.4:1). El tramo menthe es
+ * refuerzo visual: la etapa la dicen el texto «Étape n sur 6» y las marcas
+ * (marca actual en sapin 6.5:1, hechas en ardoise, pendientes en ink-faint 3.6:1).
+ */
+:host {
+  display: block;
+  container-type: inline-size;
+}
+
+/* ── Cabecera: título + medida ─────────────────────────────────────────── */
+.sl__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+  margin-bottom: var(--ds-space-3);
+}
+.sl__title {
+  font-size: var(--ds-text-sm);
+  font-weight: var(--ds-weight-medium);
+  color: var(--ds-ink-muted);
+}
+.sl__count {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-lg);
+  font-weight: var(--ds-weight-bold);
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-ink);
+  white-space: nowrap;
+}
+
+/* ── Línea de medida ───────────────────────────────────────────────────── */
+.sl__track {
+  --sl-col: calc(100% / var(--sl-n));
+  --sl-axis: 12px;                 /* eje de la línea dentro de la fila de marcas */
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--sl-n), minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Línea base: de la primera marca a la última. */
+.sl__track::before {
+  content: '';
+  position: absolute;
+  top: calc(var(--sl-axis) - 0.5px);
+  left: calc(var(--sl-col) / 2);
+  right: calc(var(--sl-col) / 2);
+  height: 1px;
+  background: var(--ds-ink-faint);
+}
+
+/* Tramo recorrido: la medida, en menthe. */
+.sl__track::after {
+  content: '';
+  position: absolute;
+  top: calc(var(--sl-axis) - 3px);
+  left: calc(var(--sl-col) / 2);
+  width: calc(var(--sl-col) * var(--sl-done));
+  height: 6px;
+  border-radius: 3px;
+  background: var(--ds-scan);
+  transition: width var(--ds-duration-slow) var(--ds-ease-out);
+}
+/* Se mide una vez al aparecer; después solo responde a cambios de etapa. */
+@starting-style {
+  .sl__track::after { width: 0; }
+}
+
+.sl__stop {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ds-space-2);
+  min-width: 0;
+  text-align: center;
+}
+
+/* Marcas: pendientes cortas y claras, hechas en tinta, la actual larga en sapin. */
+.sl__tick {
+  display: block;
+  width: 2px;
+  height: 12px;
+  margin-block: 6px;
+  border-radius: 1px;
+  background: var(--ds-ink-faint);
+}
+.is-done .sl__tick {
+  height: 16px;
+  margin-block: 4px;
+  background: var(--ds-ink);
+}
+.is-current .sl__tick {
+  width: 4px;
+  height: 24px;
+  margin-block: 0;
+  border-radius: 2px;
+  background: var(--ds-action);
+}
+
+.sl__label {
+  padding-inline: 2px;
+  font-size: var(--ds-text-sm);
+  line-height: var(--ds-leading-snug);
+  color: var(--ds-ink-muted);
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+.is-done .sl__label { color: var(--ds-ink-secondary); }
+.is-current .sl__label {
+  color: var(--ds-ink);
+  font-weight: var(--ds-weight-bold);
+}
+
+.sl__now { display: none; }
+
+/* Estrecho: solo la etapa actual a la vista. */
+@container (max-width: 29.99rem) {
+  .sl__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .sl__now {
+    display: block;
+    margin: var(--ds-space-2) 0 0;
+    font-weight: var(--ds-weight-bold);
+    color: var(--ds-ink);
+  }
+}
+
+/* ── Compacta (tarjetas) ───────────────────────────────────────────────── */
+:host(.is-compact) .sl__track { --sl-axis: 8px; }
+:host(.is-compact) .sl__track::after {
+  top: calc(var(--sl-axis) - 2px);
+  height: 4px;
+  border-radius: 2px;
+}
+:host(.is-compact) .sl__tick { height: 8px; margin-block: 4px; width: 1.5px; }
+:host(.is-compact) .is-done .sl__tick { height: 10px; margin-block: 3px; }
+:host(.is-compact) .is-current .sl__tick { width: 3px; height: 16px; margin-block: 0; }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -22,7 +24,7 @@ function fueraDeObra(estado: string): boolean {
 @Component({
   selector: 'app-contratos-expediente',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, TranslatePipe],
+  imports: [RouterLink, TranslatePipe, MatButtonModule, MatIconModule],
   templateUrl: './contratos-expediente.component.html',
   styleUrl: './contratos-expediente.component.css',
 })

@@ -1,0 +1,16 @@
+<button type="button" class="tp" (click)="abrir()">
+  @if (miniatura(); as src) {
+    <img class="tp__img" [src]="src" alt="" loading="lazy" decoding="async"
+         (error)="falloMiniatura.set(true)" />
+  } @else {
+    <span class="tp__empty" aria-hidden="true"><mat-icon>view_in_ar</mat-icon></span>
+  }
+  <span class="tp__label">
+    <mat-icon aria-hidden="true">view_in_ar</mat-icon>
+    {{ titulo() }}
+  </span>
+  <span class="tp__cta">
+    <mat-icon aria-hidden="true">fullscreen</mat-icon>
+    {{ 'dashboard_client.matterport_fullscreen' | translate }}
+  </span>
+</button>

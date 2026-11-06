@@ -1,0 +1,36 @@
+/* component: dossier card
+ * states: default · selected (lo pinta el padre con su hover/focus)
+ * contrast: servicio ink (13.9:1), número ink-muted (6.1:1)
+ */
+:host {
+  display: grid;
+  gap: var(--ds-space-1);
+  align-content: start;
+  min-width: 0;
+}
+
+.dc__svc {
+  display: -webkit-box;
+  overflow: hidden;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-lg);
+  font-weight: var(--ds-weight-bold);
+  line-height: var(--ds-leading-snug);
+  color: var(--ds-ink);
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.dc__num {
+  font-size: var(--ds-text-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-ink-muted);
+  overflow-wrap: anywhere;
+}
+
+.dc__foot {
+  display: flex;
+  margin-top: var(--ds-space-2);
+}
+
+.dc__line { margin-top: var(--ds-space-3); }

@@ -153,7 +153,9 @@
     "imprevistos": "Contingencies",
     "fiches_normatives": "Regulatory sheets",
     "evenements_ia": "AI events",
-    "archivados": "Archived"
+    "archivados": "Archived",
+    "skip": "Skip to content",
+    "plus": "More"
   },
   "ai_assistant": {
     "eyebrow": "Client area",
@@ -520,7 +522,10 @@
     "avance_contratos": "Contracts progress",
     "avance_contratos_desc": "Average site progress across active contracts.",
     "contratos_cancelados": "All contracts for this file have been cancelled.",
-    "obras_completadas": "Completed works: {{done}}/{{total}}"
+    "obras_completadas": "Completed works: {{done}}/{{total}}",
+    "empty_step1_text": "A documentation visit at a fixed price of $399.",
+    "empty_step2_text": "The whole property, measured in one pass.",
+    "empty_step3_text": "Your 3D tour, 24–48 h after the visit."
   },
   "timeline": {
     "created": "File created",
@@ -3030,5 +3035,8 @@
     "reason_range": "value out of range",
     "reason_below_min": "less than the minimum",
     "reason_invalid": "invalid value"
+  },
+  "stage": {
+    "step_of": "Step {{n}} of {{total}}"
   }
 }

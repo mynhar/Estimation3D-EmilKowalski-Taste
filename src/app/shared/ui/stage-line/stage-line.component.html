@@ -1,0 +1,34 @@
+@if (compact()) {
+  <div class="sl__track" aria-hidden="true"
+       [style.--sl-n]="etapas().length" [style.--sl-done]="paso() - 1">
+    @for (e of etapas(); track e; let i = $index) {
+      <span class="sl__stop" [class.is-done]="i + 1 < paso()" [class.is-current]="i + 1 === paso()">
+        <span class="sl__tick"></span>
+      </span>
+    }
+  </div>
+  <span class="sr-only">
+    {{ 'stage.step_of' | translate: { n: paso(), total: etapas().length } }} : {{ etiquetaActual() | translate }}
+  </span>
+} @else {
+  <div class="sl__head">
+    <span class="sl__title">{{ titulo() | translate }}</span>
+    <span class="sl__count">{{ 'stage.step_of' | translate: { n: paso(), total: etapas().length } }}</span>
+  </div>
+
+  <ol class="sl__track" [style.--sl-n]="etapas().length" [style.--sl-done]="paso() - 1"
+      [attr.aria-label]="titulo() | translate">
+    @for (e of etapas(); track e; let i = $index) {
+      <li class="sl__stop"
+          [class.is-done]="i + 1 < paso()"
+          [class.is-current]="i + 1 === paso()"
+          [attr.aria-current]="i + 1 === paso() ? 'step' : null">
+        <span class="sl__tick" aria-hidden="true"></span>
+        <span class="sl__label">{{ e | translate }}</span>
+      </li>
+    }
+  </ol>
+
+  <!-- Solo en anchos estrechos: la etapa actual, legible bajo la línea. -->
+  <p class="sl__now" aria-hidden="true">{{ etiquetaActual() | translate }}</p>
+}

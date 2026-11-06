@@ -13,7 +13,7 @@ Guía de diseño y código para este proyecto. Aplica también si usas Claude Co
 - **Componentes**: Angular Material 22 (M3), con su tema enlazado a los tokens `--ds-*`: ver sección 4
 - **Sistema de diseño**: tokens CSS en `src/styles/tokens.css`
 - **Tipografías**: Sofia Sans Semi Condensed para títulos y cifras, Atkinson Hyperlegible Next para cuerpo e interfaz
-- **Iconos**: Material Symbols Outlined vía `mat-icon` a partir de la fase 1; bootstrap-icons line en las pantallas aún no rediseñadas. Nunca filled
+- **Iconos**: Material Symbols Outlined vía `mat-icon` (subconjunto en `index.html`, mantenido por `scripts/icons.mjs`); bootstrap-icons line en el contenido de las pantallas aún no rediseñadas. Nunca filled
 
 ---
 
@@ -92,7 +92,7 @@ Con blanco encima, las cuatro bases pasan AA (6.4–7.4:1), así que sirven de r
 
 Con las utilidades heredadas de `ui-base.css`: `bg-success-subtle text-success-emphasis`; las variables `--bs-*-text-emphasis` ya apuntan a los tokens `-ink`.
 
-**Superficies oscuras** (sidebar, panel del login, grabador de vídeo)
+**Superficies oscuras** (panel del login, grabador de vídeo, visor 3D)
 
 | Token CSS | Hex | Uso |
 |-----------|-----|-----|
@@ -199,8 +199,10 @@ Tres radios con jerarquía, no uno para todo:
 
 ### Iconos
 
-- **Material Symbols Outlined** vía `mat-icon`, a partir de la fase 1 (la fuente se añade con la primera pantalla que los use)
-- Hasta que una pantalla se rediseñe sigue con bootstrap-icons line. **Nunca** mezclar los dos sets en una misma pantalla
+- **Material Symbols Outlined** vía `mat-icon`. `MatIconRegistry.setDefaultFontSetClass('material-symbols-outlined')` en `app.config.ts`
+- `index.html` pide a Google Fonts solo los iconos usados (`icon_names=`, en orden alfabético). Tras añadir o quitar un icono: `node scripts/icons.mjs --write`. `npm run lint:css` (o `npm run lint:icons`) falla si la lista no coincide
+- El script detecta `<mat-icon>nombre</mat-icon>`, `fontIcon="nombre"`, `matIcon="nombre"` y, en TypeScript, `matIcon: 'nombre'` / `matIcon = 'nombre'`. Un icono dinámico (`<mat-icon>{{ item.matIcon }}</mat-icon>`) debe leer de una propiedad `matIcon`
+- Hasta que una pantalla se rediseñe, su contenido sigue con bootstrap-icons line: un solo set en el contenido de cada pantalla. Excepción de transición: el armazón (navegación lateral, barra superior, pestañas) ya usa Material Symbols en todas las pantallas
 - Tamaños: 20 y 24 px; 16 px solo dentro de texto
 - **PROHIBIDO**: iconos rellenos (filled), emojis decorativos en UI
 
@@ -349,7 +351,7 @@ Angular Material 22 (M3) es la librería de componentes del rediseño. Botones, 
 - **Imports**: cada componente standalone importa solo los módulos de Material que usa (`MatButtonModule`, `MatFormFieldModule`, `MatInputModule`…).
 - **Ajustes por componente**: sobrescribe las variables `--mat-*` del componente de Material (p. ej. `--mat-button-filled-container-color`) en el CSS del componente, siempre con `var(--ds-...)`. Las variables `--mdc-*` ya no existen desde Material 20. Nunca `::ng-deep` ni selectores contra clases internas (`.mdc-*`, `.mat-mdc-*`).
 - **Sin `color="primary|accent|warn"`**: en M3 ese input no cambia el color (necesitaría el mixin de compatibilidad M2). El color sale del tema.
-- **No ejecutes `ng add @angular/material`**: Material ya está instalado, y el schematic añadiría Roboto, Material Icons y un tema precompilado. Los iconos Material Symbols Outlined se añadirán a mano en la fase 1.
+- **No ejecutes `ng add @angular/material`**: Material ya está instalado, y el schematic añadiría Roboto, Material Icons y un tema precompilado. Los iconos Material Symbols Outlined se cargan a mano en `index.html` (ver §Iconos).
 - **Animaciones**: `provideAnimations()` sigue en `app.config.ts`, pero `@angular/animations` está deprecado desde v20.2 y se eliminará en v23. En código nuevo, usa CSS, WAAPI o `animate.enter` / `animate.leave`.
 - **CDK directo**: solo para comportamiento sin estilo que Material no cubre (drag & drop, virtual scroll…). El `CdkMenu` del menú ⋮ de `presentacion-videos` puede pasar a `mat-menu` cuando se rediseñe esa pantalla.
 

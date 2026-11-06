@@ -69,7 +69,7 @@ nuevo. Igual con las variables sin prefijo de `src/styles.css` (`--gold`, `--ink
 `--warm-*`…) y las `--bs-*` de `bootstrap-overrides.css`: todas apuntan a `--ds-*`.
 Se borran en la fase 4.
 
-### Superficies oscuras (sidebar, panel de login, grabador de vídeo)
+### Superficies oscuras (panel de login, grabador de vídeo, visor 3D)
 - `--ds-dark-surface` (#1D2B30, ardoise) · `--ds-dark-surface-deep` (#152024)
 - Sobre ardoise el acento es **menthe** (`--ds-scan`, 9.9:1); sapin solo da 2.3:1.
   Mientras esas pantallas no se rediseñen, sus islas oscuras redirigen localmente
@@ -90,8 +90,23 @@ Se borran en la fase 4.
   sin cadenas "A · B · C", sin numeración entre corchetes, sin resaltar una sola palabra del título
 
 ## Iconography
-- **Material Symbols Outlined** vía `mat-icon` (llega en la fase 1). Hasta que cada
-  pantalla se rediseñe sigue bootstrap-icons line. Nunca mezclar los dos en una pantalla.
+- **Material Symbols Outlined** vía `mat-icon` (fuente por defecto fijada en `app.config.ts`).
+  `index.html` carga solo el subconjunto usado (`icon_names=`, orden alfabético);
+  `node scripts/icons.mjs --write` lo regenera y `npm run lint:css` falla si se desfasa.
+  Un icono dinámico (`<mat-icon>{{ x.matIcon }}</mat-icon>`) lee de una propiedad
+  `matIcon: 'nombre'` para que el script lo detecte.
+- Hasta que cada pantalla se rediseñe, su contenido sigue con bootstrap-icons line, un
+  solo set por pantalla. Transición: el armazón (navegación) ya usa Material Symbols en todas.
+
+## Armazón de la app
+- Escritorio (≥ 992px): barra lateral blanca con filete, 264px (72px plegada), navegación
+  por rol definida en `app.component.ts`; activo = fondo `--ds-scan-soft`, texto
+  `--ds-action-ink` y barra sapin de 3px.
+- Móvil: barra superior blanca (marca, idioma en `mat-menu`, avatar → perfil).
+  Cliente: pestañas inferiores Accueil · Mes dossiers · Offres reçues · Plus; «Plus» abre
+  un `mat-bottom-sheet` con el resto. Roles internos: cajón lateral con fondo ardoise translúcido.
+- Objetivos táctiles ≥ 44px, `safe-area-inset-*`, enlace «Aller au contenu».
+- `.page-wrapper`: 16px de margen lateral en móvil, 24px desde 768px, 32px desde 1200px.
 
 ## Motion stance
 - Sobria. Un solo momento orquestado por pantalla (en la landing: el barrido del escaneo).
@@ -126,7 +141,10 @@ cada rol `--mat-sys-*` apunta a un token `--ds-*`.
 ## Fases del rediseño
 0. Limpieza y base: tokens, fuentes, tema de Material, docs (hecho)
 1. Cara al cliente: landing (CSS propio + motion), login con Material, shell móvil con pestañas
-   inferiores, dashboard del cliente, estados vacíos, visor 3D (póster + diálogo a pantalla completa)
+   inferiores, dashboard del cliente, estados vacíos, visor 3D (póster + diálogo a pantalla completa).
+   Hecho: armazón, dashboard del cliente, visor 3D y componentes compartidos
+   (`shared/ui`: page-header, empty-state, status-chip, stage-line, dossier-card, tour-poster,
+   media-viewer). Pendiente: login y landing
 2. Resto de pantallas del cliente + journal y entrepreneurs
 3. Contratista · 4. Estimador y admin; después se borran `ui-base.css` y `bootstrap-overrides.css`
 

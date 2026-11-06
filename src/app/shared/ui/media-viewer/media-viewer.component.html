@@ -1,0 +1,31 @@
+<div class="mv">
+  <header class="mv__bar">
+    <h2 class="mv__title">{{ data.titulo }}</h2>
+    <button mat-icon-button type="button" class="mv__close"
+            (click)="cerrar()" [attr.aria-label]="'common.close' | translate">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  <div class="mv__stage">
+    @if (urlTour(); as url) {
+      <iframe class="mv__frame"
+              [src]="url"
+              allow="fullscreen; xr-spatial-tracking"
+              [title]="data.titulo"></iframe>
+    } @else {
+      <video class="mv__video" [src]="data.url" controls autoplay playsinline preload="metadata"></video>
+    }
+
+    @if (consejo()) {
+      <div class="mv__tip" role="note">
+        <mat-icon aria-hidden="true">touch_app</mat-icon>
+        <p>{{ 'dashboard_client.matterport_tooltip' | translate }}</p>
+        <button mat-icon-button type="button" (click)="ocultarConsejo()"
+                [attr.aria-label]="'common.close' | translate">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    }
+  </div>
+</div>

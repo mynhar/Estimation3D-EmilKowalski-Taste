@@ -1,0 +1,84 @@
+/* component: tour poster
+ * states: default · hover · focus-visible · active · sin miniatura
+ * contrast: etiquetas ink / on-action sobre fondos sólidos (≥ 6.5:1), nunca texto sobre la foto
+ */
+:host { display: block; }
+
+.tp {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-lg);
+  background: var(--ds-stone);
+  color: var(--ds-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.tp:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
+
+.tp__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--ds-duration-slow) var(--ds-ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .tp:hover .tp__img { transform: scale(1.02); }
+  .tp:hover .tp__cta { background: var(--ds-action-hover); }
+}
+.tp:active .tp__cta { background: var(--ds-action-pressed); transform: scale(0.98); }
+
+.tp__empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--ds-ink-muted);
+}
+.tp__empty mat-icon { width: 48px; height: 48px; font-size: 48px; }
+
+.tp__label,
+.tp__cta {
+  position: absolute;
+  bottom: var(--ds-space-3);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  min-height: 40px;
+  padding: 0 var(--ds-space-3);
+  border-radius: var(--ds-radius-md);
+  font-size: var(--ds-text-sm);
+  font-weight: var(--ds-weight-bold);
+  white-space: nowrap;
+}
+.tp__label {
+  left: var(--ds-space-3);
+  max-width: calc(100% - 12rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+}
+.tp__label mat-icon { flex-shrink: 0; color: var(--ds-action); }
+.tp__cta {
+  right: var(--ds-space-3);
+  background: var(--ds-action);
+  color: var(--ds-on-action);
+  transition: background-color var(--ds-duration-fast) var(--ds-ease-out),
+              transform var(--ds-duration-fast) var(--ds-ease-out);
+}
+.tp__label mat-icon,
+.tp__cta mat-icon { width: 20px; height: 20px; font-size: 20px; }
+
+/* Muy estrecho: la etiqueta cede y queda solo la acción. */
+@media (max-width: 359.98px) {
+  .tp__label { display: none; }
+}

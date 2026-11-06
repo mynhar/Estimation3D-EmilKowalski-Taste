@@ -1,0 +1,41 @@
+/* component: page header
+ * states: con o sin contexto, con o sin acciones
+ * contrast: título ink (13.9:1), contexto ink-muted (5.9:1 sobre bg)
+ */
+:host {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--ds-space-4);
+}
+
+.ph__text { min-width: 0; flex: 1 1 18rem; }
+
+.ph__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: clamp(var(--ds-text-2xl), 1.4rem + 2vw, var(--ds-text-4xl));
+  font-weight: var(--ds-weight-bold);
+  line-height: var(--ds-leading-tight);
+  letter-spacing: -0.01em;
+  color: var(--ds-ink);
+  overflow-wrap: anywhere;
+}
+
+.ph__context {
+  margin: var(--ds-space-2) 0 0;
+  font-size: var(--ds-text-base);
+  color: var(--ds-ink-muted);
+}
+
+.ph__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-3);
+}
+.ph__actions:empty { display: none; }
+
+@media (max-width: 599.98px) {
+  .ph__actions { width: 100%; }
+}

@@ -1,424 +1,145 @@
+<!-- El armazón (navegación lateral, barra móvil, pestañas, pie) se omite sin sesión
+     y también en el sitio público: allí cada página trae su propia cabecera y pie. -->
+@if (mostrarArmazon()) {
+  <a class="skip" href="#contenu">{{ 'nav.skip' | translate }}</a>
+}
+
 <div [class.app-shell]="mostrarArmazon()"
      [class.sidebar-collapsed]="collapsed() && mostrarArmazon()"
-     [class.sidebar-open]="mobileOpen() && mostrarArmazon()">
+     [class.sidebar-open]="mobileOpen() && mostrarArmazon()"
+     [class.has-tabs]="esCliente() && mostrarArmazon()">
 
-  <!-- El armazón (menú lateral, barra móvil, pie) se omite sin sesión y también
-       en el sitio público: allí cada página trae su propia cabecera y pie. -->
   @if (mostrarArmazon()) {
 
-    <!-- ── Sidebar ─────────────────────────────────────────────────────── -->
-    <aside class="app-sidebar" aria-label="Navegación principal">
+    <!-- ── Navegación lateral (escritorio; cajón en móvil para los roles internos) ── -->
+    <div class="sb">
 
-      <!-- Encabezado: brand + botón colapso -->
-      <div class="sidebar-header">
-        <a class="sidebar-brand"
-           (click)="irAHome(); closeMobile()"
-           [title]="'nav.inicio' | translate">
-          <i class="bi bi-box-seam sidebar-brand__icon" aria-hidden="true"></i>
-          <span class="sidebar-brand__text">Estimation3D</span>
+      <div class="sb__head">
+        <a class="sb__brand" [routerLink]="rutaHome()" (click)="closeMobile()"
+           [attr.aria-label]="'nav.inicio' | translate">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span class="sb__brand-text">Estimation3D</span>
         </a>
-        <button class="sidebar-toggle"
+        <button mat-icon-button type="button" class="sb__collapse"
                 (click)="toggleCollapse()"
-                [attr.aria-label]="collapsed() ? ('nav.ouvrir_menu' | translate) : ('nav.colapsar_menu' | translate)"
-                [title]="collapsed() ? ('nav.ouvrir_menu' | translate) : ('nav.colapsar_menu' | translate)">
-          <i class="bi" [class.bi-chevron-left]="!collapsed()" [class.bi-chevron-right]="collapsed()" aria-hidden="true"></i>
+                [attr.aria-label]="(collapsed() ? 'nav.ouvrir_menu' : 'nav.colapsar_menu') | translate"
+                [attr.aria-expanded]="!collapsed()">
+          @if (collapsed()) { <mat-icon>chevron_right</mat-icon> } @else { <mat-icon>chevron_left</mat-icon> }
         </button>
       </div>
 
-      <!-- Navegación -->
-      <nav class="sidebar-nav" aria-label="Menú">
-
-        <!-- Skeleton mientras carga el perfil -->
+      <nav class="sb__nav" [attr.aria-label]="'nav.section_principal' | translate">
         @if (cargandoPerfil()) {
-          <div class="sidebar-skeleton" aria-hidden="true">
-            <div class="sidebar-skel sidebar-skel--label"></div>
-            <div class="sidebar-skel sidebar-skel--item"></div>
-            <div class="sidebar-skel sidebar-skel--label"></div>
-            <div class="sidebar-skel sidebar-skel--item"></div>
-            <div class="sidebar-skel sidebar-skel--item"></div>
-            <div class="sidebar-skel sidebar-skel--item"></div>
-            <div class="sidebar-skel sidebar-skel--item"></div>
+          <div class="sb__skeleton" aria-hidden="true">
+            @for (n of [1, 2, 3, 4, 5, 6]; track n) { <span class="skel"></span> }
           </div>
         }
 
-        <!-- ── Cliente ─────────────────────────────────────────────────── -->
-        @if (esCliente()) {
-          <div class="sidebar-section-label">{{ 'nav.section_principal' | translate }}</div>
-          <div class="sidebar-section-separator"></div>
-          <a class="sidebar-item" routerLink="/client/dashboard"
-             routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:true}"
-             [title]="'nav.dashboard' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-speedometer2 sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.dashboard' | translate }}</span>
-          </a>
-
-          <div class="sidebar-section-label">{{ 'nav.section_dossiers' | translate }}</div>
-          <div class="sidebar-section-separator"></div>
-          <a class="sidebar-item" routerLink="/client/file/create"
-             routerLinkActive="active-link"
-             [title]="'nav.nouveau_dossier' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-plus-circle sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.nouveau_dossier' | translate }}</span>
-          </a>
-          <a class="sidebar-item" routerLink="/client/file/my-files"
-             routerLinkActive="active-link"
-             [title]="'nav.mes_dossiers' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-folder2 sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.mes_dossiers' | translate }}</span>
-          </a>
-          <a class="sidebar-item" routerLink="/client/offers-received"
-             routerLinkActive="active-link"
-             [title]="'nav.offres_recues' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-envelope-open sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.offres_recues' | translate }}</span>
-          </a>
-          <a class="sidebar-item" routerLink="/client/contracts"
-             routerLinkActive="active-link"
-             [title]="'nav.contrats' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-file-earmark-text sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.contrats' | translate }}</span>
-          </a>
-          <a class="sidebar-item" routerLink="/client/construction-monitoring/list"
-             routerLinkActive="active-link"
-             [title]="'nav.suivi_chantier' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-hammer sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.suivi_chantier' | translate }}</span>
-          </a>
-          <a class="sidebar-item" routerLink="/client/my-documents/list"
-             routerLinkActive="active-link"
-             [title]="'nav.mes_documents' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-files sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.mes_documents' | translate }}</span>
-          </a>
-          <a class="sidebar-item" routerLink="/client/history"
-             routerLinkActive="active-link"
-             [title]="'nav.historique' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-clock-history sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.historique' | translate }}</span>
-          </a>
-
-          <div class="sidebar-section-label">{{ 'nav.section_assistant' | translate }}</div>
-          <div class="sidebar-section-separator"></div>
-          <a class="sidebar-item" routerLink="/client/ai-assistant"
-             routerLinkActive="active-link"
-             [title]="'nav.assistant_ia' | translate"
-             (click)="closeMobile()">
-            <app-claude-icon class="sidebar-item__icon" />
-            <span class="sidebar-item__label">{{ 'nav.assistant_ia' | translate }}</span>
-          </a>
+        @for (sec of secciones(); track sec.titulo) {
+          <section class="sb__sec">
+            @if (!$first) { <h2 class="sb__sec-title">{{ sec.titulo | translate }}</h2> }
+            <ul class="sb__list">
+              @for (item of sec.items; track item.ruta) {
+                <li>
+                  <a class="sb__item" [routerLink]="item.ruta"
+                     routerLinkActive="is-active" ariaCurrentWhenActive="page"
+                     [routerLinkActiveOptions]="{ exact: !!item.exacto }"
+                     [attr.title]="collapsed() ? (item.etiqueta | translate) : null"
+                     (click)="closeMobile()">
+                    @if (item.ia) {
+                      <app-claude-icon class="sb__icon" />
+                    } @else {
+                      <mat-icon class="sb__icon" aria-hidden="true">{{ item.matIcon }}</mat-icon>
+                    }
+                    <span class="sb__label">{{ item.etiqueta | translate }}</span>
+                  </a>
+                </li>
+              }
+            </ul>
+          </section>
         }
-
-        <!-- ── Constructor ─────────────────────────────────────────────── -->
-        @if (esConstructor()) {
-          <div class="sidebar-section-label">{{ 'nav.section_principal' | translate }}</div>
-          <div class="sidebar-section-separator"></div>
-          <a class="sidebar-item" routerLink="/builder/dashboard"
-             routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:true}"
-             [title]="'nav.dashboard' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-speedometer2 sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.dashboard' | translate }}</span>
-          </a>
-
-          <div class="sidebar-section-label">{{ 'nav.section_travaux' | translate }}</div>
-          <div class="sidebar-section-separator"></div>
-          <a class="sidebar-item" routerLink="/builder/available-files"
-             routerLinkActive="active-link"
-             [title]="'nav.dossiers_disponibles' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-search sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.dossiers_disponibles' | translate }}</span>
-          </a>
-          <a class="sidebar-item" routerLink="/builder/my-offers"
-             routerLinkActive="active-link"
-             [title]="'nav.mes_offres' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-list-ul sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.mes_offres' | translate }}</span>
-          </a>
-          <a class="sidebar-item" routerLink="/builder/construction-monitoring/list"
-             routerLinkActive="active-link"
-             [title]="'nav.suivi_chantier' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-tools sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.suivi_chantier' | translate }}</span>
-          </a>
-
-          <div class="sidebar-section-label">{{ 'nav.section_assistant' | translate }}</div>
-          <div class="sidebar-section-separator"></div>
-          <a class="sidebar-item" routerLink="/builder/ai-assistant"
-             routerLinkActive="active-link"
-             [title]="'nav.assistant_ia' | translate"
-             (click)="closeMobile()">
-            <app-claude-icon class="sidebar-item__icon" />
-            <span class="sidebar-item__label">{{ 'nav.assistant_ia' | translate }}</span>
-          </a>
-        }
-
-        <!-- ── Estimador ────────────────────────────────────────────────── -->
-        @if (esEstimador()) {
-          <div class="sidebar-section-label">{{ 'nav.section_principal' | translate }}</div>
-          <div class="sidebar-section-separator"></div>
-          <a class="sidebar-item" routerLink="/estimator/dashboard"
-             routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:true}"
-             [title]="'nav.dashboard' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-speedometer2 sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.dashboard' | translate }}</span>
-          </a>
-
-          <div class="sidebar-section-label">{{ 'nav.section_dossiers' | translate }}</div>
-          <div class="sidebar-section-separator"></div>
-          <a class="sidebar-item" routerLink="/estimator/client/list"
-             routerLinkActive="active-link"
-             [title]="'nav.clientes_constructores' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-people sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.clientes_constructores' | translate }}</span>
-          </a>
-          <a class="sidebar-item" routerLink="/estimator/file/list"
-             routerLinkActive="active-link"
-             [title]="'nav.dossiers' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-folder2-open sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.dossiers' | translate }}</span>
-          </a>
-          <a class="sidebar-item" routerLink="/estimator/files-to-be-estimated"
-             routerLinkActive="active-link"
-             [title]="'nav.a_estimer' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-inbox sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.a_estimer' | translate }}</span>
-          </a>
-          <a class="sidebar-item" routerLink="/estimator/files-under-estimation"
-             routerLinkActive="active-link"
-             [title]="'nav.en_estimation' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-pencil-square sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.en_estimation' | translate }}</span>
-          </a>
-          <a class="sidebar-item" routerLink="/estimator/estimated-files"
-             routerLinkActive="active-link"
-             [title]="'nav.completes' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-clipboard-check sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.completes' | translate }}</span>
-          </a>
-          <a class="sidebar-item" routerLink="/estimator/construction-monitoring/list"
-             routerLinkActive="active-link"
-             [title]="'nav.suivi_chantier' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-hammer sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.suivi_chantier' | translate }}</span>
-          </a>
-
-          <div class="sidebar-section-label">{{ 'nav.section_assistant' | translate }}</div>
-          <div class="sidebar-section-separator"></div>
-          <a class="sidebar-item" routerLink="/estimator/ai-assistant"
-             routerLinkActive="active-link"
-             [title]="'nav.assistant_ia' | translate"
-             (click)="closeMobile()">
-            <app-claude-icon class="sidebar-item__icon" />
-            <span class="sidebar-item__label">{{ 'nav.assistant_ia' | translate }}</span>
-          </a>
-        }
-
-        <!-- ── Administrador ────────────────────────────────────────────── -->
-        @if (esAdministrador()) {
-          <div class="sidebar-section-label">{{ 'nav.section_principal' | translate }}</div>
-          <div class="sidebar-section-separator"></div>
-          <a class="sidebar-item" routerLink="/admin/dashboard"
-             routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:true}"
-             [title]="'nav.dashboard' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-speedometer2 sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.dashboard' | translate }}</span>
-          </a>
-
-          <div class="sidebar-section-label">{{ 'nav.section_gestion' | translate }}</div>
-          <div class="sidebar-section-separator"></div>
-          <a class="sidebar-item" routerLink="/admin/file"
-             routerLinkActive="active-link"
-             [title]="'nav.dossiers' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-folder2-open sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.dossiers' | translate }}</span>
-          </a>
-          <a class="sidebar-item" routerLink="/admin/to-estimate"
-             routerLinkActive="active-link"
-             [title]="'nav.estimaciones' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-clipboard-check sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.estimaciones' | translate }}</span>
-          </a>
-          <a class="sidebar-item" routerLink="/admin/offer"
-             routerLinkActive="active-link"
-             [title]="'nav.offres' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-tags sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.offres' | translate }}</span>
-          </a>
-          <a class="sidebar-item" routerLink="/admin/contract"
-             routerLinkActive="active-link"
-             [title]="'nav.contrats' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-file-earmark-text sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.contrats' | translate }}</span>
-          </a>
-          <a class="sidebar-item" routerLink="/admin/construction-monitoring/list"
-             routerLinkActive="active-link"
-             [title]="'nav.suivi_chantier' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-tools sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.suivi_chantier' | translate }}</span>
-          </a>
-          <a class="sidebar-item" routerLink="/admin/archived"
-             routerLinkActive="active-link"
-             [title]="'nav.archivados' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-archive sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.archivados' | translate }}</span>
-          </a>
-
-          <div class="sidebar-section-label">{{ 'nav.section_config' | translate }}</div>
-          <div class="sidebar-section-separator"></div>
-          <a class="sidebar-item" routerLink="/admin/service-type"
-             routerLinkActive="active-link"
-             [title]="'nav.types_service' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-grid sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.types_service' | translate }}</span>
-          </a>
-          <a class="sidebar-item" routerLink="/admin/user"
-             routerLinkActive="active-link"
-             [title]="'nav.utilisateurs' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-people sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.utilisateurs' | translate }}</span>
-          </a>
-          <a class="sidebar-item" routerLink="/admin/imprevisto"
-             routerLinkActive="active-link"
-             [title]="'nav.imprevistos' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-exclamation-diamond sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.imprevistos' | translate }}</span>
-          </a>
-          <a class="sidebar-item" routerLink="/admin/ficha"
-             routerLinkActive="active-link"
-             [title]="'nav.fiches_normatives' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-journal-text sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.fiches_normatives' | translate }}</span>
-          </a>
-
-          <div class="sidebar-section-label">{{ 'nav.section_assistant' | translate }}</div>
-          <div class="sidebar-section-separator"></div>
-          <a class="sidebar-item" routerLink="/admin/ai-assistant"
-             routerLinkActive="active-link"
-             [title]="'nav.assistant_ia' | translate"
-             (click)="closeMobile()">
-            <app-claude-icon class="sidebar-item__icon" />
-            <span class="sidebar-item__label">{{ 'nav.assistant_ia' | translate }}</span>
-          </a>
-          <a class="sidebar-item" routerLink="/admin/ai-events"
-             routerLinkActive="active-link"
-             [title]="'nav.evenements_ia' | translate"
-             (click)="closeMobile()">
-            <i class="bi bi-flag sidebar-item__icon" aria-hidden="true"></i>
-            <span class="sidebar-item__label">{{ 'nav.evenements_ia' | translate }}</span>
-          </a>
-        }
-
       </nav>
 
-      <!-- Footer: usuario → perfil → lang → divisor → cerrar sesión -->
-      <div class="sidebar-footer">
-
-        <!-- Usuario: skeleton mientras carga, info real cuando está listo -->
-        @if (cargandoPerfil()) {
-          <div class="sidebar-user" aria-hidden="true">
-            <div class="sidebar-skel sidebar-skel--avatar"></div>
-            <div class="sidebar-user__info">
-              <div class="sidebar-skel sidebar-skel--name"></div>
-              <div class="sidebar-skel sidebar-skel--role"></div>
-            </div>
-          </div>
-        } @else {
-          <div class="sidebar-user">
-            <img [src]="avatarPerfil() || 'assets/avatar-fallback.jpg'"
-                 [alt]="nombrePerfil() || ''"
-                 class="sidebar-user__avatar"
-                 referrerpolicy="no-referrer"
-                 (error)="$any($event.target).src='assets/avatar-fallback.jpg'" />
-            <div class="sidebar-user__info">
-              <span class="sidebar-user__name">{{ nombrePerfil() || user()?.email }}</span>
-              <span class="sidebar-user__role">{{ rolLabel() | translate }}</span>
-            </div>
-          </div>
-        }
-
-        <a class="sidebar-item" routerLink="/client/perfil"
-           routerLinkActive="active-link"
-           [title]="'nav.mon_profil' | translate"
-           (click)="closeMobile()">
-          <i class="bi bi-person sidebar-item__icon" aria-hidden="true"></i>
-          <span class="sidebar-item__label">{{ 'nav.mon_profil' | translate }}</span>
+      <div class="sb__foot">
+        <a class="sb__user" routerLink="/client/perfil" routerLinkActive="is-active"
+           ariaCurrentWhenActive="page" (click)="closeMobile()"
+           [attr.title]="collapsed() ? ('nav.mon_profil' | translate) : null">
+          <span class="avatar" aria-hidden="true">
+            @if (avatarPerfil(); as src) {
+              <img [src]="src" alt="" referrerpolicy="no-referrer" (error)="avatarPerfil.set(null)" />
+            } @else {
+              {{ iniciales() }}
+            }
+          </span>
+          <span class="sb__user-info">
+            @if (cargandoPerfil()) {
+              <span class="skel skel--name" aria-hidden="true"></span>
+            } @else {
+              <span class="sb__user-name">{{ nombrePerfil() || user()?.email }}</span>
+              <span class="sb__user-role">{{ rolLabel() | translate }}</span>
+              <span class="vh">{{ 'nav.mon_profil' | translate }}</span>
+            }
+          </span>
         </a>
 
-        <div class="sidebar-lang">
+        <div class="sb__lang">
           <app-lang-toggle [compact]="collapsed()" />
         </div>
 
-        <div class="sidebar-footer__divider"></div>
-
-        <button class="sidebar-item sidebar-item--danger"
-                [title]="'nav.deconnexion' | translate"
-                (click)="logout()">
-          <i class="bi bi-box-arrow-right sidebar-item__icon" aria-hidden="true"></i>
-          <span class="sidebar-item__label">{{ 'nav.deconnexion' | translate }}</span>
+        <button type="button" class="sb__item sb__logout" (click)="logout()"
+                [attr.title]="collapsed() ? ('nav.deconnexion' | translate) : null">
+          <mat-icon class="sb__icon" aria-hidden="true">logout</mat-icon>
+          <span class="sb__label">{{ 'nav.deconnexion' | translate }}</span>
         </button>
-
-      </div>
-
-    </aside>
-
-    <!-- Backdrop (cierra sidebar en móvil al tocar fuera) -->
-    <div class="sidebar-backdrop" (click)="closeMobile()" aria-hidden="true"></div>
-
-    <!-- Topbar fija en móvil -->
-    <div class="mobile-topbar" role="banner">
-      <button class="mobile-topbar__toggle"
-              (click)="toggleMobile()"
-              [attr.aria-label]="'nav.ouvrir_menu' | translate"
-              [attr.aria-expanded]="mobileOpen()">
-        <i class="bi bi-list" aria-hidden="true"></i>
-      </button>
-      <a class="mobile-topbar__brand" (click)="irAHome(); closeMobile()">
-        <i class="bi bi-box-seam" aria-hidden="true"></i>Estimation3D
-      </a>
-      <div class="mobile-topbar__right">
-        <app-lang-toggle />
-        <div class="mobile-topbar__avatar">
-          <img [src]="avatarPerfil() || 'assets/avatar-fallback.jpg'"
-               [alt]="nombrePerfil() || ''"
-               referrerpolicy="no-referrer"
-               (error)="$any($event.target).src='assets/avatar-fallback.jpg'" />
-        </div>
       </div>
     </div>
 
+    <div class="sb-backdrop" (click)="closeMobile()" aria-hidden="true"></div>
+
+    <!-- ── Barra superior (móvil) ─────────────────────────────────────────── -->
+    <header class="tb">
+      @if (!esCliente()) {
+        <button mat-icon-button type="button" class="tb__menu"
+                (click)="toggleMobile()"
+                [attr.aria-label]="'nav.ouvrir_menu' | translate"
+                [attr.aria-expanded]="mobileOpen()">
+          <mat-icon>menu</mat-icon>
+        </button>
+      }
+      <a class="tb__brand" [routerLink]="rutaHome()" [attr.aria-label]="'nav.inicio' | translate">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>Estimation3D</span>
+      </a>
+
+      <button mat-button type="button" class="tb__lang" [matMenuTriggerFor]="menuLang"
+              [attr.title]="'lang.' + langSvc.current() | translate">
+        <mat-icon>language</mat-icon>
+        {{ langSvc.current().toUpperCase() }}
+      </button>
+      <mat-menu #menuLang="matMenu" xPosition="before">
+        @for (l of langSvc.langs; track l) {
+          <button mat-menu-item type="button" role="menuitemradio" (click)="langSvc.set(l)"
+                  [attr.aria-checked]="langSvc.current() === l">
+            <mat-icon [class.is-blank]="langSvc.current() !== l" aria-hidden="true">check</mat-icon>
+            <span>{{ 'lang.' + l | translate }}</span>
+          </button>
+        }
+      </mat-menu>
+
+      <a class="tb__avatar" routerLink="/client/perfil" [attr.aria-label]="'nav.mon_profil' | translate">
+        <span class="avatar" aria-hidden="true">
+          @if (avatarPerfil(); as src) {
+            <img [src]="src" alt="" referrerpolicy="no-referrer" (error)="avatarPerfil.set(null)" />
+          } @else {
+            {{ iniciales() }}
+          }
+        </span>
+      </a>
+    </header>
   }
 
-  <!-- ── Router outlet único — nunca se destruye ──────────────────────────── -->
-  <main [class.app-main]="mostrarArmazon()">
+  <!-- ── Router outlet único — nunca se destruye ─────────────────────────── -->
+  <main id="contenu" tabindex="-1" [class.app-main]="mostrarArmazon()">
     <router-outlet />
     @if (mostrarArmazon()) {
       <app-footer />
@@ -426,4 +147,50 @@
     <app-toast />
   </main>
 
+  <!-- ── Pestañas inferiores del cliente (móvil) ────────────────────────── -->
+  @if (mostrarArmazon() && esCliente()) {
+    <nav class="tabs" [attr.aria-label]="'nav.section_principal' | translate">
+      @for (tab of tabsCliente; track tab.ruta) {
+        <a class="tabs__item" [routerLink]="tab.ruta"
+           routerLinkActive="is-active" ariaCurrentWhenActive="page"
+           [routerLinkActiveOptions]="{ exact: !!tab.exacto }">
+          <mat-icon aria-hidden="true">{{ tab.matIcon }}</mat-icon>
+          <span>{{ tab.etiqueta | translate }}</span>
+        </a>
+      }
+      <button type="button" class="tabs__item" [class.is-active]="plusActivo() || plusAbierto()"
+              (click)="abrirPlus()" aria-haspopup="dialog" [attr.aria-expanded]="plusAbierto()">
+        <mat-icon aria-hidden="true">more_horiz</mat-icon>
+        <span>{{ 'nav.plus' | translate }}</span>
+      </button>
+    </nav>
+  }
 </div>
+
+<!-- Hoja «Plus»: el resto de la navegación del cliente -->
+<ng-template #plusSheet>
+  <div class="plus">
+    <span class="plus__grip" aria-hidden="true"></span>
+    <h2 class="plus__title">{{ 'nav.plus' | translate }}</h2>
+    <mat-nav-list>
+      @for (item of plusCliente; track item.ruta) {
+        <a mat-list-item [routerLink]="item.ruta" routerLinkActive #rla="routerLinkActive"
+           [activated]="rla.isActive" [attr.aria-current]="rla.isActive ? 'page' : null"
+           (click)="cerrarPlus()">
+          @if (item.ia) {
+            <app-claude-icon matListItemIcon />
+          } @else {
+            <mat-icon matListItemIcon aria-hidden="true">{{ item.matIcon }}</mat-icon>
+          }
+          <span matListItemTitle>{{ item.etiqueta | translate }}</span>
+        </a>
+      }
+    </mat-nav-list>
+    <div class="plus__foot">
+      <button mat-stroked-button type="button" class="plus__logout" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        {{ 'nav.deconnexion' | translate }}
+      </button>
+    </div>
+  </div>
+</ng-template>
