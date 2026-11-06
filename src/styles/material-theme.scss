@@ -6,8 +6,9 @@
    el resto del proyecto sigue en CSS plano con tokens --ds-*.
 
    Cómo funciona:
-   - `use-system-variables: true` hace que los componentes de Material lean
-     colores y tipografía de variables `--mat-sys-*` en vez de valores fijos.
+   - La opción `use-system-variables` (activada) hace que los componentes de
+     Material lean colores y tipografía de variables `--mat-sys-*` en vez de
+     valores fijos.
    - `$roles-color` enlaza cada rol de color `--mat-sys-*` a un token --ds-*
      de tokens.css, y la tipografía usa var(--ds-font-*) / var(--ds-weight-*).
      Si cambian los tokens (rediseño), Material cambia solo, sin tocar este
@@ -120,10 +121,10 @@ html {
   /* CTA principal (design.md · CTA voice): relleno dorado + texto tinta.
      Las declaraciones van antes de los @include: Sass desaconseja
      declaraciones detrás de reglas anidadas (mixed-decls). */
-  --mdc-filled-button-container-color: var(--ds-gold);
-  --mdc-filled-button-label-text-color: var(--ds-ink-on-accent);
-  --mat-filled-button-state-layer-color: var(--ds-ink-on-accent);
-  --mat-filled-button-ripple-color: color-mix(in srgb, var(--ds-ink-on-accent) 12%, transparent);
+  --mat-button-filled-container-color: var(--ds-gold);
+  --mat-button-filled-label-text-color: var(--ds-ink-on-accent);
+  --mat-button-filled-state-layer-color: var(--ds-ink-on-accent);
+  --mat-button-filled-ripple-color: color-mix(in srgb, var(--ds-ink-on-accent) 12%, transparent);
 
   @include mat.system-level-colors($tema, $roles-color);
   @include mat.system-level-typography($tema);
