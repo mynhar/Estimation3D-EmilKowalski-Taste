@@ -1,4 +1,4 @@
-# Design — Proyecto Angular 18 (warm editorial)
+# Design — Proyecto Angular 22 (warm editorial)
 
 > **UNLOCKED — rediseño completo en curso.** Este archivo describe el sistema
 > **actual**, que es el punto de partida del rediseño, no una restricción.
@@ -108,13 +108,13 @@ sigue a los tokens sin tocar el tema.
 - Tabla completa y reglas de uso: `DESIGN_GUIDELINES.md` §4.
 
 ## Stack output contract
-- Componentes **Angular 18 standalone**, `OnPush`, signals (`input()`/`signal()`),
+- Componentes **Angular 22 standalone**, `OnPush`, signals (`input()`/`signal()`),
   nuevo control flow (`@if`/`@for` con `track`). NUNCA `*ngIf`/`*ngFor`, NgModules,
   ni `@Input()`/`@Output()`.
 - CSS plano por componente con `:host` (no SCSS salvo el tema `material-theme.scss`, no Tailwind).
 - Bootstrap desinstalado. Las clases heredadas (`.btn`, `.card`, `.row`...) las sirve
   `src/styles/ui-base.css` solo durante la transición; el CSS nuevo va en cada
-  componente con tokens. Controles, menús, overlays y diálogos con **Angular Material 18**.
+  componente con tokens. Controles, menús, overlays y diálogos con **Angular Material 22**.
   **NO** HTML suelto ni JSX.
 
 ## Exports

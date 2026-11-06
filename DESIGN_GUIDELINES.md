@@ -8,9 +8,9 @@ Guía de diseño y código para este proyecto. Aplica también si usas Claude Co
 
 ## 1. Stack del proyecto
 
-- **Framework**: Angular 18 (standalone components, signals, nuevo control flow)
+- **Framework**: Angular 22 (standalone components, signals, nuevo control flow), TypeScript 6.0
 - **Estilos**: CSS plano (NO SCSS, NO Tailwind). Única excepción: `src/styles/material-theme.scss`, el tema de Material. Bootstrap desinstalado: ver sección 4
-- **Componentes**: Angular Material 18 (M3), con su tema enlazado a los tokens `--ds-*`: ver sección 4
+- **Componentes**: Angular Material 22 (M3), con su tema enlazado a los tokens `--ds-*`: ver sección 4
 - **Sistema de diseño**: tokens CSS en `src/styles/tokens.css`
 - **Tipografías**: Fraunces (serif) para títulos, DM Sans para cuerpo
 - **Iconos**: estilo line/stroke (Lucide o Phosphor recomendados), NUNCA filled
@@ -225,11 +225,11 @@ El color base (`--ds-success`, `--ds-gold-active`…) se mantiene para rellenos,
 
 ---
 
-## 3. Convenciones de Angular 18
+## 3. Convenciones de Angular 22
 
 ### Componentes
 
-- **SIEMPRE standalone** (sin NgModules nuevos)
+- **SIEMPRE standalone** (sin NgModules nuevos). No escribas `standalone: true`: es el valor por defecto desde v19
 - **SIEMPRE** `ChangeDetectionStrategy.OnPush`
 - Usa la nueva API de signals: `input()`, `output()`, `signal()`, `computed()`, `effect()`
 - **NO uses** los decoradores `@Input()` / `@Output()` para código nuevo
@@ -241,7 +241,6 @@ import { Component, ChangeDetectionStrategy, input, signal } from '@angular/core
 
 @Component({
   selector: 'app-product-card',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './product-card.component.html',
   styleUrl: './product-card.component.css'
@@ -310,9 +309,9 @@ export class ProductCardComponent {
 
 ## 4. Componentes: Angular Material y la capa de transición
 
-### Angular Material 18 (librería de componentes)
+### Angular Material 22 (librería de componentes)
 
-Angular Material 18 (M3) es la librería de componentes del rediseño. Botones, campos, selects, checkboxes, menús, diálogos, snackbars, tabs y tooltips salen de Material antes que de marcado propio o de las clases heredadas.
+Angular Material 22 (M3) es la librería de componentes del rediseño. Botones, campos, selects, checkboxes, menús, diálogos, snackbars, tabs y tooltips salen de Material antes que de marcado propio o de las clases heredadas.
 
 - **Tema**: `src/styles/material-theme.scss`, el único `.scss` del proyecto. Con `use-system-variables`, los componentes leen color y tipografía de variables `--mat-sys-*`, y el tema enlaza cada rol a un token `--ds-*` (fuentes: `--ds-font-body` y `--ds-font-display`). Al cambiar los tokens, Material cambia solo: no hace falta tocar el tema.
 - **Roles de color**:
@@ -334,11 +333,11 @@ Angular Material 18 (M3) es la librería de componentes del rediseño. Botones, 
   `primary` es `--ds-gold-ink` y no `--ds-gold` porque en M3 `primary` también es color de **texto**. El dorado da 1.7:1 sobre el fondo, lo que no pasa AA; `--ds-gold-ink` da ≥ 6:1.
 - **CTA**: `mat-flat-button` es el CTA principal, con relleno `--ds-gold` y texto `--ds-ink` (ajuste en el tema, ver «CTA voice» en `design.md`). `mat-stroked-button` es el secundario y `mat-button` el de texto.
 - **Imports**: cada componente standalone importa solo los módulos de Material que usa (`MatButtonModule`, `MatFormFieldModule`, `MatInputModule`…).
-- **Ajustes por componente**: sobrescribe las variables `--mdc-*` / `--mat-*` del componente de Material en el CSS del componente, siempre con `var(--ds-...)`. Nunca `::ng-deep` ni selectores contra clases internas (`.mdc-*`, `.mat-mdc-*`).
+- **Ajustes por componente**: sobrescribe las variables `--mat-*` del componente de Material (p. ej. `--mat-button-filled-container-color`) en el CSS del componente, siempre con `var(--ds-...)`. Las variables `--mdc-*` ya no existen desde Material 20. Nunca `::ng-deep` ni selectores contra clases internas (`.mdc-*`, `.mat-mdc-*`).
 - **Sin `color="primary|accent|warn"`**: en M3 ese input no cambia el color (necesitaría el mixin de compatibilidad M2). El color sale del tema.
 - **Radios y elevaciones**: de momento, los de Material (botones pill, diálogo de 28 px, sombras de Material). El rediseño los fijará con `--ds-radius-*` / `--ds-shadow-*`.
 - **No ejecutes `ng add @angular/material`**: Material ya está instalado, y el schematic añadiría Roboto, Material Icons y un tema precompilado. Los iconos siguen siendo bootstrap-icons.
-- **Animaciones**: `provideAnimations()` ya está en `app.config.ts`.
+- **Animaciones**: `provideAnimations()` sigue en `app.config.ts`, pero `@angular/animations` está deprecado desde v20.2 y se eliminará en v23. En código nuevo, usa CSS, WAAPI o `animate.enter` / `animate.leave`.
 - **CDK directo**: solo para comportamiento sin estilo que Material no cubre (drag & drop, virtual scroll…). El `CdkMenu` del menú ⋮ de `presentacion-videos` puede pasar a `mat-menu` cuando se rediseñe esa pantalla.
 
 ### Bootstrap (desinstalado) y `ui-base.css`
@@ -547,7 +546,7 @@ ng serve
 ng build
 
 # Crear componente con las reglas del proyecto
-ng generate component shared/ui/button --standalone --change-detection OnPush --style css
+ng generate component shared/ui/button --change-detection OnPush --style css
 
 # Tests
 ng test
@@ -567,7 +566,7 @@ ng test
 - UI genérica sin postura estética
 - Reinstalar Bootstrap / ng-bootstrap — componentes con Angular Material
 - Otros archivos `.scss` aparte de `material-theme.scss`
-- Colores fijos en Material: ni hex en las variables `--mdc-*` / `--mat-*`, ni `color="primary|accent|warn"`. El color sale de los roles `--mat-sys-*`
+- Colores fijos en Material: ni hex en las variables `--mat-*`, ni `color="primary|accent|warn"`. El color sale de los roles `--mat-sys-*`
 - Clases heredadas de `ui-base.css` (`.btn`, `.row`, `.text-success`, `.bg-danger`…) en código nuevo — CSS del componente con los tokens `--ds-*`
 - `z-index` con números mágicos — usa la escala `--ds-z-*`
 - Sombras con valores sueltos — usa los tokens `--ds-shadow-*`
@@ -581,4 +580,4 @@ Desbloqueadas para el rediseño (eran reglas de la identidad actual): fondos neg
 
 Si trabajas con asistentes de IA en este proyecto, dales este archivo como contexto. Una buena instrucción inicial sería:
 
-> "Trabajo en un proyecto Angular 18 con Angular Material 18 y CSS plano (Bootstrap desinstalado). Sigue las reglas de `DESIGN_GUIDELINES.md`; la identidad visual está desbloqueada para un rediseño completo. Antes de generar código, identifica qué tokens CSS y componentes del sistema vas a usar o a cambiar. No uses gradientes morados, no uses `*ngIf`/`*ngFor`, no uses NgModules. Usa standalone components con OnPush, signals, nuevo control flow, y los tokens del sistema."
+> "Trabajo en un proyecto Angular 22 con Angular Material 22 y CSS plano (Bootstrap desinstalado). Sigue las reglas de `DESIGN_GUIDELINES.md`; la identidad visual está desbloqueada para un rediseño completo. Antes de generar código, identifica qué tokens CSS y componentes del sistema vas a usar o a cambiar. No uses gradientes morados, no uses `*ngIf`/`*ngFor`, no uses NgModules. Usa standalone components con OnPush, signals, nuevo control flow, y los tokens del sistema."

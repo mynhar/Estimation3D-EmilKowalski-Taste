@@ -1,6 +1,6 @@
 # Estimation3dA18V01
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.19.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.19 and updated to Angular 22.2 (Node `^22.22.3 || ^24.15.0`).
 
 ## Development server
 
