@@ -23,6 +23,16 @@ function conLimite(p: Promise<unknown>, ms: number): Promise<boolean> {
   return Promise.race([p.then(() => true, () => true), vencido]).finally(() => clearTimeout(t));
 }
 
+/**
+ * URL a la que Supabase vuelve tras el login con Google o la confirmación del
+ * registro. Lleva la barra final: los patrones `https://dominio/**` de las
+ * Redirect URLs de Supabase no aceptan el origen sin barra, y entonces Supabase
+ * cae en su Site URL (otro despliegue).
+ */
+function urlRetorno(): string {
+  return `${window.location.origin}/`;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -195,7 +205,7 @@ export class AuthSupabaseService {
     const { error } = await this.supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin,
+        redirectTo: urlRetorno(),
       },
     });
     if (error) throw error;
@@ -217,7 +227,7 @@ export class AuthSupabaseService {
       email,
       password,
       options: {
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: urlRetorno(),
         data: {
           nombre:   perfil.nombre,
           apellido: perfil.apellido,
