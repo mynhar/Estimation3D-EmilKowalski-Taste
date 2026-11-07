@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { createClient, SupabaseClient, User, RealtimeChannel } from '@supabase/supabase-js';
 import { environment } from '../../environments/environment';
-import { Subject, firstValueFrom, filter, take, timeout, catchError, of } from 'rxjs';
+import { Subject } from 'rxjs';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { Database, RolUsuario, TablesUpdate } from '../types/supabase';
 
@@ -12,6 +12,16 @@ export type PerfilCache = {
   apellido:   string;
   avatar_url: string | null;
 };
+
+/** Tiempo máximo que guards y navegación esperan al estado de auth. */
+const ESPERA_AUTH_MS = 8_000;
+
+/** true si la promesa se resolvió antes del límite; false si venció el plazo. */
+function conLimite(p: Promise<unknown>, ms: number): Promise<boolean> {
+  let t: ReturnType<typeof setTimeout>;
+  const vencido = new Promise<boolean>(r => (t = setTimeout(() => r(false), ms)));
+  return Promise.race([p.then(() => true, () => true), vencido]).finally(() => clearTimeout(t));
+}
 
 @Injectable({
   providedIn: 'root',
@@ -29,6 +39,15 @@ export class AuthSupabaseService {
 
   // Caché de rol y perfil — evita re-queries en cada navegación guardada
   private lastUserId: string | null = null;
+
+  // Esperas de los guards y de getHomeRoute(). Son promesas ligadas a los eventos
+  // reales (primer onAuthStateChange, carga del rol de ESTE usuario) y no los
+  // observables de abajo: toObservable va un ciclo de detección por detrás y,
+  // justo después de signOut(), aún repetía el usuario y el rol anteriores, así
+  // que guestGuard devolvía al panel en vez de dejar entrar en /login.
+  private marcarInicializado!: () => void;
+  private readonly inicializado = new Promise<void>(r => (this.marcarInicializado = r));
+  private cargaRol: Promise<void> = Promise.resolve();
   private perfilChannel: RealtimeChannel | null = null;
 
   // Subjects para eventos puntuales (no son estado, no tienen valor inicial)
@@ -86,6 +105,7 @@ export class AuthSupabaseService {
 
       if (!this.initializedSig()) {
         this.initializedSig.set(true);
+        this.marcarInicializado();
       }
 
       if (user) {
@@ -93,7 +113,8 @@ export class AuthSupabaseService {
         if (user.id !== this.lastUserId) {
           this.lastUserId = user.id;
           this.rolSig.set(undefined); // señal de "cargando"
-          this.cargarPerfilCache(user.id);
+          this.cargaRol = this.cargarPerfilCache(user.id).catch(e =>
+            console.error('[Auth] cargarPerfilCache:', e));
           this.suscribirCambiosPerfil(user.id);
         }
 
@@ -124,6 +145,9 @@ export class AuthSupabaseService {
       .select('rol, nombre, apellido, avatar_url')
       .eq('id', userId)
       .single();
+
+    // Si entretanto se cerró sesión (o entró otro usuario), este resultado ya no vale.
+    if (this.lastUserId !== userId) return;
 
     if (error) {
       if (error.message?.includes('infinite recursion')) {
@@ -267,15 +291,24 @@ export class AuthSupabaseService {
   // ----------------------------------------------------------
   // Ruta de inicio según rol del usuario
   // ----------------------------------------------------------
+  /**
+   * Usuario de la sesión una vez que Supabase informó del estado inicial.
+   * Lee la señal, que ya refleja un signOut() recién hecho. Si la
+   * inicialización tarda más de 8 s, se trata como sin sesión.
+   */
+  async usuarioActual(): Promise<User | null> {
+    const listo = await conLimite(this.inicializado, ESPERA_AUTH_MS);
+    return listo ? this.userSig() : null;
+  }
+
+  /** Rol del usuario actual, esperando a que termine su carga. Sin sesión o sin perfil: null. */
+  async rolActual(): Promise<RolUsuario | null> {
+    if (this.rolSig() === undefined) await conLimite(this.cargaRol, ESPERA_AUTH_MS);
+    return this.rolSig() ?? null;
+  }
+
   async getHomeRoute(): Promise<string> {
-    const rol = await firstValueFrom(
-      this.rol$.pipe(
-        filter((r): r is RolUsuario | null => r !== undefined),
-        take(1),
-        timeout(8_000),
-        catchError(() => of(null)),
-      )
-    );
+    const rol = await this.rolActual();
     if (rol === 'administrador') return '/admin/dashboard';
     if (rol === 'constructor')   return '/builder/dashboard';
     if (rol === 'estimador')     return '/estimator/dashboard';
