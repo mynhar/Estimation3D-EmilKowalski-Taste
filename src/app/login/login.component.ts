@@ -3,7 +3,12 @@ import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../services/auth-supabase.service';
-import { LangService, Lang } from '../services/lang.service';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { LangToggleComponent } from '../components/lang-toggle/lang-toggle.component';
 import { RolUsuario } from '../types/supabase';
 import { passwordComplexityValidator } from '../shared/validators/password.validator';
 import { CAMPOS_FALTANTES } from '../shared/ui/campos-faltantes/campos-faltantes.component';
@@ -11,7 +16,11 @@ import { CAMPOS_FALTANTES } from '../shared/ui/campos-faltantes/campos-faltantes
 @Component({
   selector: 'app-login',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, TranslatePipe, RouterLink, ...CAMPOS_FALTANTES],
+  imports: [
+    ReactiveFormsModule, TranslatePipe, RouterLink, ...CAMPOS_FALTANTES,
+    MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatIconModule, MatInputModule,
+    LangToggleComponent,
+  ],
   templateUrl: './login.component.html',
   styleUrl:    './login.component.css',
 })
@@ -20,7 +29,6 @@ export class LoginComponent implements OnInit {
   private router = inject(Router);
   private route  = inject(ActivatedRoute);
   private fb     = inject(FormBuilder);
-  lang           = inject(LangService);
 
   vista            = signal<'login' | 'registro'>('login');
   /** Envíos con campos sin completar, por formulario: cada uno trae el resumen de lo que falta. */
@@ -30,7 +38,7 @@ export class LoginComponent implements OnInit {
   errorLogin       = signal('');
   errorRegistro    = signal('');
   registroExitoso  = signal(false);
-  mostrarPassword  = false;
+  mostrarPassword  = signal(false);
   rolRegistro      = signal<RolUsuario>('cliente');
 
   loginForm = this.fb.group({
@@ -57,18 +65,11 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  setLang(l: Lang) { this.lang.set(l); }
-
   cambiarVista(v: 'login' | 'registro') {
     this.vista.set(v);
     this.errorLogin.set('');
     this.errorRegistro.set('');
     this.registroExitoso.set(false);
-  }
-
-  campoInvalido(form: ReturnType<FormBuilder['group']>, campo: string): boolean {
-    const ctrl = form.get(campo);
-    return !!(ctrl?.invalid && ctrl?.touched);
   }
 
   async onLogin() {

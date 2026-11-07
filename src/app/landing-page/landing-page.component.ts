@@ -1,48 +1,49 @@
 import {
   ChangeDetectionStrategy, Component, ElementRef, NgZone, OnDestroy, OnInit,
-  ViewEncapsulation, afterNextRender, computed, inject, signal, viewChild,
+  afterNextRender, computed, inject, signal, viewChild,
 } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 
+import { LangToggleComponent } from '../components/lang-toggle/lang-toggle.component';
 import { PROVINCIAS_CANADA, SERVICIOS_FALLBACK, Servicio } from '../models';
-import { SiteTheme, SiteThemeService } from '../public-site/site-theme.service';
 import { AuthSupabaseService } from '../services/auth-supabase.service';
 import { EdgeErrorService } from '../services/edge-error.service';
-import { Lang, LangService } from '../services/lang.service';
+import { LangService } from '../services/lang.service';
 import { SolicitudLandingService } from '../services/solicitud-landing.service';
-import { RevealDirective } from './directives/reveal.directive';
-import { ScanSliderDirective } from './directives/scan-slider.directive';
-import { SweepDirective } from './directives/sweep.directive';
-import {
-  COMPARE_ROWS, HERO_PINS, IMMERSION_WORDS, MEDIA, PLAN_PINS, PROBLEM_CELLS,
-  PROPERTY_TYPES, SPECIALTIES, TICKER_KEYS,
-} from './landing.data';
 import { CAMPOS_FALTANTES } from '../shared/ui/campos-faltantes/campos-faltantes.component';
+import {
+  COMPARE_ROWS, HERO_AREAS, HERO_COTES, IMMERSION_WORDS, MEDIA, PROCESS_STEPS,
+  PROPERTY_TYPES, SPECIALTIES,
+} from './landing.data';
 
 /** Código postal canadiense: A1A 1A1 (con espacio, guion o nada). */
 const CA_POSTAL_RE = /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/;
 
+/**
+ * Landing pública, dirección Clarté: una sola superficie clara, seis secciones
+ * (escaneo, problema frente a solución, pasos, especialidades, tour 3D y
+ * formulario) y un único momento de movimiento, el barrido del escáner del hero.
+ *
+ * Sin Material salvo botón de icono, iconos y el menú de idioma, que el armazón
+ * de la aplicación ya carga: los campos y botones son CSS propio para que la
+ * primera visita en 4G no cargue el resto de la librería.
+ */
 @Component({
   selector: 'app-landing-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  // Encapsulación emulada (la de por defecto): Angular prefija cada selector, lo que
-  // aísla los ~1000 selectores de la landing de Bootstrap y del design system de la app.
-  encapsulation: ViewEncapsulation.Emulated,
   imports: [
-    RouterLink, TranslatePipe, ReactiveFormsModule,
-    RevealDirective, SweepDirective, ScanSliderDirective, ...CAMPOS_FALTANTES],
-  templateUrl: './landing-page.component.html',
-  styleUrls: [
-    './styles/landing-base.css',
-    './styles/landing-sections.css',
-    './styles/landing-signature.css',
+    RouterLink, TranslatePipe, ReactiveFormsModule, NgOptimizedImage,
+    MatButtonModule, MatIconModule, MatMenuModule,
+    LangToggleComponent, ...CAMPOS_FALTANTES,
   ],
-  host: {
-    'class': 'e3-landing',
-    '[attr.data-theme]': 'theme()',
-  },
+  templateUrl: './landing-page.component.html',
+  styleUrl: './landing-page.component.css',
 })
 export class LandingPageComponent implements OnInit, OnDestroy {
   private zone = inject(NgZone);
@@ -53,37 +54,38 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   private edgeErrors = inject(EdgeErrorService);
 
   readonly lang = inject(LangService);
-  readonly langs = this.lang.langs;
   readonly year = new Date().getFullYear();
-
-  // El tema vive en un servicio compartido con Le Journal y Entrepreneurs: así
-  // el conmutador se recuerda al navegar entre las tres páginas públicas.
-  private themeSvc = inject(SiteThemeService);
-  readonly theme = this.themeSvc.theme;
 
   // ── Datos estructurales ───────────────────────────────────────────────────
   readonly specialties = SPECIALTIES;
-  readonly problemCells = PROBLEM_CELLS;
+  readonly steps = PROCESS_STEPS;
   readonly compareRows = COMPARE_ROWS;
   readonly immersionWords = IMMERSION_WORDS;
-  readonly heroPins = HERO_PINS;
-  readonly planPins = PLAN_PINS;
-  readonly tickerKeys = TICKER_KEYS;
+  readonly cotes = HERO_COTES;
+  readonly areas = HERO_AREAS;
   readonly propertyTypes = PROPERTY_TYPES;
   readonly provincesCanada = PROVINCIAS_CANADA;
   readonly media = MEDIA;
 
   // ── Estado de interfaz ────────────────────────────────────────────────────
-  readonly menuOpen = signal(false);
+  /** La página bajó lo bastante como para que la cabecera lleve filete. */
+  readonly scrolled = signal(false);
+  /** El escaneo del hero cargó: arranca el barrido (antes pasaría sobre una caja vacía). */
+  readonly scanReady = signal(false);
+  /** Botón fijo de móvil: entre el final del hero y el principio del formulario. */
+  readonly ctaBar = signal(false);
   /** Envíos con campos sin completar: cada uno trae el resumen de lo que falta. */
   readonly intentos = signal(0);
-  readonly scrolled = signal(false);
   readonly sent = signal(false);
   readonly sending = signal(false);
   /** Clave i18n del último fallo del envío; vacía mientras no haya error. */
   readonly sendError = signal('');
 
-  // ── Servicios activos (bloque "type de problème") ─────────────────────────
+  private menu = viewChild.required<ElementRef<HTMLDialogElement>>('menu');
+  // En un `mat-icon-button` la referencia apunta al componente: se pide el elemento.
+  private menuButton = viewChild.required('menuButton', { read: ElementRef<HTMLButtonElement> });
+
+  // ── Servicios activos (bloque "type de service") ──────────────────────────
   // La lista sale de la tabla `servicio`, no de una constante: lo que la landing
   // ofrece tiene que ser exactamente lo que la aplicación sabe estimar.
   private serviciosRaw = signal<Servicio[]>([]);
@@ -100,9 +102,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
       :              (s.nombre_fr || s.nombre_es),
     }));
   });
-
-  // ── Referencias para escritura directa al DOM (sin detección de cambios) ──
-  private railReadout = viewChild<ElementRef<HTMLElement>>('railReadout');
 
   // ── Formulario "Créer mon dossier" ────────────────────────────────────────
   readonly form = this.fb.nonNullable.group({
@@ -129,10 +128,13 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   /** Marca los campos con error sólo después del primer intento de envío. */
   readonly submitted = signal(false);
 
-  private removeScroll?: () => void;
+  private teardown: (() => void)[] = [];
 
   constructor() {
-    afterNextRender(() => this.zone.runOutsideAngular(() => this.bindScroll()));
+    afterNextRender(() => this.zone.runOutsideAngular(() => {
+      this.bindScroll();
+      this.bindCtaBar();
+    }));
   }
 
   ngOnInit(): void {
@@ -156,57 +158,80 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     this.loadingServices.set(false);
   }
 
-  // ── Cabecera, barra de progreso, regla de medición y scan-spy ─────────────
-  /**
-   * Un único listener de scroll. Corre fuera de la zona: la lectura de la regla se
-   * escribe directamente en el DOM, y sólo se vuelve a Angular cuando cambia el
-   * estado discreto de la cabecera.
-   */
+  // ── Cabecera y botón fijo ─────────────────────────────────────────────────
+  /** Filete de la cabecera. Fuera de la zona: sólo se entra al cambiar de estado. */
   private bindScroll(): void {
     const onScroll = () => {
-      const rail = this.railReadout()?.nativeElement;
-      if (rail) {
-        const y = Math.round(window.scrollY);
-        const sections = this.host.querySelectorAll<HTMLElement>('main section');
-        let idx = 1;
-        sections.forEach((s, i) => {
-          if (s.getBoundingClientRect().top < window.innerHeight * 0.5) idx = i + 1;
-        });
-        rail.textContent =
-          'Y ' + String(y).padStart(4, '0') + ' · SECT ' + String(idx).padStart(2, '0');
-      }
-
-      const isScrolled = window.scrollY > 40;
-
-      // Sólo se entra en la zona cuando algo discreto cambió.
-      if (isScrolled !== this.scrolled()) {
-        this.zone.run(() => this.scrolled.set(isScrolled));
-      }
+      const isScrolled = window.scrollY > 8;
+      if (isScrolled !== this.scrolled()) this.zone.run(() => this.scrolled.set(isScrolled));
     };
-
     window.addEventListener('scroll', onScroll, { passive: true });
-    this.removeScroll = () => window.removeEventListener('scroll', onScroll);
+    this.teardown.push(() => window.removeEventListener('scroll', onScroll));
     onScroll();
   }
 
-  // ── Acciones ──────────────────────────────────────────────────────────────
+  /**
+   * El botón fijo aparece cuando el CTA del hero ya no se ve y desaparece al
+   * llegar al formulario (allí sobra) y en adelante (taparía el pie).
+   */
+  private bindCtaBar(): void {
+    const hero = this.host.querySelector<HTMLElement>('#hero');
+    const dossier = this.host.querySelector<HTMLElement>('#dossier');
+    if (!hero || !dossier || typeof IntersectionObserver === 'undefined') return;
 
-  setLang(l: Lang): void { this.lang.set(l); }
+    let heroVisible = true;
+    let dossierReached = false;
+    const io = new IntersectionObserver(entries => {
+      for (const e of entries) {
+        if (e.target === hero) heroVisible = e.isIntersecting;
+        else dossierReached = e.isIntersecting || e.boundingClientRect.top < 0;
+      }
+      const show = !heroVisible && !dossierReached;
+      if (show !== this.ctaBar()) this.zone.run(() => this.ctaBar.set(show));
+    });
+    io.observe(hero);
+    io.observe(dossier);
+    this.teardown.push(() => io.disconnect());
+  }
 
-  setTheme(t: SiteTheme): void { this.themeSvc.set(t); }
+  // ── Menú móvil (<dialog> nativo: foco atrapado, Escape y fondo inerte) ────
+  openMenu(): void {
+    this.menu().nativeElement.showModal();
+  }
 
-  toggleMenu(): void { this.menuOpen.update(v => !v); }
+  /**
+   * `returnFocus = false` cuando se cierra para navegar: el evento `close` llega
+   * después y, si no, devolvería el foco al botón en vez de dejarlo en el destino.
+   */
+  closeMenu(returnFocus = true): void {
+    const dialog = this.menu().nativeElement;
+    if (!dialog.open) return;
+    this.returnFocus = returnFocus;
+    dialog.close();
+  }
+  private returnFocus = true;
 
-  closeMenu(): void { this.menuOpen.set(false); }
+  /** Un clic en el telón (fuera de la hoja) cierra el menú. */
+  onMenuClick(event: MouseEvent): void {
+    if (event.target === this.menu().nativeElement) this.closeMenu();
+  }
 
-  /** Desplazamiento suave a una sección de la propia landing. */
+  /** Al cerrarse, el foco vuelve al botón que lo abrió (salvo al navegar). */
+  onMenuClosed(): void {
+    if (this.returnFocus) this.menuButton().nativeElement.focus({ preventScroll: true });
+    this.returnFocus = true;
+  }
+
+  // ── Navegación interna ────────────────────────────────────────────────────
+  /** Desplazamiento a una sección de la propia landing; deja el foco en ella. */
   goTo(id: string, event?: Event): void {
     event?.preventDefault();
-    this.closeMenu();
+    this.closeMenu(false);
     const el = this.host.querySelector<HTMLElement>('#' + id);
     if (!el) return;
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    el.focus({ preventScroll: true });
   }
 
   /**
@@ -215,11 +240,12 @@ export class LandingPageComponent implements OnInit, OnDestroy {
    */
   goTop(event?: Event): void {
     event?.preventDefault();
-    this.closeMenu();
+    this.closeMenu(false);
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
   }
 
+  // ── Formulario ────────────────────────────────────────────────────────────
   /** Igual que `invalid()` pero para los campos del subgrupo de dirección. */
   invalidAddr(name: keyof typeof this.form.controls.adresse.controls): boolean {
     const c = this.form.controls.adresse.controls[name];
@@ -274,6 +300,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.removeScroll?.();
+    this.closeMenu(false);
+    for (const fn of this.teardown) fn();
   }
 }

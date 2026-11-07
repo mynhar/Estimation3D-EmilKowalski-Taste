@@ -108,6 +108,21 @@ Se borran en la fase 4.
 - Objetivos táctiles ≥ 44px, `safe-area-inset-*`, enlace «Aller au contenu».
 - `.page-wrapper`: 16px de margen lateral en móvil, 24px desde 768px, 32px desde 1200px.
 
+## Landing y páginas públicas
+- Solo tema claro. Sin selector Sombre/Clair ni controles flotantes: el idioma va en la cabecera
+  (segmentado desde 1200px, `mat-menu` por debajo, como la barra de la app). Le Journal y
+  Entrepreneurs conservan su piel antigua y `SiteThemeService` hasta la fase 2.
+- Seis secciones: escaneo (hero) · problema frente a solución (banda stone) · tres pasos ·
+  especialidades (filas en móvil, 2 × 3 desde 640px, 3 × 2 desde 1024px) · tour 3D (isla ardoise)
+  · formulario. Móvil: botón fijo «Créer mon dossier» entre el final del hero y el formulario.
+- Firma: cotas menthe sobre el escaneo, solo con medidas reales del plano. Etiquetas en HTML
+  (≥ 14px con `cqi`), líneas en SVG. Barrido único de 1.6s con `--ds-ease-in-out`: línea, velo y
+  cotas comparten curva; arranca al cargar la imagen. Con reduced motion, cotas visibles sin barrido.
+- CSS propio del componente; de Material solo `mat-icon`, `mat-icon-button` y `mat-menu` (ya
+  cargados por el armazón). Botón `.button` (nunca `.btn`: colisiona con `ui-base.css`), campos
+  de 48px a 16px con borde `--ds-ink-faint`; menú móvil en `<dialog>` nativo.
+- Imágenes con `NgOptimizedImage` y copias web (`*-800.jpg`, `scan-render-1-1400.jpg`).
+
 ## Motion stance
 - Sobria. Un solo momento orquestado por pantalla (en la landing: el barrido del escaneo).
 - Movimiento que responde a una acción (abrir, expandir, confirmar) sí; entradas en cascada por reflejo, no.
@@ -144,7 +159,7 @@ cada rol `--mat-sys-*` apunta a un token `--ds-*`.
    inferiores, dashboard del cliente, estados vacíos, visor 3D (póster + diálogo a pantalla completa).
    Hecho: armazón, dashboard del cliente, visor 3D y componentes compartidos
    (`shared/ui`: page-header, empty-state, status-chip, stage-line, dossier-card, tour-poster,
-   media-viewer). Pendiente: login y landing
+   media-viewer), login y registro, landing.
 2. Resto de pantallas del cliente + journal y entrepreneurs
 3. Contratista · 4. Estimador y admin; después se borran `ui-base.css` y `bootstrap-overrides.css`
 

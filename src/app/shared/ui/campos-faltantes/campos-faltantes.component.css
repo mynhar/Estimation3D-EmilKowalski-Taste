@@ -42,22 +42,21 @@
   margin: 0 0 var(--ds-space-2);
   font-weight: var(--ds-weight-semibold);
 }
-.cf__title .bi { line-height: 1.45; }
+.cf__icon { flex-shrink: 0; width: 18px; height: 18px; margin-top: 1px; }
 
 .cf__list {
   display: grid;
-  gap: var(--ds-space-1);
+  gap: var(--ds-space-2);
   margin: 0;
   /* Alineado con el texto del título, no con su icono. */
-  padding: 0 0 0 calc(1em + var(--ds-space-2));
+  padding: 0 0 0 calc(18px + var(--ds-space-2));
   list-style: none;
 }
 
+/* Nombre del campo y, debajo, el motivo. */
 .cf__item {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0 var(--ds-space-2);
+  display: grid;
+  justify-items: start;
   min-width: 0;
 }
 
@@ -90,17 +89,16 @@
 
 .cf__reason {
   color: var(--ds-ink-secondary);
-  font-size: var(--ds-text-xs);
+  font-size: var(--ds-text-sm);
 }
-.cf__reason::before { content: '· '; }
 
-/* ── Web pública (landing, emprendedores) ──────────────────────────────────
- * Ese sitio tiene su propia piel (tema oscuro por defecto, monoespaciada,
- * esquinas vivas) y expone sus variables en el host de la página; en tema
- * claro apuntan a los tokens --ds-*. La caja rosa de la aplicación chocaría
- * sobre el fondo oscuro: aquí el resumen es un panel del sitio con filete y
- * texto de error. --danger-text ≥ 4.5:1 en ambos temas (ver site-chrome.css). */
-:host-context(.e3-landing) .cf,
+/* ── Entrepreneurs (piel antigua, hasta su rediseño en la fase 2) ──────────
+ * Esa página aún tiene su propia piel (tema oscuro por defecto, monoespaciada,
+ * esquinas vivas) y expone sus variables en el host; en tema claro apuntan a
+ * los tokens --ds-*. La caja rosa de la aplicación chocaría sobre el fondo
+ * oscuro: aquí el resumen es un panel del sitio con filete y texto de error.
+ * --danger-text ≥ 4.5:1 en ambos temas (ver site-chrome.css). La landing ya es
+ * Clarté y usa el resumen por defecto. */
 :host-context(.e3-public-page) .cf {
   background: var(--panel);
   color: var(--danger-text);
@@ -110,15 +108,10 @@
   font-size: 0.78rem;
   letter-spacing: 0.03em;
 }
-:host-context(.e3-landing) .cf__reason,
 :host-context(.e3-public-page) .cf__reason { color: var(--white-dim); font-size: inherit; }
-:host-context(.e3-landing) .cf__link:hover,
 :host-context(.e3-public-page) .cf__link:hover,
-:host-context(.e3-landing) .cf__link:active,
 :host-context(.e3-public-page) .cf__link:active { color: var(--white); }
-:host-context(.e3-landing) .cf:focus-visible,
 :host-context(.e3-public-page) .cf:focus-visible,
-:host-context(.e3-landing) .cf__link:focus-visible,
 :host-context(.e3-public-page) .cf__link:focus-visible {
   box-shadow: none;
   outline: 1px solid var(--gold-text);

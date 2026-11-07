@@ -1,204 +1,121 @@
-<div class="lg-root">
+<div class="lg">
 
-  <!-- ── Panel izquierdo (oscuro — editorial) ──────────────────────────────── -->
+  <!-- ── Panel de marca (escritorio): isla ardoise ─────────────────────────── -->
   <aside class="lg-side" [attr.aria-label]="'auth.aria_platform_info' | translate">
+    <a class="lg-brand lg-brand--dark" routerLink="/">
+      <span class="lg-mark" aria-hidden="true"></span>
+      Estimation3D
+    </a>
 
-    <!-- Fondo punteado decorativo -->
-    <div class="lg-side__bg" aria-hidden="true"></div>
-
-    <div class="lg-side__body">
-
-      <!-- Brand -->
-      <div class="lg-brand">
-        <div class="lg-brand__icon" aria-hidden="true">
-          <i class="bi bi-box-seam"></i>
-        </div>
-        <div>
-          <span class="lg-logo">Estimation3D</span>
-          <p class="lg-logo-sub">{{ 'auth.brand_tagline' | translate }}</p>
-        </div>
-      </div>
-
-      <!-- Headline editorial -->
-      <div class="lg-side__headline">
-        <h2 class="lg-side__title">
-          {{ 'auth.side_title' | translate }}
-        </h2>
-        <p class="lg-side__lead">{{ 'auth.side_lead' | translate }}</p>
-      </div>
-
-      <!-- Trust points -->
-      <ul class="lg-points" role="list">
-        <li class="lg-point">
-          <span class="lg-point__icon" aria-hidden="true">
-            <i class="bi bi-box"></i>
-          </span>
-          <span>{{ 'auth.side_point_3d' | translate }}</span>
-        </li>
-        <li class="lg-point">
-          <span class="lg-point__icon" aria-hidden="true">
-            <i class="bi bi-patch-check"></i>
-          </span>
-          <span>{{ 'auth.side_point_verified' | translate }}</span>
-        </li>
-        <li class="lg-point">
-          <span class="lg-point__icon" aria-hidden="true">
-            <i class="bi bi-globe"></i>
-          </span>
-          <span>FR · EN · ES</span>
-        </li>
-        <li class="lg-point">
-          <span class="lg-point__icon" aria-hidden="true">
-            <i class="bi bi-gift"></i>
-          </span>
-          <span>{{ 'auth.side_point_free' | translate }}</span>
-        </li>
-      </ul>
-
+    <div class="lg-side__copy">
+      <h2 class="lg-side__title">{{ 'auth.side_title' | translate }}</h2>
+      <p class="lg-side__lead">{{ 'auth.side_lead' | translate }}</p>
     </div>
 
-    <!-- Decoración: anillos dorados en la esquina -->
-    <div class="lg-side__deco" aria-hidden="true">
-      <div class="lg-deco-ring lg-deco-ring--1"></div>
-      <div class="lg-deco-ring lg-deco-ring--2"></div>
-      <div class="lg-deco-ring lg-deco-ring--3"></div>
-    </div>
-
+    <ul class="lg-points">
+      <li>
+        <mat-icon aria-hidden="true">view_in_ar</mat-icon>
+        {{ 'auth.side_point_3d' | translate }}
+      </li>
+      <li>
+        <mat-icon aria-hidden="true">verified</mat-icon>
+        {{ 'auth.side_point_verified' | translate }}
+      </li>
+      <li>
+        <mat-icon aria-hidden="true">translate</mat-icon>
+        {{ 'lang.fr' | translate }}, {{ 'lang.en' | translate }}, {{ 'lang.es' | translate }}
+      </li>
+      <li>
+        <mat-icon aria-hidden="true">redeem</mat-icon>
+        {{ 'auth.side_point_free' | translate }}
+      </li>
+    </ul>
   </aside>
 
-  <!-- ── Panel derecho (formulario) ──────────────────────────────────────── -->
-  <main class="lg-panel">
-
-    <!-- Barra superior -->
-    <div class="lg-topbar">
-      <a routerLink="/" class="lg-back">
-        <i class="bi bi-arrow-left" aria-hidden="true"></i>
+  <!-- ── Formulario ──────────────────────────────────────────────────────── -->
+  <main class="lg-main">
+    <div class="lg-top">
+      <a mat-button routerLink="/" class="lg-back">
+        <mat-icon>arrow_back</mat-icon>
         {{ 'auth.back_to_home' | translate }}
       </a>
-      <div class="lg-lang" role="group" [attr.aria-label]="'auth.aria_language' | translate">
-        @for (l of lang.langs; track l) {
-          <button type="button" class="lg-lang__btn"
-                  [class.lg-lang__btn--active]="lang.current() === l"
-                  (click)="setLang(l)">{{ l.toUpperCase() }}</button>
-        }
-      </div>
+      <app-lang-toggle class="lg-lang" />
     </div>
 
-    <!-- Formularios -->
-    <div class="lg-form-wrap">
+    <div class="lg-wrap">
+      <a class="lg-brand lg-brand--mobile" routerLink="/">
+        <span class="lg-mark" aria-hidden="true"></span>
+        Estimation3D
+      </a>
 
-      <!-- Logo visible solo en móvil -->
-      <div class="lg-mobile-brand">
-        <div class="lg-mobile-brand__icon" aria-hidden="true">
-          <i class="bi bi-box-seam"></i>
-        </div>
-        <div>
-          <span class="lg-logo">Estimation3D</span>
-          <p class="lg-logo-sub">{{ 'auth.brand_tagline' | translate }}</p>
-        </div>
-      </div>
-
-      <!-- Encabezado del formulario -->
-      <div class="lg-form-head">
-        <h1 class="lg-form-title">
-          @if (vista() === 'login') {
-            {{ 'auth.sign_in' | translate }}
-          } @else {
-            {{ 'auth.sign_up' | translate }}
-          }
+      <header class="lg-head">
+        <h1 class="lg-title">
+          {{ (vista() === 'login' ? 'auth.sign_in' : 'auth.sign_up') | translate }}
         </h1>
-        <p class="lg-form-sub">
-          @if (vista() === 'login') {
-            {{ 'auth.sign_in_sub' | translate }}
-          } @else {
-            {{ 'auth.sign_up_sub' | translate }}
-          }
+        <p class="lg-sub">
+          {{ (vista() === 'login' ? 'auth.sign_in_sub' : 'auth.sign_up_sub') | translate }}
         </p>
-      </div>
+      </header>
 
-      <!-- Tabs -->
-      <div class="lg-tabs" role="tablist">
-        <button type="button" role="tab" class="lg-tab"
-                [class.lg-tab--active]="vista() === 'login'"
-                [attr.aria-selected]="vista() === 'login'"
-                (click)="cambiarVista('login')">
-          <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
-          {{ 'auth.sign_in' | translate }}
-        </button>
-        <button type="button" role="tab" class="lg-tab"
-                [class.lg-tab--active]="vista() === 'registro'"
-                [attr.aria-selected]="vista() === 'registro'"
-                (click)="cambiarVista('registro')">
-          <i class="bi bi-person-plus" aria-hidden="true"></i>
-          {{ 'auth.sign_up' | translate }}
-        </button>
-      </div>
+      <mat-button-toggle-group class="lg-switch" hideSingleSelectionIndicator
+                               [value]="vista()" (change)="cambiarVista($event.value)"
+                               [attr.aria-label]="'auth.login' | translate">
+        <mat-button-toggle value="login">{{ 'auth.sign_in' | translate }}</mat-button-toggle>
+        <mat-button-toggle value="registro">{{ 'auth.sign_up' | translate }}</mat-button-toggle>
+      </mat-button-toggle-group>
 
-      <!-- ═══ FORMULARIO LOGIN ═══════════════════════════════════════════════ -->
+      <!-- ═══ Iniciar sesión ═══════════════════════════════════════════════ -->
       @if (vista() === 'login') {
-
         <form [formGroup]="loginForm" (ngSubmit)="onLogin()" novalidate class="lg-form">
 
-          <div class="lg-field">
-            <label class="lg-field__label" [for]="'login-email'">
-              {{ 'common.email' | translate }}
-            </label>
-            <div class="lg-field__input-wrap">
-              <i class="bi bi-envelope lg-field__icon" aria-hidden="true"></i>
-              <input id="login-email" type="email" class="lg-field__input lg-field__input--icon"
-                     formControlName="email"
-                     [placeholder]="'auth.email_placeholder' | translate"
-                     autocomplete="email"
-                     [class.lg-field__input--error]="campoInvalido(loginForm, 'email')">
-            </div>
-          </div>
+          <mat-form-field appearance="outline" hideRequiredMarker>
+            <mat-label>{{ 'common.email' | translate }}</mat-label>
+            <input matInput type="email" formControlName="email"
+                   [placeholder]="'auth.email_placeholder' | translate"
+                   autocomplete="email" inputmode="email">
+            @if (fl['email'].hasError('email')) {
+              <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'admin_users.email_invalid' | translate }}</mat-error>
+            } @else {
+              <mat-error><mat-icon aria-hidden="true">error</mat-icon><span class="lg-cap">{{ 'missing_fields.reason_required' | translate }}</span></mat-error>
+            }
+          </mat-form-field>
 
-          <div class="lg-field">
-            <label class="lg-field__label" [for]="'login-pw'">
-              {{ 'common.password' | translate }}
-            </label>
-            <div class="lg-field__wrap">
-              <i class="bi bi-lock lg-field__icon" aria-hidden="true"></i>
-              <input id="login-pw"
-                     [type]="mostrarPassword ? 'text' : 'password'"
-                     class="lg-field__input lg-field__input--pw lg-field__input--icon"
-                     formControlName="password"
-                     placeholder="••••••••"
-                     autocomplete="current-password"
-                     [class.lg-field__input--error]="campoInvalido(loginForm, 'password')">
-              <button type="button" class="lg-field__eye"
-                      [attr.aria-label]="(mostrarPassword ? 'auth.hide_password' : 'auth.show_password') | translate"
-                      (click)="mostrarPassword = !mostrarPassword">
-                <i class="bi" aria-hidden="true"
-                   [class.bi-eye]="!mostrarPassword"
-                   [class.bi-eye-slash]="mostrarPassword"></i>
-              </button>
-            </div>
-          </div>
+          <mat-form-field appearance="outline" hideRequiredMarker>
+            <mat-label>{{ 'common.password' | translate }}</mat-label>
+            <input matInput [type]="mostrarPassword() ? 'text' : 'password'" formControlName="password"
+                   autocomplete="current-password">
+            <button mat-icon-button matIconSuffix type="button" class="lg-eye"
+                    (click)="mostrarPassword.set(!mostrarPassword())"
+                    [attr.aria-label]="(mostrarPassword() ? 'auth.hide_password' : 'auth.show_password') | translate"
+                    [attr.aria-pressed]="mostrarPassword()">
+              @if (mostrarPassword()) { <mat-icon>visibility_off</mat-icon> } @else { <mat-icon>visibility</mat-icon> }
+            </button>
+            @if (fl['password'].hasError('minlength')) {
+              <mat-error><mat-icon aria-hidden="true">error</mat-icon><span class="lg-cap">{{ 'missing_fields.reason_minlength' | translate: { n: 6 } }}</span></mat-error>
+            } @else {
+              <mat-error><mat-icon aria-hidden="true">error</mat-icon><span class="lg-cap">{{ 'missing_fields.reason_required' | translate }}</span></mat-error>
+            }
+          </mat-form-field>
 
           @if (errorLogin()) {
-            <div class="lg-alert" role="alert">
-              <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+            <p class="lg-alert" role="alert">
+              <mat-icon aria-hidden="true">error</mat-icon>
               {{ errorLogin() | translate }}
-            </div>
+            </p>
           }
 
           <!-- Activo aunque falten datos: al pulsarlo, el resumen dice cuáles. -->
-          <button type="submit" class="lg-btn lg-btn--gold"
-                  [disabled]="loading()">
+          <button mat-flat-button type="submit" class="lg-submit" [disabled]="loading()">
             @if (loading()) { <span class="lg-spinner" aria-hidden="true"></span> }
-            {{ loading() ? ('common.loading' | translate) : ('auth.sign_in' | translate) }}
+            {{ (loading() ? 'common.loading' : 'auth.sign_in') | translate }}
           </button>
-          <app-campos-faltantes class="mt-3" [formulario]="loginForm" [intento]="intentosLogin()" />
-
+          <app-campos-faltantes [formulario]="loginForm" [intento]="intentosLogin()" />
         </form>
 
-        <div class="lg-divider">
-          <span>{{ 'auth.or_divider' | translate }}</span>
-        </div>
+        <p class="lg-divider"><span>{{ 'auth.or_divider' | translate }}</span></p>
 
-        <button type="button" class="lg-btn lg-btn--google" (click)="loginWithGoogle()">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="18" height="18" aria-hidden="true" focusable="false">
+        <button mat-stroked-button type="button" class="lg-google" (click)="loginWithGoogle()">
+          <svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true" focusable="false">
             <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
             <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
             <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
@@ -206,164 +123,96 @@
           </svg>
           {{ 'auth.google_btn' | translate }}
         </button>
-
       }
 
-      <!-- ═══ FORMULARIO REGISTRO ════════════════════════════════════════════ -->
+      <!-- ═══ Crear cuenta ═════════════════════════════════════════════════ -->
       @if (vista() === 'registro') {
-
         @if (registroExitoso()) {
-
           <div class="lg-success" role="status">
-            <div class="lg-success__icon">
-              <i class="bi bi-check-lg" aria-hidden="true"></i>
-            </div>
+            <mat-icon class="lg-success__icon" aria-hidden="true">check_circle</mat-icon>
             <h2 class="lg-success__title">{{ 'auth.register_success' | translate }}</h2>
           </div>
-
         } @else {
-
           <form [formGroup]="registroForm" (ngSubmit)="onRegistro()" novalidate class="lg-form">
 
-            <div class="lg-field-row">
-              <div class="lg-field">
-                <label class="lg-field__label">
-                  {{ 'common.name' | translate }} <span class="lg-req" aria-hidden="true">*</span>
-                </label>
-                <input type="text" class="lg-field__input"
-                       formControlName="nombre"
-                       [placeholder]="'profile.name_placeholder' | translate"
-                       [class.lg-field__input--error]="campoInvalido(registroForm, 'nombre')"
-                       [attr.aria-invalid]="campoInvalido(registroForm, 'nombre')">
-                @if (campoInvalido(registroForm, 'nombre')) {
-                  <span class="lg-field__error" role="alert">
-                    <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
-                    {{ 'admin_users.name_required' | translate }}
-                  </span>
-                }
-              </div>
+            <div class="lg-row">
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'common.name' | translate }}</mat-label>
+                <input matInput type="text" formControlName="nombre" autocomplete="given-name" required>
+                <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'admin_users.name_required' | translate }}</mat-error>
+              </mat-form-field>
 
-              <div class="lg-field">
-                <label class="lg-field__label">
-                  {{ 'common.lastname' | translate }} <span class="lg-req" aria-hidden="true">*</span>
-                </label>
-                <input type="text" class="lg-field__input"
-                       formControlName="apellido"
-                       [placeholder]="'profile.lastname_placeholder' | translate"
-                       [class.lg-field__input--error]="campoInvalido(registroForm, 'apellido')"
-                       [attr.aria-invalid]="campoInvalido(registroForm, 'apellido')">
-                @if (campoInvalido(registroForm, 'apellido')) {
-                  <span class="lg-field__error" role="alert">
-                    <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
-                    {{ 'admin_users.lastname_required' | translate }}
-                  </span>
-                }
-              </div>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'common.lastname' | translate }}</mat-label>
+                <input matInput type="text" formControlName="apellido" autocomplete="family-name" required>
+                <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'admin_users.lastname_required' | translate }}</mat-error>
+              </mat-form-field>
             </div>
 
-            <div class="lg-field">
-              <label class="lg-field__label">
-                {{ 'common.email' | translate }} <span class="lg-req" aria-hidden="true">*</span>
-              </label>
-              <div class="lg-field__input-wrap">
-                <i class="bi bi-envelope lg-field__icon" aria-hidden="true"></i>
-                <input type="email" class="lg-field__input lg-field__input--icon"
-                       formControlName="email"
-                       [placeholder]="'auth.email_placeholder' | translate"
-                       autocomplete="email"
-                       [class.lg-field__input--error]="campoInvalido(registroForm, 'email')"
-                       [attr.aria-invalid]="campoInvalido(registroForm, 'email')">
-              </div>
-              @if (campoInvalido(registroForm, 'email')) {
-                <span class="lg-field__error" role="alert">
-                  <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
-                  {{ 'admin_users.email_invalid' | translate }}
-                </span>
-              }
-            </div>
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'common.email' | translate }}</mat-label>
+              <input matInput type="email" formControlName="email"
+                     [placeholder]="'auth.email_placeholder' | translate"
+                     autocomplete="email" inputmode="email" required>
+              <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'admin_users.email_invalid' | translate }}</mat-error>
+            </mat-form-field>
 
-            <div class="lg-field">
-              <label class="lg-field__label">
-                {{ 'common.password' | translate }} <span class="lg-req" aria-hidden="true">*</span>
-              </label>
-              <div class="lg-field__wrap">
-                <i class="bi bi-lock lg-field__icon" aria-hidden="true"></i>
-                <input [type]="mostrarPassword ? 'text' : 'password'"
-                       class="lg-field__input lg-field__input--pw lg-field__input--icon"
-                       formControlName="password"
-                       [placeholder]="'validation.password_hint' | translate"
-                       autocomplete="new-password"
-                       [class.lg-field__input--error]="campoInvalido(registroForm, 'password')"
-                       [attr.aria-invalid]="campoInvalido(registroForm, 'password')">
-                <button type="button" class="lg-field__eye"
-                        [attr.aria-label]="(mostrarPassword ? 'auth.hide_password' : 'auth.show_password') | translate"
-                        (click)="mostrarPassword = !mostrarPassword">
-                  <i class="bi" aria-hidden="true"
-                     [class.bi-eye]="!mostrarPassword"
-                     [class.bi-eye-slash]="mostrarPassword"></i>
-                </button>
-              </div>
-              @if (campoInvalido(registroForm, 'password')) {
-                <ul class="lg-pw-rules" role="list" [attr.aria-label]="'auth.aria_password_rules' | translate">
-                  @if (fr['password'].errors?.['pwMin'])     { <li><i class="bi bi-x-circle-fill" aria-hidden="true"></i>{{ 'validation.pw_min'     | translate }}</li> }
-                  @if (fr['password'].errors?.['pwUpper'])   { <li><i class="bi bi-x-circle-fill" aria-hidden="true"></i>{{ 'validation.pw_upper'   | translate }}</li> }
-                  @if (fr['password'].errors?.['pwLower'])   { <li><i class="bi bi-x-circle-fill" aria-hidden="true"></i>{{ 'validation.pw_lower'   | translate }}</li> }
-                  @if (fr['password'].errors?.['pwDigit'])   { <li><i class="bi bi-x-circle-fill" aria-hidden="true"></i>{{ 'validation.pw_digit'   | translate }}</li> }
-                  @if (fr['password'].errors?.['pwSpecial']) { <li><i class="bi bi-x-circle-fill" aria-hidden="true"></i>{{ 'validation.pw_special' | translate }}</li> }
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>{{ 'common.password' | translate }}</mat-label>
+              <input matInput [type]="mostrarPassword() ? 'text' : 'password'" formControlName="password"
+                     autocomplete="new-password" required>
+              <button mat-icon-button matIconSuffix type="button" class="lg-eye"
+                      (click)="mostrarPassword.set(!mostrarPassword())"
+                      [attr.aria-label]="(mostrarPassword() ? 'auth.hide_password' : 'auth.show_password') | translate"
+                      [attr.aria-pressed]="mostrarPassword()">
+                @if (mostrarPassword()) { <mat-icon>visibility_off</mat-icon> } @else { <mat-icon>visibility</mat-icon> }
+              </button>
+              <mat-hint>{{ 'validation.password_hint' | translate }}</mat-hint>
+              <mat-error>
+                <ul class="lg-rules" [attr.aria-label]="'auth.aria_password_rules' | translate">
+                  @if (fr['password'].hasError('required')) {
+                    <li><mat-icon aria-hidden="true">error</mat-icon><span class="lg-cap">{{ 'missing_fields.reason_required' | translate }}</span></li>
+                  }
+                  @if (fr['password'].hasError('pwMin'))     { <li><mat-icon aria-hidden="true">error</mat-icon>{{ 'validation.pw_min' | translate }}</li> }
+                  @if (fr['password'].hasError('pwUpper'))   { <li><mat-icon aria-hidden="true">error</mat-icon>{{ 'validation.pw_upper' | translate }}</li> }
+                  @if (fr['password'].hasError('pwLower'))   { <li><mat-icon aria-hidden="true">error</mat-icon>{{ 'validation.pw_lower' | translate }}</li> }
+                  @if (fr['password'].hasError('pwDigit'))   { <li><mat-icon aria-hidden="true">error</mat-icon>{{ 'validation.pw_digit' | translate }}</li> }
+                  @if (fr['password'].hasError('pwSpecial')) { <li><mat-icon aria-hidden="true">error</mat-icon>{{ 'validation.pw_special' | translate }}</li> }
                 </ul>
-              }
-            </div>
+              </mat-error>
+            </mat-form-field>
 
-            <div class="lg-field">
-              <label class="lg-field__label">
-                {{ 'common.phone' | translate }} <span class="lg-req" aria-hidden="true">*</span>
-              </label>
-              <div class="lg-field__input-wrap">
-                <i class="bi bi-telephone lg-field__icon" aria-hidden="true"></i>
-                <input type="tel" class="lg-field__input lg-field__input--icon"
-                       formControlName="telefono"
-                       placeholder="+1 514-000-0000"
-                       [class.lg-field__input--error]="campoInvalido(registroForm, 'telefono')"
-                       [attr.aria-invalid]="campoInvalido(registroForm, 'telefono')">
-              </div>
-              @if (campoInvalido(registroForm, 'telefono')) {
-                <span class="lg-field__error" role="alert">
-                  <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
-                  {{ 'auth.phone_required' | translate }}
-                </span>
-              }
-            </div>
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'common.phone' | translate }}</mat-label>
+              <input matInput type="tel" formControlName="telefono" placeholder="+1 514-000-0000"
+                     autocomplete="tel" inputmode="tel" required>
+              <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'auth.phone_required' | translate }}</mat-error>
+            </mat-form-field>
 
-            <div class="lg-field">
-              <label class="lg-field__label">{{ 'auth.role_label' | translate }}</label>
-              <div class="lg-role-display">
-                <i class="bi bi-person-badge lg-role-display__icon" aria-hidden="true"></i>
-                <span>{{ ('role.' + rolRegistro()) | translate }}</span>
-              </div>
-            </div>
+            <p class="lg-role">
+              <span class="lg-role__label">{{ 'auth.role_label' | translate }}</span>
+              <span class="lg-role__value">
+                <mat-icon aria-hidden="true">badge</mat-icon>
+                {{ ('role.' + rolRegistro()) | translate }}
+              </span>
+            </p>
 
             @if (errorRegistro()) {
-              <div class="lg-alert" role="alert">
-                <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+              <p class="lg-alert" role="alert">
+                <mat-icon aria-hidden="true">error</mat-icon>
                 {{ errorRegistro() | translate }}
-              </div>
+              </p>
             }
 
             <!-- Activo aunque falten datos: al pulsarlo, el resumen dice cuáles. -->
-            <button type="submit" class="lg-btn lg-btn--gold"
-                    [disabled]="loading()">
+            <button mat-flat-button type="submit" class="lg-submit" [disabled]="loading()">
               @if (loading()) { <span class="lg-spinner" aria-hidden="true"></span> }
-              {{ loading() ? ('auth.registering' | translate) : ('auth.create_account' | translate) }}
+              {{ (loading() ? 'auth.registering' : 'auth.create_account') | translate }}
             </button>
-            <app-campos-faltantes class="mt-3" [formulario]="registroForm" [intento]="intentosRegistro()" />
-
+            <app-campos-faltantes [formulario]="registroForm" [intento]="intentosRegistro()" />
           </form>
-
         }
-
       }
-
     </div>
   </main>
-
 </div>

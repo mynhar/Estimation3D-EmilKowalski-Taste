@@ -144,6 +144,9 @@ html {
   --mat-dialog-container-shape: var(--ds-radius-xl);
   --mat-bottom-sheet-container-shape: var(--ds-radius-xl);
   --mat-datepicker-calendar-container-touch-shape: var(--ds-radius-xl);
+  /* Ayudas y errores de los campos: mínimo Clarté de 14 px (M3 usa 12 px). */
+  --mat-form-field-subscript-text-size: var(--ds-text-sm);
+  --mat-form-field-subscript-text-line-height: 1.25rem;
 
   @include mat.system-level-colors($tema, $roles-color);
   @include mat.system-level-typography($tema);

@@ -13,9 +13,8 @@
    encapsulación protege hacia fuera, pero Bootstrap se carga globalmente y sus
    reglas sí entrarían aquí si reutilizáramos sus nombres.
 
-   La landing mantiene su propia copia de este armazón en
-   `landing-page/styles/landing-base.css`, porque su cabecera lleva además la
-   barra de progreso de lectura y el scan-spy de secciones.
+   La landing ya no comparte este armazón: es Clarté (fase 1). Este archivo
+   vive hasta que Le Journal y Entrepreneurs se rediseñen en la fase 2.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ════════════════════════ TOKENS ════════════════════════ */
@@ -238,8 +237,7 @@ section{ position:relative; padding:130px 0; scroll-margin-top:var(--hdr-h); }
 
 /* gap 28 y no 34: la cabecera pasó de 4 enlaces a 5 (entra el teléfono) y
    además el login salió del nav para colocarse tras el botón. Con 34 el
-   conjunto no cabía dentro de --maxw en las cadenas más largas. Mismo ajuste
-   que en la landing (landing-base.css). */
+   conjunto no cabía dentro de --maxw en las cadenas más largas. */
 .nav-links{ display:flex; align-items:center; gap:28px; }
 /* El login ya no vive en el nav —va después del botón— pero es el mismo tipo
    de enlace, así que comparte estilo en vez de duplicarlo. */

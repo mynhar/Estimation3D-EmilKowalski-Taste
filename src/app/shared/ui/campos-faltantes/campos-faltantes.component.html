@@ -1,7 +1,12 @@
 @if (visible()) {
   <section #panel class="cf" tabindex="-1" [attr.aria-labelledby]="tituloId">
     <p class="cf__title" [id]="tituloId">
-      <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+      <!-- SVG propio (no una fuente de iconos): el resumen vive en pantallas de los dos sets. -->
+      <svg class="cf__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2" />
+        <path d="M12 7.5v5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        <circle cx="12" cy="16.5" r="1.25" fill="currentColor" />
+      </svg>
       {{ titulo() | translate: { n: faltantes().length } }}
     </p>
 

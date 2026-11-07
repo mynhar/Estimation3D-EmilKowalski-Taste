@@ -1,467 +1,347 @@
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     Estimation3D — landing (dirección v3 / CINÉMA)
-     Calcada de "Estimation3D (hors-ligne).html". El texto vive en i18n bajo `landing.*`.
-     Clases `.e3-btn` / `.e3-container` renombradas para no chocar con Bootstrap.
-     ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- Landing pública, dirección Clarté. Seis secciones; el texto vive en i18n bajo `landing.*`. -->
+<a class="skip" href="#contenu" (click)="goTo('contenu', $event)">{{ 'nav.skip' | translate }}</a>
 
-<!-- ─────────── HEADER ─────────── -->
-<header class="hdr" [class.scrolled]="scrolled()">
-  <div class="in">
+<!-- ── Cabecera ──────────────────────────────────────────────────────────── -->
+<header class="hd" [class.is-scrolled]="scrolled()">
+  <div class="wrap hd__in">
     <a routerLink="/" class="brand" (click)="goTop($event)"
        [attr.aria-label]="'landing.nav.home_aria' | translate">
-      <span class="reticle"><i></i></span>
-      <span class="e3">Estimation<b>3D</b></span>
+      <span class="brand__mark" aria-hidden="true"></span>
+      <span class="brand__name">Estimation3D</span>
     </a>
 
-    <nav class="nav-links">
-      <a href="#processus" (click)="goTo('processus', $event)">{{ 'landing.nav.process' | translate }}</a>
-      <a href="#services" (click)="goTo('services', $event)">{{ 'landing.nav.specialties' | translate }}</a>
-      <a routerLink="/journal">{{ 'landing.nav.journal' | translate }}</a>
-      <a routerLink="/entrepreneurs">{{ 'landing.nav.contractors' | translate }}</a>
-      <a class="tel" href="tel:+15145108819" [attr.aria-label]="'landing.nav.phone_aria' | translate">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.2 2.2 6.6 5 5.3 6.4a8.6 8.6 0 0 0 4.3 4.3L11 9.4l2.8 1.4v2.4a1 1 0 0 1-1.1 1A11.5 11.5 0 0 1 2.2 3.3a1 1 0 0 1 1-1.1h2Z"/></svg>
-        514&nbsp;510-8819
-      </a>
+    <nav class="hd__nav">
+      <a class="hd__link" href="#processus" (click)="goTo('processus', $event)">{{ 'landing.nav.process' | translate }}</a>
+      <a class="hd__link" href="#services" (click)="goTo('services', $event)">{{ 'landing.nav.specialties' | translate }}</a>
+      <a class="hd__link" routerLink="/journal">{{ 'landing.nav.journal' | translate }}</a>
+      <a class="hd__link" routerLink="/entrepreneurs">{{ 'landing.nav.contractors' | translate }}</a>
     </nav>
 
-    <div class="hdr-actions">
-      <a href="#dossier" class="e3-btn cta" (click)="goTo('dossier', $event)">
-        {{ 'landing.nav.cta' | translate }}
-        <svg class="ar" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M1 6h13M10 1l5 5-5 5"/></svg>
+    <div class="hd__end">
+      <a class="hd__link hd__tel" href="tel:+15145108819" [attr.aria-label]="'landing.nav.phone_aria' | translate">
+        <mat-icon aria-hidden="true">call</mat-icon>
+        514&nbsp;510-8819
       </a>
-      <a routerLink="/login" class="login">{{ 'landing.nav.login' | translate }}</a>
-    </div>
+      <app-lang-toggle class="hd__lang" />
+      <a class="hd__link hd__login" routerLink="/login">{{ 'landing.nav.login' | translate }}</a>
+      <a class="button hd__cta" href="#dossier" (click)="goTo('dossier', $event)">{{ 'landing.nav.cta' | translate }}</a>
 
-    <button class="burger" type="button" (click)="toggleMenu()"
-            [attr.aria-label]="'landing.nav.menu' | translate"
-            [attr.aria-expanded]="menuOpen()">
-      <span></span><span></span><span></span>
-    </button>
+      <!-- Móvil y tableta: idioma en menú (como la barra de la app) y navegación en hoja. -->
+      <button mat-button type="button" class="hd__langmenu" [matMenuTriggerFor]="langMenu"
+              [attr.title]="'lang.' + lang.current() | translate">
+        <mat-icon>language</mat-icon>
+        {{ lang.current().toUpperCase() }}
+      </button>
+      <mat-menu #langMenu="matMenu" xPosition="before">
+        @for (l of lang.langs; track l) {
+          <button mat-menu-item type="button" role="menuitemradio" (click)="lang.set(l)"
+                  [attr.aria-checked]="lang.current() === l">
+            <mat-icon [class.is-blank]="lang.current() !== l" aria-hidden="true">check</mat-icon>
+            <span>{{ 'lang.' + l | translate }}</span>
+          </button>
+        }
+      </mat-menu>
+
+      <button mat-icon-button #menuButton type="button" class="hd__menu" (click)="openMenu()"
+              aria-haspopup="dialog" [attr.aria-label]="'landing.nav.menu' | translate">
+        <mat-icon>menu</mat-icon>
+      </button>
+    </div>
   </div>
 </header>
 
-<nav class="mobile-nav" [class.open]="menuOpen()">
-  <a href="#processus" (click)="goTo('processus', $event)"><span class="num">01</span><span>{{ 'landing.nav.process' | translate }}</span></a>
-  <a href="#services" (click)="goTo('services', $event)"><span class="num">02</span><span>{{ 'landing.nav.specialties' | translate }}</span></a>
-  <a routerLink="/journal" (click)="closeMenu()"><span class="num">03</span><span>{{ 'landing.nav.journal' | translate }}</span></a>
-  <a routerLink="/entrepreneurs" (click)="closeMenu()"><span class="num">04</span><span>{{ 'landing.nav.contractors' | translate }}</span></a>
-  <a href="tel:+15145108819" (click)="closeMenu()" [attr.aria-label]="'landing.nav.phone_aria' | translate"><span class="num">05</span><span>514&nbsp;510-8819</span></a>
-  <a href="#dossier" (click)="goTo('dossier', $event)"><span class="num">06</span><span>{{ 'landing.nav.cta' | translate }}</span></a>
-  <a routerLink="/login" (click)="closeMenu()"><span class="num">07</span><span>{{ 'landing.nav.login' | translate }}</span></a>
-</nav>
+<main id="contenu" tabindex="-1">
 
-<main id="top">
-
-  <!-- ─────────── HERO ─────────── -->
-  <section class="hero" id="hero">
-    <div class="hero-bg">
-      <video autoplay muted loop playsinline preload="metadata"
-             [poster]="media.heroPoster" [src]="media.heroVideo" aria-hidden="true"></video>
-      <div class="grade"></div>
-    </div>
-
-    <div class="e3-container">
-      <div class="hero-copy">
-        <span class="kicker">{{ 'landing.hero.kicker' | translate }}</span>
-
-        <h1>
-          <span class="line"><span>{{ 'landing.hero.l1' | translate }}</span></span>
-          <span class="line"><span>{{ 'landing.hero.l2' | translate }}</span></span>
-          <span class="line"><span class="gold-txt">{{ 'landing.hero.l3' | translate }}</span></span>
+  <!-- ── 1. Escaneo ────────────────────────────────────────────────────── -->
+  <section class="hero" id="hero" aria-labelledby="hero-title">
+    <div class="wrap hero__in">
+      <div class="hero__copy">
+        <h1 class="hero__title" id="hero-title">
+          {{ 'landing.hero.l1' | translate }} {{ 'landing.hero.l2' | translate }} {{ 'landing.hero.l3' | translate }}
         </h1>
-
-        <p class="lede">{{ 'landing.hero.lede' | translate }}</p>
-
-        <div class="hero-cta">
-          <a href="#dossier" class="e3-btn" (click)="goTo('dossier', $event)">
-            {{ 'landing.nav.cta' | translate }}
-            <svg class="ar" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M1 6h13M10 1l5 5-5 5"/></svg>
-          </a>
-          <a href="#processus" class="e3-btn ghost" (click)="goTo('processus', $event)">{{ 'landing.hero.cta_secondary' | translate }}</a>
+        <p class="hero__lede">{{ 'landing.hero.lede' | translate }}</p>
+        <div class="hero__actions">
+          <a class="button button--lg" href="#dossier" (click)="goTo('dossier', $event)">{{ 'landing.nav.cta' | translate }}</a>
+          <a class="link" href="#processus" (click)="goTo('processus', $event)">{{ 'landing.hero.cta_secondary' | translate }}</a>
         </div>
+        <p class="hero__price">{{ 'landing.hero.price' | translate }}</p>
       </div>
 
-      <div class="scan-card">
-        <span class="corner tl"></span><span class="corner tr"></span>
-        <span class="corner bl"></span><span class="corner br"></span>
-
-        <div class="imgwrap">
-          <img [src]="media.scanCard" [alt]="'landing.hero.scan_alt' | translate" />
-          <div class="sweep"></div>
-          <div class="hud">
-            @for (pin of heroPins; track pin.value) {
-              <span class="pin" [style]="pin.style">{{ pin.value }} <span class="v">ft²</span></span>
-            }
-          </div>
-        </div>
-
-        <div class="bar">
-          <span class="data live"><span class="dot"></span>{{ 'landing.hero.scan_label' | translate }}&nbsp;<span class="v">{{ 'landing.hero.scan_status' | translate }}</span></span>
-          <span class="data">786 ft² · <span class="v">{{ 'landing.hero.scan_floor' | translate }}</span></span>
-        </div>
-      </div>
-    </div>
-
-    <div class="hero-meta">
-      <div class="data"><span class="big">1</span><span>{{ 'landing.hero.meta_visit' | translate }}</span></div>
-      <div class="data"><span class="big">3</span><span>{{ 'landing.hero.meta_bids' | translate }}</span></div>
-      <div class="data"><span class="big">399&nbsp;$</span><span>{{ 'landing.hero.meta_rate' | translate }}</span></div>
-    </div>
-
-    <div class="scroll-cue"><span>{{ 'landing.hero.scroll' | translate }}</span><span class="ln"></span></div>
-  </section>
-
-  <!-- ─────────── TICKER ─────────── -->
-  <div class="ticker" aria-hidden="true">
-    <div class="ticker-track">
-      @for (copy of [1, 2]; track copy) {
-        <span class="ticker-item">
-          @for (k of tickerKeys; track k) {
-            {{ 'landing.ticker.' + k | translate }}<span class="sep">/</span>
-          }
-        </span>
-      }
-    </div>
-  </div>
-
-  <!-- ─────────── [01] PROBLÈME ─────────── -->
-  <section id="probleme">
-    <div class="e3-container">
-      <div class="sec-head">
-        <span class="idx" e3Reveal>[ 01 ]</span>
-        <h2 e3Reveal>
-          {{ 'landing.problem.title_a' | translate }}
-          <span class="display-dim">{{ 'landing.problem.title_b' | translate }}</span>
-        </h2>
-        <p class="sub" [e3Reveal]="1">{{ 'landing.problem.sub' | translate }}</p>
-      </div>
-
-      <div class="prob-grid">
-        @for (cell of problemCells; track cell.key; let i = $index) {
-          <div class="cell" [e3Reveal]="i">
-            <span class="n">{{ cell.n }}</span>
-            <h3>{{ 'landing.problem.' + cell.key + '_t' | translate }}</h3>
-            <p>{{ 'landing.problem.' + cell.key + '_d' | translate }}</p>
-          </div>
-        }
-      </div>
-    </div>
-  </section>
-
-  <!-- ─────────── [02] PROCESSUS ─────────── -->
-  <section id="processus" class="alt-bg">
-    <div class="e3-container">
-      <div class="sec-head">
-        <span class="idx" e3Reveal>[ 02 ]</span>
-        <h2 e3Reveal>
-          {{ 'landing.process.title_a' | translate }}
-          <span class="gold-txt">{{ 'landing.process.title_b' | translate }}</span>
-          {{ 'landing.process.title_c' | translate }}
-        </h2>
-        <p class="sub" [e3Reveal]="1">{{ 'landing.process.sub' | translate }}</p>
-      </div>
-
-      <div class="scan-feature">
-        <div class="reveal-scan" e3Reveal e3ScanSlider
-             [attr.aria-label]="'landing.process.rs_hint' | translate">
-          <img class="raw" [src]="media.planOutremont" [alt]="'landing.process.rs_left' | translate" />
-          <div class="doc-layer">
-            <img [src]="media.planOutremont" [alt]="'landing.process.rs_right' | translate" />
-            @for (pin of planPins; track pin.key) {
-              <span class="pin" [style]="pin.style">
-                {{ 'landing.process.pin_' + pin.key | translate }} · {{ pin.value }} <span class="v">ft²</span>
-              </span>
-            }
-          </div>
-          <span class="rs-label left">{{ 'landing.process.rs_left' | translate }}</span>
-          <span class="rs-label right">{{ 'landing.process.rs_right' | translate }}</span>
-          <div class="rs-handle">
-            <span class="grip"><svg viewBox="0 0 22 14" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 2 1 7l5 5M16 2l5 5-5 5"/></svg></span>
-          </div>
-          <span class="hint">{{ 'landing.process.rs_hint' | translate }}</span>
-        </div>
-
-        <div [e3Reveal]="1">
-          <span class="step-n">01</span>
-          <h3>{{ 'landing.process.s1_t' | translate }}</h3>
-          <p>{{ 'landing.process.s1_d' | translate }}</p>
-          <div class="feat-meta">
-            <span class="data"><span class="big">{{ 'landing.process.s1_m1_v' | translate }}</span><span>{{ 'landing.process.s1_m1_l' | translate }}</span></span>
-            <span class="data"><span class="big">2–3 h</span><span>{{ 'landing.process.s1_m2_l' | translate }}</span></span>
-          </div>
-        </div>
-      </div>
-
-      <div class="scan-feature rev">
-        <div class="scan-frame" e3Reveal e3Sweep>
-          <span class="scan-tag data"><span class="v">DATA</span> · {{ 'landing.process.s2_tag' | translate }}</span>
-          <img [src]="media.planJolicoeur" [alt]="'landing.process.s2_alt' | translate" />
-          <div class="sweep"></div>
-        </div>
-
-        <div [e3Reveal]="1">
-          <span class="step-n">02</span>
-          <h3>{{ 'landing.process.s2_t' | translate }}</h3>
-          <p>{{ 'landing.process.s2_d' | translate }}</p>
-          <div class="feat-meta">
-            <span class="data"><span class="big">786 ft²</span><span>{{ 'landing.process.s2_m1_l' | translate }}</span></span>
-            <span class="data"><span class="big">{{ 'landing.process.s2_m2_v' | translate }}</span><span>{{ 'landing.process.s2_m2_l' | translate }}</span></span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <div class="dimline"><span class="seg"></span><span class="lbl"><b>02</b> &nbsp;↔&nbsp; 03 · <span>{{ 'landing.dimline.specialties' | translate }}</span></span><span class="seg"></span></div>
-
-  <!-- ─────────── [03] SPÉCIALITÉS ─────────── -->
-  <section id="services">
-    <div class="e3-container">
-      <div class="sec-head">
-        <span class="idx" e3Reveal>[ 03 ]</span>
-        <h2 e3Reveal>
-          {{ 'landing.services.title_a' | translate }}
-          <span class="display-dim">{{ 'landing.services.title_b' | translate }}</span>
-        </h2>
-        <p class="sub" [e3Reveal]="1">{{ 'landing.services.sub' | translate }}</p>
-      </div>
-
-      <div class="svc-grid">
-        @for (s of specialties; track s.key; let i = $index) {
-          <article class="svc" [e3Reveal]="i % 3">
-            <div class="ph"><img [src]="s.img" alt="" /></div>
-            <div class="body">
-              <span class="n">{{ 'landing.services.' + s.key + '_n' | translate }}</span>
-              <h3>{{ 'landing.services.' + s.key + '_t' | translate }}</h3>
-              <p>{{ 'landing.services.' + s.key + '_d' | translate }}</p>
-            </div>
-          </article>
-        }
-      </div>
-    </div>
-  </section>
-
-  <div class="dimline"><span class="seg"></span><span class="lbl"><b>786 ft²</b> &nbsp;·&nbsp; <span>{{ 'landing.dimline.render' | translate }}</span></span><span class="seg"></span></div>
-
-  <!-- ─────────── [04] IMMERSION ─────────── -->
-  <section id="immersion" class="alt-bg">
-    <div class="e3-container immersion">
-      <span class="kicker center" e3Reveal>{{ 'landing.immersion.kicker' | translate }}</span>
-      <h2 [e3Reveal]="1">
-        {{ 'landing.immersion.title_a' | translate }}
-        <span class="gold-txt">{{ 'landing.immersion.title_b' | translate }}</span>
-      </h2>
-
-      <div class="render" [e3Reveal]="2" e3Sweep>
-        <span class="hud-corner hc-tl">{{ 'landing.immersion.hud_project' | translate }}</span>
-        <span class="hud-corner hc-tr">● {{ 'landing.immersion.hud_capture' | translate }}</span>
-        <span class="hud-corner hc-bl">{{ 'landing.immersion.hud_render' | translate }}</span>
-        <span class="hud-corner hc-br">EST3D — {{ year }}</span>
-
-        <img [src]="media.immersionRender" [alt]="'landing.immersion.render_alt' | translate" />
-        <div class="sweep"></div>
-      </div>
-
-      <div class="words" [e3Reveal]="2">
-        @for (w of immersionWords; track w) {
-          <span><b>0{{ w }}</b> &nbsp;<span>{{ 'landing.immersion.w' + w | translate }}</span></span>
-        }
-      </div>
-    </div>
-  </section>
-
-  <!-- ─────────── [05] COMPARAISON ─────────── -->
-  <section>
-    <div class="e3-container">
-      <div class="sec-head">
-        <span class="idx" e3Reveal>[ 05 ]</span>
-        <h2 e3Reveal>
-          {{ 'landing.compare.title_a' | translate }}
-          <span class="display-dim">{{ 'landing.compare.title_b' | translate }}</span>
-        </h2>
-      </div>
-
-      <div class="cmp" [e3Reveal]="1">
-        <div>
-          <span class="lbl">{{ 'landing.compare.without_lbl' | translate }}</span>
-          <h3>{{ 'landing.compare.without_t' | translate }}</h3>
-          <ul>
-            @for (r of compareRows; track r) {
-              <li>
-                <svg class="ic bad" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg>
-                <span>{{ 'landing.compare.w' + r | translate }}</span>
-              </li>
-            }
-          </ul>
-        </div>
-
-        <div class="us">
-          <span class="lbl">{{ 'landing.compare.with_lbl' | translate }}</span>
-          <h3>{{ 'landing.compare.with_t' | translate }}</h3>
-          <ul>
-            @for (r of compareRows; track r) {
-              <li>
-                <svg class="ic good" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8l3.5 3.5L13 5"/></svg>
-                <span>{{ 'landing.compare.u' + r | translate }}</span>
-              </li>
-            }
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ─────────── CITATION ─────────── -->
-  <section class="quote-sec alt-bg">
-    <div class="e3-container">
-      <span class="kicker center" e3Reveal>{{ 'landing.quote.kicker' | translate }}</span>
-      <!-- `c` empieza por la coma: sin espacio antes, para no romper la puntuación. -->
-      <blockquote [e3Reveal]="1">{{ 'landing.quote.a' | translate
-        }} <span class="gold-txt">{{ 'landing.quote.b' | translate }}</span>{{ 'landing.quote.c' | translate }}</blockquote>
-      <p class="who" [e3Reveal]="2">{{ 'landing.quote.who' | translate }}</p>
-    </div>
-  </section>
-
-  <!-- ─────────── CTA ─────────── -->
-  <section class="cta" id="cta">
-    <div class="bg">
-      <video autoplay muted loop playsinline preload="none"
-             [poster]="media.ctaPoster" [src]="media.ctaVideo" aria-hidden="true"></video>
-      <div class="grade"></div>
-    </div>
-
-    <div class="e3-container inner">
-      <span class="kicker center" e3Reveal>{{ 'landing.cta.kicker' | translate }}</span>
-      <h2 [e3Reveal]="1">
-        {{ 'landing.cta.title_a' | translate }}<br />
-        <span class="gold-txt">{{ 'landing.cta.title_b' | translate }}</span>
-      </h2>
-      <p class="lede" [e3Reveal]="2">{{ 'landing.cta.lede' | translate }}</p>
-
-      <div [e3Reveal]="2">
-        <a href="#dossier" class="e3-btn" (click)="goTo('dossier', $event)">
-          {{ 'landing.nav.cta' | translate }}
-          <svg class="ar" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M1 6h13M10 1l5 5-5 5"/></svg>
-        </a>
-      </div>
-
-      <div class="price-row" [e3Reveal]="3">
-        <span>{{ 'landing.cta.price_a' | translate }}</span> ·
-        <b>{{ 'landing.cta.price_b' | translate }}</b> ·
-        <span>{{ 'landing.cta.price_c' | translate }}</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ─────────── [06] FORMULAIRE ─────────── -->
-  <section id="dossier">
-    <div class="e3-container">
-      <div class="sec-head">
-        <span class="idx" e3Reveal>[ 06 ]</span>
-        <h2 e3Reveal>
-          {{ 'landing.form.title_a' | translate }}
-          <span class="display-dim">{{ 'landing.form.title_b' | translate }}</span>
-        </h2>
-        <p class="sub" [e3Reveal]="1">{{ 'landing.form.sub' | translate }}</p>
-      </div>
-
-      <form class="form-wrap" e3Reveal [formGroup]="form" (ngSubmit)="submit()" novalidate>
-        <div class="form-grid">
-          <div class="field">
-            <label for="f-prenom">{{ 'landing.form.firstname' | translate }}</label>
-            <input id="f-prenom" type="text" formControlName="prenom" autocomplete="given-name"
-                   [class.is-invalid]="invalid('prenom')"
-                   [placeholder]="'landing.form.firstname_ph' | translate" />
-          </div>
-
-          <div class="field">
-            <label for="f-nom">{{ 'landing.form.lastname' | translate }}</label>
-            <input id="f-nom" type="text" formControlName="nom" autocomplete="family-name"
-                   [class.is-invalid]="invalid('nom')"
-                   [placeholder]="'landing.form.lastname_ph' | translate" />
-          </div>
-
-          <div class="field">
-            <label for="f-tel">{{ 'landing.form.phone' | translate }}</label>
-            <input id="f-tel" type="tel" formControlName="telephone"
-                   [class.is-invalid]="invalid('telephone')"
-                   [placeholder]="'landing.form.phone_ph' | translate" />
-          </div>
-
-          <div class="field">
-            <label for="f-mail">{{ 'landing.form.email' | translate }}</label>
-            <input id="f-mail" type="email" formControlName="courriel"
-                   [class.is-invalid]="invalid('courriel')"
-                   [placeholder]="'landing.form.email_ph' | translate" />
-          </div>
-
-          <div class="field">
-            <label for="f-type">{{ 'landing.form.type' | translate }}</label>
-            <select id="f-type" formControlName="typePropriete" [class.is-invalid]="invalid('typePropriete')">
-              <option value="">{{ 'landing.form.type_choose' | translate }}</option>
-              @for (t of propertyTypes; track t) {
-                <option [value]="t">{{ 'landing.form.type_' + t | translate }}</option>
+      <!-- El momento de la página: el barrido menthe recorre el escaneo una vez y deja las cotas. -->
+      <figure class="scan" [class.is-ready]="scanReady()">
+        <img class="scan__img" [ngSrc]="media.scan" width="900" height="920" priority
+             [alt]="'landing.hero.scan_alt' | translate"
+             (load)="scanReady.set(true)" (error)="scanReady.set(true)" />
+        <span class="scan__veil" aria-hidden="true"></span>
+        <div class="scan__marks" aria-hidden="true">
+          <svg class="scan__lines" viewBox="0 0 900 920" preserveAspectRatio="none" focusable="false">
+            @for (c of cotes; track c.label) {
+              <line [attr.x1]="c.x1" [attr.y1]="c.y1" [attr.x2]="c.x2" [attr.y2]="c.y2" />
+              @if (c.y1 === c.y2) {
+                <line [attr.x1]="c.x1" [attr.y1]="c.y1 - 16" [attr.x2]="c.x1" [attr.y2]="c.y1 + 16" />
+                <line [attr.x1]="c.x2" [attr.y1]="c.y2 - 16" [attr.x2]="c.x2" [attr.y2]="c.y2 + 16" />
+              } @else {
+                <line [attr.x1]="c.x1 - 16" [attr.y1]="c.y1" [attr.x2]="c.x1 + 16" [attr.y2]="c.y1" />
+                <line [attr.x1]="c.x2 - 16" [attr.y1]="c.y2" [attr.x2]="c.x2 + 16" [attr.y2]="c.y2" />
               }
-            </select>
+            }
+          </svg>
+          @for (c of cotes; track c.label) {
+            <span class="scan__label scan__label--cote"
+                  [style.left.%]="c.lx / 9" [style.top.%]="c.ly / 9.2">{{ c.label }}</span>
+          }
+          @for (a of areas; track a.value) {
+            <span class="scan__label scan__label--area"
+                  [style.left.%]="a.x / 9" [style.top.%]="a.y / 9.2">{{ a.value }}&nbsp;ft²</span>
+          }
+        </div>
+        <span class="scan__sweep" aria-hidden="true"></span>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ── 2. Problema frente a solución ─────────────────────────────────── -->
+  <section class="sec sec--stone" id="probleme" tabindex="-1" aria-labelledby="probleme-title">
+    <div class="wrap">
+      <header class="sec__head">
+        <h2 class="sec__title" id="probleme-title">
+          {{ 'landing.problem.title_a' | translate }} {{ 'landing.problem.title_b' | translate }}
+        </h2>
+        <p class="sec__lead">{{ 'landing.problem.sub' | translate }}</p>
+      </header>
+
+      <div class="cmp">
+        <div class="cmp__col cmp__col--without">
+          <h3 class="cmp__label">{{ 'landing.compare.without_lbl' | translate }}</h3>
+          <p class="cmp__summary">{{ 'landing.compare.without_t' | translate }}</p>
+          <ul class="cmp__list">
+            @for (r of compareRows; track r) {
+              <li><mat-icon aria-hidden="true">close</mat-icon><span>{{ 'landing.compare.w' + r | translate }}</span></li>
+            }
+          </ul>
+        </div>
+
+        <div class="cmp__col cmp__col--with">
+          <h3 class="cmp__label">{{ 'landing.compare.with_lbl' | translate }}</h3>
+          <p class="cmp__summary">{{ 'landing.compare.with_t' | translate }}</p>
+          <ul class="cmp__list">
+            @for (r of compareRows; track r) {
+              <li><mat-icon aria-hidden="true">check</mat-icon><span>{{ 'landing.compare.u' + r | translate }}</span></li>
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 3. Los tres pasos ─────────────────────────────────────────────── -->
+  <section class="sec" id="processus" tabindex="-1" aria-labelledby="processus-title">
+    <div class="wrap proc">
+      <header class="sec__head proc__head">
+        <h2 class="sec__title" id="processus-title">
+          {{ 'landing.process.title_a' | translate }} {{ 'landing.process.title_b' | translate }} {{ 'landing.process.title_c' | translate }}
+        </h2>
+      </header>
+
+      <ol class="steps">
+        @for (s of steps; track s; let i = $index) {
+          <li class="step">
+            <span class="step__n" aria-hidden="true">{{ i + 1 }}</span>
+            <h3 class="step__title">{{ 'landing.process.' + s + '_t' | translate }}</h3>
+            <p class="step__text">{{ 'landing.process.' + s + '_d' | translate }}</p>
+          </li>
+        }
+      </ol>
+
+      <figure class="proc__plan">
+        <img [ngSrc]="media.plan" width="1600" height="904"
+             [alt]="'landing.process.plan_alt' | translate" />
+      </figure>
+    </div>
+  </section>
+
+  <!-- ── 4. Especialidades ─────────────────────────────────────────────── -->
+  <section class="sec sec--rule" id="services" tabindex="-1" aria-labelledby="services-title">
+    <div class="wrap">
+      <header class="sec__head">
+        <h2 class="sec__title" id="services-title">
+          {{ 'landing.services.title_a' | translate }} {{ 'landing.services.title_b' | translate }}
+        </h2>
+        <p class="sec__lead">{{ 'landing.services.sub' | translate }}</p>
+      </header>
+
+      <ul class="svc">
+        @for (s of specialties; track s.key) {
+          <li class="svc__item">
+            <div class="svc__ph"><img [ngSrc]="s.img" fill alt="" /></div>
+            <div class="svc__body">
+              <h3 class="svc__title">{{ 'landing.services.' + s.key + '_t' | translate }}</h3>
+              <p class="svc__text">{{ 'landing.services.' + s.key + '_d' | translate }}</p>
+            </div>
+          </li>
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── 5. Tour 3D (isla ardoise) ─────────────────────────────────────── -->
+  <section class="sec sec--dark" id="tour" tabindex="-1" aria-labelledby="tour-title">
+    <div class="wrap tour">
+      <h2 class="sec__title tour__title" id="tour-title">
+        {{ 'landing.immersion.title_a' | translate }} {{ 'landing.immersion.title_b' | translate }}
+      </h2>
+      <figure class="tour__render">
+        <img [ngSrc]="media.render" width="1400" height="1132"
+             [alt]="'landing.immersion.render_alt' | translate" />
+      </figure>
+      <ul class="tour__words">
+        @for (w of immersionWords; track w) {
+          <li>{{ 'landing.immersion.w' + w | translate }}</li>
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── 6. Formulario ─────────────────────────────────────────────────── -->
+  <section class="sec sec--rule" id="dossier" tabindex="-1" aria-labelledby="dossier-title">
+    <div class="wrap form-sec">
+      <header class="sec__head form-sec__head">
+        <h2 class="sec__title" id="dossier-title">
+          {{ 'landing.form.title_a' | translate }} {{ 'landing.form.title_b' | translate }}
+        </h2>
+        <p class="sec__lead">{{ 'landing.form.sub' | translate }}</p>
+        <ul class="facts">
+          <li><mat-icon aria-hidden="true">event_available</mat-icon>{{ 'landing.cta.price_a' | translate }}</li>
+          <li><mat-icon aria-hidden="true">payments</mat-icon>{{ 'landing.cta.price_b' | translate }}</li>
+          <li><mat-icon aria-hidden="true">autorenew</mat-icon>{{ 'landing.cta.price_c' | translate }}</li>
+        </ul>
+      </header>
+
+      <form class="fm" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="fm__grid">
+          <div class="fld">
+            <label class="fld__label" for="f-prenom">{{ 'landing.form.firstname' | translate }}</label>
+            <input class="fld__input" id="f-prenom" type="text" formControlName="prenom" autocomplete="given-name"
+                   [attr.aria-invalid]="invalid('prenom')" [attr.aria-describedby]="invalid('prenom') ? 'e-prenom' : null"
+                   [placeholder]="'landing.form.firstname_ph' | translate" />
+            @if (invalid('prenom')) {
+              <p class="fld__error" id="e-prenom"><mat-icon aria-hidden="true">error</mat-icon>{{ 'landing.form.required' | translate }}</p>
+            }
           </div>
 
-          <fieldset class="field full" formGroupName="adresse">
-            <legend>{{ 'landing.form.address' | translate }}</legend>
+          <div class="fld">
+            <label class="fld__label" for="f-nom">{{ 'landing.form.lastname' | translate }}</label>
+            <input class="fld__input" id="f-nom" type="text" formControlName="nom" autocomplete="family-name"
+                   [attr.aria-invalid]="invalid('nom')" [attr.aria-describedby]="invalid('nom') ? 'e-nom' : null"
+                   [placeholder]="'landing.form.lastname_ph' | translate" />
+            @if (invalid('nom')) {
+              <p class="fld__error" id="e-nom"><mat-icon aria-hidden="true">error</mat-icon>{{ 'landing.form.required' | translate }}</p>
+            }
+          </div>
 
-            <div class="addr-grid">
-              <div class="addr-unit">
-                <label for="f-adr-unit">
+          <div class="fld">
+            <label class="fld__label" for="f-tel">{{ 'landing.form.phone' | translate }}</label>
+            <input class="fld__input" id="f-tel" type="tel" formControlName="telephone" autocomplete="tel" inputmode="tel"
+                   [attr.aria-invalid]="invalid('telephone')" [attr.aria-describedby]="invalid('telephone') ? 'e-tel' : null"
+                   [placeholder]="'landing.form.phone_ph' | translate" />
+            @if (invalid('telephone')) {
+              <p class="fld__error" id="e-tel"><mat-icon aria-hidden="true">error</mat-icon>{{ 'landing.form.required' | translate }}</p>
+            }
+          </div>
+
+          <div class="fld">
+            <label class="fld__label" for="f-mail">{{ 'landing.form.email' | translate }}</label>
+            <input class="fld__input" id="f-mail" type="email" formControlName="courriel" autocomplete="email" inputmode="email"
+                   [attr.aria-invalid]="invalid('courriel')" [attr.aria-describedby]="invalid('courriel') ? 'e-mail' : null"
+                   [placeholder]="'landing.form.email_ph' | translate" />
+            @if (invalid('courriel')) {
+              <p class="fld__error" id="e-mail">
+                <mat-icon aria-hidden="true">error</mat-icon>
+                @if (form.controls.courriel.hasError('required')) {
+                  {{ 'landing.form.required' | translate }}
+                } @else {
+                  {{ 'admin_users.email_invalid' | translate }}
+                }
+              </p>
+            }
+          </div>
+
+          <div class="fld fld--full">
+            <label class="fld__label" for="f-type">{{ 'landing.form.type' | translate }}</label>
+            <div class="fld__select">
+              <select class="fld__input" id="f-type" formControlName="typePropriete"
+                      [attr.aria-invalid]="invalid('typePropriete')" [attr.aria-describedby]="invalid('typePropriete') ? 'e-type' : null">
+                <option value="">{{ 'landing.form.type_choose' | translate }}</option>
+                @for (t of propertyTypes; track t) {
+                  <option [value]="t">{{ 'landing.form.type_' + t | translate }}</option>
+                }
+              </select>
+              <mat-icon aria-hidden="true">expand_more</mat-icon>
+            </div>
+            @if (invalid('typePropriete')) {
+              <p class="fld__error" id="e-type"><mat-icon aria-hidden="true">error</mat-icon>{{ 'landing.form.required' | translate }}</p>
+            }
+          </div>
+
+          <fieldset class="fld fld--full" formGroupName="adresse">
+            <legend class="fld__label">{{ 'landing.form.address' | translate }}</legend>
+
+            <div class="addr">
+              <div class="fld addr__unit">
+                <label class="fld__sub" for="f-adr-unit">
                   {{ 'landing.form.addr_unit' | translate }}
-                  <span class="opt">({{ 'landing.form.optional' | translate }})</span>
+                  <span class="fld__opt">({{ 'landing.form.optional' | translate }})</span>
                 </label>
-                <input id="f-adr-unit" type="text" formControlName="numero_unidad"
+                <input class="fld__input" id="f-adr-unit" type="text" formControlName="numero_unidad"
                        [placeholder]="'landing.form.addr_unit_ph' | translate" />
               </div>
 
-              <div class="addr-street">
-                <label for="f-adr-rue">{{ 'landing.form.addr_street' | translate }}</label>
-                <input id="f-adr-rue" type="text" formControlName="calle"
-                       autocomplete="street-address"
-                       [class.is-invalid]="invalidAddr('calle')"
+              <div class="fld addr__street">
+                <label class="fld__sub" for="f-adr-rue">{{ 'landing.form.addr_street' | translate }}</label>
+                <input class="fld__input" id="f-adr-rue" type="text" formControlName="calle" autocomplete="address-line1"
+                       [attr.aria-invalid]="invalidAddr('calle')" [attr.aria-describedby]="invalidAddr('calle') ? 'e-rue' : null"
                        [placeholder]="'landing.form.addr_street_ph' | translate" />
                 @if (invalidAddr('calle')) {
-                  <p class="addr-error" role="alert">{{ 'landing.form.required' | translate }}</p>
+                  <p class="fld__error" id="e-rue"><mat-icon aria-hidden="true">error</mat-icon>{{ 'landing.form.required' | translate }}</p>
                 }
               </div>
 
-              <div class="addr-city">
-                <label for="f-adr-ville">{{ 'landing.form.addr_city' | translate }}</label>
-                <input id="f-adr-ville" type="text" formControlName="ciudad"
-                       autocomplete="address-level2"
-                       [class.is-invalid]="invalidAddr('ciudad')"
+              <div class="fld addr__city">
+                <label class="fld__sub" for="f-adr-ville">{{ 'landing.form.addr_city' | translate }}</label>
+                <input class="fld__input" id="f-adr-ville" type="text" formControlName="ciudad" autocomplete="address-level2"
+                       [attr.aria-invalid]="invalidAddr('ciudad')" [attr.aria-describedby]="invalidAddr('ciudad') ? 'e-ville' : null"
                        [placeholder]="'landing.form.addr_city_ph' | translate" />
                 @if (invalidAddr('ciudad')) {
-                  <p class="addr-error" role="alert">{{ 'landing.form.required' | translate }}</p>
+                  <p class="fld__error" id="e-ville"><mat-icon aria-hidden="true">error</mat-icon>{{ 'landing.form.required' | translate }}</p>
                 }
               </div>
 
-              <div class="addr-prov">
-                <label for="f-adr-prov">{{ 'landing.form.addr_prov' | translate }}</label>
-                <select id="f-adr-prov" formControlName="provincia_ca" autocomplete="address-level1"
-                        [class.is-invalid]="invalidAddr('provincia_ca')">
-                  <option value="">{{ 'landing.form.addr_prov_choose' | translate }}</option>
-                  @for (p of provincesCanada; track p.code) {
-                    <option [value]="p.code">{{ p.code }} — {{ p.nombre }}</option>
-                  }
-                </select>
+              <div class="fld addr__prov">
+                <label class="fld__sub" for="f-adr-prov">{{ 'landing.form.addr_prov' | translate }}</label>
+                <div class="fld__select">
+                  <select class="fld__input" id="f-adr-prov" formControlName="provincia_ca" autocomplete="address-level1"
+                          [attr.aria-invalid]="invalidAddr('provincia_ca')" [attr.aria-describedby]="invalidAddr('provincia_ca') ? 'e-prov' : null">
+                    <option value="">{{ 'landing.form.addr_prov_choose' | translate }}</option>
+                    @for (p of provincesCanada; track p.code) {
+                      <option [value]="p.code">{{ p.code }} — {{ p.nombre }}</option>
+                    }
+                  </select>
+                  <mat-icon aria-hidden="true">expand_more</mat-icon>
+                </div>
                 @if (invalidAddr('provincia_ca')) {
-                  <p class="addr-error" role="alert">{{ 'landing.form.required' | translate }}</p>
+                  <p class="fld__error" id="e-prov"><mat-icon aria-hidden="true">error</mat-icon>{{ 'landing.form.required' | translate }}</p>
                 }
               </div>
 
-              <div class="addr-postal">
-                <label for="f-adr-cp">{{ 'landing.form.addr_postal' | translate }}</label>
-                <input id="f-adr-cp" type="text" class="up" formControlName="codigo_postal"
+              <div class="fld addr__postal">
+                <label class="fld__sub" for="f-adr-cp">{{ 'landing.form.addr_postal' | translate }}</label>
+                <input class="fld__input fld__input--upper" id="f-adr-cp" type="text" formControlName="codigo_postal"
                        autocomplete="postal-code" maxlength="7"
-                       [class.is-invalid]="invalidAddr('codigo_postal')"
+                       [attr.aria-invalid]="invalidAddr('codigo_postal')" [attr.aria-describedby]="invalidAddr('codigo_postal') ? 'e-cp' : null"
                        [placeholder]="'landing.form.addr_postal_ph' | translate" />
                 @if (invalidAddr('codigo_postal')) {
-                  <p class="addr-error" role="alert">
+                  <p class="fld__error" id="e-cp">
+                    <mat-icon aria-hidden="true">error</mat-icon>
                     @if (form.controls.adresse.controls.codigo_postal.hasError('required')) {
                       {{ 'landing.form.required' | translate }}
                     } @else {
@@ -473,124 +353,144 @@
             </div>
           </fieldset>
 
-          <fieldset class="field full">
-            <legend>{{ 'landing.form.service_type' | translate }}</legend>
+          <fieldset class="fld fld--full" [attr.aria-describedby]="invalid('servicioId') ? 'e-service' : null">
+            <legend class="fld__label">{{ 'landing.form.service_type' | translate }}</legend>
             @if (loadingServices()) {
-              <p class="checks-note">{{ 'landing.form.services_loading' | translate }}</p>
+              <p class="fld__note">{{ 'landing.form.services_loading' | translate }}</p>
             } @else {
-              <div class="checks" role="radiogroup"
-                   [class.checks--err]="invalid('servicioId')"
-                   [attr.aria-label]="'landing.form.service_type' | translate">
+              <div class="chips" [class.is-invalid]="invalid('servicioId')">
                 @for (s of services(); track s.id) {
-                  <label class="check" [class.check--on]="form.controls.servicioId.value === s.id">
-                    <input type="radio" formControlName="servicioId" [value]="s.id" />
-                    <span>{{ s.nombre }}</span>
+                  <label class="chip">
+                    <input class="chip__input" type="radio" formControlName="servicioId" [value]="s.id" />
+                    <span class="chip__box">
+                      <mat-icon class="chip__check" aria-hidden="true">check</mat-icon>
+                      {{ s.nombre }}
+                    </span>
                   </label>
                 }
               </div>
               @if (invalid('servicioId')) {
-                <p class="checks-error" role="alert">{{ 'landing.form.required' | translate }}</p>
+                <p class="fld__error" id="e-service"><mat-icon aria-hidden="true">error</mat-icon>{{ 'landing.form.required' | translate }}</p>
               }
             }
           </fieldset>
 
-          <div class="field full">
-            <label for="f-desc">{{ 'landing.form.desc' | translate }}</label>
-            <textarea id="f-desc" formControlName="description"
+          <div class="fld fld--full">
+            <label class="fld__label" for="f-desc">{{ 'landing.form.desc' | translate }}</label>
+            <textarea class="fld__input fld__input--area" id="f-desc" formControlName="description" rows="4"
                       [placeholder]="'landing.form.desc_ph' | translate"></textarea>
           </div>
         </div>
 
-        <div class="form-foot">
-          <p class="form-note">{{ 'landing.form.note' | translate }}</p>
-
+        <div class="fm__foot">
           @if (sent()) {
-            <p class="form-success" role="status">✓ {{ 'landing.form.success' | translate }}</p>
+            <p class="fm__success" role="status">
+              <mat-icon aria-hidden="true">check_circle</mat-icon>
+              {{ 'landing.form.success' | translate }}
+            </p>
           } @else {
-            <button type="submit" class="e3-btn" [disabled]="sending()">
+            <!-- Activo aunque falten datos: al pulsarlo, el resumen dice cuáles. -->
+            <button type="submit" class="button button--lg fm__submit" [disabled]="sending()">
+              @if (sending()) { <span class="spinner" aria-hidden="true"></span> }
               {{ (sending() ? 'landing.form.sending' : 'landing.nav.cta') | translate }}
-              <svg class="ar" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M1 6h13M10 1l5 5-5 5"/></svg>
             </button>
           }
+          <p class="fm__note">{{ 'landing.form.note' | translate }}</p>
         </div>
-        <app-campos-faltantes class="mt-3" [formulario]="form" [intento]="intentos()" />
+
+        <app-campos-faltantes class="fm__missing" [formulario]="form" [intento]="intentos()" />
 
         @if (sendError()) {
-          <p class="form-error" role="alert">{{ sendError() | translate }}</p>
+          <p class="fm__alert" role="alert">
+            <mat-icon aria-hidden="true">error</mat-icon>
+            {{ sendError() | translate }}
+          </p>
         }
       </form>
     </div>
   </section>
-
 </main>
 
-<!-- ─────────── FOOTER ─────────── -->
-<footer class="ftr">
-  <div class="e3-container">
-    <div class="ftr-top">
-      <div>
-        <a routerLink="/" class="brand"><span class="reticle"><i></i></span><span class="e3">Estimation<b>3D</b></span></a>
-        <p>{{ 'landing.footer.tagline' | translate }}</p>
-      </div>
-
-      <div>
-        <h5>{{ 'landing.footer.platform' | translate }}</h5>
-        <ul>
-          <li><a href="#processus" (click)="goTo('processus', $event)">{{ 'landing.nav.process' | translate }}</a></li>
-          <li><a href="#services" (click)="goTo('services', $event)">{{ 'landing.nav.specialties' | translate }}</a></li>
-          <li><a href="#dossier" (click)="goTo('dossier', $event)">{{ 'landing.nav.cta' | translate }}</a></li>
-        </ul>
-      </div>
-
-      <div>
-        <h5>{{ 'landing.footer.explore' | translate }}</h5>
-        <ul>
-          <li><a routerLink="/journal">{{ 'landing.nav.journal' | translate }}</a></li>
-          <li><a routerLink="/entrepreneurs">{{ 'landing.nav.contractors' | translate }}</a></li>
-          <li><a routerLink="/entrepreneurs" fragment="form">{{ 'landing.footer.apply' | translate }}</a></li>
-          <li><a routerLink="/login">{{ 'landing.nav.login' | translate }}</a></li>
-        </ul>
-      </div>
-
-      <div>
-        <h5>{{ 'landing.footer.contact' | translate }}</h5>
-        <ul>
-          <li><span>{{ 'landing.footer.city' | translate }}</span></li>
-          <li><a href="tel:+15145108819">514 510-8819</a></li>
-          <li><a href="mailto:info@estimation3d.com">info&#64;estimation3d.com</a></li>
-          <li><span>{{ 'landing.footer.pilot' | translate }}</span></li>
-        </ul>
-      </div>
+<!-- ── Pie ────────────────────────────────────────────────────────────────── -->
+<footer class="ft">
+  <div class="wrap ft__in">
+    <div class="ft__brand">
+      <a routerLink="/" class="brand" (click)="goTop($event)" [attr.aria-label]="'landing.nav.home_aria' | translate">
+        <span class="brand__mark" aria-hidden="true"></span>
+        <span class="brand__name">Estimation3D</span>
+      </a>
+      <p class="ft__tagline">{{ 'landing.footer.tagline' | translate }}</p>
     </div>
 
-    <div class="ftr-bot">
-      <span>© {{ year }} HYGIENACTION · MONTRÉAL</span>
-      <span>EST3D — {{ 'landing.footer.sign' | translate }}</span>
+    <div class="ft__col">
+      <h2 class="ft__h">{{ 'landing.footer.platform' | translate }}</h2>
+      <ul class="ft__list">
+        <li><a href="#processus" (click)="goTo('processus', $event)">{{ 'landing.nav.process' | translate }}</a></li>
+        <li><a href="#services" (click)="goTo('services', $event)">{{ 'landing.nav.specialties' | translate }}</a></li>
+        <li><a href="#dossier" (click)="goTo('dossier', $event)">{{ 'landing.nav.cta' | translate }}</a></li>
+      </ul>
     </div>
+
+    <div class="ft__col">
+      <h2 class="ft__h">{{ 'landing.footer.explore' | translate }}</h2>
+      <ul class="ft__list">
+        <li><a routerLink="/journal">{{ 'landing.nav.journal' | translate }}</a></li>
+        <li><a routerLink="/entrepreneurs">{{ 'landing.nav.contractors' | translate }}</a></li>
+        <li><a routerLink="/entrepreneurs" fragment="form">{{ 'landing.footer.apply' | translate }}</a></li>
+        <li><a routerLink="/login">{{ 'landing.nav.login' | translate }}</a></li>
+      </ul>
+    </div>
+
+    <div class="ft__col">
+      <h2 class="ft__h">{{ 'landing.footer.contact' | translate }}</h2>
+      <ul class="ft__list">
+        <li><span>{{ 'landing.footer.city' | translate }}</span></li>
+        <li><a href="tel:+15145108819">514&nbsp;510-8819</a></li>
+        <li><a href="mailto:info@estimation3d.com">info&#64;estimation3d.com</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="wrap ft__bottom">
+    <span>© {{ year }} Hygienaction, Montréal</span>
+    <span>{{ 'landing.footer.pilot' | translate }}</span>
   </div>
 </footer>
 
-<!-- ─────────── RÈGLE DE MESURE ─────────── -->
-<div class="measure-rail" aria-hidden="true">
-  <span class="ticks"></span><span class="ticks maj"></span>
-  <span class="reticle"></span>
-  <span class="readout" #railReadout>Y 0000 · SECT 01</span>
-  <span class="cap">EST3D · SCAN VIEW</span>
+<!-- ── Botón fijo (móvil): aparece al salir del hero, se va al llegar al formulario ── -->
+<div class="ctabar" [class.is-on]="ctaBar()">
+  <a class="button button--lg ctabar__btn" href="#dossier" (click)="goTo('dossier', $event)">{{ 'landing.nav.cta' | translate }}</a>
 </div>
 
-<!-- ─────────── CONTRÔLES : LANGUE + THÈME ─────────── -->
-<div class="lang-toggle" role="group" [attr.aria-label]="'landing.controls.language' | translate">
-  @for (l of langs; track l) {
-    <!-- El CSS ya aplica text-transform:uppercase. -->
-    <button type="button" (click)="setLang(l)" [attr.aria-pressed]="lang.current() === l">{{ l }}</button>
-  }
-</div>
+<!-- ── Menú móvil ─────────────────────────────────────────────────────────── -->
+<dialog #menu class="mm" [attr.aria-label]="'landing.nav.menu' | translate"
+        (click)="onMenuClick($event)" (close)="onMenuClosed()">
+  <div class="mm__sheet">
+    <div class="mm__top">
+      <a routerLink="/" class="brand" (click)="goTop($event)" [attr.aria-label]="'landing.nav.home_aria' | translate">
+        <span class="brand__mark" aria-hidden="true"></span>
+        <span class="brand__name">Estimation3D</span>
+      </a>
+      <button mat-icon-button type="button" class="mm__close" autofocus (click)="closeMenu()"
+              [attr.aria-label]="'common.close' | translate">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
 
-<div class="theme-toggle" role="group" [attr.aria-label]="'landing.controls.theme' | translate">
-  <button type="button" (click)="setTheme('dark')" [attr.aria-pressed]="theme() === 'dark'">
-    <span class="d"></span><span>{{ 'landing.controls.dark' | translate }}</span>
-  </button>
-  <button type="button" (click)="setTheme('light')" [attr.aria-pressed]="theme() === 'light'">
-    <span class="d"></span><span>{{ 'landing.controls.light' | translate }}</span>
-  </button>
-</div>
+    <nav class="mm__nav">
+      <a href="#processus" (click)="goTo('processus', $event)">{{ 'landing.nav.process' | translate }}</a>
+      <a href="#services" (click)="goTo('services', $event)">{{ 'landing.nav.specialties' | translate }}</a>
+      <a routerLink="/journal" (click)="closeMenu(false)">{{ 'landing.nav.journal' | translate }}</a>
+      <a routerLink="/entrepreneurs" (click)="closeMenu(false)">{{ 'landing.nav.contractors' | translate }}</a>
+    </nav>
+
+    <div class="mm__foot">
+      <a class="mm__tel" href="tel:+15145108819" [attr.aria-label]="'landing.nav.phone_aria' | translate">
+        <mat-icon aria-hidden="true">call</mat-icon>
+        514&nbsp;510-8819
+      </a>
+      <a class="button button--lg button--outline" routerLink="/login" (click)="closeMenu(false)">{{ 'landing.nav.login' | translate }}</a>
+      <a class="button button--lg" href="#dossier" (click)="goTo('dossier', $event)">{{ 'landing.nav.cta' | translate }}</a>
+    </div>
+  </div>
+</dialog>

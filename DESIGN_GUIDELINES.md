@@ -475,6 +475,15 @@ Antes de cerrar un componente, verifica que:
 - Título grande + lead + un CTA primario (sapin) y, si hace falta, uno secundario. Sin eyebrow decorativo ni palabras resaltadas.
 - Un solo momento de motion (el barrido del escaneo); nada de `fade-up` en cascada por reflejo.
 
+### Páginas públicas (landing; Journal y Entrepreneurs en la fase 2)
+
+- Solo tema claro, sin conmutador de tema ni controles flotantes. Idioma en la cabecera.
+- Una sección por pantalla, como mucho seis. Copy recortado y fusionado (acordado), textos nuevos marcados para revisión.
+- CSS propio del componente con tokens. De Material, solo iconos, botones de icono y `mat-menu`. Los botones propios no se llaman `.btn` (lo sirve `ui-base.css` y su `:hover` los vaciaría en táctil).
+- `h1`–`h3` y `legend` heredan estilos de `ui-base.css`: en estas páginas, `color: inherit` y `legend { float: none; font-size: inherit }`.
+- Fotos reales sin pie, con `NgOptimizedImage` y copias web de ≤ 800px (las originales quedan como fuente).
+- En móvil, CTA fijo abajo entre el final del hero y el formulario; oculto en escritorio.
+
 ### Grids
 
 - CSS Grid / Flexbox propios del componente (la rejilla `.row` / `.col-*` heredada, solo en pantallas aún no rediseñadas).

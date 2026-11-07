@@ -28,7 +28,7 @@ Referencias del sistema (ya describen Clarté):
 - **Menús / overlays / diálogos**: Angular Material (`mat-menu`, `mat-dialog`, `mat-snack-bar`…), construido sobre `@angular/cdk`
 - **Sistema de diseño**: tokens CSS en `src/styles/tokens.css`
 - **Tipografías**: Sofia Sans Semi Condensed (títulos, cifras) + Atkinson Hyperlegible Next (cuerpo, UI)
-- **Iconos**: Material Symbols Outlined vía `mat-icon` desde la fase 1; bootstrap-icons line en las pantallas aún no rediseñadas (nunca los dos en una pantalla)
+- **Iconos**: Material Symbols Outlined vía `mat-icon` desde la fase 1; bootstrap-icons line en el contenido de las pantallas aún no rediseñadas (un solo set por contenido; excepción aceptada: la navegación de la app ya usa Material Symbols en todas). Tras añadir o quitar un icono: `node scripts/icons.mjs --write`
 - **Sistema de diseño**: Clarté (rediseño en curso por fases)
 - **Skill de diseño**: `frontend-design` (plugin de Anthropic, instalado solo en este proyecto)
 - **Skill de Angular**: `angular-developer` (oficial de Angular, en `.claude/skills/`, instalada solo en este proyecto)
