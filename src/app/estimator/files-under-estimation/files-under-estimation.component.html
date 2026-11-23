@@ -1,375 +1,272 @@
-<div class="fue-root">
+<div class="page-wrapper ls">
 
-  <!-- ── Header ──────────────────────────────────────────────────────────── -->
-  <header class="fue-header">
-    <div class="fue-header__content">
-      <p class="fue-header__eyebrow">
-        <i class="bi bi-clipboard-data"></i>
-        {{ 'role.estimateur' | translate }}
-      </p>
-      <h1 class="fue-header__title">{{ 'files_under_estimation.title' | translate }}</h1>
-      <p class="fue-header__sub">{{ 'files_under_estimation.subtitle' | translate }}</p>
-    </div>
-    @if (!cargando() && expedientes().length > 0) {
-      <div class="fue-kpis">
-        <div class="fue-kpi">
-          <span class="fue-kpi__val">{{ expedientes().length }}</span>
-          <span class="fue-kpi__label">{{ 'files_under_estimation.assigned' | translate }}</span>
-        </div>
-        @if (urgentesCount() > 0) {
-          <div class="fue-kpi fue-kpi--urgente">
-            <span class="fue-kpi__val">{{ urgentesCount() }}</span>
-            <span class="fue-kpi__label">{{ 'files_under_estimation.urgent' | translate }}</span>
-          </div>
-        }
-      </div>
-    }
-  </header>
+  <app-page-header [titulo]="'files_under_estimation.title' | translate"
+                   [contexto]="'files_under_estimation.subtitle' | translate" />
 
-  <!-- ── Cargando ─────────────────────────────────────────────────────────── -->
+  <!-- ── Cargando ────────────────────────────────────────────────────────── -->
   @if (cargando()) {
-    <div class="fue-loading">
-      <span class="fue-spinner" role="status"></span>
-      {{ 'files_under_estimation.loading' | translate }}
+    <div class="ls-grid" role="status">
+      <span class="cdk-visually-hidden">{{ 'files_under_estimation.loading' | translate }}</span>
+      @for (_ of [1, 2, 3]; track $index) {
+        <span class="skel" aria-hidden="true"></span>
+      }
     </div>
 
-  <!-- ── Sin expedientes ──────────────────────────────────────────────────── -->
+  <!-- ── Sin dossiers asignados ──────────────────────────────────────────── -->
   } @else if (expedientes().length === 0) {
-    <div class="fue-empty">
-      <div class="fue-empty__icon"><i class="bi bi-clipboard-check"></i></div>
-      <p class="fue-empty__title">{{ 'files_under_estimation.empty_title' | translate }}</p>
-      <p class="fue-empty__text">
-        {{ 'files_under_estimation.empty_text' | translate }}
-        <strong>{{ 'nav.a_estimer' | translate }}</strong>
-        {{ 'files_under_estimation.empty_text_after' | translate }}
-      </p>
-    </div>
+    <app-empty-state class="ls-empty"
+                     matIcon="assignment"
+                     [titulo]="'files_under_estimation.empty_title' | translate"
+                     [texto]="('files_under_estimation.empty_text' | translate) + ' ' + ('nav.a_estimer' | translate) + ' ' + ('files_under_estimation.empty_text_after' | translate)">
+      <a actions mat-stroked-button routerLink="/estimator/files-to-be-estimated">
+        {{ 'nav.a_estimer' | translate }}
+      </a>
+    </app-empty-state>
 
-  <!-- ── Con expedientes ──────────────────────────────────────────────────── -->
   } @else {
 
-    <!-- Toolbar -->
-    <div class="fue-toolbar">
-      <div class="fue-search">
-        <i class="bi bi-search fue-search__icon"></i>
-        <input type="search" class="fue-search__input"
+    <!-- ── Búsqueda, urgencia (con recuento) y vista ─────────────────────── -->
+    <div class="ls-tools">
+      <mat-form-field class="ls-search" appearance="outline" subscriptSizing="dynamic">
+        <mat-label>{{ 'common.search' | translate }}</mat-label>
+        <mat-icon matPrefix aria-hidden="true">search</mat-icon>
+        <input matInput type="search" autocomplete="off"
                [placeholder]="'files_under_estimation.search_placeholder' | translate"
-               [ngModel]="busqueda()"
-               (ngModelChange)="busqueda.set($event)" />
+               [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)" />
+      </mat-form-field>
+
+      <div class="ls-filter">
+        <span class="ls-filter__label" id="fue-urg-label">{{ 'files_under_estimation.col_visit' | translate }}</span>
+        <mat-button-toggle-group class="ls-toggle" hideSingleSelectionIndicator
+                                 aria-labelledby="fue-urg-label"
+                                 [value]="soloUrgentes()" (change)="soloUrgentes.set($event.value)">
+          <mat-button-toggle [value]="false">
+            {{ 'common.all' | translate }} <span class="ls-count">{{ expedientes().length }}</span>
+          </mat-button-toggle>
+          <mat-button-toggle [value]="true">
+            {{ 'files_under_estimation.urgent_only' | translate }} <span class="ls-count">{{ urgentesCount() }}</span>
+          </mat-button-toggle>
+        </mat-button-toggle-group>
       </div>
 
-      <button class="fue-chip"
-              [class.fue-chip--active]="soloUrgentes()"
-              (click)="soloUrgentes.set(!soloUrgentes())">
-        <i class="bi bi-exclamation-triangle"></i>
-        {{ 'files_under_estimation.urgent_only' | translate }}
-        @if (urgentesCount() > 0) {
-          <span class="fue-chip__badge">{{ urgentesCount() }}</span>
-        }
-      </button>
-
-      @if (hayFiltros()) {
-        <button class="fue-clear" (click)="limpiarFiltros()">
-          <i class="bi bi-x-circle"></i>
-          {{ 'common.clear' | translate }}
-        </button>
-      }
-
-      <div class="fue-view-toggle d-none d-md-inline-flex ms-auto" role="group"
-           [attr.aria-label]="'files_under_estimation.view_cards' | translate">
-        <button type="button" class="fue-view-toggle__btn"
-                [class.fue-view-toggle__btn--active]="vista() === 'tabla'"
-                [attr.aria-pressed]="vista() === 'tabla'"
-                (click)="setVista('tabla')"
-                [title]="'files_under_estimation.view_table' | translate">
-          <i class="bi bi-table" aria-hidden="true"></i>
-        </button>
-        <button type="button" class="fue-view-toggle__btn"
-                [class.fue-view-toggle__btn--active]="vista() === 'tarjetas'"
-                [attr.aria-pressed]="vista() === 'tarjetas'"
-                (click)="setVista('tarjetas')"
-                [title]="'files_under_estimation.view_cards' | translate">
-          <i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>
-        </button>
-      </div>
+      <mat-button-toggle-group class="ls-toggle ls-view" hideSingleSelectionIndicator
+                               [value]="vista()" (change)="setVista($event.value)">
+        <mat-button-toggle value="tarjetas" [aria-label]="'files_under_estimation.view_cards' | translate"
+                           [matTooltip]="'files_under_estimation.view_cards' | translate">
+          <mat-icon>grid_view</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="tabla" [aria-label]="'files_under_estimation.view_table' | translate"
+                           [matTooltip]="'files_under_estimation.view_table' | translate">
+          <mat-icon>table_rows</mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
     </div>
 
-    <!-- Results bar -->
     @if (hayFiltros()) {
-      <p class="fue-results-bar">
-        {{ 'common.showing' | translate }}
-        <strong>{{ expedientesFiltrados().length }}</strong>
-        {{ 'common.of' | translate }} {{ expedientes().length }}
-        {{ 'files_under_estimation.assigned' | translate }}
-      </p>
-    }
-
-    <!-- Sin resultados con filtro -->
-    @if (expedientesFiltrados().length === 0) {
-      <div class="fue-empty-inline">
-        <i class="bi bi-search"></i>
-        <p class="fue-empty-inline__title">{{ 'common.no_results' | translate }}</p>
-        <p class="fue-empty-inline__text">{{ 'files_under_estimation.no_filter_text' | translate }}</p>
-        <button class="fue-btn-outline" (click)="limpiarFiltros()">
-          <i class="bi bi-x-circle"></i>
-          {{ 'common.clear_filters' | translate }}
+      <div class="ls-status">
+        <p class="ls-showing" role="status">
+          {{ 'common.showing' | translate }} {{ expedientesFiltrados().length }}
+          {{ 'common.of' | translate }} {{ expedientes().length }} {{ 'files_under_estimation.assigned' | translate }}
+        </p>
+        <button mat-button type="button" class="ls-clear" (click)="limpiarFiltros()">
+          <mat-icon>close</mat-icon>
+          {{ 'common.clear' | translate }}
         </button>
       </div>
-
-    <!-- Tabla / tarjetas -->
-    } @else {
-
-      <!-- ── Vista tabla (escritorio) ───────────────────────────────────────── -->
-      <div class="fue-table-card d-none" [class.d-md-block]="vista() === 'tabla'">
-        <table class="fue-table">
-          <thead>
-            <tr>
-              <th class="fue-table__col-photo" aria-hidden="true"></th>
-              <th class="fue-table__col-num">{{ 'files_under_estimation.col_number' | translate }}</th>
-              <th>{{ 'files_under_estimation.col_service' | translate }}</th>
-              <th>{{ 'files_under_estimation.col_client' | translate }}</th>
-              <th>{{ 'files_under_estimation.col_location' | translate }}</th>
-              <th class="fue-table__col-date">{{ 'files_under_estimation.col_visit' | translate }}</th>
-              <th class="fue-table__col-action"></th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (exp of expedientesFiltrados(); track exp.id) {
-              <tr class="fue-table__row fue-table__row--clickable"
-                  (click)="abrir(exp.id)"
-                  [class.fue-table__row--confirming]="confirmandoId() === exp.id">
-
-                <td class="fue-table__col-photo">
-                  <div class="fue-thumb">
-                    @if (fotoExpediente(exp); as foto) {
-                      <img [src]="foto" loading="lazy" [alt]="exp.numero"
-                           (error)="onFotoError(exp.id)" />
-                    } @else {
-                      <i class="bi bi-badge-3d" aria-hidden="true"
-                         [title]="'files_under_estimation.photo_none' | translate"></i>
-                    }
-                  </div>
-                </td>
-
-                <td class="fue-table__col-num">
-                  <span class="fue-card__num">{{ exp.numero }}</span>
-                </td>
-
-                <td><span class="fue-table__service">{{ servicioNombre(exp) }}</span></td>
-
-                <td>{{ exp.cliente_nombre }}</td>
-
-                <td class="fue-table__addr" [title]="direccionCompleta(exp)">
-                  @if (direccionLinea1(exp)) {
-                    <span class="fue-table__addr-line">{{ direccionLinea1(exp) }}</span>
-                  }
-                  @if (direccionLinea2(exp)) {
-                    <span class="fue-table__addr-line fue-table__muted">{{ direccionLinea2(exp) }}</span>
-                  }
-                </td>
-
-                <td class="fue-table__col-date">
-                  <span class="fue-table__fecha"
-                        [class.fue-table__fecha--vencida]="urgencia(exp.fecha_visita) === 'vencida'"
-                        [class.fue-table__fecha--hoy]="urgencia(exp.fecha_visita) === 'hoy'">
-                    {{ formatFecha(exp.fecha_visita) }}
-                    @if (formatHora(exp.fecha_visita) !== '—') {
-                      <span class="fue-card__hora">{{ formatHora(exp.fecha_visita) }}</span>
-                    }
-                  </span>
-                  @if (urgencia(exp.fecha_visita) === 'vencida') {
-                    <span class="fue-badge fue-badge--danger">
-                      <i class="bi bi-exclamation-triangle"></i>
-                      {{ 'common.urgency_expired' | translate }}
-                    </span>
-                  } @else if (urgencia(exp.fecha_visita) === 'hoy') {
-                    <span class="fue-badge fue-badge--warning">
-                      <i class="bi bi-clock"></i>
-                      {{ 'common.urgency_today' | translate }}
-                    </span>
-                  } @else if (urgencia(exp.fecha_visita) === 'proxima') {
-                    <span class="fue-badge fue-badge--info">
-                      <i class="bi bi-calendar-event"></i>
-                      {{ 'common.urgency_upcoming' | translate }}
-                    </span>
-                  } @else {
-                    <span class="fue-badge fue-badge--success">
-                      <i class="bi bi-person-workspace"></i>
-                      {{ 'files_under_estimation.in_progress' | translate }}
-                    </span>
-                  }
-                </td>
-
-                <td class="fue-table__col-action" (click)="$event.stopPropagation()">
-                  <div class="fue-actions fue-actions--row">
-                    <button class="fue-btn-continue fue-btn-continue--row" (click)="estimar(exp.id)">
-                      <i class="bi bi-pencil-square"></i>
-                      {{ 'files_under_estimation.continue_btn' | translate }}
-                    </button>
-
-                    @if (confirmandoId() === exp.id) {
-                      <button class="fue-btn-release fue-btn-release--confirm"
-                              (click)="confirmarLiberar(exp.id)"
-                              [disabled]="liberandoId() === exp.id"
-                              [title]="'files_under_estimation.confirm_release_title' | translate">
-                        @if (liberandoId() === exp.id) {
-                          <span class="fue-spinner-sm"></span>
-                        } @else {
-                          <i class="bi bi-check2-circle"></i>
-                        }
-                      </button>
-                    } @else {
-                      <button class="fue-btn-release"
-                              (click)="confirmarLiberar(exp.id)"
-                              [title]="'files_under_estimation.release_title' | translate">
-                        <i class="bi bi-x-lg"></i>
-                      </button>
-                    }
-                  </div>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-
-      <!-- ── Vista tarjetas (móvil siempre · escritorio por defecto) ────────── -->
-      <div class="fue-grid" [class.d-md-none]="vista() === 'tabla'">
-        @for (exp of expedientesFiltrados(); track exp.id; let idx = $index) {
-          <article class="fue-card" role="button" tabindex="0"
-                   (click)="abrir(exp.id)"
-                   (keydown.enter)="abrir(exp.id)"
-                   (keydown.space)="$event.preventDefault(); abrir(exp.id)"
-                   [class.fue-card--vencida]="urgencia(exp.fecha_visita) === 'vencida'"
-                   [class.fue-card--hoy]="urgencia(exp.fecha_visita) === 'hoy'"
-                   [class.fue-card--proxima]="urgencia(exp.fecha_visita) === 'proxima'"
-                   [class.fue-card--confirming]="confirmandoId() === exp.id"
-                   [class.fue-card--reciente]="idx === 0 && !hayFiltros()">
-
-            <!-- Foto del expediente (miniatura del tour 3D) -->
-            <div class="fue-card__photo">
-              @if (fotoExpediente(exp); as foto) {
-                <img class="fue-card__photo-img" [src]="foto" loading="lazy"
-                     [alt]="exp.numero" (error)="onFotoError(exp.id)" />
-              } @else {
-                <div class="fue-card__photo-empty"
-                     [title]="'files_under_estimation.photo_none' | translate">
-                  <i class="bi bi-badge-3d" aria-hidden="true"></i>
-                </div>
-              }
-            </div>
-
-            <!-- Head: num + badges -->
-            <div class="fue-card__head">
-              <span class="fue-card__num">{{ exp.numero }}</span>
-              <div class="fue-card__badges">
-                @if (urgencia(exp.fecha_visita) === 'vencida') {
-                  <span class="fue-badge fue-badge--danger">
-                    <i class="bi bi-exclamation-triangle"></i>
-                    {{ 'common.urgency_expired' | translate }}
-                  </span>
-                } @else if (urgencia(exp.fecha_visita) === 'hoy') {
-                  <span class="fue-badge fue-badge--warning">
-                    <i class="bi bi-clock"></i>
-                    {{ 'common.urgency_today' | translate }}
-                  </span>
-                } @else if (urgencia(exp.fecha_visita) === 'proxima') {
-                  <span class="fue-badge fue-badge--info">
-                    <i class="bi bi-calendar-event"></i>
-                    {{ 'common.urgency_upcoming' | translate }}
-                  </span>
-                } @else {
-                  <span class="fue-badge fue-badge--success">
-                    <i class="bi bi-person-workspace"></i>
-                    {{ 'files_under_estimation.in_progress' | translate }}
-                  </span>
-                }
-                @if (idx === 0 && !hayFiltros()) {
-                  <span class="fue-badge fue-badge--reciente">
-                    {{ 'common.recent' | translate }}
-                  </span>
-                }
-              </div>
-            </div>
-
-            <!-- Servicio -->
-            <h2 class="fue-card__service">{{ servicioNombre(exp) }}</h2>
-
-            <!-- Meta -->
-            <div class="fue-card__meta">
-              <span class="fue-meta-item">
-                <i class="bi bi-person"></i>{{ exp.cliente_nombre }}
-              </span>
-              @if (direccionLinea1(exp) || direccionLinea2(exp)) {
-                <span class="fue-meta-item fue-addr" [title]="direccionCompleta(exp)">
-                  <i class="bi bi-geo-alt"></i>
-                  <span class="fue-addr__text">
-                    @if (direccionLinea1(exp)) {
-                      <span class="fue-addr__line">{{ direccionLinea1(exp) }}</span>
-                    }
-                    @if (direccionLinea2(exp)) {
-                      <span class="fue-addr__line fue-addr__line--muted">{{ direccionLinea2(exp) }}</span>
-                    }
-                  </span>
-                </span>
-              }
-            </div>
-
-            <!-- Visit date -->
-            <div class="fue-card__fecha"
-                 [class.fue-card__fecha--vencida]="urgencia(exp.fecha_visita) === 'vencida'"
-                 [class.fue-card__fecha--hoy]="urgencia(exp.fecha_visita) === 'hoy'">
-              <i class="bi bi-calendar3"></i>
-              <span>{{ formatFecha(exp.fecha_visita) }}</span>
-              @if (formatHora(exp.fecha_visita) !== '—') {
-                <span class="fue-card__hora">{{ formatHora(exp.fecha_visita) }}</span>
-              }
-            </div>
-
-            <!-- Acciones (los botones internos no deben disparar la navegación) -->
-            <div class="fue-actions" (click)="$event.stopPropagation()"
-                 (keydown.enter)="$event.stopPropagation()"
-                 (keydown.space)="$event.stopPropagation()">
-              <button class="fue-btn-continue" (click)="estimar(exp.id)">
-                <i class="bi bi-pencil-square"></i>
-                {{ 'files_under_estimation.continue_btn' | translate }}
-              </button>
-
-              @if (confirmandoId() === exp.id) {
-                <button class="fue-btn-release fue-btn-release--confirm"
-                        (click)="confirmarLiberar(exp.id)"
-                        [disabled]="liberandoId() === exp.id"
-                        [title]="'files_under_estimation.confirm_release_title' | translate">
-                  @if (liberandoId() === exp.id) {
-                    <span class="fue-spinner-sm"></span>
-                  } @else {
-                    <i class="bi bi-check2-circle"></i>
-                  }
-                </button>
-              } @else {
-                <button class="fue-btn-release"
-                        (click)="confirmarLiberar(exp.id)"
-                        [title]="'files_under_estimation.release_title' | translate">
-                  <i class="bi bi-x-lg"></i>
-                </button>
-              }
-            </div>
-
-            <!-- Aviso de confirmación -->
-            @if (confirmandoId() === exp.id) {
-              <div class="fue-confirm-msg">
-                <i class="bi bi-exclamation-diamond"></i>
-                {{ 'files_under_estimation.confirm_msg_before' | translate }}
-                <i class="bi bi-check2-circle"></i>
-                {{ 'files_under_estimation.confirm_msg_after' | translate }}
-              </div>
-            }
-
-          </article>
-        }
-      </div>
     }
 
-  }
+    @if (expedientesFiltrados().length === 0) {
+      <app-empty-state class="ls-empty"
+                       matIcon="filter_alt_off"
+                       [titulo]="'common.no_results' | translate"
+                       [texto]="'files_under_estimation.no_filter_text' | translate">
+        <button actions mat-stroked-button type="button" (click)="limpiarFiltros()">
+          {{ 'common.clear_filters' | translate }}
+        </button>
+      </app-empty-state>
 
+    } @else {
+
+      <!-- ── Tabla (escritorio, si se elige) ─────────────────────────────── -->
+      @if (vista() === 'tabla') {
+        <div class="ls-table-wrap">
+          <table class="ls-table">
+            <thead>
+              <tr>
+                <th scope="col">{{ 'files_under_estimation.col_service' | translate }}</th>
+                <th scope="col">{{ 'files_under_estimation.col_client' | translate }}</th>
+                <th scope="col">{{ 'files_under_estimation.col_location' | translate }}</th>
+                <th scope="col">{{ 'files_under_estimation.col_visit' | translate }}</th>
+                <th scope="col"><span class="cdk-visually-hidden">{{ 'files_under_estimation.continue_btn' | translate }}</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (exp of expedientesFiltrados(); track exp.id) {
+                <tr class="ls-table__row is-link" (click)="abrir(exp.id)">
+                  <td>
+                    <div class="ls-table__main">
+                      <span class="ls-thumb">
+                        @if (fotoExpediente(exp); as foto) {
+                          <img [src]="foto" loading="lazy" alt="" (error)="onFotoError(exp.id)" />
+                        } @else {
+                          <mat-icon aria-hidden="true">view_in_ar</mat-icon>
+                        }
+                      </span>
+                      <span class="ls-table__text">
+                        <a class="ls-table__link" [id]="'fue-t-' + exp.id"
+                           [routerLink]="['/estimator/file-under-estimation', exp.id]"
+                           (click)="$event.stopPropagation()">{{ servicioNombre(exp) }}</a>
+                        <span class="ls-table__sub ls-fig">{{ exp.numero }}</span>
+                      </span>
+                    </div>
+                  </td>
+                  <td>{{ exp.cliente_nombre }}</td>
+                  <td class="is-addr" [title]="direccionCompleta(exp)">
+                    <span class="ls-table__text">
+                      @if (direccionLinea1(exp)) { <span>{{ direccionLinea1(exp) }}</span> }
+                      @if (direccionLinea2(exp)) { <span class="ls-table__sub">{{ direccionLinea2(exp) }}</span> }
+                    </span>
+                  </td>
+                  <td>
+                    <span class="ls-table__text">
+                      <span class="ls-fig ls-nowrap">
+                        {{ formatFecha(exp.fecha_visita) }}
+                        @if (formatHora(exp.fecha_visita) !== '—') { <span class="ls-table__sub">{{ formatHora(exp.fecha_visita) }}</span> }
+                      </span>
+                      <ng-container [ngTemplateOutlet]="urgenciaTag" [ngTemplateOutletContext]="{ $implicit: exp }" />
+                    </span>
+                  </td>
+                  <td class="ls-table__action" (click)="$event.stopPropagation()">
+                    <div class="fue-row-actions">
+                      <ng-container [ngTemplateOutlet]="acciones"
+                                    [ngTemplateOutletContext]="{ $implicit: exp, ref: 'fue-t-' + exp.id }" />
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <!-- ── Tarjetas (en móvil siempre; en escritorio, salvo vista tabla) ── -->
+      <ul class="ls-grid" [class.is-mobile-only]="vista() === 'tabla'">
+        @for (exp of expedientesFiltrados(); track exp.id; let idx = $index) {
+          <li class="ls-card">
+            <span class="ls-card__photo">
+              @if (fotoExpediente(exp); as foto) {
+                <img [src]="foto" loading="lazy" alt="" (error)="onFotoError(exp.id)" />
+              } @else {
+                <mat-icon aria-hidden="true">view_in_ar</mat-icon>
+                <span class="ls-card__nophoto">{{ 'files_under_estimation.photo_none' | translate }}</span>
+              }
+            </span>
+
+            <div class="ls-card__body">
+              <span class="ls-tags">
+                <ng-container [ngTemplateOutlet]="urgenciaTag" [ngTemplateOutletContext]="{ $implicit: exp }" />
+                @if (idx === 0 && !hayFiltros()) {
+                  <span class="ls-tag">{{ 'common.recent' | translate }}</span>
+                }
+              </span>
+
+              <h2 class="ls-card__title">
+                <a class="ls-card__link" [id]="'fue-c-' + exp.id"
+                   [routerLink]="['/estimator/file-under-estimation', exp.id]">{{ servicioNombre(exp) }}</a>
+              </h2>
+              <p class="ls-card__num">{{ exp.numero }}</p>
+
+              <p class="ls-card__line">
+                <mat-icon aria-hidden="true">person</mat-icon>
+                <span>{{ exp.cliente_nombre }}</span>
+              </p>
+              @if (direccionLinea1(exp) || direccionLinea2(exp)) {
+                <p class="ls-card__line" [title]="direccionCompleta(exp)">
+                  <mat-icon aria-hidden="true">location_on</mat-icon>
+                  <span>
+                    @if (direccionLinea1(exp)) { {{ direccionLinea1(exp) }} }
+                    @if (direccionLinea2(exp)) { <span class="ls-card__sub">{{ direccionLinea2(exp) }}</span> }
+                  </span>
+                </p>
+              }
+
+              <div class="ls-card__foot">
+                <span [class.is-late]="urgencia(exp.fecha_visita) === 'vencida'">
+                  <mat-icon aria-hidden="true">calendar_month</mat-icon>
+                  <strong class="ls-fig">{{ formatFecha(exp.fecha_visita) }}</strong>
+                  @if (formatHora(exp.fecha_visita) !== '—') { <span class="ls-fig">{{ formatHora(exp.fecha_visita) }}</span> }
+                </span>
+              </div>
+
+              <div class="fue-card-actions">
+                <ng-container [ngTemplateOutlet]="acciones"
+                              [ngTemplateOutletContext]="{ $implicit: exp, ref: 'fue-c-' + exp.id, icono: true }" />
+              </div>
+
+              @if (confirmandoId() === exp.id) {
+                <p class="fue-confirm" role="status">
+                  <mat-icon aria-hidden="true">info</mat-icon>
+                  <span>
+                    {{ 'files_under_estimation.confirm_msg_before' | translate }}
+                    <mat-icon class="fue-confirm__check" aria-hidden="true">check</mat-icon>
+                    <span class="cdk-visually-hidden">{{ 'common.confirm' | translate }}</span>
+                    {{ 'files_under_estimation.confirm_msg_after' | translate }}
+                  </span>
+                </p>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  }
 </div>
+
+<!-- Urgencia de la visita: icono y texto, nunca solo color. Sin urgencia: «En cours». -->
+<ng-template #urgenciaTag let-exp>
+  @switch (urgencia(exp.fecha_visita)) {
+    @case ('vencida') {
+      <span class="ls-tag is-late"><mat-icon aria-hidden="true">error</mat-icon>{{ 'common.urgency_expired' | translate }}</span>
+    }
+    @case ('hoy') {
+      <span class="ls-tag is-warn"><mat-icon aria-hidden="true">schedule</mat-icon>{{ 'common.urgency_today' | translate }}</span>
+    }
+    @case ('proxima') {
+      <span class="ls-tag is-info"><mat-icon aria-hidden="true">event</mat-icon>{{ 'common.urgency_upcoming' | translate }}</span>
+    }
+    @default {
+      <span class="ls-tag"><mat-icon aria-hidden="true">edit_note</mat-icon>{{ 'files_under_estimation.in_progress' | translate }}</span>
+    }
+  }
+</ng-template>
+
+<!-- Continuar (tomate en el primero) y liberar en dos pasos: el segundo clic confirma. -->
+<ng-template #acciones let-exp let-ref="ref" let-icono="icono">
+  <button mat-flat-button type="button" class="fue-continue" [class.ds-cta]="ctaId() === exp.id"
+          [attr.aria-describedby]="ref" (click)="estimar(exp.id)">
+    @if (icono) { <mat-icon>edit_note</mat-icon> }
+    {{ 'files_under_estimation.continue_btn' | translate }}
+  </button>
+  @if (confirmandoId() === exp.id) {
+    <button mat-stroked-button type="button" class="fue-release is-confirming"
+            [attr.aria-describedby]="ref"
+            [attr.aria-label]="'files_under_estimation.confirm_release_title' | translate"
+            [matTooltip]="'files_under_estimation.confirm_release_title' | translate"
+            [disabled]="liberandoId() === exp.id" (click)="confirmarLiberar(exp.id)">
+      @if (liberandoId() === exp.id) {
+        <span class="ls-spinner" aria-hidden="true"></span>
+      } @else {
+        <mat-icon>check</mat-icon>
+      }
+      {{ 'common.confirm' | translate }}
+    </button>
+  } @else {
+    <button mat-icon-button type="button" class="fue-release"
+            [attr.aria-describedby]="ref"
+            [attr.aria-label]="'files_under_estimation.release_title' | translate"
+            [matTooltip]="'files_under_estimation.release_title' | translate"
+            (click)="confirmarLiberar(exp.id)">
+      <mat-icon>assignment_return</mat-icon>
+    </button>
+  }
+</ng-template>

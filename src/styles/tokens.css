@@ -1,121 +1,117 @@
 /* ============================================================
-   DESIGN TOKENS — Clarté
-   Superficies claras de cal y blanco, tinta pizarra, un único
-   color de acción (sapin) y la firma del escaneo (menthe).
-   Contrastes calculados (WCAG 2.x) en los comentarios.
+   DESIGN TOKENS — Trait rouge
+   60 % crema clásica (papel), 30 % verde abeto (estructura y
+   acción por defecto), 10 % rojo tomate (la siguiente etapa y el
+   trazo de medida). Contrastes WCAG 2.x en los comentarios.
    ============================================================ */
 
 :root {
   /* ----------------------------------------------------------
      COLOR — Superficies
      ---------------------------------------------------------- */
-  --ds-bg:                #FAFAF7;  /* Chaux: fondo de página */
-  --ds-bg-alt:            #F0F2EE;  /* Secciones alternas, hover de filas, rellenos sutiles */
-  --ds-stone:             #E4E6E1;  /* Pierre grise: bandas de sección */
-  --ds-surface:           #FFFFFF;  /* Blanc: tarjetas, paneles, campos */
-  --ds-surface-elevated:  #FFFFFF;  /* Modales, overlays (se distinguen por sombra) */
-  --ds-surface-overlay:   rgba(255, 255, 255, 0.92); /* Blanco translúcido sobre imágenes */
-  --ds-overlay:           rgba(29, 43, 48, 0.45);    /* Backdrops (ardoise) */
+  --ds-bg:                #EEE2CB;  /* Crema clásica: fondo de página (60 %) */
+  --ds-bg-alt:            #F1E8D6;  /* Rellenos sutiles dentro de superficies: hover de filas, cabeceras de tabla */
+  --ds-band:              #E4D5B9;  /* Kraft: bandas de sección alternas */
+  --ds-surface:           #F8F2E6;  /* Vélin: tarjetas, paneles, campos, hojas */
+  --ds-surface-elevated:  #FBF7EF;  /* Modales y overlays (se distinguen también por sombra) */
+  --ds-surface-overlay:   rgba(248, 242, 230, 0.92); /* Vélin translúcido sobre imágenes */
+  --ds-overlay:           rgba(20, 42, 32, 0.45);    /* Backdrops (abeto noche) */
 
   /* ----------------------------------------------------------
      COLOR — Tinta / Texto
      ---------------------------------------------------------- */
-  --ds-ink:               #1D2B30;  /* Ardoise: texto principal — 13.9:1 sobre bg */
-  --ds-ink-secondary:     #34444A;  /* Texto secundario — 9.0:1 sobre bg-alt */
-  --ds-ink-muted:         #56646A;  /* Texto terciario — 6.1:1 sobre blanco, 5.4 sobre bg-alt, 4.9 sobre stone */
-  --ds-ink-faint:         #7C8A8D;  /* SOLO gráficos y contorno de campos: 3.6:1 sobre blanco. Nunca texto */
-  --ds-ink-on-accent:     #FFFFFF;  /* Texto sobre relleno de acción (legado: antes tinta sobre dorado) */
-  --ds-ink-inverse:       #FFFFFF;  /* Texto sobre superficies oscuras — 14.6:1 sobre ardoise */
+  --ds-ink:               #142A20;  /* Abeto noche: texto principal — 11.9:1 sobre bg, 13.6 sobre surface */
+  --ds-ink-secondary:     #2E3F35;  /* Texto secundario — 8.7:1 sobre bg, 7.7 sobre band */
+  --ds-ink-muted:         #4A5547;  /* Texto terciario — 6.1:1 sobre bg, 7.0 sobre surface, 5.4 sobre band */
+  --ds-ink-faint:         #6F7A68;  /* Liquen: SOLO gráficos y contorno de campos (4.0:1 sobre surface, 3.5 sobre bg). Nunca texto */
+  --ds-ink-inverse:       #F8F2E6;  /* Texto sobre superficies oscuras — 9.7:1 sobre abeto, 13.6 sobre abeto noche */
 
   /* ----------------------------------------------------------
-     COLOR — Acción (sapin): el ÚNICO color de acción
-     Botones principales, enlaces, foco, selección.
+     COLOR — Acción por defecto (abeto)
+     Enlaces, botón relleno normal, foco, selección, checkbox, pestañas.
+     Rol primary de Material.
      ---------------------------------------------------------- */
-  --ds-action:            #1E6A55;  /* 6.5:1 sobre blanco, 5.7 sobre bg-alt */
-  --ds-action-hover:      #185846;
-  --ds-action-pressed:    #134A3B;
-  --ds-on-action:         #FFFFFF;  /* 6.5:1 sobre action */
-  --ds-action-soft:       #CFE8DF;  /* Bordes de selección, realces */
-  --ds-action-ink:        #17523F;  /* Texto sobre action-soft (7.0:1) y scan-soft (8.1:1) */
+  --ds-action:            #1B4532;  /* 8.4:1 sobre bg, 9.7 sobre surface */
+  --ds-action-hover:      #163A2A;
+  --ds-action-pressed:    #112E21;
+  --ds-on-action:         #F8F2E6;  /* 9.7:1 sobre action */
+  --ds-action-soft:       #C5D3C0;  /* Bordes de selección y realces — action encima 6.9:1 */
+  --ds-action-faint:      #DDE5D6;  /* Fondos de selección y de «hecho» — action encima 8.4:1 */
+  --ds-action-ink:        var(--ds-action);  /* Texto sobre action-soft / action-faint */
 
   /* ----------------------------------------------------------
-     COLOR — Escaneo (menthe): la firma
-     Cotas, línea de progreso, medidas reales. Nunca texto sobre
-     claro (1.4:1). Sí como acento sobre ardoise (9.9:1) y como
-     relleno con tinta encima (9.9:1).
+     COLOR — Siguiente etapa (tomate)
+     Un solo botón por vista: lo que toca hacer ahora. Nunca texto,
+     nunca junto al abeto (2.8:1 entre ellos).
      ---------------------------------------------------------- */
-  --ds-scan:              #9BE3CF;
-  --ds-scan-hover:        #B7ECDD;  /* Hover de rellenos menthe (islas oscuras) */
-  --ds-scan-soft:         #E3F6F0;  /* Fondos de selección y estados suaves */
+  --ds-cta:               #D23A22;  /* Tomate profundo — blanco encima 4.8:1 */
+  --ds-cta-hover:         #B5301B;  /* 6.2:1 */
+  --ds-cta-pressed:       #9C2815;  /* 7.7:1 */
+  --ds-on-cta:            #FFFFFF;
+  --ds-mark:              #EE4129;  /* Tomate de marca: cotas, punto de aviso, logotipo. SOLO gráfico:
+                                       3.0:1 sobre bg, 3.5 sobre surface, 5.4 sobre el negro del escaneo.
+                                       No sobre band (2.7) ni sobre abeto (2.8). */
 
   /* ----------------------------------------------------------
-     COLOR — Legado dorado → Clarté
-     Alias para que las 86 pantallas cambien sin romperse mientras
-     se rediseñan. No los uses en código nuevo: usa --ds-action*,
-     --ds-scan* directamente. Se borran en la fase 4.
+     COLOR — Bordes y separadores (filetes)
      ---------------------------------------------------------- */
-  --ds-gold:              var(--ds-action);
-  --ds-gold-hover:        var(--ds-action-hover);
-  --ds-gold-active:       var(--ds-action-pressed);
-  --ds-gold-soft:         var(--ds-action-soft);
-  --ds-gold-faint:        var(--ds-scan-soft);
-  --ds-gold-ink:          var(--ds-action-ink);
-
-  /* ----------------------------------------------------------
-     COLOR — Bordes y separadores (filets)
-     ---------------------------------------------------------- */
-  --ds-border:            #D3D7D2;  /* Filet estándar */
-  --ds-border-strong:     #B6BEB9;  /* Bordes de énfasis */
-  --ds-border-subtle:     #E8EBE6;  /* Separadores muy sutiles */
+  --ds-border:            #D9CBAE;  /* Filete estándar */
+  --ds-border-strong:     #BBA886;  /* Bordes de énfasis */
+  --ds-border-subtle:     #E8DDC7;  /* Separadores muy sutiles */
 
   /* ----------------------------------------------------------
      COLOR — Estados semánticos
-     Las bases ya pasan AA como texto, así que -ink coincide con la
-     base salvo en danger. Regla: texto sobre -soft → -ink. La base
-     sirve para rellenos (con blanco encima), barras, bordes, iconos.
+     Regla: texto sobre -soft → -ink. La base sirve para rellenos,
+     barras, bordes e iconos. Éxito es la familia del abeto: lo que
+     avanza. Ámbar: lo que pide una acción tuya. Ladrillo: errores,
+     siempre con icono y texto (el tomate es relleno, el error texto).
      ---------------------------------------------------------- */
-  --ds-success:           #17623F;  /* 7.4:1 sobre blanco · blanco encima 7.4:1 */
-  --ds-success-soft:      #E2F1E8;
-  --ds-warning:           #8A5200;  /* 6.4:1 sobre blanco */
-  --ds-warning-soft:      #FFF0D9;
-  --ds-danger:            #B3261E;  /* 6.5:1 sobre blanco */
-  --ds-danger-soft:       #FBE6E4;
-  --ds-info:              #245B78;  /* 7.4:1 sobre blanco */
-  --ds-info-soft:         #E2EEF4;
+  --ds-success:           #1B4532;  /* 8.4:1 sobre bg */
+  --ds-success-soft:      #DDE5D6;
+  --ds-warning:           #7A4F00;  /* 5.6:1 sobre bg, 6.4 sobre surface */
+  --ds-warning-soft:      #F5E6C4;
+  --ds-danger:            #A1251B;  /* 5.9:1 sobre bg, 6.7 sobre surface; blanco encima 7.5 */
+  --ds-danger-soft:       #F6DDD3;
+  --ds-info:              #245B78;  /* 6.6:1 sobre surface */
+  --ds-info-soft:         #DCE6E6;
 
-  --ds-success-ink:       #17623F;  /* 6.3:1 sobre success-soft */
-  --ds-warning-ink:       #8A5200;  /* 5.7:1 sobre warning-soft */
-  --ds-danger-ink:        #A3231C;  /* 6.2:1 sobre danger-soft  */
-  --ds-info-ink:          #245B78;  /* 6.3:1 sobre info-soft    */
+  --ds-success-ink:       #1B4532;  /* 8.4:1 sobre success-soft */
+  --ds-warning-ink:       #7A4F00;  /* 5.8:1 sobre warning-soft */
+  --ds-danger-ink:        #A1251B;  /* 5.8:1 sobre danger-soft  */
+  --ds-info-ink:          #245B78;  /* 5.8:1 sobre info-soft    */
 
   /* ----------------------------------------------------------
-     COLOR — Superficies oscuras (panel de login, grabador, visor 3D)
-     Ardoise. Sobre ellas el acento es menthe (--ds-scan): sapin
-     solo da 2.3:1 sobre ardoise.
+     COLOR — Superficies oscuras (bandas abeto, panel de login,
+     grabador de vídeo, visor 3D). Encima: texto vélin y botones
+     vélin. El tomate no se usa sobre ellas.
      ---------------------------------------------------------- */
-  --ds-dark-surface:        #1D2B30;  /* Ardoise */
-  --ds-dark-surface-deep:   #152024;  /* Variante profunda (gradiente, base) */
-  --ds-danger-on-dark:      #F4A39D;  /* 7.3:1 sobre ardoise */
-  --ds-danger-on-dark-hover:#F9C6C2;  /* 9.6:1 sobre ardoise */
+  --ds-dark-surface:        #1B4532;  /* Abeto */
+  --ds-dark-surface-deep:   #142A20;  /* Abeto noche */
+  --ds-ink-inverse-muted:   #C9CDB9;  /* Texto secundario sobre oscuro — 6.6:1 sobre abeto */
+  --ds-danger-on-dark:      #F6B3A5;  /* 6.1:1 sobre abeto, 8.6 sobre abeto noche */
+  --ds-danger-on-dark-hover:#F9CBC0;
+  --ds-scan-bg:             #0E1712;  /* Fondo del visor y de las imágenes de escaneo */
 
   /* ----------------------------------------------------------
      TIPOGRAFÍA
-     Sofia Sans Semi Condensed (600/700/800): títulos y cifras.
-     Atkinson Hyperlegible Next (400/500/700 + itálica 400): cuerpo e
-     interfaz. Sin monoespaciada de marca: --ds-font-mono es la del
-     sistema, solo para código o identificadores técnicos.
+     Archivo, una sola familia variable (peso 400–800, ancho 75–125 %,
+     itálica 400). El ancho hace de voz: expandida para títulos,
+     normal para leer, estrecha y tabular para precios y medidas.
+     --ds-font-mono es la del sistema, solo para código o identificadores.
      ---------------------------------------------------------- */
-  --ds-font-display:      'Sofia Sans Semi Condensed', 'Arial Narrow', system-ui, sans-serif;
-  --ds-font-body:         'Atkinson Hyperlegible Next', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ds-font-display:      'Archivo', 'Helvetica Neue', Arial, system-ui, sans-serif;
+  --ds-font-body:         'Archivo', 'Helvetica Neue', Arial, system-ui, sans-serif;
   --ds-font-mono:         ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
-  /* Escala tipográfica (basada en 16px).
-     Fase 0 conserva los tamaños para no romper pantallas. La escala
-     Clarté (1.25 sobre 17px en móvil, 1.333 sobre 18px en escritorio,
-     mínimo 14px) entra pantalla a pantalla en las fases 1–4. */
-  --ds-text-2xs:          0.6875rem;   /* 11px - legado: no usar en código nuevo */
-  --ds-text-xs:           0.75rem;     /* 12px - legado: no usar en código nuevo */
-  --ds-text-sm:           0.875rem;    /* 14px - mínimo Clarté */
+  /* Anchos (font-stretch) */
+  --ds-stretch-display:   125%;  /* Hero y título de pantalla */
+  --ds-stretch-heading:   112%;  /* Títulos de sección */
+  --ds-stretch-body:      100%;
+  --ds-stretch-figure:    75%;   /* Precios, medidas, contadores (con tabular-nums) */
+
+  /* Escala tipográfica (basada en 16px). Mínimo 14px en toda la app:
+     2xs y xs ya valen 14px y desaparecen pantalla a pantalla. */
+  --ds-text-sm:           0.875rem;    /* 14px - mínimo */
   --ds-text-base:         1rem;        /* 16px - body */
   --ds-text-lg:           1.125rem;    /* 18px - lead */
   --ds-text-xl:           1.375rem;    /* 22px - h5 */
@@ -130,7 +126,7 @@
   --ds-weight-medium:     500;
   --ds-weight-semibold:   600;
   --ds-weight-bold:       700;
-  --ds-weight-black:      800;  /* Solo títulos en Sofia Sans */
+  --ds-weight-black:      800;  /* Títulos expandidos */
 
   /* Interlineado */
   --ds-leading-tight:     1.1;
@@ -139,10 +135,9 @@
   --ds-leading-relaxed:   1.65;
 
   /* Tracking (letter-spacing) */
-  --ds-tracking-tight:    -0.02em;
+  --ds-tracking-tight:    -0.015em;
   --ds-tracking-normal:   0;
   --ds-tracking-wide:     0.04em;
-  --ds-tracking-widest:   0.18em;  /* Legado (mayúsculas espaciadas). Clarté no usa mayúsculas en etiquetas */
 
   /* ----------------------------------------------------------
      ESPACIADO (escala de 4px, generosa)
@@ -173,24 +168,24 @@
   --ds-radius-circle:     50%;
 
   /* ----------------------------------------------------------
-     SOMBRAS (teñidas de ardoise, nunca negro puro)
+     SOMBRAS (teñidas de abeto noche, nunca negro puro)
      ---------------------------------------------------------- */
-  --ds-shadow-xs:         0 1px 2px rgba(29, 43, 48, 0.05);
-  --ds-shadow-sm:         0 2px 4px rgba(29, 43, 48, 0.06),
-                          0 1px 2px rgba(29, 43, 48, 0.04);
-  --ds-shadow-md:         0 4px 12px rgba(29, 43, 48, 0.08),
-                          0 2px 4px rgba(29, 43, 48, 0.04);
-  --ds-shadow-lg:         0 12px 24px rgba(29, 43, 48, 0.10),
-                          0 4px 8px rgba(29, 43, 48, 0.05);
-  --ds-shadow-xl:         0 24px 48px rgba(29, 43, 48, 0.14),
-                          0 8px 16px rgba(29, 43, 48, 0.06);
-  --ds-shadow-action:     0 4px 16px rgba(30, 106, 85, 0.24);
-  --ds-shadow-gold:       var(--ds-shadow-action);  /* Legado */
+  --ds-shadow-xs:         0 1px 2px rgba(20, 42, 32, 0.06);
+  --ds-shadow-sm:         0 2px 4px rgba(20, 42, 32, 0.07),
+                          0 1px 2px rgba(20, 42, 32, 0.05);
+  --ds-shadow-md:         0 4px 12px rgba(20, 42, 32, 0.09),
+                          0 2px 4px rgba(20, 42, 32, 0.05);
+  --ds-shadow-lg:         0 12px 24px rgba(20, 42, 32, 0.11),
+                          0 4px 8px rgba(20, 42, 32, 0.06);
+  --ds-shadow-xl:         0 24px 48px rgba(20, 42, 32, 0.15),
+                          0 8px 16px rgba(20, 42, 32, 0.07);
+  --ds-shadow-action:     0 4px 16px rgba(27, 69, 50, 0.24);
 
-  /* Foco: doble anillo (superficie + acción), visible sobre claro y
-     sobre ardoise. --ds-focus-ring es para box-shadow; para outline
-     usa --ds-focus-outline. */
+  /* Foco: doble anillo (superficie + abeto). --ds-focus-ring es para
+     box-shadow; para outline usa --ds-focus-outline. Sobre superficies
+     oscuras, --ds-focus-ring-dark (anillo vélin). */
   --ds-focus-ring:        0 0 0 2px var(--ds-surface), 0 0 0 4px var(--ds-action);
+  --ds-focus-ring-dark:   0 0 0 2px var(--ds-dark-surface), 0 0 0 4px var(--ds-ink-inverse);
   --ds-focus-outline:     2px solid var(--ds-action);
 
   /* ----------------------------------------------------------
@@ -241,10 +236,11 @@ body {
   font-size: var(--ds-text-base);
   line-height: var(--ds-leading-normal);
   font-weight: var(--ds-weight-regular);
+  font-stretch: var(--ds-stretch-body);
 }
 
 ::selection {
-  background-color: var(--ds-scan);
+  background-color: var(--ds-action-soft);
   color: var(--ds-ink);
 }
 

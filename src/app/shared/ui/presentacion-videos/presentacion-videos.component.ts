@@ -1,8 +1,13 @@
 import {
   ChangeDetectionStrategy, Component, ElementRef, OnInit, computed, inject, input, signal, viewChild,
 } from '@angular/core';
-import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
-import { ConnectedPosition } from '@angular/cdk/overlay';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatSelectModule } from '@angular/material/select';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { LangService } from '../../../services/lang.service';
 import { PerfilVideoService, VideoError } from '../../../services/perfil-video.service';
@@ -40,7 +45,8 @@ interface Pendiente { clave: string; titulo: string; }
   selector: 'app-presentacion-videos',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    TranslatePipe, CdkMenuTrigger, CdkMenu, CdkMenuItem,
+    TranslatePipe, MatButtonModule, MatDividerModule, MatFormFieldModule, MatIconModule,
+    MatInputModule, MatMenuModule, MatSelectModule,
     GrabadorVideoComponent, ReproductorVideoComponent,
   ],
   templateUrl: './presentacion-videos.component.html',
@@ -57,12 +63,6 @@ export class PresentacionVideosComponent implements OnInit {
   readonly nombre   = input('');
   /** El dueño gestiona sus propios videos (su perfil): la ayuda le habla a él. */
   readonly propio   = input(false);
-
-  /** Menú ⋮: abre bajo el botón alineado a la derecha; si no cabe, encima. */
-  protected readonly menuPosiciones: ConnectedPosition[] = [
-    { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top', offsetY: 2 },
-    { originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'bottom', offsetY: -2 },
-  ];
 
   readonly claveAyuda = computed(() =>
     this.propio() ? 'presentation_videos.hint_self'

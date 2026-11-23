@@ -1,0 +1,51 @@
+/* component: avisos del asistente IA (administración, Trait rouge)
+ * Base en shared/ui/lista/lista.css (herramientas, marcas, tarjetas, tabla); aquí lo propio:
+ * el filtro de tipo como lista desplegable (siete opciones largas), el resumen legible,
+ * las filas resueltas en segundo plano y el botón de resolver / reabrir.
+ *
+ * states: cargando (esqueleto) · error · vacío · filtros sin resultados · pendiente · resuelto
+ *         (fondo kraft claro, texto intacto) · actualizando (spinner en el botón)
+ * contrast: resumen ink-secondary 9.6:1 · meta ink-muted 6.8:1 · «Résolu» success-ink ·
+ *           marcas warning-ink/-soft 5.8:1 e info-ink/-soft
+ * type: número de dossier y fechas al 75 % con tabular-nums
+ * Sin tomate: revisar avisos no es una etapa del dossier.
+ */
+:host { display: block; }
+
+.aev-type { flex: 0 1 20rem; min-width: 0; }
+
+.aev-summary {
+  min-width: 14rem;
+  max-width: 60ch;
+  line-height: var(--ds-leading-normal);
+  color: var(--ds-ink);
+}
+/* «Dossier EXP-AAAAMMDD-NNNN» en una línea: ni la etiqueta sola ni el número partido por el guion. */
+.aev-dossier { font-weight: var(--ds-weight-semibold); color: var(--ds-ink); white-space: nowrap; }
+
+/* Resuelto: la fila pasa a segundo plano sin bajar el contraste del texto. */
+.aev-row.is-done td { background: var(--ds-bg-alt); }
+
+.aev-card-summary {
+  margin: 0;
+  line-height: var(--ds-leading-normal);
+  color: var(--ds-ink);
+  overflow-wrap: anywhere;
+}
+
+.aev-resolve,
+.aev-resolved { min-height: 44px; }
+.aev-resolved {
+  --mat-button-text-label-text-color: var(--ds-success-ink);
+  --mat-button-text-state-layer-color: var(--ds-success);
+}
+
+/* Cinco columnas con un resumen largo junto a la barra lateral: la tabla solo cabe desde 1400px;
+   antes, tarjetas. */
+@media (max-width: 1399.98px) {
+  .ls-table-wrap { display: none; }
+  .ls-grid.is-mobile-only { display: grid; }
+}
+@media (max-width: 599.98px) {
+  .aev-type { flex: 1 1 100%; }
+}

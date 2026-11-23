@@ -1,68 +1,60 @@
 @let o = obra();
 
-<article class="cm-obra">
+<article class="ob">
 
-  <!-- ── Banda de cabecera: identidad · estado · avance hero ── -->
-  <header class="cm-obra__head">
-    <div class="cm-obra__top">
-      <div class="cm-obra__id">
-        <h2 class="cm-obra__number">{{ o.expedienteNumero }}</h2>
-        <span class="cm-obra__service">{{ servicioNombre() }}</span>
+  <!-- ── Cabecera: identidad, estado y avance ──────────────────────────────── -->
+  <header class="ob-head">
+    <div class="ob-head__top">
+      <div class="ob-id">
+        <h3 class="ob-id__num">{{ o.expedienteNumero }}</h3>
+        <p class="ob-id__svc">{{ servicioNombre() }}</p>
       </div>
-      <span class="cm-badge" [class]="badgeContrato(o.estadoContrato)">
-        {{ ('construction_monitoring.estado_' + o.estadoContrato) | translate }}
-      </span>
+      <app-status-chip [estado]="o.estadoContrato" prefijo="construction_monitoring.estado_" />
     </div>
     @if (o.estadoContrato === 'archivado') {
-      <app-aviso-archivado class="cm-obra__aviso" ambito="obra" [compacto]="true" />
+      <app-aviso-archivado ambito="obra" [compacto]="true" />
     }
 
-    <div class="cm-hero">
-      <!-- Avance global como métrica hero -->
-      <div class="cm-hero__avance">
-        <span class="cm-hero__label">{{ 'client_monitoring.avance_global' | translate }}</span>
-        <strong class="cm-hero__pct">{{ o.avanceGlobal }}<span>%</span></strong>
-        <div class="cm-hero__track">
-          <span class="cm-hero__fill" [style.width.%]="o.avanceGlobal"></span>
-        </div>
+    <div class="ob-hero">
+      <div class="ob-hero__avance">
+        <span class="ob-label" id="ob-avance-{{ o.seguimientoId }}">{{ 'client_monitoring.avance_global' | translate }}</span>
+        <strong class="ob-hero__pct">{{ o.avanceGlobal }}<span> %</span></strong>
+        <span class="ob-track ob-track--lg" role="progressbar"
+              aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="o.avanceGlobal"
+              [attr.aria-labelledby]="'ob-avance-' + o.seguimientoId">
+          <span class="ob-track__fill" [style.width.%]="o.avanceGlobal"></span>
+        </span>
       </div>
 
-      <!-- Estado + KPIs -->
-      <div class="cm-hero__meta">
-        <div class="cm-timeline">
+      <div class="ob-hero__meta">
+        <ol class="ob-steps">
           @for (paso of PASOS; track paso.key) {
-            <div class="cm-timeline__step"
-                 [class.is-done]="pasoActivo(paso.key)"
-                 [class.is-current]="esPasoActual(paso.key)">
-              <span class="cm-timeline__dot"><i class="bi" [class]="paso.icon"></i></span>
-              <span class="cm-timeline__label">
-                {{ ('construction_monitoring.estado_' + paso.key) | translate }}
-              </span>
-            </div>
-            @if (!$last) {
-              <span class="cm-timeline__line" [class.is-done]="pasoActivo(paso.key)"></span>
-            }
+            <li class="ob-step" [class.is-done]="pasoActivo(paso.key)" [class.is-current]="esPasoActual(paso.key)"
+                [attr.aria-current]="esPasoActual(paso.key) ? 'step' : null">
+              <span class="ob-step__dot" aria-hidden="true"><mat-icon>{{ paso.matIcon }}</mat-icon></span>
+              <span class="ob-step__label">{{ ('construction_monitoring.estado_' + paso.key) | translate }}</span>
+            </li>
           }
-        </div>
+        </ol>
 
-        <dl class="cm-kpis">
-          <div class="cm-kpi">
+        <dl class="ob-kpis">
+          <div class="ob-kpi">
             <dt>{{ 'client_monitoring.kpi_actualizacion' | translate }}</dt>
             <dd>{{ formatFechaHora(o.ultimaActualizacion) }}</dd>
           </div>
-          <div class="cm-kpi">
+          <div class="ob-kpi">
             <dt>{{ 'client_monitoring.kpi_estimado' | translate }}</dt>
             <dd>{{ plazoLabel() }}</dd>
           </div>
-          <div class="cm-kpi">
+          <div class="ob-kpi">
             <dt>{{ 'client_monitoring.kpi_llegada_fecha' | translate }}</dt>
             <dd>{{ formatFecha(fechaSel()) }}</dd>
           </div>
-          <div class="cm-kpi">
+          <div class="ob-kpi">
             <dt>{{ 'client_monitoring.kpi_llegada_hora' | translate }}</dt>
             <dd>{{ horaCorta(horaLlegada()) }}</dd>
           </div>
-          <div class="cm-kpi">
+          <div class="ob-kpi">
             <dt>{{ 'client_monitoring.kpi_horas_dia' | translate }}</dt>
             <dd>{{ horasDia() != null ? horasDia() + ' h' : '—' }}</dd>
           </div>
@@ -71,51 +63,46 @@
     </div>
   </header>
 
-  <!-- ── Workbench ── -->
-  <div class="cm-work">
+  <!-- ── Mesa de trabajo ───────────────────────────────────────────────────── -->
+  <div class="ob-work">
 
-    <!-- Flujo de eventos — columna espina -->
-    <section class="cm-panel cm-panel--eventos">
-      <div class="cm-panel__head">
-        <i class="bi bi-clock-history"></i>
-        <span>{{ 'client_monitoring.eventos_title' | translate }}</span>
-      </div>
-      <div class="cm-panel__body cm-panel__body--scroll">
+    <!-- Flujo de eventos: elegir un día carga su detalle (zonas, fotos). -->
+    <section class="ob-panel ob-panel--eventos">
+      <h4 class="ob-panel__title">
+        <mat-icon aria-hidden="true">history</mat-icon>
+        {{ 'client_monitoring.eventos_title' | translate }}
+      </h4>
+      <div class="ob-panel__body ob-panel__body--scroll">
         @if (dias().length > 0 && multiServicio()) {
-          <!-- Varios servicios: un flujo por servicio, cada uno con sus días y
-               SU acumulado. Elegir un día carga el detalle de ese día. -->
+          <!-- Varios servicios: un flujo por servicio, cada uno con sus días y SU acumulado. -->
           @for (g of eventosPorServicio(); track g.clave) {
-            <p class="cm-group">
+            <p class="ob-group">
               @if (g.nombre) {
-                {{ g.nombre }}@if (g.avance !== null) { · {{ g.avance }}%}
+                <span>{{ g.nombre }}</span>
+                @if (g.avance !== null) { <span class="ob-fig">{{ g.avance }} %</span> }
               } @else {
                 {{ 'client_monitoring.otros_partes' | translate }}
               }
             </p>
             @if (g.dias.length > 0) {
-              <ul class="cm-events cm-events--servicio">
+              <ul class="ob-events">
                 @for (x of g.dias; track x.dia.fecha) {
                   <li>
-                    <button class="cm-event" type="button"
+                    <button class="ob-event" type="button"
                             [class.is-selected]="x.dia.fecha === fechaSel()"
                             [attr.aria-pressed]="x.dia.fecha === fechaSel()"
                             (click)="seleccionarDia(x.dia)">
-                      <span class="cm-event__when">
-                        <strong>{{ diaNum(x.dia.fecha) }}</strong>
-                        <small>{{ mesCorto(x.dia.fecha) }}</small>
-                      </span>
-                      <span class="cm-event__body">
-                        <span class="cm-event__row">
-                          <span class="cm-event__acum">{{ x.parte.porcentaje_acumulado ?? 0 }}%</span>
-                          <span class="cm-event__delta">+{{ x.parte.porcentaje_avance_dia }}%</span>
+                      <span class="ob-when"><strong>{{ diaNum(x.dia.fecha) }}</strong><small>{{ mesCorto(x.dia.fecha) }}</small></span>
+                      <span class="ob-event__body">
+                        <span class="ob-event__row">
+                          <span class="ob-event__acum">{{ x.parte.porcentaje_acumulado ?? 0 }} %</span>
+                          <span class="ob-event__delta">+{{ x.parte.porcentaje_avance_dia }} %</span>
                         </span>
                         @if (faseNameById(x.parte.fase_id)) {
-                          <span class="cm-event__fase">
-                            <i class="bi bi-layers"></i> {{ faseNameById(x.parte.fase_id) }}
-                          </span>
+                          <span class="ob-event__fase"><mat-icon aria-hidden="true">layers</mat-icon>{{ faseNameById(x.parte.fase_id) }}</span>
                         }
                         @if (x.parte.descripcion) {
-                          <span class="cm-event__desc">{{ x.parte.descripcion }}</span>
+                          <span class="ob-event__desc">{{ x.parte.descripcion }}</span>
                         }
                       </span>
                     </button>
@@ -123,50 +110,40 @@
                 }
               </ul>
             } @else {
-              <p class="cm-muted cm-events__vacio">{{ 'client_monitoring.sin_eventos_servicio' | translate }}</p>
+              <p class="ob-muted">{{ 'client_monitoring.sin_eventos_servicio' | translate }}</p>
             }
           }
         } @else if (dias().length > 0) {
           <!-- Un servicio: un elemento por día. -->
-          <ul class="cm-events">
+          <ul class="ob-events">
             @for (d of dias(); track d.fecha) {
               <li>
-                <button class="cm-event" type="button"
+                <button class="ob-event" type="button"
                         [class.is-selected]="d.fecha === fechaSel()"
                         [attr.aria-pressed]="d.fecha === fechaSel()"
                         (click)="seleccionarDia(d)">
-                  <span class="cm-event__when">
-                    <strong>{{ diaNum(d.fecha) }}</strong>
-                    <small>{{ mesCorto(d.fecha) }}</small>
-                  </span>
-                  <span class="cm-event__body">
-                    <!-- Con un servicio, el acumulado es el de la obra. Con
-                         varios, cada servicio lleva el suyo (abajo, por parte). -->
+                  <span class="ob-when"><strong>{{ diaNum(d.fecha) }}</strong><small>{{ mesCorto(d.fecha) }}</small></span>
+                  <span class="ob-event__body">
                     @if (!multiServicio()) {
-                      <span class="cm-event__row">
-                        <span class="cm-event__acum">{{ d.acumulado ?? o.avanceGlobal }}%</span>
-                        <span class="cm-event__delta">+{{ d.delta }}%</span>
+                      <span class="ob-event__row">
+                        <span class="ob-event__acum">{{ d.acumulado ?? o.avanceGlobal }} %</span>
+                        <span class="ob-event__delta">+{{ d.delta }} %</span>
                       </span>
                     }
                     @for (r of d.partes; track r.id) {
-                      <span class="cm-event__parte">
+                      <span class="ob-event__parte">
                         @if (multiServicio() && servicioNombreById(r.servicio_id)) {
-                          <span class="cm-event__svc">
-                            <i class="bi bi-tools" aria-hidden="true"></i>
-                            {{ servicioNombreById(r.servicio_id) }}
-                          </span>
-                          <span class="cm-event__row">
-                            <span class="cm-event__acum">{{ r.porcentaje_acumulado ?? 0 }}%</span>
-                            <span class="cm-event__delta">+{{ r.porcentaje_avance_dia }}%</span>
+                          <span class="ob-event__svc"><mat-icon aria-hidden="true">construction</mat-icon>{{ servicioNombreById(r.servicio_id) }}</span>
+                          <span class="ob-event__row">
+                            <span class="ob-event__acum">{{ r.porcentaje_acumulado ?? 0 }} %</span>
+                            <span class="ob-event__delta">+{{ r.porcentaje_avance_dia }} %</span>
                           </span>
                         }
                         @if (faseNameById(r.fase_id)) {
-                          <span class="cm-event__fase">
-                            <i class="bi bi-layers"></i> {{ faseNameById(r.fase_id) }}
-                          </span>
+                          <span class="ob-event__fase"><mat-icon aria-hidden="true">layers</mat-icon>{{ faseNameById(r.fase_id) }}</span>
                         }
                         @if (r.descripcion) {
-                          <span class="cm-event__desc">{{ r.descripcion }}</span>
+                          <span class="ob-event__desc">{{ r.descripcion }}</span>
                         }
                       </span>
                     }
@@ -176,250 +153,209 @@
             }
           </ul>
         } @else {
-          <p class="cm-muted">{{ 'client_monitoring.sin_eventos' | translate }}</p>
+          <p class="ob-muted">{{ 'client_monitoring.sin_eventos' | translate }}</p>
         }
       </div>
     </section>
 
-    <!-- Fases de la obra -->
-    <section class="cm-panel cm-panel--fases">
-      <div class="cm-panel__head">
-        <i class="bi bi-layers"></i>
-        <span>{{ 'client_monitoring.fases_title' | translate }}</span>
-      </div>
-      <div class="cm-panel__body">
+    <!-- Fases -->
+    <section class="ob-panel ob-panel--fases">
+      <h4 class="ob-panel__title">
+        <mat-icon aria-hidden="true">layers</mat-icon>
+        {{ 'client_monitoring.fases_title' | translate }}
+      </h4>
+      <div class="ob-panel__body">
         @if (multiServicio() && o.fasesPorServicio.length > 1) {
-          <!-- Una lista por servicio: cada uno reparte SU avance entre sus fases. -->
           @for (g of o.fasesPorServicio; track g.servicioId) {
-            <p class="cm-group">{{ servicioNombreById(g.servicioId) }} · {{ g.avance }}%</p>
+            <p class="ob-group"><span>{{ servicioNombreById(g.servicioId) }}</span><span class="ob-fig">{{ g.avance }} %</span></p>
             @for (f of g.fases; track f.fase.id) {
-              <div class="cm-bar">
-                <div class="cm-bar__top">
-                  <span class="cm-bar__name">{{ faseName(f.fase) }}</span>
-                  <span class="cm-bar__pct">{{ f.pct }}%</span>
-                </div>
-                <div class="cm-bar__track">
-                  <span class="cm-bar__fill" [style.width.%]="f.pct"></span>
-                </div>
-              </div>
+              <ng-container [ngTemplateOutlet]="barra" [ngTemplateOutletContext]="{ nombre: faseName(f.fase), pct: f.pct }" />
             } @empty {
-              <p class="cm-muted cm-muted--sm">{{ 'client_monitoring.sin_fases' | translate }}</p>
+              <p class="ob-muted">{{ 'client_monitoring.sin_fases' | translate }}</p>
             }
           }
         } @else if (o.fases.length > 0) {
           @for (f of o.fases; track f.fase.id) {
-            <div class="cm-bar">
-              <div class="cm-bar__top">
-                <span class="cm-bar__name">{{ faseName(f.fase) }}</span>
-                <span class="cm-bar__pct">{{ f.pct }}%</span>
-              </div>
-              <div class="cm-bar__track">
-                <span class="cm-bar__fill" [style.width.%]="f.pct"></span>
-              </div>
-            </div>
+            <ng-container [ngTemplateOutlet]="barra" [ngTemplateOutletContext]="{ nombre: faseName(f.fase), pct: f.pct }" />
           }
         } @else {
-          <p class="cm-muted">{{ 'client_monitoring.sin_fases' | translate }}</p>
+          <p class="ob-muted">{{ 'client_monitoring.sin_fases' | translate }}</p>
         }
       </div>
     </section>
 
     <!-- Próxima inspección -->
-    <section class="cm-panel cm-panel--insp">
-      <div class="cm-panel__body">
+    <section class="ob-panel ob-panel--insp">
+      <div class="ob-panel__body">
         <app-obra-inspecciones [seguimientoId]="o.seguimientoId" />
       </div>
     </section>
 
-    <!-- Lista de actividades -->
-    <section class="cm-panel cm-panel--activ">
-      <div class="cm-panel__head">
-        <i class="bi bi-check2-square"></i>
-        <span>{{ 'client_monitoring.actividades_title' | translate }}</span>
-      </div>
-      <div class="cm-panel__body">
+    <!-- Actividades -->
+    <section class="ob-panel ob-panel--activ">
+      <h4 class="ob-panel__title">
+        <mat-icon aria-hidden="true">checklist</mat-icon>
+        {{ 'client_monitoring.actividades_title' | translate }}
+      </h4>
+      <div class="ob-panel__body">
         @if (multiServicio() && o.actividadesPorServicio.length > 1) {
-          <!-- Una lista por servicio; el % es sobre los días trabajados en él. -->
           @for (g of o.actividadesPorServicio; track g.servicioId) {
-            <p class="cm-group">{{ servicioNombreById(g.servicioId) }}</p>
+            <p class="ob-group"><span>{{ servicioNombreById(g.servicioId) }}</span></p>
             @for (a of g.actividades; track a.actividad.id) {
-              <div class="cm-bar" [class.is-off]="!a.hecha">
-                <div class="cm-bar__top">
-                  <span class="cm-bar__name">
-                    @if (a.hecha) { <i class="bi bi-check-circle cm-bar__ic"></i> }
-                    @else { <i class="bi bi-circle cm-bar__ic"></i> }
-                    {{ actividadName(a.actividad) }}
-                  </span>
-                  <span class="cm-bar__pct">{{ a.pct }}%</span>
-                </div>
-                <div class="cm-bar__track">
-                  <span class="cm-bar__fill" [style.width.%]="a.pct"></span>
-                </div>
-              </div>
+              <ng-container [ngTemplateOutlet]="barra"
+                            [ngTemplateOutletContext]="{ nombre: actividadName(a.actividad), pct: a.pct, actividad: true, hecha: a.hecha }" />
             } @empty {
-              <p class="cm-muted cm-muted--sm">{{ 'client_monitoring.sin_actividades' | translate }}</p>
+              <p class="ob-muted">{{ 'client_monitoring.sin_actividades' | translate }}</p>
             }
           }
         } @else if (o.actividades.length > 0) {
           @for (a of o.actividades; track a.actividad.id) {
-            <div class="cm-bar" [class.is-off]="!a.hecha">
-              <div class="cm-bar__top">
-                <span class="cm-bar__name">
-                  @if (a.hecha) { <i class="bi bi-check-circle cm-bar__ic"></i> }
-                  @else { <i class="bi bi-circle cm-bar__ic"></i> }
-                  {{ actividadName(a.actividad) }}
-                </span>
-                <span class="cm-bar__pct">{{ a.pct }}%</span>
-              </div>
-              <div class="cm-bar__track">
-                <span class="cm-bar__fill" [style.width.%]="a.pct"></span>
-              </div>
-            </div>
+            <ng-container [ngTemplateOutlet]="barra"
+                          [ngTemplateOutletContext]="{ nombre: actividadName(a.actividad), pct: a.pct, actividad: true, hecha: a.hecha }" />
           }
         } @else {
-          <p class="cm-muted">{{ 'client_monitoring.sin_actividades' | translate }}</p>
+          <p class="ob-muted">{{ 'client_monitoring.sin_actividades' | translate }}</p>
         }
       </div>
     </section>
 
-    <!-- Desglose por zona -->
-    <section class="cm-panel cm-panel--zonas">
-      <div class="cm-panel__head">
-        <i class="bi bi-grid-1x2"></i>
-        <span>{{ 'client_monitoring.zonas_title' | translate }}</span>
-      </div>
-      <div class="cm-panel__body">
+    <!-- Zonas del día elegido -->
+    <section class="ob-panel ob-panel--zonas">
+      <h4 class="ob-panel__title">
+        <mat-icon aria-hidden="true">grid_view</mat-icon>
+        {{ 'client_monitoring.zonas_title' | translate }}
+      </h4>
+      <div class="ob-panel__body">
         @if (hayZonas()) {
           @for (p of partesDia(); track p.reporte.id) {
             @if (p.zonas.length > 0) {
               @if (variosPartes()) {
-                <p class="cm-group">{{ servicioNombreById(p.reporte.servicio_id) }}</p>
+                <p class="ob-group"><span>{{ servicioNombreById(p.reporte.servicio_id) }}</span></p>
               }
               @for (z of p.zonas; track z.id) {
-                <div class="cm-bar">
-                  <div class="cm-bar__top">
-                    <span class="cm-bar__name">{{ z.zona }}</span>
-                    <span class="cm-bar__pct">{{ z.porcentaje_avance ?? 0 }}%</span>
-                  </div>
-                  <div class="cm-bar__track">
-                    <span class="cm-bar__fill" [style.width.%]="z.porcentaje_avance ?? 0"></span>
-                  </div>
-                  @if (z.descripcion) {
-                    <p class="cm-bar__desc">{{ z.descripcion }}</p>
-                  }
-                </div>
+                <ng-container [ngTemplateOutlet]="barra"
+                              [ngTemplateOutletContext]="{ nombre: z.zona, pct: z.porcentaje_avance ?? 0, desc: z.descripcion }" />
               }
             }
           }
         } @else {
-          <p class="cm-muted">{{ 'client_monitoring.sin_zonas' | translate }}</p>
+          <p class="ob-muted">{{ 'client_monitoring.sin_zonas' | translate }}</p>
         }
       </div>
     </section>
 
-    <!-- Fotos del día seleccionado — banda a todo el ancho -->
-    <section class="cm-panel cm-panel--media">
-      <div class="cm-panel__head">
-        <i class="bi bi-images"></i>
-        <span>{{ 'client_monitoring.media_title' | translate }}</span>
+    <!-- Fotos, vídeos y documentos del día elegido -->
+    <section class="ob-panel ob-panel--media">
+      <h4 class="ob-panel__title">
+        <mat-icon aria-hidden="true">photo_library</mat-icon>
+        {{ 'client_monitoring.media_title' | translate }}
         @if (fechaSel()) {
-          <span class="cm-panel__date">{{ formatFecha(fechaSel()) }}</span>
+          <span class="ob-panel__date">{{ formatFecha(fechaSel()) }}</span>
         }
-        @if (cargandoDia()) { <span class="cm-spinner cm-spinner--sm"></span> }
-      </div>
-      <div class="cm-panel__body">
+        @if (cargandoDia()) {
+          <span class="ob-spinner" aria-hidden="true"></span>
+        }
+      </h4>
+      <div class="ob-panel__body">
         @if (partesDia().length === 0) {
-          <p class="cm-muted cm-muted--sm">{{ 'client_monitoring.sin_media' | translate }}</p>
+          <p class="ob-muted">{{ 'client_monitoring.sin_media' | translate }}</p>
         }
-        <!-- Un bloque por parte del día (uno por servicio trabajado). -->
         @for (p of partesDia(); track p.reporte.id) {
           @if (variosPartes()) {
-            <p class="cm-group">{{ servicioNombreById(p.reporte.servicio_id) }}</p>
+            <p class="ob-group"><span>{{ servicioNombreById(p.reporte.servicio_id) }}</span></p>
           }
-          <div class="cm-media-grid" [class.cm-media-grid--grupo]="variosPartes()">
+          <div class="ob-media">
 
-            <!-- Fotos -->
-            <div class="cm-media-row">
-              <span class="cm-media-row__label">
-                <i class="bi bi-image"></i> {{ 'monitoring.media_fotos' | translate }}
-                @if (p.fotos.length) { <span class="cm-media-count">{{ p.fotos.length }}</span> }
-              </span>
+            <div class="ob-media__col">
+              <h5 class="ob-media__label">
+                <mat-icon aria-hidden="true">image</mat-icon>
+                {{ 'monitoring.media_fotos' | translate }}
+                @if (p.fotos.length) { <span class="ob-count">{{ p.fotos.length }}</span> }
+              </h5>
               @if (p.fotos.length > 0) {
-                <div class="cm-strip">
+                <ul class="ob-strip">
                   @for (foto of p.fotos; track foto.id) {
-                    <button class="cm-thumb cm-thumb--foto" type="button" (click)="abrirMedia(foto)">
-                      <img [src]="publicUrl(foto.url_storage)" [alt]="foto.nombre_archivo" loading="lazy">
-                    </button>
+                    <li>
+                      <button class="ob-thumb" type="button" (click)="abrirMedia(foto)" [attr.aria-label]="foto.nombre_archivo">
+                        <img [src]="publicUrl(foto.url_storage)" alt="" loading="lazy">
+                      </button>
+                    </li>
                   }
-                </div>
+                </ul>
               } @else {
-                <p class="cm-muted cm-muted--sm">{{ 'client_monitoring.sin_media' | translate }}</p>
+                <p class="ob-muted">{{ 'client_monitoring.sin_media' | translate }}</p>
               }
             </div>
 
-            <!-- Videos -->
-            <div class="cm-media-row">
-              <span class="cm-media-row__label">
-                <i class="bi bi-camera-video"></i> {{ 'monitoring.media_videos' | translate }}
-                @if (p.videos.length) { <span class="cm-media-count">{{ p.videos.length }}</span> }
-              </span>
+            <div class="ob-media__col">
+              <h5 class="ob-media__label">
+                <mat-icon aria-hidden="true">movie</mat-icon>
+                {{ 'monitoring.media_videos' | translate }}
+                @if (p.videos.length) { <span class="ob-count">{{ p.videos.length }}</span> }
+              </h5>
               @if (p.videos.length > 0) {
-                <div class="cm-strip">
+                <ul class="ob-files">
                   @for (video of p.videos; track video.id) {
-                    <button class="cm-thumb cm-thumb--video" type="button" (click)="abrirMedia(video)">
-                      <i class="bi bi-play-circle cm-thumb__play"></i>
-                      <span class="cm-thumb__name">{{ video.nombre_archivo }}</span>
-                    </button>
+                    <li>
+                      <button class="ob-file" type="button" (click)="abrirMedia(video)">
+                        <mat-icon aria-hidden="true">play_circle</mat-icon>
+                        <span class="ob-file__name">{{ video.nombre_archivo }}</span>
+                      </button>
+                    </li>
                   }
-                </div>
+                </ul>
               } @else {
-                <p class="cm-muted cm-muted--sm">{{ 'client_monitoring.sin_media' | translate }}</p>
+                <p class="ob-muted">{{ 'client_monitoring.sin_media' | translate }}</p>
               }
             </div>
 
-            <!-- Documentos -->
-            <div class="cm-media-row">
-              <span class="cm-media-row__label">
-                <i class="bi bi-file-earmark-text"></i> {{ 'monitoring.media_docs' | translate }}
-                @if (p.documentos.length) { <span class="cm-media-count">{{ p.documentos.length }}</span> }
-              </span>
+            <div class="ob-media__col">
+              <h5 class="ob-media__label">
+                <mat-icon aria-hidden="true">description</mat-icon>
+                {{ 'monitoring.media_docs' | translate }}
+                @if (p.documentos.length) { <span class="ob-count">{{ p.documentos.length }}</span> }
+              </h5>
               @if (p.documentos.length > 0) {
-                <div class="cm-strip">
+                <ul class="ob-files">
                   @for (doc of p.documentos; track doc.id) {
-                    <a class="cm-thumb cm-thumb--doc" [href]="publicUrl(doc.url_storage)" target="_blank" rel="noopener">
-                      <i class="bi bi-file-earmark-text cm-thumb__doc"></i>
-                      <span class="cm-thumb__name">{{ doc.nombre_archivo }}</span>
-                    </a>
+                    <li>
+                      <a class="ob-file" [href]="publicUrl(doc.url_storage)" target="_blank" rel="noopener">
+                        <mat-icon aria-hidden="true">open_in_new</mat-icon>
+                        <span class="ob-file__name">{{ doc.nombre_archivo }}</span>
+                      </a>
+                    </li>
                   }
-                </div>
+                </ul>
               } @else {
-                <p class="cm-muted cm-muted--sm">{{ 'client_monitoring.sin_media' | translate }}</p>
+                <p class="ob-muted">{{ 'client_monitoring.sin_media' | translate }}</p>
               }
             </div>
-
           </div>
         }
       </div>
     </section>
-
-  </div><!-- /cm-work -->
+  </div>
 </article>
 
-<!-- ── Visor de media ── -->
-@if (mediaViewer(); as mv) {
-  <div class="cm-viewer-overlay" (click)="cerrarViewer()">
-    <div class="cm-viewer" (click)="$event.stopPropagation()">
-      <div class="cm-viewer__bar">
-        <span class="cm-viewer__name">{{ mv.nombre }}</span>
-        <button class="cm-viewer__close" type="button" (click)="cerrarViewer()">
-          <i class="bi bi-x-lg"></i>
-        </button>
-      </div>
-      @if (mv.tipo === 'foto') {
-        <img class="cm-viewer__img" [src]="mv.url" [alt]="mv.nombre">
-      } @else {
-        <video class="cm-viewer__video" [src]="mv.url" controls autoplay></video>
-      }
+<!-- Barra de avance: fase, actividad (hecha o no) o zona. -->
+<ng-template #barra let-nombre="nombre" let-pct="pct" let-desc="desc" let-actividad="actividad" let-hecha="hecha">
+  <div class="ob-bar" [class.is-off]="actividad && !hecha">
+    <div class="ob-bar__top">
+      <span class="ob-bar__name">
+        @if (actividad) {
+          @if (hecha) {
+            <mat-icon class="ob-bar__ic is-done" aria-hidden="true">check_circle</mat-icon>
+          } @else {
+            <mat-icon class="ob-bar__ic" aria-hidden="true">radio_button_unchecked</mat-icon>
+          }
+        }
+        {{ nombre }}
+      </span>
+      <span class="ob-bar__pct">{{ pct }} %</span>
     </div>
+    <span class="ob-track" aria-hidden="true"><span class="ob-track__fill" [style.width.%]="pct"></span></span>
+    @if (desc) {
+      <p class="ob-bar__desc">{{ desc }}</p>
+    }
   </div>
-}
+</ng-template>

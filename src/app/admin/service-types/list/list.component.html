@@ -1,219 +1,152 @@
-<div class="container-fluid py-4 px-3 px-xl-4">
+<div class="page-wrapper ls">
 
-  <!-- ── Encabezado ─────────────────────────────────────────────────────────── -->
-  <header class="page-header mb-4">
-    <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
-      <div>
-        <span class="eyebrow">{{ 'role.administrateur' | translate }}</span>
-        <h1 class="page-header__title">{{ 'admin_service_types.title' | translate }}</h1>
-        <p class="page-header__lead">{{ 'admin_service_types.subtitle' | translate }}</p>
-      </div>
-      <div class="d-flex align-items-center gap-2 flex-wrap">
-        @if (!cargando() && !error()) {
-          <span class="kpi-pill">
-            <i class="bi bi-grid" aria-hidden="true"></i>
-            {{ serviciosFiltrados().length }}
-            @if (hayFiltros()) { <span class="kpi-pill__total">/ {{ total }}</span> }
-            {{ 'admin_service_types.count' | translate }}
-          </span>
-        }
-        <a routerLink="/admin/service-type/create" class="btn btn-primary btn-sm">
-          <i class="bi bi-plus-circle me-1" aria-hidden="true"></i>{{ 'admin_service_types.create_btn' | translate }}
-        </a>
-      </div>
-    </div>
-  </header>
+  <app-page-header [titulo]="'admin_service_types.title' | translate"
+                   [contexto]="'admin_service_types.subtitle' | translate">
+    <a actions mat-flat-button routerLink="/admin/service-type/create">
+      <mat-icon>add</mat-icon>
+      {{ 'admin_service_types.create_btn' | translate }}
+    </a>
+  </app-page-header>
 
-  <!-- ── Skeleton de carga ──────────────────────────────────────────────────── -->
+  <!-- ── Cargando ────────────────────────────────────────────────────────── -->
   @if (cargando()) {
-    <div class="filter-bar mb-3" aria-hidden="true">
-      <div class="skel skel--input mb-3"></div>
-      <div class="d-flex gap-2">
-        <div class="skel skel--chip"></div>
-        <div class="skel skel--chip"></div>
-        <div class="skel skel--chip"></div>
+    <div class="ls-people-skel" role="status">
+      <span class="cdk-visually-hidden">{{ 'common.loading' | translate }}</span>
+      @for (_ of [1, 2, 3, 4, 5]; track $index) {
+        <span class="skel skel--row" aria-hidden="true"></span>
+      }
+    </div>
+
+  <!-- ── Error ───────────────────────────────────────────────────────────── -->
+  } @else if (error()) {
+    <p class="ls-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ error() }}</p>
+
+  <!-- ── Sin servicios ───────────────────────────────────────────────────── -->
+  } @else if (total === 0) {
+    <app-empty-state class="ls-empty" matIcon="category" [titulo]="'admin_service_types.no_data' | translate" />
+
+  } @else {
+
+    <!-- ── Búsqueda y estado ─────────────────────────────────────────────── -->
+    <div class="ls-tools">
+      <mat-form-field class="ls-search" appearance="outline" subscriptSizing="dynamic">
+        <mat-label>{{ 'common.search' | translate }}</mat-label>
+        <mat-icon matPrefix aria-hidden="true">search</mat-icon>
+        <input matInput type="search" autocomplete="off"
+               [placeholder]="'admin_service_types.search_placeholder' | translate"
+               [value]="busqueda()" (input)="setBusqueda($event)" />
+        @if (busqueda()) {
+          <button mat-icon-button matSuffix type="button"
+                  [attr.aria-label]="'common.clear' | translate" (click)="busqueda.set('')">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </mat-form-field>
+
+      <div class="ls-filter">
+        <span class="ls-filter__label" id="asl-act-label">{{ 'admin_service_types.status_filter' | translate }}</span>
+        <mat-button-toggle-group class="ls-toggle" hideSingleSelectionIndicator aria-labelledby="asl-act-label"
+                                 [value]="filtroActivo()" (change)="filtroActivo.set($event.value)">
+          @for (a of estadosActivo; track a) {
+            <mat-button-toggle [value]="a">
+              {{ (a === 'todos' ? 'common.all' : a === 'activo' ? 'common.active' : 'common.inactive') | translate }}
+            </mat-button-toggle>
+          }
+        </mat-button-toggle-group>
       </div>
     </div>
-    <div class="card table-card">
-      <div class="table-responsive">
-        <table class="table table-admin mb-0">
+
+    @if (hayFiltros()) {
+      <div class="ls-status">
+        <p class="ls-showing" role="status">
+          <span class="ls-fig">{{ serviciosFiltrados().length }} / {{ total }}</span> {{ 'admin_service_types.count' | translate }}
+        </p>
+        <button mat-button type="button" class="ls-clear" (click)="limpiarFiltros()">
+          <mat-icon>close</mat-icon>
+          {{ 'common.clear_filters' | translate }}
+        </button>
+      </div>
+    }
+
+    @if (serviciosFiltrados().length === 0) {
+      <app-empty-state class="ls-empty" matIcon="filter_alt_off"
+                       [titulo]="'common.no_results' | translate"
+                       [texto]="'admin_service_types.no_results' | translate">
+        <button actions mat-stroked-button type="button" (click)="limpiarFiltros()">
+          {{ 'common.clear_filters' | translate }}
+        </button>
+      </app-empty-state>
+
+    } @else {
+
+      <!-- ── Tabla (desde 768px) ─────────────────────────────────────────── -->
+      <div class="ls-table-wrap">
+        <table class="ls-table">
           <thead>
             <tr>
-              @for (_ of [1,2,3,4,5]; track $index) {
-                <th><div class="skel skel--th"></div></th>
-              }
+              <th scope="col">{{ 'admin_service_types.col_code' | translate }}</th>
+              <th scope="col">{{ 'admin_service_types.col_name' | translate }}</th>
+              <th scope="col">{{ 'admin_service_types.col_description' | translate }}</th>
+              <th scope="col">{{ 'admin_service_types.col_active' | translate }}</th>
+              <th scope="col"><span class="cdk-visually-hidden">{{ 'admin_service_types.edit_btn' | translate }}</span></th>
             </tr>
           </thead>
           <tbody>
-            @for (_ of [1,2,3,4,5,6]; track $index) {
-              <tr>
-                <td><div class="skel skel--td skel--td-sm"></div></td>
-                <td><div class="skel skel--td skel--td-md"></div></td>
-                <td><div class="skel skel--td skel--td-lg"></div></td>
-                <td class="text-center"><div class="skel skel--td skel--td-icon mx-auto"></div></td>
-                <td><div class="skel skel--td skel--td-btn mx-auto"></div></td>
+            @for (s of serviciosPaginados(); track s.id) {
+              <tr class="ls-table__row is-link" (click)="irAEditar(s.id)">
+                <td class="ls-fig ls-nowrap">{{ s.codigo }}</td>
+                <td class="cl-name">
+                  <a class="ls-table__link" [id]="'asl-t-' + s.id"
+                     [routerLink]="['/admin/service-type/edit', s.id]"
+                     (click)="$event.stopPropagation()">{{ servicioNombre(s) }}</a>
+                </td>
+                <td><span class="cl-desc" [title]="servicioDescripcion(s)">{{ servicioDescripcion(s) || '—' }}</span></td>
+                <td><ng-container [ngTemplateOutlet]="tplActivo" [ngTemplateOutletContext]="{ $implicit: s.activo }" /></td>
+                <td class="ls-table__action" (click)="$event.stopPropagation()">
+                  <a mat-icon-button [routerLink]="['/admin/service-type/edit', s.id]"
+                     [attr.aria-label]="'admin_service_types.edit_btn' | translate"
+                     [attr.aria-describedby]="'asl-t-' + s.id"
+                     [matTooltip]="'admin_service_types.edit_btn' | translate">
+                    <mat-icon>edit</mat-icon>
+                  </a>
+                </td>
               </tr>
             }
           </tbody>
         </table>
       </div>
-    </div>
 
-  <!-- ── Error ──────────────────────────────────────────────────────────────── -->
-  } @else if (error()) {
-    <div class="error-alert" role="alert">
-      <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
-      <span>{{ error() }}</span>
-    </div>
-
-  <!-- ── Contenido ──────────────────────────────────────────────────────────── -->
-  } @else {
-
-    <!-- Filtros -->
-    <div class="filter-bar mb-3">
-
-      <div class="input-group mb-3">
-        <span class="input-group-text filter-bar__search-icon">
-          <i class="bi bi-search" aria-hidden="true"></i>
-        </span>
-        <input type="text" class="form-control filter-bar__search-input"
-               [placeholder]="'admin_service_types.search_placeholder' | translate"
-               [value]="busqueda()"
-               (input)="setBusqueda($event)">
-        @if (busqueda()) {
-          <button class="btn filter-bar__clear-btn" type="button" (click)="busqueda.set('')"
-                  [attr.aria-label]="'common.clear_filters' | translate">
-            <i class="bi bi-x-lg" aria-hidden="true"></i>
-          </button>
-        }
-      </div>
-
-      <div class="d-flex align-items-center gap-3 flex-wrap">
-        <span class="filter-bar__label">{{ 'admin_service_types.status_filter' | translate }}</span>
-        <div class="filter-chips" role="group">
-          @for (a of estadosActivo; track a) {
-            <button type="button" class="filter-chip"
-                    [class.filter-chip--active-todos]="filtroActivo() === a && a === 'todos'"
-                    [class.filter-chip--active-yes]="filtroActivo() === a && a === 'activo'"
-                    [class.filter-chip--active-no]="filtroActivo() === a && a === 'inactivo'"
-                    (click)="filtroActivo.set(a)">
-              {{ a === 'todos'    ? ('common.all'      | translate) :
-                 a === 'activo'  ? ('common.active'   | translate) :
-                                   ('common.inactive' | translate) }}
-            </button>
-          }
-        </div>
-        @if (hayFiltros()) {
-          <button class="filter-bar__reset" type="button" (click)="limpiarFiltros()">
-            <i class="bi bi-x-circle me-1" aria-hidden="true"></i>{{ 'common.clear_filters' | translate }}
-          </button>
-        }
-      </div>
-
-    </div>
-
-    <!-- Lista de servicios -->
-    <div class="card table-card">
-
-      @if (serviciosFiltrados().length === 0) {
-        <div class="empty-state">
-          @if (hayFiltros()) {
-            <i class="bi bi-funnel empty-state__icon" aria-hidden="true"></i>
-            <p class="empty-state__msg">{{ 'admin_service_types.no_results' | translate }}</p>
-          } @else {
-            <i class="bi bi-grid empty-state__icon" aria-hidden="true"></i>
-            <p class="empty-state__msg">{{ 'admin_service_types.no_data' | translate }}</p>
-          }
-        </div>
-
-      } @else {
-
-        <!-- Escritorio: tabla con filas clicables -->
-        <div class="table-responsive d-none d-lg-block">
-          <table class="table table-hover table-admin align-middle mb-0">
-            <thead>
-              <tr>
-                <th style="width:130px">{{ 'admin_service_types.col_code'       | translate }}</th>
-                <th style="width:220px">{{ 'admin_service_types.col_name'       | translate }}</th>
-                <th>                    {{ 'admin_service_types.col_description' | translate }}</th>
-                <th class="text-center" style="width:100px">{{ 'admin_service_types.col_active' | translate }}</th>
-                <th style="width:56px"></th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (s of serviciosPaginados(); track s.id) {
-                <tr class="row-clickable" tabindex="0" role="button"
-                    [attr.aria-label]="('admin_service_types.edit_btn' | translate) + ': ' + servicioNombre(s)"
-                    (click)="irAEditar(s.id)"
-                    (keydown.enter)="irAEditar(s.id)"
-                    (keydown.space)="$event.preventDefault(); irAEditar(s.id)">
-                  <td><span class="codigo-chip">{{ s.codigo }}</span></td>
-                  <td class="nombre-cell">{{ servicioNombre(s) }}</td>
-                  <td class="col-descripcion">{{ servicioDescripcion(s) || '—' }}</td>
-                  <td class="text-center">
-                    <span class="status-badge"
-                          [class.status-badge--active]="s.activo"
-                          [class.status-badge--inactive]="!s.activo">
-                      <i class="bi"
-                         [class.bi-check-circle]="s.activo"
-                         [class.bi-x-circle]="!s.activo"
-                         aria-hidden="true"></i>
-                      {{ (s.activo ? 'common.active' : 'common.inactive') | translate }}
-                    </span>
-                  </td>
-                  <td class="text-center">
-                    <a [routerLink]="['/admin/service-type/edit', s.id]"
-                       class="btn-icon-edit"
-                       [title]="'admin_service_types.edit_btn' | translate"
-                       (click)="$event.stopPropagation()">
-                      <i class="bi bi-pencil-square" aria-hidden="true"></i>
-                    </a>
-                  </td>
-                </tr>
+      <!-- ── Tarjetas (móvil) ────────────────────────────────────────────── -->
+      <ul class="ls-grid is-mobile-only">
+        @for (s of serviciosPaginados(); track s.id) {
+          <li class="ls-card is-plain" [class.is-off]="!s.activo">
+            <div class="ls-card__body">
+              <span class="ls-tags">
+                <span class="ls-tag ls-fig">{{ s.codigo }}</span>
+                <ng-container [ngTemplateOutlet]="tplActivo" [ngTemplateOutletContext]="{ $implicit: s.activo }" />
+              </span>
+              <h2 class="ls-card__title">
+                <a class="ls-card__link" [routerLink]="['/admin/service-type/edit', s.id]"
+                   [attr.aria-label]="('admin_service_types.edit_btn' | translate) + ' : ' + servicioNombre(s)">{{ servicioNombre(s) }}</a>
+              </h2>
+              @if (servicioDescripcion(s)) {
+                <p class="cl-card-desc">{{ servicioDescripcion(s) }}</p>
               }
-            </tbody>
-          </table>
-        </div>
+            </div>
+          </li>
+        }
+      </ul>
 
-        <!-- Móvil: tarjetas clicables (sin scroll lateral) -->
-        <div class="cm-cards d-lg-none">
-          @for (s of serviciosPaginados(); track s.id) {
-            <button type="button" class="cm-card" (click)="irAEditar(s.id)"
-                    [attr.aria-label]="('admin_service_types.edit_btn' | translate) + ': ' + servicioNombre(s)">
-              <div class="cm-card__top">
-                <span class="codigo-chip">{{ s.codigo }}</span>
-                <span class="status-badge"
-                      [class.status-badge--active]="s.activo"
-                      [class.status-badge--inactive]="!s.activo">
-                  <i class="bi"
-                     [class.bi-check-circle]="s.activo"
-                     [class.bi-x-circle]="!s.activo"
-                     aria-hidden="true"></i>
-                  {{ (s.activo ? 'common.active' : 'common.inactive') | translate }}
-                </span>
-              </div>
-              <div class="cm-card__body">
-                <span class="cm-card__name">{{ servicioNombre(s) }}</span>
-                @if (servicioDescripcion(s)) {
-                  <span class="cm-card__desc">{{ servicioDescripcion(s) }}</span>
-                }
-              </div>
-            </button>
-          }
-        </div>
-
-      }
-
-      <div class="table-card__footer">
-        <app-pagination
-          [total]="serviciosFiltrados().length"
-          [page]="paginaActual()"
-          [pageSize]="POR_PAGINA"
-          (pageChange)="paginaActual.set($event)">
-        </app-pagination>
-      </div>
-    </div>
-
+      <app-pagination [total]="serviciosFiltrados().length" [page]="paginaActual()" [pageSize]="POR_PAGINA"
+                      (pageChange)="paginaActual.set($event)" />
+    }
   }
-
 </div>
+
+<ng-template #tplActivo let-activo>
+  @if (activo) {
+    <span class="ls-tag is-ok"><mat-icon aria-hidden="true">check_circle</mat-icon>{{ 'common.active' | translate }}</span>
+  } @else {
+    <span class="ls-tag is-muted"><mat-icon aria-hidden="true">block</mat-icon>{{ 'common.inactive' | translate }}</span>
+  }
+</ng-template>

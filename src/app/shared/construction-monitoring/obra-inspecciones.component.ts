@@ -12,6 +12,11 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { map } from 'rxjs';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../services/auth-supabase.service';
 import { SeguimientoService } from '../../services/seguimiento.service';
@@ -22,7 +27,9 @@ interface CalDia { num: number; tipo: 'vacio' | 'normal' | 'trabajado' | 'hoy' |
 @Component({
   selector: 'app-obra-inspecciones',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe],
+  imports: [
+    TranslatePipe, MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatIconModule, MatInputModule,
+  ],
   templateUrl: './obra-inspecciones.component.html',
   styleUrl: './obra-inspecciones.component.css',
 })
@@ -65,7 +72,13 @@ export class ObraInspeccionesComponent implements OnInit, OnDestroy {
   errorInsp   = signal<string | null>(null);
 
   readonly fechaHoy = this.fechaISO(new Date());
-  readonly CAL_HEADERS = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+
+  /** Iniciales de lunes a domingo en el idioma activo (antes, fijas en español). */
+  calCabeceras = computed(() => {
+    const fmt = new Intl.DateTimeFormat(this.langLocale(), { weekday: 'narrow' });
+    // 5 de enero de 2026 es lunes.
+    return Array.from({ length: 7 }, (_, i) => fmt.format(new Date(2026, 0, 5 + i)));
+  });
 
   // Realtime: refresco en vivo cuando se agenda/elimina una inspección.
   private channel: RealtimeChannel | null = null;
@@ -246,9 +259,9 @@ export class ObraInspeccionesComponent implements OnInit, OnDestroy {
 
   mesCorto(fecha: string): string {
     const raw = fecha.includes('T') ? fecha.split('T')[0] : fecha;
+    // Sentence case: sin mayúsculas forzadas.
     return new Intl.DateTimeFormat(this.langLocale(), { month: 'short' })
       .format(new Date(`${raw}T00:00:00`))
-      .toUpperCase()
       .replace('.', '');
   }
 

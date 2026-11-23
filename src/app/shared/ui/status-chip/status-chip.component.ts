@@ -20,9 +20,21 @@ const TONO: Record<string, Tono> = {
   pendiente:     'atencion',
   aceptada:      'ok',
   rechazada:     'error',
+  // Contratos: la firma pendiente es una decisión del cliente.
+  generado:      'atencion',
+  firmado:       'ok',
+  en_ejecucion:  'info',
+  completado:    'ok',
+  // Seguimiento de obra (`seguimiento_estado.`): la pausa pide atención.
+  no_iniciado:   'neutro',
+  en_progreso:   'info',
+  pausado:       'atencion',
 };
 
-/** Etiqueta de estado de un dossier u oferta: texto `state.<estado>` sobre fondo suave. */
+/**
+ * Etiqueta de estado de un dossier, oferta o contrato: texto `<prefijo><estado>`
+ * (por defecto `state.<estado>`) sobre fondo suave.
+ */
 @Component({
   selector: 'app-status-chip',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -34,12 +46,14 @@ const TONO: Record<string, Tono> = {
               stroke-linecap="round" stroke-linejoin="round" />
       </svg>
     }
-    {{ ('state.' + estado()) | translate }}
+    {{ (prefijo() + estado()) | translate }}
   `,
   styleUrl: './status-chip.component.css',
   host: { '[attr.data-tono]': 'tono()' },
 })
 export class StatusChipComponent {
   estado = input.required<string>();
+  /** Prefijo de la clave i18n: `contract_list.status_` para contratos. */
+  prefijo = input('state.');
   protected tono = computed<Tono>(() => TONO[this.estado()] ?? 'neutro');
 }

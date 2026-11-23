@@ -1,574 +1,347 @@
-﻿<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     LIGHTBOX
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-@if (fotoAmpliada()) {
-  <div class="lightbox-overlay" (click)="cerrarFoto()">
-    <button class="lightbox-close" type="button" (click)="cerrarFoto()"
-            [title]="'common.close' | translate">
-      <i class="bi bi-x-lg"></i>
-    </button>
-    <div class="lightbox-container" (click)="$event.stopPropagation()">
-      <img [src]="fotoAmpliada()!" class="lightbox-img" alt="" />
-    </div>
-  </div>
-}
+﻿<div class="page-wrapper mof">
 
-<div class="page-wrapper">
-
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       ESTADO: CARGANDO
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ── Cargando ────────────────────────────────────────────────────────── -->
   @if (cargando()) {
-    <div class="page-loading">
-      <div class="spinner-border spinner-border-sm me-2" style="color:var(--ds-gold)" role="status">
-        <span class="visually-hidden">Cargandoâ€¦</span>
-      </div>
-      <span class="text-ink-muted">{{ 'common.loading' | translate }}</span>
+    <div class="mof-skel" role="status">
+      <span class="cdk-visually-hidden">{{ 'common.loading' | translate }}</span>
+      <span class="skel skel--title" aria-hidden="true"></span>
+      <span class="mof-skel__cols" aria-hidden="true">
+        <span class="skel skel--offer"></span>
+        <span class="skel skel--file"></span>
+      </span>
     </div>
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       ESTADO: NO ENCONTRADO
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ── No encontrada ───────────────────────────────────────────────────── -->
   } @else if (!detalle()) {
-    <div class="empty-wrap">
-      <div class="card card-premium text-center px-4 py-5">
-        <div class="empty-icon mx-auto mb-4">
-          <i class="bi bi-exclamation-triangle"></i>
-        </div>
-        <h2 class="empty-title mb-2">{{ 'my_offer.not_found' | translate }}</h2>
-        @if (errorMsg()) {
-          <p class="text-danger small mb-3">{{ errorMsg() | translate }}</p>
-        }
-        <div>
-          <button class="btn btn-outline-secondary" type="button" (click)="volver()">
-            <i class="bi bi-arrow-left me-1"></i>{{ 'common.back' | translate }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <app-empty-state class="mof-missing"
+                     matIcon="search_off"
+                     [titulo]="'my_offer.not_found' | translate"
+                     [texto]="errorMsg() ? (errorMsg() | translate) : ''">
+      <a actions mat-stroked-button routerLink="/builder/my-offers">
+        <mat-icon>arrow_back</mat-icon>
+        {{ 'my_offer.back_btn' | translate }}
+      </a>
+    </app-empty-state>
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       CONTENIDO PRINCIPAL
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
   } @else {
+    @let d = detalle()!;
+    @let titulo = serviciosTexto();
+    <!-- Archivado, el servicio no devuelve servicio, número ni dirección: el
+         aviso pasa a ser la cabecera para no repetirlo dos veces. -->
+    @let archivadoSinDatos = d.estado === 'archivado' && !hay(titulo);
 
-    <!-- â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-    <header class="card card-premium mb-4 fade-up"
-            [class.header--accepted]="detalle()!.estado === 'aceptada'"
-            [class.header--rejected]="detalle()!.estado === 'rechazada'">
-      <div class="card-body px-4 px-lg-5 py-4">
-        <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
-
-          <div class="d-flex align-items-center gap-3">
-            <button class="btn-back" type="button" (click)="volver()"
-                    [title]="'my_offer.back_btn' | translate">
-              <i class="bi bi-arrow-left"></i>
-            </button>
-            <div>
-              <span class="eyebrow mb-1 d-block">
-                <i class="bi bi-list-check me-1"></i>{{ 'role.constructeur' | translate }}
-              </span>
-              <div class="d-flex align-items-center gap-2 flex-wrap">
-                <span class="exp-num">{{ detalle()!.expediente_numero }}</span>
-                <span class="estado-badge"
-                      [class.estado-badge--pending]="detalle()!.estado === 'pendiente'"
-                      [class.estado-badge--accepted]="detalle()!.estado === 'aceptada'"
-                      [class.estado-badge--rejected]="detalle()!.estado === 'rechazada'"
-                      [class.estado-badge--archived]="detalle()!.estado === 'archivado'">
-                  <i class="bi {{ estadoIcon(detalle()!.estado) }} me-1"></i>
-                  {{ ('state.' + detalle()!.estado) | translate }}
-                </span>
-              </div>
-              <p class="text-ink-secondary mt-1 mb-0" style="font-size:var(--ds-text-sm)">
-                {{ serviciosTexto() }}
-              </p>
-            </div>
-          </div>
-
-          <div class="price-hero">
-            <span class="price-hero__label">{{ 'my_offer.total_price' | translate }}</span>
-            <span class="price-hero__value">{{ formatCosto(detalle()!.precio) }}</span>
-            @if (detalle()!.plazo_semanas_min || detalle()!.plazo_semanas_max) {
-              <span class="price-hero__sub">
-                <i class="bi bi-calendar-range me-1"></i>
-                {{ formatPlazo(detalle()!.plazo_semanas_min, detalle()!.plazo_semanas_max) }}
-              </span>
-            }
-          </div>
-
-        </div>
+    <!-- ── Cabecera ──────────────────────────────────────────────────────── -->
+    <header class="mof-head">
+      <a mat-button class="mof-back" routerLink="/builder/my-offers">
+        <mat-icon>arrow_back</mat-icon>
+        {{ 'my_offer.back_btn' | translate }}
+      </a>
+      <app-page-header [titulo]="archivadoSinDatos ? ('archivo.titulo_expediente' | translate) : titulo"
+                       [contexto]="archivadoSinDatos ? ('archivo.texto_oferta' | translate) : ''" />
+      <div class="mof-meta">
+        @if (hay(d.expediente_numero)) {
+          <span class="mof-fig">{{ d.expediente_numero }}</span>
+        }
+        <app-status-chip [estado]="d.estado" />
       </div>
     </header>
 
     <!-- Expediente archivado: la oferta queda archivada y los trabajos no se harán. -->
-    @if (detalle()!.estado === 'archivado') {
-      <app-aviso-archivado class="mb-4" ambito="oferta" />
+    @if (d.estado === 'archivado' && !archivadoSinDatos) {
+      <app-aviso-archivado ambito="oferta" />
     }
 
-    <!-- â”€â”€ Main grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-    <div class="row g-4 align-items-start">
+    <div class="mof-layout">
 
-      <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-           COLUMNA IZQUIERDA â€” Contexto del expediente + Media + DescripciÃ³n + Adjuntos
-      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-      <div class="col-lg-7 d-flex flex-column gap-3 fade-up" style="--delay:80ms">
-
-        <!-- â”€â”€ Contexto del expediente â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-        <div class="info-card">
-          <div class="info-card__header">
-            <span class="section-heading">
-              <i class="bi bi-clipboard2-data me-2"></i>{{ 'my_offer.section_file' | translate }}
-            </span>
+      <!-- ════ Lo suyo: la oferta y su video de presentación ════ -->
+      <div class="mof-col">
+        <section class="mof-card mof-offer" aria-labelledby="mof-offer-title">
+          <div class="mof-offer__head">
+            <h2 id="mof-offer-title" class="mof-h2">{{ 'my_offer.section_summary' | translate }}</h2>
+            <p class="mof-sent">
+              {{ 'my_offer.sent_on' | translate }} <span class="mof-fig">{{ formatFecha(d.creado_en) }}</span>
+            </p>
           </div>
 
-          <div class="context-row">
-            <div class="context-icon context-icon--service"><i class="bi bi-tools"></i></div>
-            <div class="context-content">
+          <!-- Dónde está la decisión del cliente (el aviso de archivo va arriba). -->
+          @switch (d.estado) {
+            @case ('aceptada') {
+              <div class="mof-state is-ok">
+                <mat-icon aria-hidden="true">check_circle</mat-icon>
+                <p>
+                  <strong>{{ 'my_offer.accepted_title' | translate }}</strong>
+                  {{ 'my_offer.accepted_sub' | translate }}
+                </p>
+              </div>
+            }
+            @case ('rechazada') {
+              <div class="mof-state is-out">
+                <mat-icon aria-hidden="true">info</mat-icon>
+                <p>
+                  <strong>{{ 'my_offer.rejected_title' | translate }}</strong>
+                  {{ 'my_offer.rejected_sub' | translate }}
+                </p>
+              </div>
+            }
+            @case ('pendiente') {
+              <div class="mof-state is-wait">
+                <mat-icon aria-hidden="true">hourglass_top</mat-icon>
+                <p>
+                  <strong>{{ 'my_offer.pending_title' | translate }}</strong>
+                  {{ 'my_offer.pending_sub' | translate }}
+                </p>
+              </div>
+            }
+          }
+
+          <dl class="mof-terms">
+            <div class="mof-price">
+              <dt>{{ 'my_offer.total_price' | translate }}</dt>
+              <dd class="mof-fig">{{ formatCosto(d.precio) }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'my_offer.estimated_deadline' | translate }}</dt>
+              <dd class="mof-fig">{{ formatPlazo(d.plazo_semanas_min, d.plazo_semanas_max) }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'my_offer.start_date' | translate }}</dt>
+              <dd class="mof-fig">{{ formatFecha(d.fecha_inicio) }}</dd>
+            </div>
+            @if (d.garantia_anos) {
+              <div>
+                <dt>{{ 'offer.warranty' | translate }}</dt>
+                <dd><span class="mof-fig">{{ d.garantia_anos }}</span> {{ 'offer.years' | translate }}</dd>
+              </div>
+            }
+          </dl>
+
+          <div class="mof-block">
+            <h3 class="mof-label">{{ 'my_offer.section_approach' | translate }}</h3>
+            <p class="mof-prose">{{ d.descripcion || SIN_DATO }}</p>
+          </div>
+
+          <div class="mof-block">
+            <h3 class="mof-label">{{ 'my_offer.section_attachments' | translate }}</h3>
+
+            <div class="mof-sub">
+              <p class="mof-sub__label">{{ 'my_offer.offer_docs' | translate }}</p>
+              @if (documentos().length === 0) {
+                <p class="mof-muted">{{ 'my_offer.no_docs_adj' | translate }}</p>
+              } @else {
+                <ul class="mof-files">
+                  @for (doc of documentos(); track doc.id) {
+                    <li class="mof-file">
+                      <mat-icon class="mof-file__icon" aria-hidden="true">picture_as_pdf</mat-icon>
+                      <span class="mof-file__text">
+                        <span class="mof-file__name">{{ doc.nombre_archivo }}</span>
+                        <span class="mof-file__size">{{ formatTamano(doc.tamano_bytes) }}</span>
+                      </span>
+                      <a mat-button class="mof-file__act" [href]="publicUrl(doc.url_storage)" target="_blank" rel="noopener"
+                         [attr.aria-label]="('common.open' | translate) + ' ' + doc.nombre_archivo">
+                        <mat-icon>open_in_new</mat-icon>
+                        {{ 'common.open' | translate }}
+                      </a>
+                    </li>
+                  }
+                </ul>
+              }
+            </div>
+
+            <!-- Videos de la oferta: el formulario ya no los pide; sólo se
+                 muestran los que ya había o los que agregó el administrador. -->
+            @if (videos().length) {
+              <div class="mof-sub">
+                <p class="mof-sub__label">{{ 'my_offer.offer_video' | translate }}</p>
+                <ul class="mof-files">
+                  @for (v of videos(); track v.id) {
+                    <li class="mof-file">
+                      <mat-icon class="mof-file__icon" aria-hidden="true">movie</mat-icon>
+                      <span class="mof-file__text">
+                        <span class="mof-file__name">{{ v.nombre_archivo }}</span>
+                        <span class="mof-file__size">{{ formatTamano(v.tamano_bytes) }}</span>
+                      </span>
+                      <button mat-button type="button" class="mof-file__act" (click)="verVideo(v)"
+                              [attr.aria-label]="('builder_offer.play' | translate) + ' ' + v.nombre_archivo">
+                        <mat-icon>play_arrow</mat-icon>
+                        {{ 'builder_offer.play' | translate }}
+                      </button>
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
+          </div>
+
+          <!-- Mientras el cliente no decide, la oferta se puede cambiar. No es la
+               siguiente etapa: va en abeto, no en tomate. -->
+          @if (d.estado === 'pendiente') {
+            <div class="mof-actions">
+              <button mat-flat-button type="button" (click)="editarOferta()">
+                <mat-icon>edit</mat-icon>
+                {{ 'my_offer.edit_btn' | translate }}
+              </button>
+            </div>
+          }
+        </section>
+
+        @if (user()?.id; as constructorId) {
+          <!-- Video de presentación del constructor (opcional), como en la
+               oferta: se enlaza al expediente y cada acción se guarda al
+               momento. Sólo se cambia mientras la oferta está pendiente. -->
+          <section class="mof-card" aria-labelledby="mof-video-title">
+            <h2 id="mof-video-title" class="mof-h2">
+              {{ 'expediente_video.title' | translate }}
+              <span class="mof-tag">{{ 'common.optional' | translate }}</span>
+            </h2>
+            <app-video-expediente [expedienteId]="d.expediente_id"
+                                  [perfilId]="constructorId"
+                                  [numero]="d.expediente_numero"
+                                  [editable]="d.estado === 'pendiente'" />
+          </section>
+        }
+      </div>
+
+      <!-- ════ El dossier ════ -->
+      <div class="mof-col">
+
+        <section class="mof-card" aria-labelledby="mof-file-title">
+          <h2 id="mof-file-title" class="mof-h2">{{ 'my_offer.section_file' | translate }}</h2>
+          <dl class="mof-facts">
+            <div class="mof-fact">
               @let nombres = serviciosNombres();
               @if (nombres.length > 1) {
                 <!-- Varios: uno por línea, en el orden del expediente -->
-                <p class="context-label" id="mof-servicios-label">{{ 'offer_services.label' | translate }}</p>
-                <ul class="context-list" aria-labelledby="mof-servicios-label">
-                  @for (n of nombres; track n) {
-                    <li class="context-value">{{ n }}</li>
-                  }
-                </ul>
+                <dt>{{ 'offer_services.label' | translate }}</dt>
+                <dd>
+                  <ul class="mof-list">
+                    @for (n of nombres; track n) { <li>{{ n }}</li> }
+                  </ul>
+                </dd>
               } @else {
-                <p class="context-label">{{ 'my_offer.service' | translate }}</p>
-                <p class="context-value mb-0">{{ serviciosTexto() }}</p>
+                <dt>{{ 'my_offer.service' | translate }}</dt>
+                <dd>{{ hay(titulo) ? titulo : SIN_DATO }}</dd>
               }
             </div>
-          </div>
-
-          <div class="context-divider"></div>
-
-          <div class="context-row">
-            <div class="context-icon context-icon--location"><i class="bi bi-geo-alt"></i></div>
-            <div class="context-content">
-              <p class="context-label">{{ 'common.address' | translate }}</p>
-              <p class="context-value mb-1">{{ detalle()!.canton }}, {{ detalle()!.provincia }}</p>
-              <p class="context-sub mb-0">{{ detalle()!.distrito }} Â· {{ detalle()!.direccion }}</p>
-              @if (detalle()!.referencia) {
-                <p class="context-sub mb-0">{{ detalle()!.referencia }}</p>
-              }
-            </div>
-          </div>
-
-          <div class="context-divider"></div>
-
-          <div class="context-row">
-            <div class="context-icon context-icon--date"><i class="bi bi-calendar3"></i></div>
-            <div class="context-content">
-              <p class="context-label">{{ 'my_offer.scheduled_visit' | translate }}</p>
-              <p class="context-value mb-0">
-                {{ formatFecha(detalle()!.fecha_visita) }}
-                @if (formatHora(detalle()!.fecha_visita) !== 'â€”') {
-                  <span class="context-time">Â· {{ formatHora(detalle()!.fecha_visita) }}</span>
+            <div class="mof-fact">
+              <dt>{{ 'common.address' | translate }}</dt>
+              <dd>
+                @if (hay(d.canton)) {
+                  {{ d.canton }}, {{ d.provincia }}
+                  @if (hay(d.direccion)) {
+                    <span class="mof-fact__sub">{{ d.direccion }}{{ hay(d.distrito) ? ', ' + d.distrito : '' }}</span>
+                  }
+                  @if (hay(d.referencia)) {
+                    <span class="mof-fact__sub">{{ d.referencia }}</span>
+                  }
+                } @else {
+                  {{ SIN_DATO }}
                 }
-              </p>
+              </dd>
             </div>
-          </div>
-
-          <div class="context-divider"></div>
-
-          <div class="context-row">
-            <div class="context-icon context-icon--visit"><i class="bi bi-calendar-check"></i></div>
-            <div class="context-content">
-              <p class="context-label">{{ 'my_offer.estimator_visit' | translate }}</p>
-              <p class="context-value mb-0">
-                {{ formatFecha(detalle()!.fecha_visita_real) }}
-                @if (formatHora(detalle()!.fecha_visita_real) !== 'â€”') {
-                  <span class="context-time">Â· {{ formatHora(detalle()!.fecha_visita_real) }}</span>
+            <div class="mof-fact is-half">
+              <dt>{{ 'my_offer.scheduled_visit' | translate }}</dt>
+              <dd class="mof-fig">
+                {{ formatFecha(d.fecha_visita) }}
+                @if (formatHora(d.fecha_visita) !== SIN_DATO) {
+                  <span class="mof-fact__sub">{{ formatHora(d.fecha_visita) }}</span>
                 }
-              </p>
+              </dd>
             </div>
-          </div>
-
-          @if (detalle()!.descripcion_problemas) {
-            <div class="context-divider"></div>
-            <div class="context-row context-row--last">
-              <div class="context-icon context-icon--warn"><i class="bi bi-exclamation-triangle"></i></div>
-              <div class="context-content">
-                <p class="context-label">{{ 'my_offer.problems_noted' | translate }}</p>
-                <p class="context-sub context-sub--pre mb-0">{{ detalle()!.descripcion_problemas }}</p>
+            <div class="mof-fact is-half">
+              <dt>{{ 'my_offer.estimator_visit' | translate }}</dt>
+              <dd class="mof-fig">
+                {{ formatFecha(d.fecha_visita_real) }}
+                @if (formatHora(d.fecha_visita_real) !== SIN_DATO) {
+                  <span class="mof-fact__sub">{{ formatHora(d.fecha_visita_real) }}</span>
+                }
+              </dd>
+            </div>
+            @if (d.descripcion_problemas) {
+              <div class="mof-fact">
+                <dt>{{ 'my_offer.problems_noted' | translate }}</dt>
+                <dd class="mof-fact__notes">{{ d.descripcion_problemas }}</dd>
               </div>
+            }
+          </dl>
+        </section>
+
+        <!-- Visita 3D -->
+        <section class="mof-section" aria-labelledby="mof-tour-title">
+          <h2 id="mof-tour-title" class="mof-h2">
+            {{ 'my_offer.tab_tour' | translate }}
+            @if (urlsTour.length > 1) { <span class="mof-count">{{ urlsTour.length }}</span> }
+          </h2>
+          @if (urlsTour.length > 0) {
+            <div class="mof-tours">
+              @for (url of urlsTour; track $index) {
+                <app-tour-poster [url]="url" [titulo]="tituloTour($index)" />
+              }
             </div>
+          } @else {
+            <p class="mof-muted">{{ 'my_offer.no_tour' | translate }}</p>
           }
-        </div>
+        </section>
 
-        <!-- â”€â”€ Archivos del expediente â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-        <div class="info-card overflow-hidden">
-
-          <div class="media-tabs">
-            <button class="media-tab" type="button"
-                    [class.media-tab--active]="tabMedia() === 'tour'"
-                    (click)="tabMedia.set('tour')">
-              <i class="bi bi-camera-video me-1"></i>{{ 'my_offer.tab_tour' | translate }}
-              @if (urlsTour.length > 0) {
-                <span class="media-tab__count">{{ urlsTour.length }}</span>
+        <!-- Fotos y documentos del dossier -->
+        <section class="mof-card" aria-labelledby="mof-photos-title">
+          <h2 id="mof-photos-title" class="mof-h2">
+            {{ 'my_offer.tab_photos' | translate }}
+            @if (fotosExp().length) { <span class="mof-count">{{ fotosExp().length }}</span> }
+          </h2>
+          @if (fotosExp().length === 0) {
+            <p class="mof-muted">{{ 'my_offer.no_photos' | translate }}</p>
+          } @else {
+            <ul class="mof-photos">
+              @for (f of fotosExp(); track f.id) {
+                <li>
+                  <button type="button" class="mof-photo" (click)="verFoto(f)" [attr.aria-label]="f.nombre_archivo">
+                    <img [src]="publicUrl(f.url_storage)" alt="" loading="lazy" />
+                  </button>
+                </li>
               }
-            </button>
-            <button class="media-tab" type="button"
-                    [class.media-tab--active]="tabMedia() === 'fotos'"
-                    (click)="tabMedia.set('fotos')">
-              <i class="bi bi-images me-1"></i>{{ 'my_offer.tab_photos' | translate }}
-              @if (fotosExp().length > 0) {
-                <span class="media-tab__count">{{ fotosExp().length }}</span>
-              }
-            </button>
-            <button class="media-tab" type="button"
-                    [class.media-tab--active]="tabMedia() === 'docs'"
-                    (click)="tabMedia.set('docs')">
-              <i class="bi bi-file-earmark-text me-1"></i>{{ 'my_offer.tab_docs' | translate }}
-              @if (documentosExp().length > 0) {
-                <span class="media-tab__count">{{ documentosExp().length }}</span>
-              }
-            </button>
-          </div>
-
-          <!-- Tab: Tour 3D -->
-          @if (tabMedia() === 'tour') {
-            <div class="tab-body">
-              @if (urlsTour.length === 0) {
-                <div class="media-empty">
-                  <i class="bi bi-camera-video"></i>
-                  <span>{{ 'my_offer.no_tour' | translate }}</span>
-                </div>
-              } @else {
-                <div class="d-flex flex-column gap-3">
-                  @for (url of urlsTour; track $index) {
-                    <div>
-                      <p class="tour-label">
-                        <i class="bi bi-camera-video me-1"></i>
-                        {{ 'estimator_file.tour_video_n' | translate:{ n: $index + 1 } }}
-                      </p>
-                      <div class="ratio ratio-16x9 rounded-3 overflow-hidden">
-                        <iframe [src]="getSafeUrl(url)" allowfullscreen
-                                allow="xr-spatial-tracking"
-                                [title]="'Video ' + ($index + 1)"></iframe>
-                      </div>
-                    </div>
-                  }
-                </div>
-              }
-            </div>
+            </ul>
           }
 
-          <!-- Tab: Fotos -->
-          @if (tabMedia() === 'fotos') {
-            <div class="tab-body">
-              @if (fotosExp().length === 0) {
-                <div class="media-empty">
-                  <i class="bi bi-image"></i>
-                  <span>{{ 'my_offer.no_photos' | translate }}</span>
-                </div>
-              } @else {
-                <div class="photos-grid">
-                  @for (f of fotosExp(); track f.id) {
-                    <button class="photo-thumb" type="button"
-                            (click)="abrirFoto(f)" [title]="f.nombre_archivo">
-                      <img [src]="publicUrl(f.url_storage)"
-                           class="photo-thumb__img" [alt]="f.nombre_archivo" />
-                      <div class="photo-thumb__overlay" aria-hidden="true">
-                        <i class="bi bi-zoom-in"></i>
-                      </div>
-                    </button>
-                  }
-                </div>
-              }
-            </div>
-          }
-
-          <!-- Tab: Documentos -->
-          @if (tabMedia() === 'docs') {
-            <div class="tab-body tab-body--compact">
-              @if (documentosExp().length === 0) {
-                <div class="media-empty">
-                  <i class="bi bi-file-earmark"></i>
-                  <span>{{ 'my_offer.no_docs' | translate }}</span>
-                </div>
-              } @else {
-                <div class="file-list">
-                  @for (d of documentosExp(); track d.id) {
-                    <div class="file-row">
-                      <div class="file-row__icon file-row__icon--doc">
-                        <i class="bi bi-file-earmark-text"></i>
-                      </div>
-                      <div class="file-row__info">
-                        <span class="file-row__name">{{ d.nombre_archivo }}</span>
-                        <span class="file-row__meta">{{ formatTamano(d.tamano_bytes) }}</span>
-                      </div>
-                      <button class="btn btn-outline-secondary btn-sm flex-shrink-0"
-                              type="button" (click)="verArchivo(d)"
-                              [title]="'common.open' | translate">
-                        <i class="bi bi-box-arrow-up-right"></i>
-                      </button>
-                    </div>
-                  }
-                </div>
-              }
-            </div>
-          }
-
-        </div>
-
-        <!-- Video del estimador: con él se presenta en el expediente. El
-             constructor sólo lo ve; no lo cambia ni lo quita. -->
-        @if (user()?.id; as constructorId) {
-          <div class="info-card">
-            <div class="info-card__header">
-              <span class="section-heading">
-                <i class="bi bi-person-video3 me-2"></i>{{ 'my_offer.section_estimator_video' | translate }}
-              </span>
-            </div>
-            <div class="info-card__body">
-              <app-videos-expediente-lectura [expedienteId]="detalle()!.expediente_id"
-                                             [perfilId]="constructorId"
-                                             ayuda="my_offer.estimator_video_hint"
-                                             vacio="my_offer.estimator_video_empty" />
-            </div>
-          </div>
-        }
-
-        <!-- â”€â”€ DescripciÃ³n del enfoque â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-        <div class="info-card">
-          <div class="info-card__header">
-            <span class="section-heading">
-              <i class="bi bi-text-paragraph me-2"></i>{{ 'my_offer.section_approach' | translate }}
-            </span>
-          </div>
-          <div class="p-4">
-            <p class="desc-text">{{ detalle()!.descripcion || 'â€”' }}</p>
-          </div>
-        </div>
-
-        <!-- â”€â”€ Adjuntos de la oferta â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-        <div class="info-card overflow-hidden">
-          <div class="info-card__header">
-            <span class="section-heading">
-              <i class="bi bi-paperclip me-2"></i>{{ 'my_offer.section_attachments' | translate }}
-            </span>
-          </div>
-
-          <!-- PDFs -->
-          <div class="attach-section">
-            <p class="attach-section__label">{{ 'my_offer.offer_docs' | translate }}</p>
-            @if (documentos().length === 0) {
-              <p class="attach-section__empty">{{ 'my_offer.no_docs_adj' | translate }}</p>
+          <div class="mof-block">
+            <h3 class="mof-label">
+              {{ 'my_offer.tab_docs' | translate }}
+              @if (documentosExp().length) { <span class="mof-count">{{ documentosExp().length }}</span> }
+            </h3>
+            @if (documentosExp().length === 0) {
+              <p class="mof-muted">{{ 'my_offer.no_docs' | translate }}</p>
             } @else {
-              <div class="file-list">
-                @for (d of documentos(); track d.id) {
-                  <div class="file-row">
-                    <div class="file-row__icon file-row__icon--doc">
-                      <i class="bi bi-file-earmark-pdf"></i>
-                    </div>
-                    <div class="file-row__info">
-                      <span class="file-row__name">{{ d.nombre_archivo }}</span>
-                      <span class="file-row__meta">{{ formatTamano(d.tamano_bytes) }}</span>
-                    </div>
-                    <button class="btn btn-outline-secondary btn-sm flex-shrink-0"
-                            type="button" (click)="verArchivo(d)"
-                            [title]="'common.open' | translate">
-                      <i class="bi bi-box-arrow-up-right"></i>
-                    </button>
-                  </div>
+              <ul class="mof-files">
+                @for (doc of documentosExp(); track doc.id) {
+                  <li class="mof-file">
+                    <mat-icon class="mof-file__icon" aria-hidden="true">description</mat-icon>
+                    <span class="mof-file__text">
+                      <span class="mof-file__name">{{ doc.nombre_archivo }}</span>
+                      <span class="mof-file__size">{{ formatTamano(doc.tamano_bytes) }}</span>
+                    </span>
+                    <a mat-button class="mof-file__act" [href]="publicUrl(doc.url_storage)" target="_blank" rel="noopener"
+                       [attr.aria-label]="('common.open' | translate) + ' ' + doc.nombre_archivo">
+                      <mat-icon>open_in_new</mat-icon>
+                      {{ 'common.open' | translate }}
+                    </a>
+                  </li>
                 }
-              </div>
+              </ul>
             }
           </div>
+        </section>
 
-          <!-- Videos de la oferta: el formulario ya no los pide; sólo se
-               muestran los que ya había o los que agregó el administrador. -->
-          @if (videos().length) {
-            <div class="attach-divider"></div>
-            <div class="attach-section">
-              <p class="attach-section__label">{{ 'my_offer.offer_video' | translate }}</p>
-              <div class="file-list">
-                @for (v of videos(); track v.id) {
-                  <div class="file-row" [class.file-row--playing]="videoActivo()?.id === v.id">
-                    <div class="file-row__icon file-row__icon--video">
-                      <i class="bi bi-play-circle"></i>
-                    </div>
-                    <div class="file-row__info">
-                      <span class="file-row__name">{{ v.nombre_archivo }}</span>
-                      <span class="file-row__meta">{{ formatTamano(v.tamano_bytes) }}</span>
-                    </div>
-                    <div class="d-flex gap-1 flex-shrink-0">
-                      <button class="video-toggle-btn"
-                              [class.video-toggle-btn--active]="videoActivo()?.id === v.id"
-                              type="button" (click)="toggleVideo(v)">
-                        <i class="bi"
-                           [class.bi-stop-circle]="videoActivo()?.id === v.id"
-                           [class.bi-play-circle]="videoActivo()?.id !== v.id"></i>
-                      </button>
-                      <button class="btn btn-outline-secondary btn-sm"
-                              type="button" (click)="verArchivo(v)"
-                              [title]="'common.open' | translate">
-                        <i class="bi bi-box-arrow-up-right"></i>
-                      </button>
-                    </div>
-                  </div>
-                  @if (videoActivo()?.id === v.id) {
-                    <div class="video-player">
-                      <video controls autoplay class="video-player__el"
-                             [src]="publicUrl(v.url_storage)">
-                      </video>
-                    </div>
-                  }
-                }
-              </div>
-            </div>
-          }
-
-        </div>
-
-        <!-- Video de presentación del constructor (opcional), como en la
-             oferta: se enlaza al expediente y cada acción se guarda al
-             momento. Sólo se cambia mientras la oferta está pendiente. -->
         @if (user()?.id; as constructorId) {
-          <div class="info-card">
-            <div class="info-card__header d-flex align-items-center">
-              <span class="section-heading">
-                <i class="bi bi-person-video3 me-2"></i>{{ 'expediente_video.title' | translate }}
-              </span>
-              <span class="opt-badge ms-2">{{ 'common.optional' | translate }}</span>
-            </div>
-            <div class="info-card__body">
-              <app-video-expediente [expedienteId]="detalle()!.expediente_id"
-                                    [perfilId]="constructorId"
-                                    [numero]="detalle()!.expediente_numero"
-                                    [editable]="detalle()!.estado === 'pendiente'" />
-            </div>
-          </div>
+          <!-- Video del estimador: con él se presenta en el expediente. El
+               constructor sólo lo ve; no lo cambia ni lo quita. -->
+          <section class="mof-card" aria-labelledby="mof-est-video-title">
+            <h2 id="mof-est-video-title" class="mof-h2">{{ 'my_offer.section_estimator_video' | translate }}</h2>
+            <app-videos-expediente-lectura [expedienteId]="d.expediente_id"
+                                           [perfilId]="constructorId"
+                                           ayuda="my_offer.estimator_video_hint"
+                                           vacio="my_offer.estimator_video_empty" />
+          </section>
         }
-
-      </div><!-- /col izquierda -->
-
-      <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-           COLUMNA DERECHA â€” Resumen de la oferta (sticky)
-      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-      <div class="col-lg-5 fade-up" style="--delay:160ms">
-        <div class="sidebar-sticky">
-
-          <!-- â”€â”€ Tarjeta de resumen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-          <div class="summary-card mb-3"
-               [class.summary-card--accepted]="detalle()!.estado === 'aceptada'"
-               [class.summary-card--rejected]="detalle()!.estado === 'rechazada'"
-               [class.summary-card--pending]="detalle()!.estado === 'pendiente'">
-
-            <div class="summary-card__header">
-              <div class="d-flex align-items-center justify-content-between">
-                <span class="section-heading" style="color:inherit">
-                  <i class="bi bi-file-earmark-check me-2"></i>{{ 'my_offer.section_summary' | translate }}
-                </span>
-                <span class="estado-badge"
-                      [class.estado-badge--pending]="detalle()!.estado === 'pendiente'"
-                      [class.estado-badge--accepted]="detalle()!.estado === 'aceptada'"
-                      [class.estado-badge--rejected]="detalle()!.estado === 'rechazada'"
-                      [class.estado-badge--archived]="detalle()!.estado === 'archivado'">
-                  <i class="bi {{ estadoIcon(detalle()!.estado) }} me-1"></i>
-                  {{ ('state.' + detalle()!.estado) | translate }}
-                </span>
-              </div>
-            </div>
-
-            <div class="summary-card__body">
-
-              <!-- Precio -->
-              <div class="price-block">
-                <p class="price-block__label">{{ 'my_offer.total_price' | translate }}</p>
-                <p class="price-block__value">{{ formatCosto(detalle()!.precio) }}</p>
-              </div>
-
-              <hr class="summary-divider">
-
-              <!-- MÃ©tricas clave -->
-              <div class="metrics-grid">
-                <div class="metric-item">
-                  <span class="metric-item__label">
-                    <i class="bi bi-calendar-range me-1"></i>{{ 'my_offer.estimated_deadline' | translate }}
-                  </span>
-                  <span class="metric-item__value">
-                    {{ formatPlazo(detalle()!.plazo_semanas_min, detalle()!.plazo_semanas_max) }}
-                  </span>
-                </div>
-                <div class="metric-item">
-                  <span class="metric-item__label">
-                    <i class="bi bi-calendar-event me-1"></i>{{ 'my_offer.start_date' | translate }}
-                  </span>
-                  <span class="metric-item__value">{{ formatFecha(detalle()!.fecha_inicio) }}</span>
-                </div>
-                @if (detalle()!.garantia_anos) {
-                  <div class="metric-item">
-                    <span class="metric-item__label">
-                      <i class="bi bi-shield-check me-1"></i>{{ 'offer.warranty' | translate }}
-                    </span>
-                    <span class="metric-item__value">
-                      {{ detalle()!.garantia_anos }} {{ 'offer.years' | translate }}
-                    </span>
-                  </div>
-                }
-                <div class="metric-item">
-                  <span class="metric-item__label">
-                    <i class="bi bi-send me-1"></i>{{ 'my_offer.sent_on' | translate }}
-                  </span>
-                  <span class="metric-item__value">{{ formatFecha(detalle()!.creado_en) }}</span>
-                </div>
-              </div>
-
-              <hr class="summary-divider">
-
-              <!-- Banner de estado -->
-              @if (detalle()!.estado === 'aceptada') {
-                <div class="estado-banner estado-banner--accepted">
-                  <i class="bi bi-check-circle flex-shrink-0"></i>
-                  <div>
-                    <p class="estado-banner__title">{{ 'my_offer.accepted_title' | translate }}</p>
-                    <p class="estado-banner__sub">{{ 'my_offer.accepted_sub' | translate }}</p>
-                  </div>
-                </div>
-              } @else if (detalle()!.estado === 'archivado') {
-                <app-aviso-archivado ambito="oferta" [compacto]="true" />
-              } @else if (detalle()!.estado === 'rechazada') {
-                <div class="estado-banner estado-banner--rejected">
-                  <i class="bi bi-x-circle flex-shrink-0"></i>
-                  <div>
-                    <p class="estado-banner__title">{{ 'my_offer.rejected_title' | translate }}</p>
-                    <p class="estado-banner__sub">{{ 'my_offer.rejected_sub' | translate }}</p>
-                  </div>
-                </div>
-              } @else {
-                <div class="estado-banner estado-banner--pending">
-                  <i class="bi bi-hourglass flex-shrink-0"></i>
-                  <div>
-                    <p class="estado-banner__title">{{ 'my_offer.pending_title' | translate }}</p>
-                    <p class="estado-banner__sub">{{ 'my_offer.pending_sub' | translate }}</p>
-                  </div>
-                </div>
-              }
-
-            </div>
-          </div>
-
-          <!-- â”€â”€ Acciones â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-          <div class="d-flex flex-column gap-2">
-            @if (detalle()!.estado === 'pendiente') {
-              <button class="btn-edit" type="button" (click)="editarOferta()">
-                <i class="bi bi-pencil me-2"></i>{{ 'my_offer.edit_btn' | translate }}
-              </button>
-            }
-            <button class="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2"
-                    type="button" (click)="volver()">
-              <i class="bi bi-arrow-left"></i>{{ 'my_offer.back_btn' | translate }}
-            </button>
-          </div>
-
-        </div>
-      </div><!-- /col derecha -->
-
-    </div><!-- /row -->
-
+      </div>
+    </div>
   }
-
 </div>
-

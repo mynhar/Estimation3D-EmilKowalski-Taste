@@ -1,24 +1,29 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../services/auth-supabase.service';
 import { ExpedienteService } from '../../services/expediente.service';
 import { EstimacionService } from '../../services/estimacion.service';
 import { ContratoService } from '../../services/contrato.service';
-import {
-  ExpedienteConOfertas,
-  OfertaResumen,
-  ESTADO_BADGE_OFERTA_RECIBIDA,
-} from '../../models';
+import { ExpedienteConOfertas, OfertaResumen } from '../../models';
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../shared/ui/empty-state/empty-state.component';
+import { StatusChipComponent } from '../../shared/ui/status-chip/status-chip.component';
 
 type VistaExpedientes = 'tabla' | 'tarjetas';
 
 @Component({
   selector: 'app-offers-received',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, NgTemplateOutlet],
+  imports: [
+    TranslatePipe, NgTemplateOutlet, RouterLink, MatButtonToggleModule, MatIconModule, MatTooltipModule,
+    PageHeaderComponent, EmptyStateComponent, StatusChipComponent,
+  ],
   templateUrl: './offers-received.component.html',
   styleUrl: './offers-received.component.css',
 })
@@ -91,11 +96,6 @@ export class OffersReceivedComponent implements OnInit {
     } catch (e: unknown) {
       console.error('[OffersReceived] obra:', e instanceof Error ? e.message : e);
     }
-  }
-
-  // ── Estado del expediente (badge) ───────────────────────────────────────────
-  estadoClase(estado: string): string {
-    return ESTADO_BADGE_OFERTA_RECIBIDA[estado] ?? 'bg-secondary';
   }
 
   // ── Formato ─────────────────────────────────────────────────────────────────

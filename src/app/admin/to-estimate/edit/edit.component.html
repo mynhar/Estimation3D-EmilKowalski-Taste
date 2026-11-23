@@ -1,90 +1,76 @@
-<div class="fued-root">
+<div class="page-wrapper fi">
 
-  <!-- ── Cargando ──────────────────────────────────────────────────────────── -->
+  <!-- ── Cargando ────────────────────────────────────────────────────────── -->
   @if (cargando()) {
-    <div class="fued-loading">
-      <span class="fued-spinner" role="status"></span>
-      {{ 'builder_offer.loading' | translate }}
+    <div class="fi-skel" role="status">
+      <span class="cdk-visually-hidden">{{ 'builder_offer.loading' | translate }}</span>
+      <span class="skel skel--title" aria-hidden="true"></span>
+      <span class="fi-skel__cols" aria-hidden="true">
+        <span class="skel skel--card"></span>
+        <span class="skel skel--form"></span>
+      </span>
     </div>
 
-  <!-- ── No encontrado ─────────────────────────────────────────────────────── -->
+  <!-- ── No encontrado ───────────────────────────────────────────────────── -->
   } @else if (!detalle()) {
-    <div class="fued-not-found">
-      <div class="fued-not-found__icon"><i class="bi bi-exclamation-triangle"></i></div>
-      <p class="fued-not-found__title">{{ 'file.not_found' | translate }}</p>
-      @if (errorMsg()) {
-        <p class="fued-not-found__error">{{ errorMsg() | translate }}</p>
-      }
-      <button class="fued-btn-back-outline" (click)="volver()">
-        <i class="bi bi-arrow-left"></i>{{ 'common.back' | translate }}
+    <app-empty-state class="fi-missing"
+                     matIcon="folder_off"
+                     [titulo]="'file.not_found' | translate"
+                     [texto]="errorMsg() ? (errorMsg() | translate) : ''">
+      <button actions mat-stroked-button type="button" (click)="volver()">
+        <mat-icon>arrow_back</mat-icon>
+        {{ 'common.back' | translate }}
       </button>
-    </div>
+    </app-empty-state>
 
-  <!-- ── Contenido ─────────────────────────────────────────────────────────── -->
   } @else {
+    @let d = detalle()!;
 
-    <!-- Encabezado -->
-    <header class="fued-header">
-      <div class="fued-header__top">
-        <button class="fued-btn-back" (click)="volver()" [title]="'common.back' | translate">
-          <i class="bi bi-arrow-left"></i>
-        </button>
-        <span class="fued-header__eyebrow">
-          <i class="bi bi-shield-check"></i>
-          {{ 'role.administrateur' | translate }} · {{ 'to_estimate.title' | translate }}
-        </span>
-        <!-- Archivar: arriba a la derecha. Desaparece una vez archivado. -->
+    <!-- ── Cabecera ────────────────────────────────────────────────────── -->
+    <header class="fi-head">
+      <button mat-button type="button" class="fi-back" (click)="volver()">
+        <mat-icon>arrow_back</mat-icon>
+        {{ 'common.back' | translate }}
+      </button>
+      <app-page-header [titulo]="servicioNombre">
+        <!-- Archivar: desaparece una vez archivado. -->
         @if (!archivado()) {
-          <div class="fued-header__acciones">
-            <app-boton-archivar [control]="archivo" />
-          </div>
+          <app-boton-archivar actions [control]="archivo" />
         }
-      </div>
-      <div class="fued-header__body">
-        <div class="fued-header__info">
-          <p class="fued-header__num">{{ detalle()!.numero }}</p>
-          <h1 class="fued-header__title">{{ servicioNombre }}</h1>
-          <div class="fued-header__meta">
-            <span class="fued-meta-item">
-              <i class="bi bi-person"></i>{{ detalle()!.cliente_nombre }}
-            </span>
-            <span class="fued-meta-item">
-              <i class="bi bi-geo-alt"></i>{{ detalle()!.canton }}, {{ detalle()!.provincia }}
-            </span>
-            @if (servicios().length > 1) {
-              <span class="fued-meta-item">
-                <i class="bi bi-tools"></i>
-                {{ (servicios().length === 2 ? 'admin_file_edit.more_services_one' : 'admin_file_edit.more_services_other') | translate: { n: servicios().length - 1 } }}
-              </span>
-            }
-            @if (estimadorSeleccionadoNombre) {
-              <span class="fued-meta-item">
-                <i class="bi bi-person-badge"></i>{{ estimadorSeleccionadoNombre }}
-              </span>
-            }
-          </div>
-        </div>
-        <div class="fued-header__badges">
-          @if (formularioCompleto) {
-            <span class="fued-badge fued-badge--success">
-              <i class="bi bi-check-circle"></i>{{ 'estimator_file.pill_ready' | translate }}
-            </span>
-          } @else {
-            <span class="fued-badge fued-badge--warning">
-              <i class="bi bi-hourglass"></i>{{ 'estimator_file.pill_in_estimation' | translate }}
-            </span>
-          }
-          @if (fotos().length > 0) {
-            <span class="fued-badge fued-badge--info">
-              <i class="bi bi-images"></i>{{ fotos().length }}
-              {{ fotos().length !== 1 ? ('estimator_file.photos_many' | translate) : ('estimator_file.photos_one' | translate) }}
-            </span>
-          }
-        </div>
+      </app-page-header>
+      <div class="fi-meta">
+        <span class="fi-fig">{{ d.numero }}</span>
+        <span class="fi-meta__item">
+          <mat-icon aria-hidden="true">person</mat-icon>{{ d.cliente_nombre }}
+        </span>
+        <span class="fi-meta__item">
+          <mat-icon aria-hidden="true">location_on</mat-icon>{{ d.canton }}, {{ d.provincia }}
+        </span>
+        @if (servicios().length > 1) {
+          <span class="fi-meta__item">
+            <mat-icon aria-hidden="true">construction</mat-icon>
+            {{ (servicios().length === 2 ? 'admin_file_edit.more_services_one' : 'admin_file_edit.more_services_other') | translate: { n: servicios().length - 1 } }}
+          </span>
+        }
+        @if (estimadorSeleccionadoNombre) {
+          <span class="fi-meta__item">
+            <mat-icon aria-hidden="true">badge</mat-icon>{{ estimadorSeleccionadoNombre }}
+          </span>
+        }
+        @if (formularioCompleto) {
+          <span class="fi-tag is-ok"><mat-icon aria-hidden="true">check_circle</mat-icon>{{ 'estimator_file.pill_ready' | translate }}</span>
+        } @else {
+          <span class="fi-tag is-info"><mat-icon aria-hidden="true">hourglass_top</mat-icon>{{ 'estimator_file.pill_in_estimation' | translate }}</span>
+        }
+        @if (fotos().length > 0) {
+          <span class="fi-meta__item">
+            <mat-icon aria-hidden="true">photo_library</mat-icon>
+            <span><span class="fi-fig">{{ fotos().length }}</span> {{ (fotos().length === 1 ? 'estimator_file.photos_one' : 'estimator_file.photos_many') | translate }}</span>
+          </span>
+        }
       </div>
     </header>
 
-    <!-- Confirmación de archivo. Sin margen: .fued-root ya separa con gap. -->
     <app-archivar-expediente #archivo [expedienteId]="expedienteId" [separado]="false"
                              [despues]="recargarTrasArchivar" />
 
@@ -92,772 +78,616 @@
       <app-aviso-archivado ambito="admin" />
     }
 
-    <!-- Layout principal -->
-    <div class="fued-main">
+    <div class="fi-layout">
 
-      <!-- ── Columna izquierda ───────────────────────────────────────────── -->
-      <div class="fued-col-main">
+      <!-- ══ Columna del dossier ══════════════════════════════════════════ -->
+      <div class="fi-col">
 
-        <!-- Detalles del expediente -->
-        <section class="fued-card">
-          <div class="fued-card__header">
-            <div class="fued-card__header-left">
-              <i class="bi bi-info-circle"></i>
-              {{ 'estimator_file.details_title' | translate }}
-            </div>
-          </div>
-          <div class="fued-card__body">
+        <!-- Datos del dossier -->
+        <section class="fi-card" aria-labelledby="ate-details-title">
+          <h2 id="ate-details-title" class="fi-h2">{{ 'estimator_file.details_title' | translate }}</h2>
 
-            <!-- Todos los servicios del expediente; el principal primero -->
+          <div class="fi-section">
+            <h3 class="fi-label">{{ 'service_selector.name' | translate }}</h3>
+            <!-- Todos los servicios del dossier; el principal primero. -->
             @let srvs = serviciosNombres;
-            <p class="fued-section-label" id="fued-servicios-label">{{ 'service_selector.name' | translate }}</p>
-            <ul class="fued-servicios" aria-labelledby="fued-servicios-label">
+            <ul class="ate-services">
               @for (s of srvs; track s.id; let first = $first) {
-                @let principal = first && srvs.length > 1;
-                <li class="fued-servicio" [class.fued-servicio--principal]="principal">
+                <li>
                   {{ s.nombre }}
-                  @if (principal) {
-                    <span class="fued-servicio__tag">{{ 'service_selector.principal' | translate }}</span>
+                  @if (first && srvs.length > 1) {
+                    <span class="fi-tag">{{ 'service_selector.principal' | translate }}</span>
                   }
                 </li>
               }
             </ul>
+          </div>
 
-            <div class="fued-divider"></div>
-
-            <p class="fued-section-label">{{ 'builder_offer.client_label' | translate }}</p>
-            <div class="fued-info-grid">
-              <div class="fued-info-item">
-                <p class="fued-info-label">{{ 'common.name' | translate }}</p>
-                <p class="fued-info-value">{{ detalle()!.cliente_nombre }}</p>
+          <div class="fi-block">
+            <h3 class="fi-label">{{ 'builder_offer.client_label' | translate }}</h3>
+            <dl class="fi-facts">
+              <div class="fi-fact">
+                <dt>{{ 'common.name' | translate }}</dt>
+                <dd>{{ d.cliente_nombre }}</dd>
               </div>
-              <div class="fued-info-item">
-                <p class="fued-info-label">{{ 'common.phone' | translate }}</p>
-                <p class="fued-info-value">
-                  @if (detalle()!.cliente_telefono) {
-                    <a href="tel:{{ detalle()!.cliente_telefono }}" class="fued-link">
-                      <i class="bi bi-telephone"></i>{{ detalle()!.cliente_telefono }}
-                    </a>
+              <div class="fi-fact">
+                <dt>{{ 'common.phone' | translate }}</dt>
+                <dd class="fi-fig">
+                  @if (d.cliente_telefono) {
+                    <a class="ate-tel" [href]="'tel:' + d.cliente_telefono">{{ d.cliente_telefono }}</a>
                   } @else { — }
-                </p>
+                </dd>
               </div>
-            </div>
+            </dl>
+          </div>
 
-            <div class="fued-divider"></div>
+          <div class="fi-block">
+            <h3 class="fi-label">{{ 'estimator_file.location_section' | translate }}</h3>
+            <dl class="fi-facts">
+              <div class="fi-fact is-wide">
+                <dt>{{ 'common.address' | translate }}</dt>
+                <dd>
+                  {{ d.direccion }}
+                  <span class="fi-fact__sub">{{ d.canton }}, {{ d.provincia }}, {{ d.distrito }}</span>
+                </dd>
+              </div>
+              <div class="fi-fact is-wide">
+                <dt>{{ 'file.reference' | translate }}</dt>
+                <dd class="fi-notes">{{ d.referencia || '—' }}</dd>
+              </div>
+            </dl>
+          </div>
 
-            <p class="fued-section-label">{{ 'estimator_file.location_section' | translate }}</p>
-            <div class="fued-info-grid">
-              <div class="fued-info-item fued-info-item--full">
-                <p class="fued-info-label">{{ 'common.address' | translate }}</p>
-                <p class="fued-info-value">{{ detalle()!.direccion }}</p>
-                <p class="fued-info-value">{{ detalle()!.canton }}, {{ detalle()!.provincia }}, {{ detalle()!.distrito }}</p>
+          <div class="fi-block">
+            <h3 class="fi-label">{{ 'estimator_file.planned_visit_client' | translate }}</h3>
+            <dl class="fi-facts">
+              <div class="fi-fact">
+                <dt>{{ 'common.date' | translate }}</dt>
+                <dd class="fi-fig">{{ formatFecha(d.fecha_visita) }}</dd>
               </div>
-              <div class="fued-info-item">
-                <p class="fued-info-label">{{ 'file.reference' | translate }}</p>
-                <p class="fued-info-value">{{ detalle()!.referencia || '—' }}</p>
+              <div class="fi-fact">
+                <dt>{{ 'file.hour' | translate }}</dt>
+                <dd class="fi-fig">{{ formatHora(d.fecha_visita) }}</dd>
               </div>
-            </div>
-
-            <div class="fued-divider"></div>
-
-            <p class="fued-section-label">{{ 'estimator_file.planned_visit_client' | translate }}</p>
-            <div class="fued-info-grid">
-              <div class="fued-info-item">
-                <p class="fued-info-label">{{ 'common.date' | translate }}</p>
-                <p class="fued-info-value">{{ formatFecha(detalle()!.fecha_visita) }}</p>
-              </div>
-              <div class="fued-info-item">
-                <p class="fued-info-label">{{ 'file.hour' | translate }}</p>
-                <p class="fued-info-value">{{ formatHora(detalle()!.fecha_visita) }}</p>
-              </div>
-              @if (detalle()!.descripcion) {
-                <div class="fued-info-item fued-info-item--full">
-                  <p class="fued-info-label">{{ 'estimator_file.client_desc' | translate }}</p>
-                  <p class="fued-desc-client">{{ detalle()!.descripcion }}</p>
+              @if (d.descripcion) {
+                <div class="fi-fact is-wide">
+                  <dt>{{ 'estimator_file.client_desc' | translate }}</dt>
+                  <dd class="fi-notes">{{ d.descripcion }}</dd>
                 </div>
               }
-            </div>
-
+            </dl>
           </div>
         </section>
 
-        <!-- Fotos del sitio -->
-        <section class="fued-card">
-          <div class="fued-card__header">
-            <div class="fued-card__header-left">
-              <i class="bi bi-images"></i>
-              {{ 'file.site_photos' | translate }}
-              @if (fotos().length > 0) {
-                <span class="fued-count-badge">{{ fotos().length }}</span>
-              }
-            </div>
-            <label class="fued-btn-upload" [class.fued-btn-upload--busy]="subiendoFoto()">
-              @if (subiendoFoto()) {
-                <span class="fued-spinner-sm"></span>{{ 'estimator_file.uploading' | translate }}
-              } @else {
-                <i class="bi bi-cloud-upload"></i>{{ 'estimator_file.upload_photos' | translate }}
-              }
-              <input type="file" accept="image/*" multiple class="fued-file-input"
-                     (change)="subirFotos($event)" [disabled]="subiendoFoto()"/>
-            </label>
-          </div>
-          <div class="fued-card__body fued-dropzone"
-               [class.fued-dropzone--drag]="dragFotos()"
-               (dragover)="onDragOverFotos($event)"
-               (dragleave)="onDragLeaveFotos()"
-               (drop)="onDropFotos($event)">
-            <p class="fued-drop-hint">
-              <i class="bi bi-cloud-arrow-down" aria-hidden="true"></i>{{ 'my_documents.add_drop' | translate }}
-            </p>
-            @if (errorFotos()) {
-              <div class="fued-alert fued-alert--danger">{{ errorFotos() }}</div>
-            }
-            @if (fotos().length === 0) {
-              <div class="fued-empty-inline">
-                <i class="bi bi-camera"></i>
-                <p>{{ 'estimator_file.no_photos_hint' | translate }}</p>
-              </div>
+        <!-- Fotos del sitio: pulsar o soltar -->
+        <section class="fi-card" aria-labelledby="ate-photos-title">
+          <h2 id="ate-photos-title" class="fi-h2">
+            {{ 'file.site_photos' | translate }}
+            @if (fotos().length > 0) { <span class="fi-count">{{ fotos().length }}</span> }
+          </h2>
+
+          <label class="fi-drop" [class.is-busy]="subiendoFoto()" [class.is-drag]="dragFotos()"
+                 (dragover)="onDragOverFotos($event)" (dragleave)="onDragLeaveFotos()" (drop)="onDropFotos($event)">
+            @if (subiendoFoto()) {
+              <span class="fi-spinner" aria-hidden="true"></span>
+              <span class="fi-drop__title">{{ 'estimator_file.uploading' | translate }}</span>
             } @else {
-              <div class="fued-photo-grid">
-                @for (f of fotos(); track f.id) {
-                  <div class="fued-photo-thumb">
-                    <img [src]="publicUrl(f.url_storage)"
-                         class="fued-photo-thumb__img"
-                         [title]="f.nombre_archivo"
-                         (click)="verArchivo(f)" />
-                    <button class="fued-photo-thumb__del"
-                            [title]="'estimator_file.delete_photo' | translate"
-                            (click)="eliminarArchivo(f, 'foto')">
-                      <i class="bi bi-x-lg"></i>
-                    </button>
-                  </div>
-                }
-              </div>
+              <mat-icon aria-hidden="true">add_photo_alternate</mat-icon>
+              <span class="fi-drop__title">{{ 'estimator_file.upload_photos' | translate }}</span>
+              <span class="fi-drop__sub">{{ 'my_documents.add_drop' | translate }}</span>
             }
-          </div>
+            <input type="file" accept="image/*" multiple class="cdk-visually-hidden"
+                   [disabled]="subiendoFoto()" (change)="subirFotos($event)" />
+          </label>
+
+          @if (errorFotos()) {
+            <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorFotos() }}</p>
+          }
+
+          @if (fotos().length > 0) {
+            <ul class="fi-photos">
+              @for (f of fotos(); track f.id) {
+                <li>
+                  <button type="button" class="fi-photo" (click)="verArchivo(f)" [attr.aria-label]="f.nombre_archivo">
+                    <img [src]="publicUrl(f.url_storage)" alt="" loading="lazy" />
+                  </button>
+                  <button mat-icon-button type="button" class="fi-photo__del"
+                          [attr.aria-label]="('estimator_file.delete_photo' | translate) + ' ' + f.nombre_archivo"
+                          [matTooltip]="'estimator_file.delete_photo' | translate"
+                          (click)="eliminarArchivo(f, 'foto')">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </li>
+              }
+            </ul>
+          }
         </section>
 
-        <!-- Tour virtual -->
-        <section class="fued-card">
-          <div class="fued-card__header">
-            <div class="fued-card__header-left">
-              <i class="bi bi-badge-3d"></i>
+        <!-- Tour virtual (Matterport): una fila por vídeo, desplegable -->
+        <section class="fi-card" aria-labelledby="ate-tour-title">
+          <div class="fi-card__head">
+            <h2 id="ate-tour-title" class="fi-h2">
               {{ 'estimator_file.tour_title' | translate }}
-              @if (urlsTour().length > 0) {
-                <span class="fued-count-badge">{{ urlsTour().length }}</span>
-              }
-            </div>
+              @if (urlsTour().length > 0) { <span class="fi-count">{{ urlsTour().length }}</span> }
+            </h2>
             @if (!mostrandoFormAdd() && editandoIndex() === null) {
-              <button class="fued-btn-add" (click)="mostrarFormAgregarVideo()" [disabled]="guardandoTour()">
-                <i class="bi bi-plus-lg"></i>{{ 'estimator_file.tour_add_video' | translate }}
+              <button mat-stroked-button type="button" [disabled]="guardandoTour()" (click)="mostrarFormAgregarVideo()">
+                <mat-icon>add</mat-icon>
+                {{ 'estimator_file.tour_add_video' | translate }}
               </button>
             }
           </div>
-          <div class="fued-card__body">
-            @if (errorTour()) {
-              <div class="fued-alert fued-alert--danger">{{ errorTour() }}</div>
-            }
 
-            @for (url of urlsTour(); track $index) {
-              <div class="fued-tour-item">
+          @if (errorTour()) {
+            <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorTour() }}</p>
+          }
+
+          @if (urlsTour().length > 0) {
+            <ul class="fi-tours">
+              @for (url of urlsTour(); track $index) {
                 @if (editandoIndex() === $index) {
-                  <div class="fued-tour-edit">
-                    <p class="fued-tour-edit__label">
-                      <i class="bi bi-pencil"></i>
-                      {{ 'estimator_file.tour_video_n' | translate:{ n: $index + 1 } }}
-                    </p>
-                    <div class="fued-input-group">
-                      <span class="fued-input-prefix"><i class="bi bi-link-45deg"></i></span>
-                      <input type="url" class="fued-input"
-                             placeholder="https://my.matterport.com/show/?m=…"
-                             [(ngModel)]="editandoUrlTemp"
-                             [disabled]="guardandoTour()" />
-                    </div>
-                    <div class="fued-tour-edit__actions">
-                      <button class="fued-btn-save" (click)="guardarEdicionVideo()"
-                              [disabled]="guardandoTour() || !editandoUrlTemp.trim()">
+                  <li class="fi-tour-form">
+                    <h3 class="fi-label">{{ 'estimator_file.tour_video_n' | translate:{ n: $index + 1 } }}</h3>
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                      <mat-label>{{ 'estimator_file.tour_url_label' | translate }}</mat-label>
+                      <mat-icon matPrefix aria-hidden="true">link</mat-icon>
+                      <input matInput type="url" inputmode="url" placeholder="https://my.matterport.com/show/?m=…"
+                             [(ngModel)]="editandoUrlTemp" [disabled]="guardandoTour()" />
+                    </mat-form-field>
+                    <div class="ate-inline-actions">
+                      <button mat-flat-button type="button"
+                              [disabled]="guardandoTour() || !editandoUrlTemp.trim()" (click)="guardarEdicionVideo()">
                         @if (guardandoTour()) {
-                          <span class="fued-spinner-sm"></span>{{ 'estimator_file.saving' | translate }}
+                          <span class="fi-spinner" aria-hidden="true"></span>
                         } @else {
-                          <i class="bi bi-check-lg"></i>{{ 'common.save' | translate }}
+                          <mat-icon>check</mat-icon>
                         }
+                        {{ (guardandoTour() ? 'estimator_file.saving' : 'common.save') | translate }}
                       </button>
-                      <button class="fued-btn-cancel" (click)="cancelarEdicionVideo()" [disabled]="guardandoTour()">
+                      <button mat-button type="button" [disabled]="guardandoTour()" (click)="cancelarEdicionVideo()">
                         {{ 'common.cancel' | translate }}
                       </button>
                     </div>
                     @if (editandoUrlSafe) {
-                      <p class="fued-preview-label">{{ 'estimator_file.preview_label' | translate }}</p>
-                      <div class="fued-tour-embed fued-tour-embed--standalone">
-                        <iframe [src]="editandoUrlSafe" allowfullscreen allow="xr-spatial-tracking" title="Vista previa"></iframe>
+                      <p class="fi-hint">{{ 'estimator_file.preview_label' | translate }}</p>
+                      <div class="fi-frame">
+                        <iframe [src]="editandoUrlSafe" allowfullscreen allow="xr-spatial-tracking"
+                                [title]="'estimator_file.preview_label' | translate"></iframe>
                       </div>
                     }
-                  </div>
+                  </li>
                 } @else {
-                  <div class="fued-tour-row" [class.fued-tour-row--expanded]="isExpanded($index)">
-                    <button class="fued-tour-row__toggle"
-                            (click)="toggleExpandVideo($index)"
-                            [title]="isExpanded($index) ? ('common.collapse' | translate) : ('common.expand' | translate)">
-                      <i class="bi bi-badge-3d fued-tour-row__icon"></i>
-                      <span class="fued-tour-row__label">{{ 'estimator_file.tour_video_n' | translate:{ n: $index + 1 } }}</span>
-                      <span class="fued-tour-row__url">{{ url }}</span>
-                      <i class="bi fued-tour-row__chevron"
-                         [class.bi-chevron-down]="!isExpanded($index)"
-                         [class.bi-chevron-up]="isExpanded($index)"></i>
-                    </button>
-                    <div class="fued-tour-row__actions">
-                      <button class="fued-btn-icon" (click)="iniciarEdicionVideo($index)"
-                              [disabled]="guardandoTour()" [title]="'common.edit' | translate">
-                        <i class="bi bi-pencil"></i>
+                  <li class="fi-tour" [class.is-open]="isExpanded($index)">
+                    <div class="fi-tour__row">
+                      <button type="button" class="fi-tour__toggle"
+                              [attr.aria-expanded]="isExpanded($index)"
+                              (click)="toggleExpandVideo($index)">
+                        <mat-icon aria-hidden="true">view_in_ar</mat-icon>
+                        <span class="fi-tour__text">
+                          <span class="fi-tour__name">{{ 'estimator_file.tour_video_n' | translate:{ n: $index + 1 } }}</span>
+                          <span class="fi-tour__url">{{ url }}</span>
+                        </span>
+                        <mat-icon class="fi-tour__chevron" aria-hidden="true">expand_more</mat-icon>
                       </button>
-                      <button class="fued-btn-icon fued-btn-icon--danger" (click)="eliminarVideo($index)"
-                              [disabled]="guardandoTour()" [title]="'estimator_file.tour_delete_video' | translate">
+                      <button mat-icon-button type="button" [disabled]="guardandoTour()"
+                              [attr.aria-label]="('common.edit' | translate) + ' ' + ('estimator_file.tour_video_n' | translate:{ n: $index + 1 })"
+                              [matTooltip]="'common.edit' | translate"
+                              (click)="iniciarEdicionVideo($index)">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                      <button mat-icon-button type="button" class="fi-del" [disabled]="guardandoTour()"
+                              [attr.aria-label]="'estimator_file.tour_delete_video' | translate"
+                              [matTooltip]="'estimator_file.tour_delete_video' | translate"
+                              (click)="eliminarVideo($index)">
                         @if (guardandoTour()) {
-                          <span class="fued-spinner-sm"></span>
+                          <span class="fi-spinner" aria-hidden="true"></span>
                         } @else {
-                          <i class="bi bi-trash3"></i>
+                          <mat-icon>delete</mat-icon>
                         }
                       </button>
                     </div>
-                  </div>
-                  @if (isExpanded($index)) {
-                    <div class="fued-tour-embed">
-                      <iframe [src]="getSafeUrl(url)" allowfullscreen allow="xr-spatial-tracking"
-                              [title]="'Video ' + ($index + 1)"></iframe>
-                    </div>
-                  }
-                }
-              </div>
-            }
-
-            @if (urlsTour().length === 0 && !mostrandoFormAdd()) {
-              <div class="fued-empty-inline">
-                <i class="bi bi-badge-3d"></i>
-                <p>{{ 'estimator_file.no_tour_hint' | translate }}</p>
-                @if (!hasDraft()) {
-                  <p class="fued-hint-muted">
-                    <i class="bi bi-info-circle"></i>{{ 'estimator_file.tour_draft_hint' | translate }}
-                  </p>
-                }
-              </div>
-            }
-
-            @if (mostrandoFormAdd()) {
-              <div class="fued-tour-edit" [class.fued-tour-edit--separated]="urlsTour().length > 0">
-                @if (!hasDraft()) {
-                  <div class="fued-alert fued-alert--warning">
-                    <i class="bi bi-info-circle"></i>
-                    {{ 'estimator_file.tour_draft_hint_alt' | translate }}
-                  </div>
-                }
-                <p class="fued-tour-edit__label">
-                  <i class="bi bi-plus-circle"></i>
-                  {{ 'estimator_file.tour_add_video' | translate }}
-                </p>
-                <div class="fued-input-group">
-                  <span class="fued-input-prefix"><i class="bi bi-link-45deg"></i></span>
-                  <input type="url" class="fued-input"
-                         placeholder="https://my.matterport.com/show/?m=…"
-                         [(ngModel)]="nuevoUrlInput"
-                         [disabled]="guardandoTour()" />
-                </div>
-                <div class="fued-tour-edit__actions">
-                  <button class="fued-btn-save" (click)="agregarVideo()"
-                          [disabled]="guardandoTour() || !nuevoUrlInput.trim()">
-                    @if (guardandoTour()) {
-                      <span class="fued-spinner-sm"></span>{{ 'estimator_file.saving' | translate }}
-                    } @else {
-                      <i class="bi bi-plus-lg"></i>{{ 'estimator_file.tour_add_video' | translate }}
-                    }
-                  </button>
-                  <button class="fued-btn-cancel" (click)="cancelarAgregarVideo()" [disabled]="guardandoTour()">
-                    {{ 'common.cancel' | translate }}
-                  </button>
-                </div>
-                @if (nuevoUrlSafe) {
-                  <p class="fued-preview-label">{{ 'estimator_file.preview_label' | translate }}</p>
-                  <div class="fued-tour-embed fued-tour-embed--standalone">
-                    <iframe [src]="nuevoUrlSafe" allowfullscreen allow="xr-spatial-tracking" title="Vista previa"></iframe>
-                  </div>
-                }
-              </div>
-            }
-
-          </div>
-        </section>
-
-        <!-- Ficha de la propiedad escaneada (Matterport) -->
-        <app-matterport-info
-          [modelos]="matterportModelos()"
-          [puedeSincronizar]="true"
-          [sincronizando]="sincronizandoMp()"
-          [errorClave]="errorMpClave()"
-          [exitoClave]="exitoMpClave()"
-          (sincronizar)="sincronizarMatterport()" />
-
-        <!-- Documentos técnicos -->
-        <section class="fued-card">
-          <div class="fued-card__header">
-            <div class="fued-card__header-left">
-              <i class="bi bi-file-earmark-text"></i>
-              {{ 'file.technical_docs' | translate }}
-              @if (documentos().length > 0) {
-                <span class="fued-count-badge">{{ documentos().length }}</span>
-              }
-            </div>
-            <label class="fued-btn-upload" [class.fued-btn-upload--busy]="subiendoDocumento()">
-              @if (subiendoDocumento()) {
-                <span class="fued-spinner-sm"></span>{{ 'estimator_file.uploading' | translate }}
-              } @else {
-                <i class="bi bi-cloud-upload"></i>{{ 'estimator_file.upload_doc' | translate }}
-              }
-              <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv"
-                     multiple class="fued-file-input"
-                     (change)="subirDocumentos($event)" [disabled]="subiendoDocumento()"/>
-            </label>
-          </div>
-          <div class="fued-card__body fued-dropzone"
-               [class.fued-dropzone--drag]="dragDocs()"
-               (dragover)="onDragOverDocs($event)"
-               (dragleave)="onDragLeaveDocs()"
-               (drop)="onDropDocs($event)">
-            <p class="fued-drop-hint">
-              <i class="bi bi-cloud-arrow-down" aria-hidden="true"></i>{{ 'my_documents.add_drop' | translate }}
-            </p>
-            @if (errorDocumentos()) {
-              <div class="fued-alert fued-alert--danger">{{ errorDocumentos() }}</div>
-            }
-            @if (documentos().length === 0) {
-              <div class="fued-empty-inline">
-                <i class="bi bi-file-earmark"></i>
-                <p>{{ 'estimator_file.no_docs_hint' | translate }}</p>
-              </div>
-            } @else {
-              @for (d of documentos(); track d.id) {
-                <div class="fued-file-row">
-                  <div class="fued-file-row__icon">
-                    <i class="bi bi-file-earmark-text"></i>
-                  </div>
-                  <div class="fued-file-row__info">
-                    <p class="fued-file-row__name">{{ d.nombre_archivo }}</p>
-                    <p class="fued-file-row__meta">{{ formatTamano(d.tamano_bytes) }}</p>
-                  </div>
-                  <div class="fued-file-row__actions">
-                    <button class="fued-btn-icon" (click)="verArchivo(d)" [title]="'common.view' | translate">
-                      <i class="bi bi-eye"></i>
-                    </button>
-                    <button class="fued-btn-icon fued-btn-icon--danger" (click)="eliminarArchivo(d, 'documento')"
-                            [title]="'common.delete' | translate">
-                      <i class="bi bi-trash3"></i>
-                    </button>
-                  </div>
-                </div>
-              }
-            }
-          </div>
-        </section>
-
-        <!-- Invitación a constructores -->
-        <section class="fued-card">
-          <div class="fued-card__header">
-            <div class="fued-card__header-left">
-              <i class="bi bi-envelope-paper"></i>
-              {{ 'admin_invite.title' | translate }}
-              @if (invitadosIds().size > 0) {
-                <span class="fued-count-badge">{{ invitadosIds().size }}</span>
-              }
-            </div>
-          </div>
-          <div class="fued-card__body">
-
-            @if (!puedeInvitar) {
-              <div class="fued-alert fued-alert--warning">
-                <i class="bi bi-info-circle"></i>
-                {{ 'admin_invite.need_estimado' | translate }}
-              </div>
-            } @else if (constructores().length === 0) {
-              <div class="fued-empty-inline">
-                <i class="bi bi-people"></i>
-                <p>{{ 'admin_invite.no_constructores' | translate }}</p>
-              </div>
-            } @else {
-              <p class="fued-invite-hint">{{ 'admin_invite.hint' | translate }}</p>
-
-              <ul class="fued-invite-list" role="list">
-                @for (c of constructores(); track c.id) {
-                  <li>
-                    <label class="fued-invite-row"
-                           [class.fued-invite-row--selected]="seleccionInvitados().has(c.id)"
-                           [class.fued-invite-row--disabled]="!c.email">
-                      <input type="checkbox" class="fued-invite-check"
-                             [checked]="seleccionInvitados().has(c.id)"
-                             (change)="toggleSeleccionInvitado(c.id)"
-                             [disabled]="!c.email || enviandoInvitacion() || guardando()
-                                         || abriendoATodos() || bloqueadoPorOferta" />
-                      <span class="fued-invite-row__info">
-                        <span class="fued-invite-row__name">{{ c.nombre }} {{ c.apellido }}</span>
-                        <span class="fued-invite-row__email">
-                          @if (c.email) {
-                            <i class="bi bi-envelope"></i>{{ c.email }}
-                          } @else {
-                            <i class="bi bi-envelope-slash"></i>{{ 'admin_invite.no_email' | translate }}
-                          }
-                        </span>
-                      </span>
-                      @if (estaInvitado(c.id)) {
-                        <span class="fued-invite-badge">
-                          <i class="bi bi-check-circle"></i>{{ 'admin_invite.invited' | translate }}
-                        </span>
-                      }
-                    </label>
-
-                    <!-- La contraseña guardada está hasheada: mandar una implica
-                         fijarla. Se deja vacía para no tocar el acceso actual. -->
-                    @if (seleccionInvitados().has(c.id)) {
-                      <div class="fued-invite-pass">
-                        @if (c.proveedor === 'email') {
-                          <label class="fued-invite-pass__label" [attr.for]="'invite-pass-' + c.id">
-                            <i class="bi bi-key"></i>{{ 'admin_invite.password_label' | translate }}
-                          </label>
-                          <input type="password" class="fued-input fued-invite-pass__input"
-                                 [id]="'invite-pass-' + c.id"
-                                 autocomplete="new-password"
-                                 [placeholder]="'admin_invite.password_ph' | translate"
-                                 [ngModel]="passwordInvitado(c.id)"
-                                 (ngModelChange)="setPasswordInvitado(c.id, $event)"
-                                 [disabled]="enviandoInvitacion() || guardando() || abriendoATodos()" />
-                          <p class="fued-invite-pass__hint">{{ 'admin_invite.password_hint' | translate }}</p>
-                        } @else {
-                          <p class="fued-invite-pass__hint">
-                            <i class="bi bi-shield-lock"></i>{{ 'admin_invite.password_google' | translate }}
-                          </p>
-                        }
+                    @if (isExpanded($index)) {
+                      <div class="fi-frame">
+                        <iframe [src]="getSafeUrl(url)" allowfullscreen allow="xr-spatial-tracking"
+                                [title]="'estimator_file.tour_video_n' | translate:{ n: $index + 1 }"></iframe>
                       </div>
                     }
                   </li>
                 }
-              </ul>
+              }
+            </ul>
+          } @else if (!mostrandoFormAdd()) {
+            <p class="fi-empty"><mat-icon aria-hidden="true">view_in_ar</mat-icon>{{ 'estimator_file.no_tour_hint' | translate }}</p>
+            @if (!hasDraft()) {
+              <p class="fi-hint"><mat-icon aria-hidden="true">info</mat-icon>{{ 'estimator_file.tour_draft_hint' | translate }}</p>
             }
+          }
 
-            <!-- Avisos comunes: valen también sin constructores en la lista,
-                 porque «Todos los Constructores» sigue disponible. -->
-            @if (puedeInvitar) {
-              @if (errorInvitacionMsg()) {
-                <div class="fued-alert fued-alert--danger" role="alert">
-                  {{ errorInvitacionMsg() | translate }}
-                </div>
+          @if (mostrandoFormAdd()) {
+            <div class="fi-tour-form">
+              @if (!hasDraft()) {
+                <p class="fi-feedback is-warn"><mat-icon aria-hidden="true">info</mat-icon>{{ 'estimator_file.tour_draft_hint_alt' | translate }}</p>
               }
-              @if (exitoInvitacionMsg()) {
-                <div class="fued-alert fued-alert--success" role="status">
-                  {{ exitoInvitacionMsg() | translate:exitoInvitacionArgs() }}
-                </div>
-              }
-
-              @if (bloqueadoPorOferta) {
-                <p class="fued-invite-hint fued-invite-hint--sm">
-                  <i class="bi bi-lock"></i>{{ 'admin_invite.locked_en_oferta' | translate }}
-                </p>
-              } @else {
-                <p class="fued-invite-hint fued-invite-hint--sm">
-                  <i class="bi bi-people"></i>{{ 'admin_invite.all_builders_hint' | translate }}
-                </p>
-                @if (constructores().length > 0 && !formularioCompleto) {
-                  <p class="fued-invite-hint fued-invite-hint--sm">
-                    <i class="bi bi-info-circle"></i>{{ 'admin_invite.send_and_estimate_hint' | translate }}
-                  </p>
-                }
-              }
-
-              <!-- Confirmación: abrir a todos borra la lista de invitados. -->
-              @if (confirmarAbrirATodos()) {
-                <div class="fued-invite-confirm" role="alertdialog" aria-live="polite"
-                     aria-labelledby="invite-confirm-title" aria-describedby="invite-confirm-body">
-                  <p class="fued-invite-confirm__title" id="invite-confirm-title">
-                    <i class="bi bi-exclamation-triangle"></i>
-                    {{ 'admin_invite.all_builders_confirm_title' | translate }}
-                  </p>
-                  <p class="fued-invite-confirm__body" id="invite-confirm-body">
-                    {{ 'admin_invite.all_builders_confirm_body' | translate }}
-                  </p>
-                  @if (invitadosIds().size > 0) {
-                    <p class="fued-invite-confirm__body">
-                      {{ 'admin_invite.all_builders_confirm_warning' | translate }}
-                    </p>
+              <h3 class="fi-label">{{ 'estimator_file.tour_add_video' | translate }}</h3>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>{{ 'estimator_file.tour_url_label' | translate }}</mat-label>
+                <mat-icon matPrefix aria-hidden="true">link</mat-icon>
+                <input matInput type="url" inputmode="url" placeholder="https://my.matterport.com/show/?m=…"
+                       [(ngModel)]="nuevoUrlInput" [disabled]="guardandoTour()" />
+              </mat-form-field>
+              <div class="ate-inline-actions">
+                <button mat-flat-button type="button"
+                        [disabled]="guardandoTour() || !nuevoUrlInput.trim()" (click)="agregarVideo()">
+                  @if (guardandoTour()) {
+                    <span class="fi-spinner" aria-hidden="true"></span>
+                  } @else {
+                    <mat-icon>add</mat-icon>
                   }
-                  <div class="fued-invite-confirm__actions">
-                    <button type="button" class="fued-btn-draft fued-btn-invite"
-                            (click)="cancelarAbrirATodos()" [disabled]="abriendoATodos()">
-                      {{ 'common.cancel' | translate }}
-                    </button>
-                    <button type="button" class="fued-btn-submit fued-btn-invite"
-                            (click)="abrirATodosLosConstructores()" [disabled]="abriendoATodos()">
-                      @if (abriendoATodos()) {
-                        <span class="fued-spinner-sm"></span>{{ 'common.saving' | translate }}
-                      } @else {
-                        <i class="bi bi-people"></i>{{ 'admin_invite.all_builders_confirm_ok' | translate }}
-                      }
-                    </button>
-                  </div>
-                </div>
-              }
-
-              <div class="fued-invite-actions">
-                <span class="fued-invite-count">
-                  {{ 'admin_invite.selected_count' | translate:{ n: seleccionInvitados().size } }}
-                </span>
-                <div class="fued-invite-buttons">
-                  <!-- Retira las invitaciones por correo: el expediente vuelve a
-                       ser público y lo ve cualquier constructor. -->
-                  <button type="button" class="fued-btn-draft fued-btn-invite" (click)="pedirAbrirATodos()"
-                          [disabled]="bloqueadoPorOferta || abriendoATodos() || confirmarAbrirATodos()
-                                      || enviandoInvitacion() || guardando()">
-                    @if (abriendoATodos()) {
-                      <span class="fued-spinner-sm"></span>{{ 'common.saving' | translate }}
-                    } @else {
-                      <i class="bi bi-people"></i>{{ 'admin_invite.all_builders_btn' | translate }}
-                    }
-                  </button>
-                  <!-- Envía el correo y además hace lo mismo que «Enviar estimación». -->
-                  <button type="button" class="fued-btn-submit fued-btn-invite" (click)="enviarInvitacionYEstimacion()"
-                          [disabled]="bloqueadoPorOferta || enviandoInvitacion() || guardando() || abriendoATodos()
-                                      || confirmarAbrirATodos()
-                                      || seleccionInvitados().size === 0">
-                    @if (enviandoInvitacion() || guardando()) {
-                      <span class="fued-spinner-sm"></span>{{ 'admin_invite.sending' | translate }}
-                    } @else {
-                      <i class="bi bi-envelope-arrow-up"></i>{{ 'admin_invite.send_btn' | translate }}
-                    }
-                  </button>
-                </div>
-              </div>
-            }
-
-          </div>
-        </section>
-
-      </div>
-
-      <!-- ── Columna derecha: formulario sticky ──────────────────────────── -->
-      <aside class="fued-col-side">
-        <div class="fued-form-card">
-          <div class="fued-form-card__header">
-            <i class="bi bi-clipboard2-check"></i>
-            {{ 'estimator_file.visit_doc_title' | translate }}
-          </div>
-          <div class="fued-form-card__body">
-
-            <!-- Estimador -->
-            <div class="fued-field">
-              <label class="fued-label">
-                <i class="bi bi-person-badge"></i>{{ 'admin_estimate.estimador_label' | translate }}
-                <span class="fued-req">*</span>
-              </label>
-              @if (estimadores().length === 0) {
-                <p class="fued-field-hint">{{ 'admin_estimate.no_estimadores' | translate }}</p>
-              } @else {
-                <select id="est-estimador" class="fued-input fued-select"
-                        [ngModel]="estimadorSeleccionadoId()"
-                        (ngModelChange)="estimadorSeleccionadoId.set($event)">
-                  <option value="">— {{ 'admin_estimate.select_estimador' | translate }} —</option>
-                  @for (est of estimadores(); track est.id) {
-                    <option [value]="est.id">{{ est.nombre }} {{ est.apellido }}</option>
-                  }
-                </select>
-              }
-            </div>
-
-            <!-- Fecha + Hora real de visita -->
-            <div class="fued-field-row">
-              <div class="fued-field">
-                <label class="fued-label">
-                  <i class="bi bi-calendar3"></i>{{ 'estimator_file.real_date' | translate }}
-                  <span class="fued-req">*</span>
-                </label>
-                <input id="est-fecha" type="date" class="fued-input" [(ngModel)]="fechaVisita" />
-              </div>
-              <div class="fued-field">
-                <label class="fued-label">
-                  <i class="bi bi-clock"></i>{{ 'file.hour' | translate }}
-                  <span class="fued-req">*</span>
-                </label>
-                <input id="est-hora" type="time" class="fued-input" [(ngModel)]="horaVisita" />
-              </div>
-            </div>
-
-            <!-- Problemas observados -->
-            <div class="fued-field">
-              <label class="fued-label">
-                <i class="bi bi-card-text"></i>{{ 'estimator_file.problems_observed' | translate }}
-                <span class="fued-req">*</span>
-              </label>
-              <textarea id="est-problemas" class="fued-input fued-textarea" rows="4"
-                        [placeholder]="'estimator_file.problems_placeholder' | translate"
-                        [(ngModel)]="descripcionProblema"></textarea>
-            </div>
-
-            <!-- Costo estimado (rango) -->
-            <div class="fued-field">
-              <label class="fued-label">
-                <i class="bi bi-cash-coin"></i>{{ 'estimator_file.approx_cost' | translate }}
-                <span class="fued-opt">({{ 'common.optional' | translate }})</span>
-              </label>
-              <div class="fued-cost-range">
-                <div>
-                  <p class="fued-cost-sub">{{ 'file.min' | translate }}</p>
-                  <div class="fued-input-group">
-                    <span class="fued-input-prefix">CA$</span>
-                    <input type="number" class="fued-input" placeholder="0" min="0" step="1000"
-                           id="est-costo-min" [attr.aria-label]="('estimator_file.approx_cost' | translate) + ' · ' + ('file.min' | translate)"
-                           [(ngModel)]="costoMin" />
-                  </div>
-                </div>
-                <span class="fued-cost-sep">→</span>
-                <div>
-                  <p class="fued-cost-sub">{{ 'file.max' | translate }}</p>
-                  <div class="fued-input-group">
-                    <span class="fued-input-prefix">CA$</span>
-                    <input type="number" class="fued-input" placeholder="0" min="0" step="1000"
-                           id="est-costo-max" [attr.aria-label]="('estimator_file.approx_cost' | translate) + ' · ' + ('file.max' | translate)"
-                           [(ngModel)]="costoMax" />
-                  </div>
-                </div>
-              </div>
-              @if (!costoValido) {
-                <p class="fued-field-error">
-                  <i class="bi bi-exclamation-circle"></i>{{ 'estimator_file.cost_error' | translate }}
-                </p>
-              }
-            </div>
-
-            <!-- Notas internas -->
-            <div class="fued-field">
-              <label class="fued-label fued-label--muted">
-                <i class="bi bi-lock"></i>{{ 'estimator_file.internal_notes' | translate }}
-                <span class="fued-opt">({{ 'common.optional' | translate }})</span>
-              </label>
-              <textarea class="fued-input fued-textarea fued-textarea--sm" rows="3"
-                        [placeholder]="'estimator_file.notes_placeholder' | translate"
-                        [(ngModel)]="notasInternas"></textarea>
-            </div>
-
-            <!-- Checklist -->
-            <div class="fued-checklist">
-              <div class="fued-checklist-item" [class.fued-checklist-item--done]="!!estimadorSeleccionadoId()">
-                <i class="bi" [class.bi-check-circle]="!!estimadorSeleccionadoId()" [class.bi-circle]="!estimadorSeleccionadoId()"></i>
-                {{ 'admin_estimate.estimador_label' | translate }}
-              </div>
-              <div class="fued-checklist-item" [class.fued-checklist-item--done]="!!fechaVisita">
-                <i class="bi" [class.bi-check-circle]="!!fechaVisita" [class.bi-circle]="!fechaVisita"></i>
-                {{ 'estimator_file.check_visit_date' | translate }}
-              </div>
-              <div class="fued-checklist-item" [class.fued-checklist-item--done]="!!horaVisita">
-                <i class="bi" [class.bi-check-circle]="!!horaVisita" [class.bi-circle]="!horaVisita"></i>
-                {{ 'estimator_file.check_visit_time' | translate }}
-              </div>
-              <div class="fued-checklist-item" [class.fued-checklist-item--done]="!!descripcionProblema.trim()">
-                <i class="bi"
-                   [class.bi-check-circle]="!!descripcionProblema.trim()"
-                   [class.bi-circle]="!descripcionProblema.trim()"></i>
-                {{ 'estimator_file.problems_observed' | translate }}
-              </div>
-              <div class="fued-checklist-item" [class.fued-checklist-item--done]="urlsTour().length > 0">
-                <i class="bi"
-                   [class.bi-check-circle]="urlsTour().length > 0"
-                   [class.bi-circle]="urlsTour().length === 0"></i>
-                {{ 'estimator_file.tour_title' | translate }}
-                <span class="fued-opt">({{ 'common.optional' | translate }})</span>
-              </div>
-              <div class="fued-checklist-item"
-                   [class.fued-checklist-item--done]="costoMin !== null && costoMax !== null && costoValido">
-                <i class="bi"
-                   [class.bi-check-circle]="costoMin !== null && costoMax !== null && costoValido"
-                   [class.bi-circle]="costoMin === null || costoMax === null || !costoValido"></i>
-                {{ 'estimator_file.approx_cost' | translate }}
-                <span class="fued-opt">({{ 'common.optional' | translate }})</span>
-              </div>
-            </div>
-
-            @if (errorVisitaMsg()) {
-              <div class="fued-alert fued-alert--danger">{{ errorVisitaMsg() | translate }}</div>
-            }
-            @if (exitoVisitaMsg()) {
-              <div class="fued-alert fued-alert--success">{{ exitoVisitaMsg() | translate }}</div>
-            }
-
-            <!-- Acciones -->
-            <div class="fued-form-actions">
-              <button class="fued-btn-draft" (click)="guardarVisita()" [disabled]="guardandoVisita()">
-                @if (guardandoVisita()) {
-                  <span class="fued-spinner-sm"></span>{{ 'estimator_file.saving' | translate }}
-                } @else {
-                  <i class="bi bi-floppy"></i>{{ 'estimator_file.save_draft' | translate }}
-                }
-              </button>
-              <button class="fued-btn-submit" (click)="guardarEstimacion()"
-                      [disabled]="guardando()">
-                @if (guardando()) {
-                  <span class="fued-spinner-sm"></span>{{ 'estimator_file.sending' | translate }}
-                } @else {
-                  <i class="bi bi-send-check"></i>{{ 'estimator_file.send_estimation' | translate }}
-                }
-              </button>
-            </div>
-            <!-- Los botones ya no se bloquean con el formulario incompleto: al
-                 pulsarlos, este resumen dice qué falta. -->
-            <app-campos-faltantes class="mt-3" [extra]="modoEst() === 'borrador' ? faltantesBorrador : faltantesEst" [intento]="intentosEst()" />
-
-            @if (errorGuardado()) {
-              <div class="fued-alert fued-alert--danger">{{ errorGuardado() | translate }}</div>
-            }
-            @if (exitoMsg()) {
-              <div class="fued-alert fued-alert--success">{{ exitoMsg() | translate }}</div>
-            }
-
-          </div>
-
-          <!-- Zona de peligro: eliminar estimación -->
-          @if (hasDraft()) {
-            <div class="fued-danger-zone">
-              @if (!puedeEliminar) {
-                <p class="fued-danger-zone__blocked">
-                  <i class="bi bi-lock"></i>
-                  {{ 'admin_estimate.delete_blocked' | translate }}
-                </p>
-              } @else if (!confirmandoEliminar()) {
-                <button class="fued-btn-danger" (click)="confirmandoEliminar.set(true)"
-                        [disabled]="eliminando()">
-                  <i class="bi bi-trash3"></i>{{ 'admin_estimate.delete_btn' | translate }}
+                  {{ (guardandoTour() ? 'estimator_file.saving' : 'estimator_file.tour_add_video') | translate }}
                 </button>
-              } @else {
-                <p class="fued-danger-zone__confirm-msg">
-                  <i class="bi bi-exclamation-triangle"></i>
-                  {{ 'admin_estimate.delete_confirm' | translate }}
-                </p>
-                <div class="fued-danger-zone__actions">
-                  <button class="fued-btn-danger-confirm" (click)="eliminarEstimacion()"
-                          [disabled]="eliminando()">
-                    @if (eliminando()) {
-                      <span class="fued-spinner-sm"></span>{{ 'admin_estimate.deleting' | translate }}
-                    } @else {
-                      <i class="bi bi-trash3"></i>{{ 'admin_estimate.delete_confirm_btn' | translate }}
-                    }
-                  </button>
-                  <button class="fued-btn-cancel" (click)="confirmandoEliminar.set(false)"
-                          [disabled]="eliminando()">
-                    {{ 'common.cancel' | translate }}
-                  </button>
+                <button mat-button type="button" [disabled]="guardandoTour()" (click)="cancelarAgregarVideo()">
+                  {{ 'common.cancel' | translate }}
+                </button>
+              </div>
+              @if (nuevoUrlSafe) {
+                <p class="fi-hint">{{ 'estimator_file.preview_label' | translate }}</p>
+                <div class="fi-frame">
+                  <iframe [src]="nuevoUrlSafe" allowfullscreen allow="xr-spatial-tracking"
+                          [title]="'estimator_file.preview_label' | translate"></iframe>
                 </div>
-                @if (errorEliminar()) {
-                  <div class="fued-alert fued-alert--danger">{{ errorEliminar() }}</div>
-                }
               }
             </div>
           }
+        </section>
 
+        <!-- Ficha de la propiedad escaneada (Matterport), con sincronización -->
+        <app-matterport-info [modelos]="matterportModelos()"
+                             [puedeSincronizar]="true"
+                             [sincronizando]="sincronizandoMp()"
+                             [errorClave]="errorMpClave()"
+                             [exitoClave]="exitoMpClave()"
+                             (sincronizar)="sincronizarMatterport()" />
+
+        <!-- Documentos técnicos: pulsar o soltar -->
+        <section class="fi-card" aria-labelledby="ate-docs-title">
+          <h2 id="ate-docs-title" class="fi-h2">
+            {{ 'file.technical_docs' | translate }}
+            @if (documentos().length > 0) { <span class="fi-count">{{ documentos().length }}</span> }
+          </h2>
+
+          <label class="fi-drop" [class.is-busy]="subiendoDocumento()" [class.is-drag]="dragDocs()"
+                 (dragover)="onDragOverDocs($event)" (dragleave)="onDragLeaveDocs()" (drop)="onDropDocs($event)">
+            @if (subiendoDocumento()) {
+              <span class="fi-spinner" aria-hidden="true"></span>
+              <span class="fi-drop__title">{{ 'estimator_file.uploading' | translate }}</span>
+            } @else {
+              <mat-icon aria-hidden="true">upload_file</mat-icon>
+              <span class="fi-drop__title">{{ 'estimator_file.upload_doc' | translate }}</span>
+              <span class="fi-drop__sub">{{ 'my_documents.add_drop' | translate }}</span>
+            }
+            <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv" multiple
+                   class="cdk-visually-hidden" [disabled]="subiendoDocumento()" (change)="subirDocumentos($event)" />
+          </label>
+
+          @if (errorDocumentos()) {
+            <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorDocumentos() }}</p>
+          }
+
+          @if (documentos().length > 0) {
+            <ul class="fi-files">
+              @for (doc of documentos(); track doc.id) {
+                <li class="fi-file">
+                  <mat-icon class="fi-file__icon" aria-hidden="true">description</mat-icon>
+                  <span class="fi-file__text">
+                    <span class="fi-file__name" [title]="doc.nombre_archivo">{{ doc.nombre_archivo }}</span>
+                    <span class="fi-file__size">{{ formatTamano(doc.tamano_bytes) }}</span>
+                  </span>
+                  <button mat-button type="button" class="fi-file__open" (click)="verArchivo(doc)"
+                          [attr.aria-label]="('common.view' | translate) + ' ' + doc.nombre_archivo">
+                    {{ 'common.view' | translate }}
+                  </button>
+                  <button mat-icon-button type="button" class="fi-del" (click)="eliminarArchivo(doc, 'documento')"
+                          [attr.aria-label]="('common.delete' | translate) + ' ' + doc.nombre_archivo"
+                          [matTooltip]="'common.delete' | translate">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+
+        <!-- Invitación a constructores -->
+        <section class="fi-card" aria-labelledby="ate-invite-title">
+          <h2 id="ate-invite-title" class="fi-h2">
+            {{ 'admin_invite.title' | translate }}
+            @if (invitadosIds().size > 0) { <span class="fi-count">{{ invitadosIds().size }}</span> }
+          </h2>
+
+          @if (!puedeInvitar) {
+            <p class="fi-feedback is-warn"><mat-icon aria-hidden="true">info</mat-icon>{{ 'admin_invite.need_estimado' | translate }}</p>
+          } @else if (constructores().length === 0) {
+            <p class="fi-empty"><mat-icon aria-hidden="true">group_off</mat-icon>{{ 'admin_invite.no_constructores' | translate }}</p>
+          } @else {
+            <p class="fi-muted">{{ 'admin_invite.hint' | translate }}</p>
+            <ul class="fi-pick">
+              @for (c of constructores(); track c.id) {
+                <li class="fi-pick__item" [class.is-selected]="seleccionInvitados().has(c.id)">
+                  <div class="fi-pick__row">
+                    <mat-checkbox [checked]="seleccionInvitados().has(c.id)"
+                                  (change)="toggleSeleccionInvitado(c.id)"
+                                  [disabled]="!c.email || enviandoInvitacion() || guardando()
+                                              || abriendoATodos() || bloqueadoPorOferta">
+                      <span class="fi-pick__name">{{ c.nombre }} {{ c.apellido }}</span>
+                      @if (c.email) {
+                        <span class="fi-pick__sub"><mat-icon aria-hidden="true">mail</mat-icon>{{ c.email }}</span>
+                      } @else {
+                        <span class="fi-pick__sub"><mat-icon aria-hidden="true">unsubscribe</mat-icon>{{ 'admin_invite.no_email' | translate }}</span>
+                      }
+                    </mat-checkbox>
+                    @if (estaInvitado(c.id)) {
+                      <span class="fi-tag is-ok"><mat-icon aria-hidden="true">check_circle</mat-icon>{{ 'admin_invite.invited' | translate }}</span>
+                    }
+                  </div>
+                  <!-- La contraseña guardada está hasheada: mandar una implica fijarla.
+                       Se deja vacía para no tocar el acceso actual. -->
+                  @if (seleccionInvitados().has(c.id)) {
+                    <div class="fi-pick__extra">
+                      @if (c.proveedor === 'email') {
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                          <mat-label>{{ 'admin_invite.password_label' | translate }}</mat-label>
+                          <mat-icon matPrefix aria-hidden="true">key</mat-icon>
+                          <input matInput type="password" autocomplete="new-password"
+                                 [id]="'invite-pass-' + c.id"
+                                 [placeholder]="'admin_invite.password_ph' | translate"
+                                 [ngModel]="passwordInvitado(c.id)"
+                                 (ngModelChange)="setPasswordInvitado(c.id, $event)"
+                                 [disabled]="enviandoInvitacion() || guardando() || abriendoATodos()" />
+                        </mat-form-field>
+                        <p class="fi-hint">{{ 'admin_invite.password_hint' | translate }}</p>
+                      } @else {
+                        <p class="fi-hint"><mat-icon aria-hidden="true">shield_lock</mat-icon>{{ 'admin_invite.password_google' | translate }}</p>
+                      }
+                    </div>
+                  }
+                </li>
+              }
+            </ul>
+          }
+
+          <!-- Avisos y acciones: valen también sin constructores en la lista, porque
+               «Tous les constructeurs» sigue disponible. -->
+          @if (puedeInvitar) {
+            @if (errorInvitacionMsg()) {
+              <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorInvitacionMsg() | translate }}</p>
+            }
+            @if (exitoInvitacionMsg()) {
+              <p class="fi-feedback is-ok" role="status"><mat-icon aria-hidden="true">check_circle</mat-icon>{{ exitoInvitacionMsg() | translate:exitoInvitacionArgs() }}</p>
+            }
+
+            @if (bloqueadoPorOferta) {
+              <p class="fi-hint"><mat-icon aria-hidden="true">lock</mat-icon>{{ 'admin_invite.locked_en_oferta' | translate }}</p>
+            } @else {
+              <p class="fi-hint"><mat-icon aria-hidden="true">groups</mat-icon>{{ 'admin_invite.all_builders_hint' | translate }}</p>
+              @if (constructores().length > 0 && !formularioCompleto) {
+                <p class="fi-hint"><mat-icon aria-hidden="true">info</mat-icon>{{ 'admin_invite.send_and_estimate_hint' | translate }}</p>
+              }
+            }
+
+            <!-- Confirmación: abrir a todos borra la lista de invitados. -->
+            @if (confirmarAbrirATodos()) {
+              <div class="fi-confirm" role="alertdialog" aria-live="polite"
+                   aria-labelledby="ate-invite-confirm-title" aria-describedby="ate-invite-confirm-body">
+                <p class="fi-confirm__title" id="ate-invite-confirm-title">
+                  <mat-icon aria-hidden="true">warning</mat-icon>
+                  {{ 'admin_invite.all_builders_confirm_title' | translate }}
+                </p>
+                <p id="ate-invite-confirm-body">{{ 'admin_invite.all_builders_confirm_body' | translate }}</p>
+                @if (invitadosIds().size > 0) {
+                  <p>{{ 'admin_invite.all_builders_confirm_warning' | translate }}</p>
+                }
+                <div class="ate-inline-actions">
+                  <button mat-flat-button type="button" [disabled]="abriendoATodos()" (click)="abrirATodosLosConstructores()">
+                    @if (abriendoATodos()) {
+                      <span class="fi-spinner" aria-hidden="true"></span>
+                    } @else {
+                      <mat-icon>groups</mat-icon>
+                    }
+                    {{ (abriendoATodos() ? 'common.saving' : 'admin_invite.all_builders_confirm_ok') | translate }}
+                  </button>
+                  <button mat-button type="button" [disabled]="abriendoATodos()" (click)="cancelarAbrirATodos()">
+                    {{ 'common.cancel' | translate }}
+                  </button>
+                </div>
+              </div>
+            }
+
+            <div class="ate-invite-foot">
+              <span class="fi-hint">{{ 'admin_invite.selected_count' | translate:{ n: seleccionInvitados().size } }}</span>
+              <div class="ate-inline-actions">
+                <!-- Retira las invitaciones por correo: el dossier vuelve a ser público. -->
+                <button mat-stroked-button type="button" (click)="pedirAbrirATodos()"
+                        [disabled]="bloqueadoPorOferta || abriendoATodos() || confirmarAbrirATodos()
+                                    || enviandoInvitacion() || guardando()">
+                  <mat-icon>groups</mat-icon>
+                  {{ 'admin_invite.all_builders_btn' | translate }}
+                </button>
+                <!-- Envía el correo y además hace lo mismo que «Envoyer l'estimation». -->
+                <button mat-flat-button type="button" (click)="enviarInvitacionYEstimacion()"
+                        [disabled]="bloqueadoPorOferta || enviandoInvitacion() || guardando() || abriendoATodos()
+                                    || confirmarAbrirATodos() || seleccionInvitados().size === 0">
+                  @if (enviandoInvitacion() || guardando()) {
+                    <span class="fi-spinner" aria-hidden="true"></span>
+                  } @else {
+                    <mat-icon>forward_to_inbox</mat-icon>
+                  }
+                  {{ (enviandoInvitacion() || guardando() ? 'admin_invite.sending' : 'admin_invite.send_btn') | translate }}
+                </button>
+              </div>
+            </div>
+          }
+        </section>
+      </div>
+
+      <!-- ══ Columna del informe de visita ════════════════════════════════ -->
+      <section class="fi-card fi-form" aria-labelledby="ate-form-title">
+        <h2 id="ate-form-title" class="fi-h2">{{ 'estimator_file.visit_doc_title' | translate }}</h2>
+
+        <div class="fi-fields">
+          @if (estimadores().length === 0) {
+            <p class="fi-feedback is-warn"><mat-icon aria-hidden="true">info</mat-icon>{{ 'admin_estimate.no_estimadores' | translate }}</p>
+          } @else {
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>{{ 'admin_estimate.estimador_label' | translate }}</mat-label>
+              <mat-icon matPrefix aria-hidden="true">badge</mat-icon>
+              <mat-select id="est-estimador" required
+                          [value]="estimadorSeleccionadoId()"
+                          (selectionChange)="estimadorSeleccionadoId.set($event.value)">
+                <mat-option value="">{{ 'admin_estimate.select_estimador' | translate }}</mat-option>
+                @for (est of estimadores(); track est.id) {
+                  <mat-option [value]="est.id">{{ est.nombre }} {{ est.apellido }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          }
+
+          <div class="fi-row2">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>{{ 'estimator_file.real_date' | translate }}</mat-label>
+              <input matInput id="est-fecha" type="date" required [(ngModel)]="fechaVisita" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>{{ 'file.hour' | translate }}</mat-label>
+              <input matInput id="est-hora" type="time" required [(ngModel)]="horaVisita" />
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>{{ 'estimator_file.problems_observed' | translate }}</mat-label>
+            <textarea matInput id="est-problemas" rows="5" required
+                      [placeholder]="'estimator_file.problems_placeholder' | translate"
+                      [(ngModel)]="descripcionProblema"></textarea>
+          </mat-form-field>
+
+          <fieldset class="fi-fieldset">
+            <legend class="fi-label">
+              {{ 'estimator_file.approx_cost' | translate }}
+              <span class="fi-opt">({{ 'common.optional' | translate }})</span>
+            </legend>
+            <div class="fi-row2">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>{{ 'file.min' | translate }}</mat-label>
+                <span matTextPrefix>CA$&nbsp;</span>
+                <input matInput id="est-costo-min" type="number" inputmode="numeric" min="0" step="1000" placeholder="0"
+                       [(ngModel)]="costoMin" />
+              </mat-form-field>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>{{ 'file.max' | translate }}</mat-label>
+                <span matTextPrefix>CA$&nbsp;</span>
+                <input matInput id="est-costo-max" type="number" inputmode="numeric" min="0" step="1000" placeholder="0"
+                       [(ngModel)]="costoMax" />
+              </mat-form-field>
+            </div>
+            @if (!costoValido) {
+              <p class="fi-error"><mat-icon aria-hidden="true">error</mat-icon>{{ 'estimator_file.cost_error' | translate }}</p>
+            }
+          </fieldset>
+
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>{{ 'estimator_file.internal_notes' | translate }} ({{ 'common.optional' | translate }})</mat-label>
+            <mat-icon matSuffix aria-hidden="true">lock</mat-icon>
+            <textarea matInput rows="3" [(ngModel)]="notasInternas"></textarea>
+            <mat-hint>{{ 'estimator_file.notes_placeholder' | translate }}</mat-hint>
+          </mat-form-field>
         </div>
-      </aside>
 
+        <ul class="fi-check" aria-hidden="true">
+          @for (c of checklist; track c.label) {
+            <li [class.is-done]="c.ok">
+              @if (c.ok) { <mat-icon>check_circle</mat-icon> } @else { <mat-icon>radio_button_unchecked</mat-icon> }
+              {{ c.label | translate }}
+              @if (c.opcional) { <span>({{ 'common.optional' | translate }})</span> }
+            </li>
+          }
+        </ul>
+
+        @if (errorVisitaMsg()) {
+          <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorVisitaMsg() | translate }}</p>
+        }
+        @if (exitoVisitaMsg()) {
+          <p class="fi-feedback is-ok" role="status"><mat-icon aria-hidden="true">check_circle</mat-icon>{{ exitoVisitaMsg() | translate }}</p>
+        }
+
+        <!-- Tomate: enviar la estimación es la siguiente etapa del dossier. -->
+        <div class="fi-actions">
+          <button mat-stroked-button type="button" [disabled]="guardandoVisita()" (click)="guardarVisita()">
+            @if (guardandoVisita()) {
+              <span class="fi-spinner" aria-hidden="true"></span>
+            } @else {
+              <mat-icon>save</mat-icon>
+            }
+            {{ (guardandoVisita() ? 'estimator_file.saving' : 'estimator_file.save_draft') | translate }}
+          </button>
+          <button mat-flat-button type="button" class="ds-cta" [disabled]="guardando()" (click)="guardarEstimacion()">
+            @if (guardando()) {
+              <span class="fi-spinner" aria-hidden="true"></span>
+            } @else {
+              <mat-icon>send</mat-icon>
+            }
+            {{ (guardando() ? 'estimator_file.sending' : 'estimator_file.send_estimation') | translate }}
+          </button>
+        </div>
+
+        <!-- Los botones no se bloquean con el formulario incompleto: al pulsarlos,
+             este resumen dice qué falta. -->
+        <app-campos-faltantes [extra]="modoEst() === 'borrador' ? faltantesBorrador : faltantesEst" [intento]="intentosEst()" />
+
+        @if (errorGuardado()) {
+          <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorGuardado() | translate }}</p>
+        }
+        @if (exitoMsg()) {
+          <p class="fi-feedback is-ok" role="status"><mat-icon aria-hidden="true">check_circle</mat-icon>{{ exitoMsg() | translate }}</p>
+        }
+
+        <!-- Eliminar la estimación: irreversible, se confirma en el sitio. -->
+        @if (hasDraft()) {
+          <div class="ate-delete">
+            @if (!puedeEliminar) {
+              <p class="fi-hint"><mat-icon aria-hidden="true">lock</mat-icon>{{ 'admin_estimate.delete_blocked' | translate }}</p>
+            } @else if (!confirmandoEliminar()) {
+              <button mat-button type="button" class="ate-delete__btn" [disabled]="eliminando()"
+                      (click)="confirmandoEliminar.set(true)">
+                <mat-icon>delete</mat-icon>
+                {{ 'admin_estimate.delete_btn' | translate }}
+              </button>
+            } @else {
+              <div class="ate-delete__confirm" role="alertdialog" aria-labelledby="ate-delete-title">
+                <p class="ate-delete__title" id="ate-delete-title">
+                  <mat-icon aria-hidden="true">warning</mat-icon>
+                  {{ 'admin_estimate.delete_confirm' | translate }}
+                </p>
+                <div class="ate-inline-actions">
+                  <button mat-button type="button" [disabled]="eliminando()" (click)="confirmandoEliminar.set(false)">
+                    {{ 'common.cancel' | translate }}
+                  </button>
+                  <button mat-flat-button type="button" class="ate-delete__ok" [disabled]="eliminando()"
+                          [attr.aria-busy]="eliminando()" (click)="eliminarEstimacion()">
+                    @if (eliminando()) {
+                      <span class="fi-spinner" aria-hidden="true"></span>
+                    } @else {
+                      <mat-icon>delete</mat-icon>
+                    }
+                    {{ (eliminando() ? 'admin_estimate.deleting' : 'admin_estimate.delete_confirm_btn') | translate }}
+                  </button>
+                </div>
+                @if (errorEliminar()) {
+                  <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorEliminar() }}</p>
+                }
+              </div>
+            }
+          </div>
+        }
+      </section>
     </div>
   }
-
 </div>

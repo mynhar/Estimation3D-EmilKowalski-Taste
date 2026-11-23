@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe } from '@ngx-translate/core';
 
 /**
@@ -23,7 +24,7 @@ export type AmbitoArchivado = 'expediente' | 'oferta' | 'contrato' | 'obra' | 'a
 @Component({
   selector: 'app-aviso-archivado',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, DatePipe],
+  imports: [MatIconModule, TranslatePipe, DatePipe],
   templateUrl: './aviso-archivado.component.html',
   styleUrl: './aviso-archivado.component.css',
 })

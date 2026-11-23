@@ -1,118 +1,84 @@
-:host {
-  display: block;
-  font-family: var(--ds-font-body);
-  color: var(--ds-ink);
+/* component: suivi de chantier del cliente (Trait rouge)
+ * states: cargando · error · vacío · por dossier (plegable) · obras
+ * contrast: cifras ink sobre kraft (12.1:1) · etiquetas ink-secondary · error danger-ink sobre danger-soft (5.8:1)
+ *           tomate: ninguno en la lista
+ * type: cifras 75 % con tabular-nums; el resto lo pone cada tarjeta de obra
+ */
+
+.cm {
+  display: grid;
+  gap: var(--ds-space-5);
+  max-width: 1320px;
+  min-width: 0;
 }
 
-.cm-page {
-  /* Full-bleed: usa el 100% del ancho disponible, con respiración lateral. */
-  width: 100%;
-  margin: 0;
-  padding: var(--ds-space-6) clamp(var(--ds-space-4), 4vw, var(--ds-space-8)) var(--ds-space-9);
+.cm-fig { font-stretch: var(--ds-stretch-figure); font-variant-numeric: tabular-nums; }
+.cm-empty { max-width: 44rem; }
+
+.cm-error {
   display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-6);
-}
-
-/* ── Encabezado de página ── */
-.cm-pagehead {
-  margin-bottom: var(--ds-space-1);
-  padding-bottom: var(--ds-space-4);
-  border-bottom: 1px solid var(--ds-border);
-}
-.cm-eyebrow {
-  display: block;
-  font-size: var(--ds-text-2xs);
-  letter-spacing: var(--ds-tracking-widest);
-  text-transform: uppercase;
-  color: var(--ds-ink-muted);
-  margin-bottom: var(--ds-space-2);
-}
-.cm-pagetitle {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-3xl);
-  font-weight: var(--ds-weight-semibold);
-  letter-spacing: var(--ds-tracking-tight);
-  line-height: var(--ds-leading-tight);
+  align-items: flex-start;
+  gap: var(--ds-space-2);
   margin: 0;
-}
-.cm-pagesub {
-  color: var(--ds-ink-secondary);
-  font-size: var(--ds-text-sm);
-  margin: var(--ds-space-2) 0 0;
-}
-
-/* ── Estados de carga / vacío ── */
-.cm-loading { display: flex; justify-content: center; padding: var(--ds-space-9) 0; }
-.cm-spinner {
-  width: 32px; height: 32px;
-  border: 3px solid var(--ds-border);
-  border-top-color: var(--ds-gold);
-  border-radius: var(--ds-radius-circle);
-  animation: cm-spin 0.7s linear infinite;
-}
-@keyframes cm-spin { to { transform: rotate(360deg); } }
-
-.cm-empty {
-  text-align: center;
-  padding: var(--ds-space-9) var(--ds-space-5);
-  background: var(--ds-surface);
-  border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-lg);
-}
-.cm-empty i { font-size: 2.5rem; color: var(--ds-gold-ink); }
-.cm-empty__title {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-xl);
-  margin: var(--ds-space-3) 0 var(--ds-space-1);
-}
-.cm-empty__hint { color: var(--ds-ink-muted); font-size: var(--ds-text-sm); margin: 0; }
-
-.cm-alert {
-  display: flex; align-items: center; gap: var(--ds-space-3);
-  padding: var(--ds-space-4);
+  padding: var(--ds-space-3) var(--ds-space-4);
   border-radius: var(--ds-radius-md);
-  font-size: var(--ds-text-sm);
-}
-.cm-alert--error {
   background: var(--ds-danger-soft);
   color: var(--ds-danger-ink);
-  border: 1px solid color-mix(in srgb, var(--ds-danger) 25%, transparent);
 }
-.cm-alert p { margin: 0; }
+.cm-error mat-icon { flex-shrink: 0; }
 
-/* ── Franja de resumen (misma que Mis documentos) ── */
-.cm-stats { display: flex; flex-wrap: wrap; gap: var(--ds-space-3); }
-.cm-stat {
-  flex: 1 1 120px;
-  min-width: 110px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-1);
+.cm-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: var(--ds-space-3) var(--ds-space-5);
+  margin: 0;
   padding: var(--ds-space-4) var(--ds-space-5);
-  background: var(--ds-surface);
-  border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
-  box-shadow: var(--ds-shadow-xs);
+  border-radius: var(--ds-radius-lg);
+  background: var(--ds-band);
 }
-.cm-stat--accent { background: var(--ds-gold-faint); border-color: var(--ds-gold); }
-.cm-stat__num {
+.cm-stat { display: grid; gap: var(--ds-space-1); min-width: 0; }
+.cm-stat dt { font-size: var(--ds-text-sm); color: var(--ds-ink-secondary); }
+.cm-stat dd {
+  margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-3xl);
-  font-weight: var(--ds-weight-semibold);
-  line-height: 1;
+  font-size: var(--ds-text-2xl);
+  font-weight: var(--ds-weight-bold);
+  font-stretch: var(--ds-stretch-figure);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--ds-leading-tight);
   color: var(--ds-ink);
 }
-.cm-stat__label {
-  font-size: var(--ds-text-2xs);
-  letter-spacing: var(--ds-tracking-wide);
-  text-transform: uppercase;
-  color: var(--ds-ink-muted);
-}
 
-/* ── Acordeón por expediente (app-expediente-panel) ── */
-.cm-accordion { display: flex; flex-direction: column; gap: var(--ds-space-4); }
-.cm-meta { display: inline-flex; align-items: center; gap: var(--ds-space-3); flex-wrap: wrap; }
-.cm-meta__item { display: inline-flex; align-items: center; gap: var(--ds-space-1); white-space: nowrap; }
-.cm-meta__avance { font-weight: var(--ds-weight-semibold); color: var(--ds-ink); }
-.cm-meta__obra { font-size: var(--ds-text-2xs); gap: 4px; }
+.cm-accordion { display: grid; gap: var(--ds-space-4); }
+
+.cm-meta { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--ds-space-2) var(--ds-space-4); }
+.cm-meta__item { display: inline-flex; align-items: center; gap: var(--ds-space-1); }
+.cm-meta__item mat-icon { width: 18px; height: 18px; font-size: 18px; }
+.cm-obra {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  min-height: 28px;
+  padding: 2px var(--ds-space-3);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-success-soft);
+  color: var(--ds-success-ink);
+  font-size: var(--ds-text-sm);
+  font-weight: var(--ds-weight-semibold);
+}
+.cm-obra mat-icon { width: 16px; height: 16px; font-size: 16px; }
+
+.cm-skel { display: grid; gap: var(--ds-space-4); }
+.skel {
+  display: block;
+  border-radius: var(--ds-radius-lg);
+  background: var(--ds-bg-alt);
+  animation: skel 1.4s var(--ds-ease-in-out) infinite alternate;
+}
+.skel--strip { height: 88px; }
+.skel--panel { height: 26rem; }
+@keyframes skel { to { opacity: 0.45; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .skel { animation: none; }
+}

@@ -1,6 +1,8 @@
 import {
   ChangeDetectionStrategy, Component, ElementRef, OnInit, computed, inject, input, signal, viewChild,
 } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { LangService } from '../../../services/lang.service';
 import { PerfilVideoService, VideoError } from '../../../services/perfil-video.service';
@@ -31,7 +33,7 @@ type Tarea = { tipo: 'subiendo'; titulo: string } | { tipo: 'guardando' } | { ti
 @Component({
   selector: 'app-video-expediente',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, GrabadorVideoComponent, ReproductorVideoComponent],
+  imports: [TranslatePipe, MatButtonModule, MatIconModule, GrabadorVideoComponent, ReproductorVideoComponent],
   templateUrl: './video-expediente.component.html',
   styleUrls: ['./video-slot.css', './video-expediente.component.css'],
 })

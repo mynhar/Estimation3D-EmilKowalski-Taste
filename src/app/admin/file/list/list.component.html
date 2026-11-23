@@ -1,325 +1,229 @@
-<div class="container-fluid py-4 px-3 px-xl-4">
+<div class="page-wrapper ls">
 
-  <!-- ── Encabezado ─────────────────────────────────────────────────────────── -->
-  <header class="page-header p-4 mb-4">
-    <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
-      <div>
-        <p class="page-eyebrow">
-          <i class="bi bi-shield-check"></i>{{ 'role.administrateur' | translate }}
-        </p>
-        <h4 class="mb-1">{{ 'admin_file.title' | translate }}</h4>
-        <p class="text-muted small mb-0">{{ 'admin_file.subtitle' | translate }}</p>
-      </div>
-      <div class="d-flex align-items-center gap-2 flex-wrap">
-        @if (!cargando() && !error()) {
-          <span class="kpi-pill">
-            <i class="bi bi-folder2"></i>
-            {{ totalItems() }} {{ 'admin_file.count' | translate }}
-          </span>
-        }
-        <a routerLink="/admin/file/create" class="btn btn-primary btn-sm">
-          <i class="bi bi-plus me-1"></i>{{ 'admin_file.add_btn' | translate }}
-        </a>
-      </div>
-    </div>
-  </header>
+  <app-page-header [titulo]="'admin_file.title' | translate"
+                   [contexto]="'admin_file.subtitle' | translate">
+    <a actions mat-flat-button class="ds-cta" routerLink="/admin/file/create">
+      <mat-icon>add</mat-icon>
+      {{ 'admin_file.add_btn' | translate }}
+    </a>
+  </app-page-header>
 
-  <!-- ── Filtros ───────────────────────────────────────────────────────────
-       Fuera del @if de carga a propósito: si se destruyen y recrean en cada
-       recarga, el input de búsqueda pierde el foco letra a letra. -->
-  <div class="filter-bar mb-3">
+  <!-- ── Búsqueda, estado y vista ─────────────────────────────────────────
+       Fuera del @if de carga a propósito: la consulta es del servidor y, si se
+       recrearan en cada recarga, el campo de búsqueda perdería el foco letra a letra. -->
+  <div class="ls-tools">
+    <mat-form-field class="ls-search" appearance="outline" subscriptSizing="dynamic">
+      <mat-label>{{ 'common.search' | translate }}</mat-label>
+      <mat-icon matPrefix aria-hidden="true">search</mat-icon>
+      <input matInput type="search" autocomplete="off"
+             [placeholder]="'admin_file.search_placeholder' | translate"
+             [value]="busqueda()" (input)="setBusqueda($event)" />
+      @if (busqueda()) {
+        <button mat-icon-button matSuffix type="button"
+                [attr.aria-label]="'common.clear' | translate" (click)="clearBusqueda()">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </mat-form-field>
 
-    <!-- Búsqueda -->
-    <div class="filter-bar__search">
-      <div class="input-group">
-        <span class="input-group-text search-icon">
-          <i class="bi bi-search"></i>
-        </span>
-        <input type="text" class="form-control search-input"
-               [placeholder]="'admin_file.search_placeholder' | translate"
-               [value]="busqueda()"
-               (input)="setBusqueda($event)">
-        @if (busqueda()) {
-          <button class="btn search-clear" type="button" (click)="clearBusqueda()"
-                  [title]="'common.clear' | translate">
-            <i class="bi bi-x-lg"></i>
-          </button>
-        }
-      </div>
-    </div>
-
-    <!-- Status chips -->
-    <div class="filter-bar__chips">
-      <div class="status-chips" role="group">
+    <div class="ls-filter is-grid">
+      <span class="ls-filter__label" id="afl-state-label">{{ 'admin_file.status_filter' | translate }}</span>
+      <mat-button-toggle-group class="ls-toggle" hideSingleSelectionIndicator
+                               aria-labelledby="afl-state-label"
+                               [value]="filtroEstado()" (change)="setFiltroEstado($event.value)">
         @for (estado of estados; track estado) {
-          <button type="button" class="status-chip"
-                  [class.status-chip--active]="filtroEstado() === estado"
-                  (click)="setFiltroEstado(estado)">
-            <span class="status-chip__label">
-              {{ estado === 'todos'
-                  ? ('common.all' | translate)
-                  : (('admin_file.status_' + estado) | translate) }}
-            </span>
-            @if (estado === 'todos') {
-              <span class="status-chip__count">{{ totalItems() }}</span>
-            }
-          </button>
+          <mat-button-toggle [value]="estado">
+            {{ (estado === 'todos' ? 'common.all' : 'admin_file.status_' + estado) | translate }}
+            @if (estado === 'todos' && !cargando()) { <span class="ls-count">{{ totalItems() }}</span> }
+          </mat-button-toggle>
         }
-      </div>
-      <div class="filter-bar__right">
-        @if (hayFiltros()) {
-          <button class="btn-clear-filters" (click)="limpiarFiltros()">
-            <i class="bi bi-x-circle"></i>{{ 'common.clear_filters' | translate }}
-          </button>
-        }
-        <div class="view-toggle d-none d-md-inline-flex" role="group"
-             [attr.aria-label]="'admin_file.view_table' | translate">
-          <button type="button" class="view-toggle__btn"
-                  [class.view-toggle__btn--active]="vista() === 'tabla'"
-                  [attr.aria-pressed]="vista() === 'tabla'"
-                  (click)="setVista('tabla')"
-                  [title]="'admin_file.view_table' | translate">
-            <i class="bi bi-table" aria-hidden="true"></i>
-          </button>
-          <button type="button" class="view-toggle__btn"
-                  [class.view-toggle__btn--active]="vista() === 'tarjetas'"
-                  [attr.aria-pressed]="vista() === 'tarjetas'"
-                  (click)="setVista('tarjetas')"
-                  [title]="'admin_file.view_cards' | translate">
-            <i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>
-          </button>
-        </div>
-      </div>
+      </mat-button-toggle-group>
     </div>
 
+    <mat-button-toggle-group class="ls-toggle ls-view" hideSingleSelectionIndicator
+                             [value]="vista()" (change)="setVista($event.value)">
+      <mat-button-toggle value="tarjetas" [aria-label]="'admin_file.view_cards' | translate"
+                         [matTooltip]="'admin_file.view_cards' | translate">
+        <mat-icon>grid_view</mat-icon>
+      </mat-button-toggle>
+      <mat-button-toggle value="tabla" [aria-label]="'admin_file.view_table' | translate"
+                         [matTooltip]="'admin_file.view_table' | translate">
+        <mat-icon>table_rows</mat-icon>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
   </div>
 
-  <!-- ── Skeleton (sólo el listado) ──────────────────────────────────────── -->
-  @if (cargando()) {
-    <div class="skeleton-wrap">
-      <div class="skeleton-table">
-        @for (i of [1,2,3,4,5,6,7,8]; track i) {
-          <div class="skeleton-row">
-            <div class="skel skel--xs"></div>
-            <div class="skel skel--lg"></div>
-            <div class="skel skel--sm"></div>
-            <div class="skel skel--md"></div>
-            <div class="skel skel--md"></div>
-            <div class="skel skel--sm"></div>
-          </div>
-        }
-      </div>
+  @if (hayFiltros() && !cargando() && !error()) {
+    <div class="ls-status">
+      <p class="ls-showing" role="status">
+        <span class="ls-fig">{{ totalItems() }}</span> {{ 'admin_file.count' | translate }}
+      </p>
+      <button mat-button type="button" class="ls-clear" (click)="limpiarFiltros()">
+        <mat-icon>close</mat-icon>
+        {{ 'common.clear_filters' | translate }}
+      </button>
     </div>
-  <!-- ── Error ──────────────────────────────────────────────────────────────── -->
-  } @else if (error()) {
-    <div class="empty-state">
-      <div class="empty-state__icon empty-state__icon--danger">
-        <i class="bi bi-exclamation-triangle"></i>
-      </div>
-      <p class="empty-state__title">{{ 'common.error' | translate }}</p>
-      <p class="empty-state__desc">{{ error() }}</p>
-    </div>
-
-  <!-- ── Contenido ──────────────────────────────────────────────────────────── -->
-  } @else {
-
-    <!-- ── Tabla / Tarjetas ─────────────────────────────────────────────────── -->
-    <div class="table-card">
-
-      @if (expedientes().length === 0) {
-        <!-- ── Estado vacío (compartido) ──────────────────────────────────── -->
-        <div class="empty-state empty-state--table">
-          @if (hayFiltros()) {
-            <div class="empty-state__icon">
-              <i class="bi bi-funnel"></i>
-            </div>
-            <p class="empty-state__title">{{ 'admin_file.no_results' | translate }}</p>
-            <p class="empty-state__desc">{{ 'admin_file.no_results_hint' | translate }}</p>
-            <button class="btn btn-outline-primary btn-sm mt-2" (click)="limpiarFiltros()">
-              <i class="bi bi-x-circle me-1"></i>{{ 'common.clear_filters' | translate }}
-            </button>
-          } @else {
-            <div class="empty-state__icon">
-              <i class="bi bi-folder2-open"></i>
-            </div>
-            <p class="empty-state__title">{{ 'admin_file.no_data' | translate }}</p>
-            <p class="empty-state__desc">{{ 'admin_file.no_data_hint' | translate }}</p>
-            <a routerLink="/admin/file/create" class="btn btn-primary btn-sm mt-2">
-              <i class="bi bi-plus me-1"></i>{{ 'admin_file.add_btn' | translate }}
-            </a>
-          }
-        </div>
-
-      } @else {
-
-        <!-- ── Tabla (escritorio, vista tabla) ──────────────────────────────── -->
-        <div class="table-responsive d-none" [class.d-md-block]="vista() === 'tabla'">
-          <table class="table table-admin align-middle mb-0">
-            <thead>
-              <tr>
-                <th class="col-num">#</th>
-                <th>{{ 'admin_file.col_client' | translate }} / {{ 'admin_file.col_service' | translate }}</th>
-                <th>{{ 'admin_file.col_visit_date' | translate }}</th>
-                <th>{{ 'admin_file.col_status' | translate }}</th>
-                <th>{{ 'admin_file.col_estimator' | translate }}</th>
-                <th class="text-end">{{ 'admin_file.col_price' | translate }}</th>
-                <th class="col-actions"></th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (e of expedientes(); track e.id) {
-                <tr class="table-row table-row--clickable" (click)="irAEditar(e.id)">
-
-                  <!-- Número -->
-                  <td class="col-num">
-                    <span class="exp-num">{{ e.numero }}</span>
-                  </td>
-
-                  <!-- Cliente / Servicio -->
-                  <td class="col-identity">
-                    <span class="cell-primary">{{ e.cliente_nombre }}</span>
-                    <span class="cell-secondary">{{ servicioNombre(e) }}</span>
-                  </td>
-
-                  <!-- Visita -->
-                  <td class="col-date">
-                    <span class="cell-primary">{{ formatFecha(e.fecha_visita) }}</span>
-                    @if (e.fecha_visita_real) {
-                      <span class="cell-secondary cell-real-date">
-                        <i class="bi bi-check2"></i>{{ formatFecha(e.fecha_visita_real) }}
-                      </span>
-                    }
-                  </td>
-
-                  <!-- Estado -->
-                  <td>
-                    <span class="estado-badge {{ estadoBadge(e.estado) }}">
-                      {{ ('admin_file.status_' + e.estado) | translate }}
-                    </span>
-                  </td>
-
-                  <!-- Estimador -->
-                  <td class="col-estimador">
-                    @if (e.estimador_nombre) {
-                      <span class="cell-primary">{{ e.estimador_nombre }}</span>
-                    } @else {
-                      <span class="cell-muted">—</span>
-                    }
-                  </td>
-
-                  <!-- Precio / Inicio -->
-                  <td class="text-end col-precio">
-                    @if (e.oferta_precio) {
-                      <span class="cell-precio">{{ formatPrecio(e.oferta_precio) }}</span>
-                      @if (e.oferta_fecha_inicio) {
-                        <span class="cell-secondary">{{ formatFecha(e.oferta_fecha_inicio) }}</span>
-                      }
-                    } @else {
-                      <span class="cell-muted">—</span>
-                    }
-                  </td>
-
-                  <!-- Acciones -->
-                  <td class="col-actions" (click)="$event.stopPropagation()">
-                    <a [routerLink]="['/admin/file/edit', e.id]"
-                       class="action-btn"
-                       [title]="'admin_file.edit_btn' | translate">
-                      <i class="bi bi-pencil"></i>
-                    </a>
-                  </td>
-
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-
-        <!-- ── Tarjetas (móvil siempre · escritorio en vista tarjetas) ──────── -->
-        <ul class="file-cards list-unstyled mb-0" [class.d-md-none]="vista() === 'tabla'">
-          @for (e of expedientes(); track e.id) {
-            <li class="file-card" role="button" tabindex="0"
-                (click)="irAEditar(e.id)"
-                (keydown.enter)="irAEditar(e.id)"
-                (keydown.space)="$event.preventDefault(); irAEditar(e.id)">
-
-              <!-- Foto del expediente (miniatura del tour 3D) -->
-              <div class="file-card__photo">
-                @if (fotoExpediente(e); as foto) {
-                  <img class="file-card__photo-img" [src]="foto" loading="lazy"
-                       [alt]="e.numero" (error)="onFotoError(e.id)" />
-                } @else {
-                  <div class="file-card__photo-empty"
-                       [title]="'admin_file.photo_none' | translate">
-                    <i class="bi bi-badge-3d" aria-hidden="true"></i>
-                  </div>
-                }
-                <span class="estado-badge file-card__badge {{ estadoBadge(e.estado) }}">
-                  {{ ('admin_file.status_' + e.estado) | translate }}
-                </span>
-              </div>
-
-              <div class="file-card__content">
-                <div class="file-card__top">
-                  <span class="exp-num">{{ e.numero }}</span>
-                  @if (e.oferta_precio) {
-                    <span class="cell-precio d-inline">{{ formatPrecio(e.oferta_precio) }}</span>
-                  }
-                </div>
-
-                <div class="file-card__body">
-                  <span class="cell-primary file-card__name">{{ e.cliente_nombre }}</span>
-                  <span class="cell-secondary file-card__service">{{ servicioNombre(e) }}</span>
-                  @if (direccionLinea1(e) || direccionLinea2(e)) {
-                    <p class="file-card__addr" [title]="direccionCompleta(e)">
-                      <i class="bi bi-geo-alt file-card__addr-icon" aria-hidden="true"></i>
-                      <span class="file-card__addr-text">
-                        @if (direccionLinea1(e)) {
-                          <span class="file-card__addr-line">{{ direccionLinea1(e) }}</span>
-                        }
-                        @if (direccionLinea2(e)) {
-                          <span class="file-card__addr-line file-card__addr-line--muted">{{ direccionLinea2(e) }}</span>
-                        }
-                      </span>
-                    </p>
-                  }
-                </div>
-
-                <dl class="file-card__meta">
-                  <div class="file-card__meta-item">
-                    <dt><i class="bi bi-calendar3" aria-hidden="true"></i>{{ 'admin_file.col_visit_date' | translate }}</dt>
-                    <dd>
-                      {{ formatFecha(e.fecha_visita) }}
-                      @if (e.fecha_visita_real) {
-                        <span class="cell-real-date"><i class="bi bi-check2"></i>{{ formatFecha(e.fecha_visita_real) }}</span>
-                      }
-                    </dd>
-                  </div>
-                  <div class="file-card__meta-item">
-                    <dt><i class="bi bi-person" aria-hidden="true"></i>{{ 'admin_file.col_estimator' | translate }}</dt>
-                    <dd>{{ e.estimador_nombre || '—' }}</dd>
-                  </div>
-                </dl>
-              </div>
-            </li>
-          }
-        </ul>
-
-      }
-
-      <!-- ── Paginación ───────────────────────────────────────────────────── -->
-      @if (totalItems() > POR_PAGINA) {
-        <div class="table-footer">
-          <app-pagination
-            [total]="totalItems()"
-            [page]="paginaActual()"
-            [pageSize]="POR_PAGINA"
-            (pageChange)="paginaActual.set($event)">
-          </app-pagination>
-        </div>
-      }
-
-    </div>
-
   }
 
+  <!-- ── Cargando ────────────────────────────────────────────────────────── -->
+  @if (cargando()) {
+    <div class="ls-grid" role="status">
+      <span class="cdk-visually-hidden">{{ 'common.loading' | translate }}</span>
+      @for (_ of [1, 2, 3]; track $index) {
+        <span class="skel" aria-hidden="true"></span>
+      }
+    </div>
+
+  <!-- ── Error ───────────────────────────────────────────────────────────── -->
+  } @else if (error()) {
+    <p class="ls-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ error() }}</p>
+
+  <!-- ── Sin resultados / sin dossiers ───────────────────────────────────── -->
+  } @else if (expedientes().length === 0) {
+    @if (hayFiltros()) {
+      <app-empty-state class="ls-empty" matIcon="filter_alt_off"
+                       [titulo]="'admin_file.no_results' | translate"
+                       [texto]="'admin_file.no_results_hint' | translate">
+        <button actions mat-stroked-button type="button" (click)="limpiarFiltros()">
+          {{ 'common.clear_filters' | translate }}
+        </button>
+      </app-empty-state>
+    } @else {
+      <app-empty-state class="ls-empty" matIcon="folder_open"
+                       [titulo]="'admin_file.no_data' | translate"
+                       [texto]="'admin_file.no_data_hint' | translate" />
+    }
+
+  } @else {
+
+    <!-- ── Tabla (escritorio, si se elige) ───────────────────────────────── -->
+    @if (vista() === 'tabla') {
+      <div class="ls-table-wrap">
+        <table class="ls-table">
+          <thead>
+            <tr>
+              <th scope="col">{{ 'admin_file.col_number' | translate }}</th>
+              <th scope="col">{{ 'admin_file.col_client' | translate }}</th>
+              <th scope="col">{{ 'admin_file.col_visit_date' | translate }}</th>
+              <th scope="col">{{ 'admin_file.col_status' | translate }}</th>
+              <th scope="col">{{ 'admin_file.col_estimator' | translate }}</th>
+              <th scope="col" class="is-right">{{ 'admin_file.col_price' | translate }}</th>
+              <th scope="col"><span class="cdk-visually-hidden">{{ 'admin_file.edit_btn' | translate }}</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (e of expedientes(); track e.id) {
+              <tr class="ls-table__row is-link" (click)="irAEditar(e.id)">
+                <td class="ls-fig">{{ e.numero }}</td>
+                <td>
+                  <span class="ls-table__text">
+                    <a class="ls-table__link" [id]="'afl-t-' + e.id"
+                       [routerLink]="['/admin/file/edit', e.id]"
+                       (click)="$event.stopPropagation()">{{ e.cliente_nombre }}</a>
+                    <span class="ls-table__sub">{{ servicioNombre(e) }}</span>
+                  </span>
+                </td>
+                <td>
+                  <span class="ls-table__text">
+                    <span class="ls-fig">{{ formatFecha(e.fecha_visita) }}</span>
+                    @if (e.fecha_visita_real) {
+                      <span class="ls-table__sub afl-real">
+                        <mat-icon aria-hidden="true">check</mat-icon>
+                        <span class="cdk-visually-hidden">{{ 'admin_file.col_real_visit' | translate }} </span>
+                        <span class="ls-fig">{{ formatFecha(e.fecha_visita_real) }}</span>
+                      </span>
+                    }
+                  </span>
+                </td>
+                <td><app-status-chip [estado]="e.estado" prefijo="admin_file.status_" /></td>
+                <td>{{ e.estimador_nombre || '—' }}</td>
+                <td class="is-right">
+                  @if (e.oferta_precio) {
+                    <span class="ls-table__text">
+                      <span class="ls-fig afl-price">{{ formatPrecio(e.oferta_precio) }}</span>
+                      @if (e.oferta_fecha_inicio) {
+                        <span class="ls-table__sub ls-fig">{{ formatFecha(e.oferta_fecha_inicio) }}</span>
+                      }
+                    </span>
+                  } @else { — }
+                </td>
+                <td class="ls-table__action" (click)="$event.stopPropagation()">
+                  <a mat-icon-button [routerLink]="['/admin/file/edit', e.id]"
+                     [attr.aria-label]="'admin_file.edit_btn' | translate"
+                     [attr.aria-describedby]="'afl-t-' + e.id"
+                     [matTooltip]="'admin_file.edit_btn' | translate">
+                    <mat-icon>edit</mat-icon>
+                  </a>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    <!-- ── Tarjetas (en móvil siempre; en escritorio, salvo vista tabla) ──── -->
+    <ul class="ls-grid" [class.is-mobile-only]="vista() === 'tabla'">
+      @for (e of expedientes(); track e.id) {
+        <li class="ls-card" [class.is-out]="e.estado === 'cancelado' || e.estado === 'archivado'">
+          <span class="ls-card__photo">
+            @if (fotoExpediente(e); as foto) {
+              <img [src]="foto" loading="lazy" alt="" (error)="onFotoError(e.id)" />
+            } @else {
+              <mat-icon aria-hidden="true">view_in_ar</mat-icon>
+              <span class="ls-card__nophoto">{{ 'admin_file.photo_none' | translate }}</span>
+            }
+          </span>
+
+          <div class="ls-card__body">
+            <span class="ls-tags">
+              <app-status-chip [estado]="e.estado" prefijo="admin_file.status_" />
+              @if (e.oferta_precio) { <span class="ls-tag ls-fig">{{ formatPrecio(e.oferta_precio) }}</span> }
+            </span>
+
+            <h2 class="ls-card__title">
+              <a class="ls-card__link" [routerLink]="['/admin/file/edit', e.id]">{{ e.cliente_nombre }}</a>
+            </h2>
+            <p class="ls-card__num">{{ e.numero }}</p>
+
+            <p class="ls-card__line">
+              <mat-icon aria-hidden="true">construction</mat-icon>
+              <span>{{ servicioNombre(e) }}</span>
+            </p>
+            @if (direccionLinea1(e) || direccionLinea2(e)) {
+              <p class="ls-card__line" [title]="direccionCompleta(e)">
+                <mat-icon aria-hidden="true">location_on</mat-icon>
+                <span>
+                  @if (direccionLinea1(e)) { {{ direccionLinea1(e) }} }
+                  @if (direccionLinea2(e)) { <span class="ls-card__sub">{{ direccionLinea2(e) }}</span> }
+                </span>
+              </p>
+            }
+            <p class="ls-card__line">
+              <mat-icon aria-hidden="true">person</mat-icon>
+              <span><span class="cdk-visually-hidden">{{ 'admin_file.col_estimator' | translate }} : </span>{{ e.estimador_nombre || '—' }}</span>
+            </p>
+
+            <div class="ls-card__foot">
+              <span>
+                <mat-icon aria-hidden="true">calendar_month</mat-icon>
+                {{ 'admin_file.col_visit_date' | translate }}
+                <strong class="ls-fig">{{ formatFecha(e.fecha_visita) }}</strong>
+              </span>
+              @if (e.fecha_visita_real) {
+                <span>
+                  <mat-icon aria-hidden="true">event_available</mat-icon>
+                  {{ 'admin_file.col_real_visit' | translate }}
+                  <strong class="ls-fig">{{ formatFecha(e.fecha_visita_real) }}</strong>
+                </span>
+              }
+            </div>
+          </div>
+        </li>
+      }
+    </ul>
+
+    <app-pagination [total]="totalItems()" [page]="paginaActual()" [pageSize]="POR_PAGINA"
+                    (pageChange)="paginaActual.set($event)" />
+  }
 </div>

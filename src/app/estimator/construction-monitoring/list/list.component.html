@@ -1,301 +1,247 @@
-<div class="container-fluid py-4 px-3 px-xl-4">
+<div class="page-wrapper cml">
 
-  <!-- ── Encabezado ──────────────────────────────────────────────────────────── -->
-  <header class="page-header p-4 mb-4">
-    <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
-      <div>
-        <p class="page-eyebrow">
-          <i class="bi bi-clipboard2-pulse"></i>{{ 'role.estimateur' | translate }}
-        </p>
-        <h4 class="mb-1">{{ 'construction_monitoring.title' | translate }}</h4>
-        <p class="text-muted small mb-0">{{ 'construction_monitoring.subtitle' | translate }}</p>
-      </div>
-      @if (!cargando() && !error()) {
-        <span class="kpi-pill">
-          <i class="bi bi-clipboard-check"></i>
-          {{ total }} {{ 'construction_monitoring.count' | translate }}
-        </span>
+  <app-page-header [titulo]="'construction_monitoring.title' | translate"
+                   [contexto]="'construction_monitoring.subtitle' | translate" />
+
+  <!-- ── Cargando ────────────────────────────────────────────────────────── -->
+  @if (cargando()) {
+    <div class="cml-grid" role="status">
+      <span class="cdk-visually-hidden">{{ 'common.loading' | translate }}</span>
+      @for (_ of [1, 2, 3]; track $index) {
+        <span class="skel" aria-hidden="true"></span>
       }
     </div>
-  </header>
 
-  <!-- ── Skeleton ────────────────────────────────────────────────────────────── -->
-  @if (cargando()) {
-    <div class="skeleton-wrap">
-      <div class="skeleton-chips mb-3">
-        @for (i of [1,2,3,4,5]; track i) { <div class="skel skel--chip"></div> }
-      </div>
-      <div class="skeleton-table">
-        @for (i of [1,2,3,4,5,6]; track i) {
-          <div class="skeleton-row">
-            <div class="skel skel--xs"></div>
-            <div class="skel skel--lg"></div>
-            <div class="skel skel--md"></div>
-            <div class="skel skel--sm"></div>
-            <div class="skel skel--sm"></div>
-            <div class="skel skel--sm"></div>
-            <div class="skel skel--md"></div>
-          </div>
-        }
-      </div>
-    </div>
-
-  <!-- ── Error ────────────────────────────────────────────────────────────────── -->
+  <!-- ── Error ───────────────────────────────────────────────────────────── -->
   } @else if (error()) {
-    <div class="empty-state">
-      <div class="empty-state__icon empty-state__icon--danger">
-        <i class="bi bi-exclamation-triangle"></i>
-      </div>
-      <p class="empty-state__title">{{ 'common.error' | translate }}</p>
-      <p class="empty-state__desc">{{ error() }}</p>
-    </div>
+    <p class="cml-error" role="alert">
+      <mat-icon aria-hidden="true">error</mat-icon>
+      <span><strong>{{ 'common.error' | translate }}</strong> {{ error() }}</span>
+    </p>
 
-  <!-- ── Contenido ────────────────────────────────────────────────────────────── -->
+  <!-- ── Sin obras ───────────────────────────────────────────────────────── -->
+  } @else if (total === 0) {
+    <app-empty-state class="cml-empty"
+                     matIcon="construction"
+                     [titulo]="'construction_monitoring.no_data' | translate"
+                     [texto]="'construction_monitoring.no_data_hint' | translate" />
+
   } @else {
 
-    <!-- ── Búsqueda + chips de estado ───────────────────────────────────────── -->
-    <div class="filter-bar mb-3">
+    <!-- ── Búsqueda, filtro por estado (hace también de recuento) y vista ── -->
+    <div class="cml-tools">
+      <mat-form-field class="cml-search" appearance="outline" subscriptSizing="dynamic">
+        <mat-label>{{ 'common.search' | translate }}</mat-label>
+        <mat-icon matPrefix aria-hidden="true">search</mat-icon>
+        <input matInput type="search" autocomplete="off"
+               [placeholder]="'construction_monitoring.search_placeholder' | translate"
+               [value]="busqueda()" (input)="setBusqueda($event)" />
+      </mat-form-field>
 
-      <div class="filter-bar__search">
-        <div class="input-group">
-          <span class="input-group-text search-icon">
-            <i class="bi bi-search"></i>
-          </span>
-          <input type="text" class="form-control search-input"
-                 [placeholder]="'construction_monitoring.search_placeholder' | translate"
-                 [value]="busqueda()"
-                 (input)="setBusqueda($event)">
-          @if (busqueda()) {
-            <button class="btn search-clear" type="button" (click)="busqueda.set('')"
-                    [title]="'common.clear' | translate">
-              <i class="bi bi-x-lg"></i>
-            </button>
-          }
-        </div>
-      </div>
-
-      <div class="filter-bar__chips">
-      <div class="status-chips" role="group">
-        @for (estado of estados; track estado) {
-          <button type="button"
-                  class="status-chip"
-                  [class.status-chip--active]="filtroEstado() === estado"
-                  (click)="filtroEstado.set(estado)">
-            @if (estado !== 'todos') {
-              <i class="bi {{ iconoEstado(estado) }} status-chip__icon"></i>
-            }
-            <span class="status-chip__label">
+      <div class="cml-filter">
+        <span class="cml-filter__label" id="cml-state-label">{{ 'common.status' | translate }}</span>
+        <mat-button-toggle-group class="cml-toggle" hideSingleSelectionIndicator
+                                 aria-labelledby="cml-state-label"
+                                 [value]="filtroEstado()" (change)="filtroEstado.set($event.value)">
+          @for (estado of estados; track estado) {
+            <mat-button-toggle [value]="estado">
               {{ estado === 'todos'
                   ? ('common.all' | translate)
                   : (('construction_monitoring.estado_' + estado) | translate) }}
-            </span>
-            <span class="status-chip__count">
-              {{ estado === 'todos' ? total : (estadoCounts()[estado] || 0) }}
-            </span>
-          </button>
-        }
+              <span class="cml-count">{{ estado === 'todos' ? total : (estadoCounts()[estado] || 0) }}</span>
+            </mat-button-toggle>
+          }
+        </mat-button-toggle-group>
       </div>
 
-      <div class="view-toggle d-none d-lg-inline-flex" role="group"
-           [attr.aria-label]="'construction_monitoring.view_cards' | translate">
-        <button type="button" class="view-toggle__btn"
-                [class.view-toggle__btn--active]="vista() === 'tabla'"
-                [attr.aria-pressed]="vista() === 'tabla'"
-                (click)="setVista('tabla')"
-                [title]="'construction_monitoring.view_table' | translate">
-          <i class="bi bi-table" aria-hidden="true"></i>
-        </button>
-        <button type="button" class="view-toggle__btn"
-                [class.view-toggle__btn--active]="vista() === 'tarjetas'"
-                [attr.aria-pressed]="vista() === 'tarjetas'"
-                (click)="setVista('tarjetas')"
-                [title]="'construction_monitoring.view_cards' | translate">
-          <i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>
-        </button>
-      </div>
-      </div>
+      <mat-button-toggle-group class="cml-toggle cml-view" hideSingleSelectionIndicator
+                               [value]="vista()" (change)="setVista($event.value)">
+        <mat-button-toggle value="tarjetas" [aria-label]="'construction_monitoring.view_cards' | translate"
+                           [matTooltip]="'construction_monitoring.view_cards' | translate">
+          <mat-icon>grid_view</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="tabla" [aria-label]="'construction_monitoring.view_table' | translate"
+                           [matTooltip]="'construction_monitoring.view_table' | translate">
+          <mat-icon>table_rows</mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
     </div>
 
-    <!-- ── Lista de contratos ───────────────────────────────────────────────── -->
-    <div class="table-card">
+    @if (hayFiltros()) {
+      <div class="cml-status">
+        <p class="cml-showing" role="status">
+          {{ 'common.showing' | translate }} {{ contratosFiltrados().length }} {{ 'common.of' | translate }} {{ total }}
+        </p>
+        <button mat-button type="button" class="cml-clear" (click)="limpiarFiltros()">
+          <mat-icon>close</mat-icon>
+          {{ 'common.clear_filters' | translate }}
+        </button>
+      </div>
+    }
 
-      @if (contratosFiltrados().length === 0) {
-        <div class="empty-state empty-state--table">
-          @if (hayFiltros()) {
-            <div class="empty-state__icon">
-              <i class="bi bi-funnel"></i>
-            </div>
-            <p class="empty-state__title">{{ 'construction_monitoring.no_results' | translate }}</p>
-            <p class="empty-state__desc">{{ 'construction_monitoring.no_results_hint' | translate }}</p>
-            <button class="btn btn-outline-primary btn-sm mt-2" (click)="limpiarFiltros()">
-              <i class="bi bi-x-circle me-1"></i>{{ 'common.clear_filters' | translate }}
-            </button>
-          } @else {
-            <div class="empty-state__icon">
-              <i class="bi bi-clipboard"></i>
-            </div>
-            <p class="empty-state__title">{{ 'construction_monitoring.no_data' | translate }}</p>
-            <p class="empty-state__desc">{{ 'construction_monitoring.no_data_hint' | translate }}</p>
-          }
-        </div>
+    <!-- ── Filtro sin resultados ─────────────────────────────────────────── -->
+    @if (contratosFiltrados().length === 0) {
+      <app-empty-state class="cml-empty"
+                       matIcon="filter_alt_off"
+                       [titulo]="'construction_monitoring.no_results' | translate"
+                       [texto]="'construction_monitoring.no_results_hint' | translate">
+        <button actions mat-stroked-button type="button" (click)="limpiarFiltros()">
+          {{ 'common.clear_filters' | translate }}
+        </button>
+      </app-empty-state>
 
-      } @else {
+    } @else {
 
-        <!-- Escritorio: tabla con filas clicables (vista tabla) -->
-        <div class="table-responsive d-none" [class.d-lg-block]="vista() === 'tabla'">
-          <table class="table table-monitoring align-middle mb-0">
+      <!-- ── Tabla (escritorio, si se elige) ──────────────────────────────── -->
+      @if (vista() === 'tabla') {
+        <div class="cml-table-wrap">
+          <table class="cml-table">
             <thead>
               <tr>
-                <th class="col-photo" aria-hidden="true"></th>
-                <th class="col-num">{{ 'construction_monitoring.col_number' | translate }}</th>
-                <th class="col-identity">{{ 'construction_monitoring.col_client' | translate }} / {{ 'construction_monitoring.col_service' | translate }}</th>
-                <th class="col-location">{{ 'construction_monitoring.col_location' | translate }}</th>
-                <th class="col-date">{{ 'construction_monitoring.col_signed' | translate }}</th>
-                <th class="col-date">{{ 'construction_monitoring.col_start' | translate }}</th>
-                <th class="col-plazo">{{ 'construction_monitoring.col_deadline' | translate }}</th>
-                <th class="col-precio">{{ 'construction_monitoring.col_price' | translate }}</th>
-                <th>{{ 'construction_monitoring.col_status' | translate }}</th>
+                <th scope="col">{{ 'construction_monitoring.col_client' | translate }}</th>
+                <th scope="col">{{ 'construction_monitoring.col_number' | translate }}</th>
+                <th scope="col">{{ 'construction_monitoring.col_location' | translate }}</th>
+                <th scope="col">{{ 'construction_monitoring.col_signed' | translate }}</th>
+                <th scope="col">{{ 'construction_monitoring.col_start' | translate }}</th>
+                <th scope="col">{{ 'construction_monitoring.col_deadline' | translate }}</th>
+                <th scope="col" class="is-num">{{ 'construction_monitoring.col_price' | translate }}</th>
+                <th scope="col">{{ 'construction_monitoring.col_status' | translate }}</th>
               </tr>
             </thead>
             <tbody>
               @for (c of contratosPaginados(); track c.id) {
-                <tr class="table-row table-row--clickable" (click)="irAMonitoreo(c.id)">
-                  <td class="col-photo">
-                    <div class="cm-thumb">
-                      @if (fotoContrato(c); as foto) {
-                        <img [src]="foto" loading="lazy" [alt]="c.expediente_numero"
-                             (error)="onFotoError(c.id)" />
-                      } @else {
-                        <i class="bi bi-badge-3d" aria-hidden="true"
-                           [title]="'construction_monitoring.photo_none' | translate"></i>
-                      }
+                <!-- La fila entera abre el seguimiento; el foco de teclado va al enlace del cliente. -->
+                <tr class="cml-table__row" (click)="irAMonitoreo(c.id)">
+                  <td>
+                    <div class="cml-table__who">
+                      <span class="cml-thumb">
+                        @if (fotoContrato(c); as foto) {
+                          <img [src]="foto" loading="lazy" alt="" (error)="onFotoError(c.id)" />
+                        } @else {
+                          <mat-icon aria-hidden="true">view_in_ar</mat-icon>
+                        }
+                      </span>
+                      <span class="cml-table__text">
+                        <a class="cml-table__link"
+                           [routerLink]="['/estimator/construction-monitoring/monitoring', c.id]"
+                           (click)="$event.stopPropagation()">
+                          {{ hay(c.cliente_nombre) ? c.cliente_nombre : serviciosTexto(c) }}
+                        </a>
+                        @if (hay(c.cliente_nombre)) {
+                          <span class="cml-table__svc">{{ serviciosTexto(c) }}</span>
+                        }
+                      </span>
                     </div>
                   </td>
-                  <td class="col-num">
-                    <span class="exp-num">{{ c.expediente_numero }}</span>
+                  <td class="cml-fig cml-nowrap">{{ hay(c.expediente_numero) ? c.expediente_numero : '' }}</td>
+                  <td class="cml-nowrap">{{ hay(c.canton) ? c.canton + ', ' + c.provincia : '' }}</td>
+                  <td class="cml-fig cml-nowrap">{{ formatFecha(c.firmado_en) }}</td>
+                  <td class="cml-fig cml-nowrap">{{ formatFecha(c.fecha_inicio) }}</td>
+                  <td class="cml-fig cml-nowrap">
+                    @if (plazo(c)) { {{ plazo(c) }} {{ 'offer.weeks' | translate }} }
                   </td>
-                  <td class="col-identity">
-                    <span class="cell-primary">{{ c.cliente_nombre }}</span>
-                    <span class="cell-secondary cell-servicios">{{ serviciosTexto(c) }}</span>
-                  </td>
-                  <td class="col-location" [title]="direccionCompleta(c)">
-                    @if (direccionLinea1(c)) {
-                      <span class="cell-primary col-location__line">{{ direccionLinea1(c) }}</span>
-                    }
-                    @if (direccionLinea2(c)) {
-                      <span class="cell-secondary col-location__line">{{ direccionLinea2(c) }}</span>
-                    }
-                  </td>
-                  <td class="col-date">
-                    <span class="cell-primary">{{ formatFecha(c.firmado_en) }}</span>
-                  </td>
-                  <td class="col-date">
-                    <span class="cell-primary">{{ formatFecha(c.fecha_inicio) }}</span>
-                  </td>
-                  <td class="col-plazo">
-                    <span class="cell-muted">{{ plazoLabel(c) }}</span>
-                  </td>
-                  <td class="col-precio">
-                    <span class="cell-precio">{{ formatPrecio(c.precio_final) }}</span>
-                  </td>
+                  <td class="cml-fig cml-nowrap is-num cml-table__price">{{ formatPrecio(c.precio_final) }}</td>
                   <td>
-                    <span class="estado-badge {{ badgeContrato(c.estado) }}">
-                      <i class="bi {{ iconoEstado(c.estado) }}"></i>
-                      {{ ('construction_monitoring.estado_' + c.estado) | translate }}
+                    <span class="cml-chips">
+                      <app-status-chip [estado]="c.estado" prefijo="construction_monitoring.estado_" />
+                      @if (c.obra_terminada) {
+                        <span class="cml-done">
+                          <mat-icon aria-hidden="true">flag</mat-icon>
+                          {{ 'monitoring.obra_terminada_badge' | translate }}
+                        </span>
+                      }
                     </span>
-                    @if (c.obra_terminada) {
-                      <span class="tag tag-gold obra-terminada">
-                        <i class="bi bi-flag" aria-hidden="true"></i>{{ 'monitoring.obra_terminada_badge' | translate }}
-                      </span>
-                    }
                   </td>
                 </tr>
               }
             </tbody>
           </table>
         </div>
+      }
 
-        <!-- Tarjetas clicables (móvil siempre · escritorio por defecto) -->
-        <div class="cm-cards" [class.d-lg-none]="vista() === 'tabla'">
-          @for (c of contratosPaginados(); track c.id) {
-            <button type="button" class="cm-card" (click)="irAMonitoreo(c.id)">
-
-              <!-- Foto del expediente (miniatura del tour 3D) -->
-              <div class="cm-card__photo">
-                @if (fotoContrato(c); as foto) {
-                  <img class="cm-card__photo-img" [src]="foto" loading="lazy"
-                       [alt]="c.expediente_numero" (error)="onFotoError(c.id)" />
-                } @else {
-                  <div class="cm-card__photo-empty"
-                       [title]="'construction_monitoring.photo_none' | translate">
-                    <i class="bi bi-badge-3d" aria-hidden="true"></i>
-                  </div>
-                }
-              </div>
-
-              <div class="cm-card__top">
-                <span class="exp-num">{{ c.expediente_numero }}</span>
-                <span class="estado-badge {{ badgeContrato(c.estado) }}">
-                  <i class="bi {{ iconoEstado(c.estado) }}"></i>
-                  {{ ('construction_monitoring.estado_' + c.estado) | translate }}
-                </span>
-              </div>
-              @if (c.obra_terminada) {
-                <span class="tag tag-gold obra-terminada">
-                  <i class="bi bi-flag" aria-hidden="true"></i>{{ 'monitoring.obra_terminada_badge' | translate }}
+      <!-- ── Tarjetas (en móvil siempre; en escritorio, salvo vista tabla) ── -->
+      <ul class="cml-grid" [class.is-mobile-only]="vista() === 'tabla'">
+        @for (c of contratosPaginados(); track c.id) {
+          <li class="cml-card" [class.is-out]="c.estado === 'cancelado' || c.estado === 'archivado'">
+            <span class="cml-card__photo">
+              @if (fotoContrato(c); as foto) {
+                <img [src]="foto" loading="lazy" alt="" (error)="onFotoError(c.id)" />
+              } @else {
+                <span class="cml-card__nophoto">
+                  <mat-icon aria-hidden="true">view_in_ar</mat-icon>
+                  {{ 'construction_monitoring.photo_none' | translate }}
                 </span>
               }
-              <div class="cm-card__body">
-                <span class="cm-card__name">{{ c.cliente_nombre }}</span>
-                <span class="cm-card__svc">{{ serviciosTexto(c) }}</span>
-                @if (direccionLinea1(c) || direccionLinea2(c)) {
-                  <p class="cm-card__addr" [title]="direccionCompleta(c)">
-                    <i class="bi bi-geo-alt cm-card__addr-icon" aria-hidden="true"></i>
-                    <span class="cm-card__addr-text">
-                      @if (direccionLinea1(c)) {
-                        <span class="cm-card__addr-line">{{ direccionLinea1(c) }}</span>
-                      }
-                      @if (direccionLinea2(c)) {
-                        <span class="cm-card__addr-line cm-card__addr-line--muted">{{ direccionLinea2(c) }}</span>
-                      }
-                    </span>
-                  </p>
+            </span>
+
+            <div class="cml-card__body">
+              <span class="cml-chips">
+                <app-status-chip [estado]="c.estado" prefijo="construction_monitoring.estado_" />
+                @if (c.obra_terminada) {
+                  <span class="cml-done">
+                    <mat-icon aria-hidden="true">flag</mat-icon>
+                    {{ 'monitoring.obra_terminada_badge' | translate }}
+                  </span>
                 }
-              </div>
-              <div class="cm-card__meta">
-                <span class="cm-meta">
-                  <i class="bi bi-cash-coin" aria-hidden="true"></i>{{ formatPrecio(c.precio_final) }}
-                </span>
-                <span class="cm-meta">
-                  <i class="bi bi-pen" aria-hidden="true"></i>{{ formatFecha(c.firmado_en) }}
-                </span>
-                <span class="cm-meta">
-                  <i class="bi bi-calendar-event" aria-hidden="true"></i>{{ formatFecha(c.fecha_inicio) }}
-                </span>
-                <span class="cm-meta">
-                  <i class="bi bi-hourglass-split" aria-hidden="true"></i>{{ plazoLabel(c) }}
-                </span>
-              </div>
-            </button>
-          }
-        </div>
+              </span>
 
-      }
+              <!-- El enlace del título cubre la tarjeta entera (::after). -->
+              <h2 class="cml-card__title">
+                <a class="cml-card__link" [routerLink]="['/estimator/construction-monitoring/monitoring', c.id]">
+                  {{ hay(c.cliente_nombre) ? c.cliente_nombre : serviciosTexto(c) }}
+                </a>
+              </h2>
+              @if (hay(c.cliente_nombre)) {
+                <p class="cml-card__svc">{{ serviciosTexto(c) }}</p>
+              }
+              @if (hay(c.expediente_numero)) {
+                <p class="cml-card__num">{{ c.expediente_numero }}</p>
+              }
 
-      <!-- ── Paginación ──────────────────────────────────────────────────────── -->
-      @if (contratosFiltrados().length > POR_PAGINA) {
-        <div class="table-footer">
-          <app-pagination
-            [total]="contratosFiltrados().length"
-            [page]="paginaActual()"
-            [pageSize]="POR_PAGINA"
-            (pageChange)="paginaActual.set($event)">
-          </app-pagination>
-        </div>
-      }
+              @if (hay(direccionLinea1(c)) || hay(direccionLinea2(c))) {
+                <p class="cml-card__place" [title]="direccionCompleta(c)">
+                  <mat-icon aria-hidden="true">location_on</mat-icon>
+                  <span>
+                    @if (hay(direccionLinea1(c))) { {{ direccionLinea1(c) }} }
+                    @if (hay(direccionLinea2(c))) {
+                      <span class="cml-card__addr">{{ direccionLinea2(c) }}</span>
+                    }
+                  </span>
+                </p>
+              }
 
-    </div>
+              <dl class="cml-card__facts">
+                <div>
+                  <dt>{{ 'construction_monitoring.col_price' | translate }}</dt>
+                  <dd class="cml-card__price">{{ formatPrecio(c.precio_final) }}</dd>
+                </div>
+                <div>
+                  <dt>{{ 'construction_monitoring.col_start' | translate }}</dt>
+                  <dd class="cml-fig">
+                    {{ formatFecha(c.fecha_inicio) }}
+                    @if (plazo(c)) {
+                      <span class="cml-card__sub">{{ plazo(c) }} {{ 'offer.weeks' | translate }}</span>
+                    }
+                  </dd>
+                </div>
+              </dl>
 
+              @if (c.firmado_en) {
+                <p class="cml-card__date">
+                  <mat-icon aria-hidden="true">draw</mat-icon>
+                  <span>{{ 'construction_monitoring.col_signed' | translate }} <span class="cml-fig">{{ formatFecha(c.firmado_en) }}</span></span>
+                </p>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+
+      <app-pagination
+        [total]="contratosFiltrados().length"
+        [page]="paginaActual()"
+        [pageSize]="POR_PAGINA"
+        (pageChange)="paginaActual.set($event)" />
+    }
   }
-
 </div>

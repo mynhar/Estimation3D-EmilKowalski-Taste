@@ -1,7 +1,9 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { ExpedienteService } from '../../../services/expediente.service';
 import { OfertaService } from '../../../services/oferta.service';
 import { ArchivoService, TipoArchivo } from '../../../services/archivo.service';
@@ -17,17 +19,28 @@ import { ContratosExpedienteComponent } from '../../../shared/ui/contratos-exped
 import { AvisoArchivadoComponent } from '../../../shared/ui/aviso-archivado/aviso-archivado.component';
 import { VideoFichaComponent } from '../../../shared/ui/presentacion-videos/video-ficha.component';
 import { DbPerfilVideo } from '../../../types/supabase';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
+import { StatusChipComponent } from '../../../shared/ui/status-chip/status-chip.component';
+import { StageLineComponent } from '../../../shared/ui/stage-line/stage-line.component';
+import { TourPosterComponent } from '../../../shared/ui/tour-poster/tour-poster.component';
+import { abrirVisor } from '../../../shared/ui/media-viewer/media-viewer.component';
+import { etapaDossier } from '../../../shared/util/etapas';
 
 
 @Component({
   selector: 'app-my-file',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, TranslatePipe, NgTemplateOutlet, MatterportInfoComponent, ContratosExpedienteComponent, AvisoArchivadoComponent, VideoFichaComponent],
+  imports: [
+    RouterLink, TranslatePipe, NgTemplateOutlet, MatButtonModule, MatIconModule,
+    PageHeaderComponent, EmptyStateComponent, StatusChipComponent, StageLineComponent, TourPosterComponent,
+    MatterportInfoComponent, ContratosExpedienteComponent, AvisoArchivadoComponent, VideoFichaComponent,
+  ],
   templateUrl: './my-file.component.html',
   styleUrl:    './my-file.component.css',
 })
 export class MyFileComponent implements OnInit {
-  private sanitizer         = inject(DomSanitizer);
+  private dialog            = inject(MatDialog);
   private translate         = inject(TranslateService);
   private expedienteService = inject(ExpedienteService);
   private ofertaService     = inject(OfertaService);
@@ -37,7 +50,6 @@ export class MyFileComponent implements OnInit {
   private contratoService   = inject(ContratoService);
   private matterportService = inject(MatterportService);
   private route             = inject(ActivatedRoute);
-  private router            = inject(Router);
 
   private expedienteId = '';
 
@@ -72,7 +84,6 @@ export class MyFileComponent implements OnInit {
     .map(p => [p.perfilId, p])));
   // Todos los contratos del expediente, cancelados incluidos.
   contratos      = signal<ContratoPanelCliente[]>([]);
-  fotoAmpliada   = signal<string | null>(null);
   cargando       = signal(true);
   errorMsg       = signal('');
   subiendo        = signal<TipoArchivo | null>(null);
@@ -87,50 +98,11 @@ export class MyFileComponent implements OnInit {
   misDocs     = computed(() => this.documentos().filter(f => f.subido_por === this.currentUserId()));
   otrosVideos = computed(() => this.videos().filter(f => f.subido_por !== this.currentUserId()));
 
-  readonly ESTADO_CFG: Record<string, { clase: string; icono: string }> = {
-    nuevo:         { clase: 'bg-primary-subtle text-primary-emphasis',            icono: 'bi-inbox' },
-    en_estimacion: { clase: 'bg-info-subtle text-info-emphasis',         icono: 'bi-clipboard2-pulse' },
-    estimado:      { clase: 'bg-success-subtle text-success-emphasis',            icono: 'bi-check-circle' },
-    en_oferta:     { clase: 'bg-warning-subtle text-warning-emphasis',   icono: 'bi-cash-coin' },
-    adjudicado:    { clase: 'bg-warning-subtle text-warning-emphasis',   icono: 'bi-trophy' },
-    contratado:    { clase: 'bg-success-subtle text-success-emphasis',            icono: 'bi-file-earmark-check' },
-    cancelado:     { clase: 'bg-secondary-subtle text-secondary',        icono: 'bi-x-circle' },
-    archivado:     { clase: 'badge-archivado',                           icono: 'bi-archive' },
-  };
-
-  readonly ESTADO_PROGRESO: Record<string, number> = {
-    nuevo:         15,
-    en_estimacion: 30,
-    estimado:      50,
-    en_oferta:     65,
-    adjudicado:    80,
-    contratado:    100,
-    cancelado:     0,
-    archivado:     0,
-  };
-
-  readonly PASOS: { key: string; icon: string; tkey: string }[] = [
-    { key: 'nuevo',         icon: 'bi-inbox',              tkey: 'pipeline.received' },
-    { key: 'en_estimacion', icon: 'bi-clipboard2-pulse',   tkey: 'pipeline.review'   },
-    { key: 'estimado',      icon: 'bi-check-circle',       tkey: 'state.estimado'    },
-    { key: 'en_oferta',     icon: 'bi-cash-coin',          tkey: 'pipeline.offers'   },
-    { key: 'adjudicado',    icon: 'bi-trophy',             tkey: 'pipeline.chosen'   },
-    { key: 'contratado',    icon: 'bi-file-earmark-check', tkey: 'pipeline.signed'   },
-  ];
-
-  progreso(estado: string): number {
-    return this.ESTADO_PROGRESO[estado] ?? 0;
-  }
-
-  pasoActivo(pasoKey: string, estadoActual: string): 'done' | 'active' | 'pending' {
-    if (estadoActual === 'cancelado' || estadoActual === 'archivado') return 'pending';
-    const keys    = ['nuevo', 'en_estimacion', 'estimado', 'en_oferta', 'adjudicado', 'contratado'];
-    const iActual = keys.indexOf(estadoActual);
-    const iPaso   = keys.indexOf(pasoKey);
-    if (iPaso < iActual)  return 'done';
-    if (iPaso === iActual) return 'active';
-    return 'pending';
-  }
+  /** Etapa 1–6; los contratos pueden adelantarla. 0 = cancelado o archivado. */
+  etapa = computed(() => {
+    const d = this.detalle();
+    return d ? etapaDossier(d.estado, this.contratos()) : 0;
+  });
 
   get urlsTour(): string[] {
     const raw = this.detalle()?.url_tour ?? null;
@@ -142,8 +114,9 @@ export class MyFileComponent implements OnInit {
     return [raw];
   }
 
-  getSafeUrl(url: string): SafeResourceUrl {
-    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  tituloTour(i: number): string {
+    const base = this.translate.instant('file.tour_title');
+    return this.urlsTour.length > 1 ? `${base} ${i + 1}` : base;
   }
 
   async ngOnInit() {
@@ -254,14 +227,15 @@ export class MyFileComponent implements OnInit {
     }
   }
 
-  /** Abre el visor con la URL ya resuelta del VM. */
-  abrirFotoVM(foto: ArchivoVM): void {
-    this.fotoAmpliada.set(foto.url);
+  /** Abre una foto en el visor a pantalla completa. */
+  verFoto(url: string, nombre: string): void {
+    abrirVisor(this.dialog, { tipo: 'foto', url, titulo: nombre });
   }
 
-  /** Abre el visor para una foto propia (ArchivoRow). */
-  abrirFoto(archivo: ArchivoRow): void {
-    this.fotoAmpliada.set(this.publicUrl(archivo.url_storage));
+  /** Borra un archivo propio desde una fila: los del VM (todas las fuentes) o los del expediente. */
+  borrar(item: ArchivoVM | ArchivoRow, vm: boolean): void {
+    if (vm) this.eliminarArchivoVM(item as ArchivoVM);
+    else    this.eliminarArchivo(item as ArchivoRow);
   }
 
   /** Borra una foto/documento propio del expediente y recarga las galerías. */
@@ -287,10 +261,6 @@ export class MyFileComponent implements OnInit {
     } finally {
       this.eliminando.set(null);
     }
-  }
-
-  estadoCfg(estado: string) {
-    return this.ESTADO_CFG[estado] ?? { clase: 'bg-secondary-subtle text-secondary', icono: 'bi-question-circle' };
   }
 
   get servicioNombre(): string {
@@ -336,9 +306,4 @@ export class MyFileComponent implements OnInit {
     if (bytes < 1_048_576) return `${(bytes / 1_024).toFixed(1)} KB`;
     return `${(bytes / 1_048_576).toFixed(1)} MB`;
   }
-
-
-  cerrarFoto() { this.fotoAmpliada.set(null); }
-
-  volver() { this.router.navigate(['/client/file/my-files']); }
 }

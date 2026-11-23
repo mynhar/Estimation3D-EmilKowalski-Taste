@@ -1,8 +1,10 @@
 /* component: acceso (iniciar sesión / crear cuenta)
  * states: campos default · focus · error (mat-error con icono) · disabled (enviando)
  *         envío: default · hover · focus-visible · active · loading · éxito (cuenta creada)
- * contrast: formulario ink sobre chaux (13.4:1) · errores danger-ink sobre surface (6.6:1)
- *           isla ardoise: texto ink-inverse (14.6:1), secundario al 80 % (≥ 9:1), iconos menthe (9.9:1)
+ * contrast: formulario ink sobre crema (11.8:1) · errores danger-ink sobre danger-soft (5.8:1)
+ *           isla abeto: texto ink-inverse (9.7:1), secundario ink-inverse-muted (6.6:1), iconos vélin
+ *           enviar: el botón tomate de la vista (.ds-cta, blanco encima 4.8:1); Google, de contorno
+ * type: títulos en display 125 %, marca y éxito en 112 %
  */
 :host {
   display: block;
@@ -28,32 +30,36 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-black);
+  font-stretch: var(--ds-stretch-heading);
   text-decoration: none;
 }
 .lg-brand:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
 
-/* Cuadro ardoise con la cota menthe en la esquina (mismo signo que el armazón). */
+/* Cuadro abeto con la L vélin en la esquina (mismo signo que el armazón). */
 .lg-mark {
   position: relative;
   flex-shrink: 0;
   width: 32px;
   height: 32px;
   border-radius: var(--ds-radius-md);
-  background: var(--ds-ink);
+  background: var(--ds-action);
 }
 .lg-mark::after {
   content: '';
   position: absolute;
   inset: 8px;
-  border-left: 2px solid var(--ds-scan);
-  border-bottom: 2px solid var(--ds-scan);
+  border-left: 2px solid var(--ds-ink-inverse);
+  border-bottom: 2px solid var(--ds-ink-inverse);
 }
+/* Sobre la isla abeto, el signo se invierte: cuadro vélin, L abeto. */
+.lg-side .lg-mark { background: var(--ds-ink-inverse); }
+.lg-side .lg-mark::after { border-color: var(--ds-action); }
 
-/* ── Isla ardoise (escritorio) ──────────────────────────────────────────── */
+/* ── Isla abeto (escritorio) ────────────────────────────────────────────── */
 .lg-side {
-  /* Sobre ardoise el foco y el acento van en menthe; sapin solo daría 2.3:1. */
-  --ds-focus-ring: 0 0 0 2px var(--ds-dark-surface), 0 0 0 4px var(--ds-scan);
-  --side-text-2: color-mix(in srgb, var(--ds-ink-inverse) 80%, transparent);
+  /* Sobre abeto el foco y el acento van en vélin. */
+  --ds-focus-ring: var(--ds-focus-ring-dark);
+  --side-text-2: var(--ds-ink-inverse-muted);
 
   display: none;
   background: var(--ds-dark-surface);
@@ -72,19 +78,16 @@
   }
 }
 .lg-brand--dark { align-self: flex-start; color: var(--ds-ink-inverse); }
-.lg-brand--dark .lg-mark {
-  background: var(--ds-dark-surface-deep);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ds-ink-inverse) 18%, transparent);
-}
 
 .lg-side__copy { display: grid; gap: var(--ds-space-4); max-width: 30rem; }
 .lg-side__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: clamp(var(--ds-text-3xl), 2.6vw + 1rem, var(--ds-text-5xl));
+  font-size: clamp(var(--ds-text-3xl), 2.2vw + 1rem, 3.5rem);
   font-weight: var(--ds-weight-black);
+  font-stretch: var(--ds-stretch-display);
   line-height: 1.02;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   color: var(--ds-ink-inverse);
   text-wrap: balance;
 }
@@ -106,7 +109,7 @@
   color: var(--side-text-2);
 }
 .lg-points li { display: flex; align-items: center; gap: var(--ds-space-3); }
-.lg-points mat-icon { flex-shrink: 0; color: var(--ds-scan); }
+.lg-points mat-icon { flex-shrink: 0; color: var(--ds-ink-inverse); }
 
 /* ── Columna del formulario ─────────────────────────────────────────────── */
 .lg-main {
@@ -155,7 +158,9 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: clamp(var(--ds-text-3xl), 2vw + 1.5rem, var(--ds-text-4xl));
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-black);
+  font-stretch: var(--ds-stretch-display);
+  letter-spacing: -0.02em;
   line-height: var(--ds-leading-tight);
   color: var(--ds-ink);
 }
@@ -169,7 +174,7 @@
 .lg-switch {
   --mat-button-toggle-height: 44px;
   --mat-button-toggle-text-color: var(--ds-ink-secondary);
-  --mat-button-toggle-selected-state-background-color: var(--ds-scan-soft);
+  --mat-button-toggle-selected-state-background-color: var(--ds-action-faint);
   --mat-button-toggle-selected-state-text-color: var(--ds-action-ink);
   --mat-button-toggle-divider-color: var(--ds-border);
   --mat-button-toggle-label-text-size: var(--ds-text-base);
@@ -240,7 +245,7 @@ mat-error mat-icon,
   min-height: 32px;
   padding: 0 var(--ds-space-3);
   border-radius: var(--ds-radius-pill);
-  background: var(--ds-stone);
+  background: var(--ds-band);
   color: var(--ds-ink);
   font-weight: var(--ds-weight-bold);
 }
@@ -318,6 +323,7 @@ mat-error mat-icon,
 .lg-success__title {
   margin: 0;
   font-family: var(--ds-font-display);
+  font-stretch: var(--ds-stretch-heading);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
   line-height: var(--ds-leading-snug);

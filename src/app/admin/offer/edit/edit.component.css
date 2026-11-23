@@ -1,2143 +1,362 @@
-/* ============================================================
-   HOST + ROOT
-   ============================================================ */
+/* component: administración, ofertas de un dossier (Trait rouge)
+ * Base en shared/ui/ficha/ficha.css; aquí solo lo propio: el orden de las tres piezas,
+ * las tarjetas de oferta, la suma con varios servicios, los adjuntos y la baja.
+ *
+ * states: cargando (esqueleto) · no encontrado · archivado (aviso; crear y dar de baja bloqueados)
+ *         ofertas: sin ofertas · error de lectura · default · hover (puntero fino) · abierta (borde
+ *                  abeto) · marcada para el reparto · retirada (punteada) · confirmar adjudicar ·
+ *                  confirmar baja · procesando (spinner)
+ *         formulario: nueva · edición · campo inválido (mat-error) · arrastrando PDF · enviando ·
+ *                     error · éxito · baja: bloqueada · pedir · confirmar · borrando
+ * contrast: importes ink 13.6:1 · etiquetas ink-muted 6.8:1 sobre vélin · ladrillo danger-ink
+ *           sobre danger-soft
+ * type: importes, plazos, fechas y el cupo al 75 % con tabular-nums
+ * Sin tomate: crear, guardar y adjudicar son acciones de la administración, en abeto.
+ */
+:host { display: block; }
 
-:host {
-  display: block;
-  background: var(--ds-bg);
-  min-height: 100vh;
-}
-
-.fued-root {
-  padding: var(--ds-space-5) var(--ds-space-5) var(--ds-space-9);
-  max-width: 1680px;
-  margin: 0 auto;
-  /* Garantía anti-desbordamiento lateral en móvil. */
-  overflow-x: clip;
-}
-
-/* ============================================================
-   LOADING
-   ============================================================ */
-
-.fued-loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--ds-space-3);
-  min-height: 40vh;
-  font-size: var(--ds-text-base);
-  color: var(--ds-ink-muted);
-}
-
-.fued-spinner {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--ds-border);
-  border-top-color: var(--ds-gold);
-  border-radius: var(--ds-radius-circle);
-  animation: spin 0.7s linear infinite;
-}
-
-.fued-spinner-sm {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  border-top-color: currentColor;
-  border-radius: var(--ds-radius-circle);
-  animation: spin 0.7s linear infinite;
-  vertical-align: middle;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* ============================================================
-   NOT FOUND
-   ============================================================ */
-
-.fued-not-found {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--ds-space-4);
-  min-height: 40vh;
-  text-align: center;
-  padding: var(--ds-space-8);
-}
-
-.fued-not-found__icon {
-  font-size: 2.5rem;
-  color: var(--ds-ink-muted);
-  opacity: 0.5;
-}
-
-.fued-not-found__title {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-xl);
-  color: var(--ds-ink);
-  margin: 0;
-}
-
-.fued-not-found__error {
-  font-size: var(--ds-text-sm);
-  color: var(--ds-danger);
-  margin: 0;
-}
-
-.fued-btn-back-outline {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-  padding: var(--ds-space-2) var(--ds-space-5);
-  background: transparent;
-  border: 1px solid var(--ds-border-strong);
-  border-radius: var(--ds-radius-md);
-  font-family: var(--ds-font-body);
-  font-size: var(--ds-text-sm);
-  color: var(--ds-ink-secondary);
-  cursor: pointer;
-  transition: var(--ds-transition-color);
-}
-
-.fued-btn-back-outline:hover {
-  border-color: var(--ds-ink);
-  color: var(--ds-ink);
-}
-
-/* ============================================================
-   LIGHTBOX
-   ============================================================ */
-
-.lightbox-overlay {
-  position: fixed;
-  inset: 0;
-  background: var(--ds-overlay);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: var(--ds-z-modal);
-  backdrop-filter: blur(4px);
-}
-
-.lightbox-close {
-  position: absolute;
-  top: var(--ds-space-4);
-  right: var(--ds-space-4);
-  width: 40px;
-  height: 40px;
-  border-radius: var(--ds-radius-circle);
-  background: var(--ds-surface);
-  border: 1px solid var(--ds-border);
-  color: var(--ds-ink);
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: var(--ds-transition-color);
-  z-index: 1;
-}
-
-.lightbox-close:hover {
-  background: var(--ds-bg-alt);
-}
-
-.lightbox-container {
-  max-width: min(90vw, 1000px);
-  max-height: 85vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.lightbox-img {
-  max-width: 100%;
-  max-height: 85vh;
-  border-radius: var(--ds-radius-lg);
-  box-shadow: var(--ds-shadow-xl);
-  object-fit: contain;
-}
-
-/* ============================================================
-   PAGE HEADER
-   ============================================================ */
-
-.fued-header {
-  margin-bottom: var(--ds-space-5);
-}
-
-.fued-header__top {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-3);
-  flex-wrap: wrap;
-  margin-bottom: var(--ds-space-4);
-}
-/* Archivar, arriba a la derecha. */
-.fued-header__acciones { margin-left: auto; flex-shrink: 0; }
-
-.fued-btn-back {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--ds-radius-md);
-  background: var(--ds-surface);
-  border: 1px solid var(--ds-border);
-  color: var(--ds-ink-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: var(--ds-transition-color), box-shadow var(--ds-duration-fast) var(--ds-ease-out);
-}
-
-.fued-btn-back:hover {
-  background: var(--ds-bg-alt);
-  border-color: var(--ds-border-strong);
-  color: var(--ds-ink);
-}
-
-.fued-header__eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-  font-size: var(--ds-text-xs);
-  font-weight: var(--ds-weight-medium);
-  color: var(--ds-gold-ink);
-  text-transform: uppercase;
-  letter-spacing: var(--ds-tracking-widest);
-}
-
-.fued-header__body {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--ds-space-5);
-}
-
-.fued-header__info {
-  flex: 1;
-  min-width: 0;
-}
-
-.fued-header__num {
-  font-size: var(--ds-text-xs);
-  font-weight: var(--ds-weight-medium);
-  color: var(--ds-ink-muted);
-  text-transform: uppercase;
-  letter-spacing: var(--ds-tracking-widest);
-  margin: 0 0 var(--ds-space-1);
-}
-
-.fued-header__title {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-2xl);
-  font-weight: var(--ds-weight-semibold);
-  color: var(--ds-ink);
-  line-height: var(--ds-leading-snug);
-  margin: 0 0 var(--ds-space-3);
-  letter-spacing: var(--ds-tracking-tight);
-  overflow-wrap: anywhere;
-}
-
-.fued-header__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ds-space-2);
-}
-
-.fued-meta-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-space-1);
-  padding: 3px var(--ds-space-3);
-  background: var(--ds-surface);
-  border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-pill);
-  font-size: var(--ds-text-xs);
-  color: var(--ds-ink-secondary);
-  min-width: 0;
-  max-width: 100%;
-  overflow-wrap: anywhere;
-}
-
-.fued-meta-chip--gold {
-  background: var(--ds-gold-faint);
-  border-color: var(--ds-gold-soft);
-  color: var(--ds-gold-ink);
-  font-weight: var(--ds-weight-medium);
-}
-
-.fued-header__badges {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-2);
-  align-items: flex-end;
-  flex-shrink: 0;
-}
-
-/* ============================================================
-   BADGES
-   ============================================================ */
-
-.fued-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px var(--ds-space-3);
-  border-radius: var(--ds-radius-pill);
-  font-size: var(--ds-text-xs);
-  font-weight: var(--ds-weight-medium);
-  white-space: nowrap;
-  background: var(--ds-bg-alt);
-  color: var(--ds-ink-secondary);
-  border: 1px solid var(--ds-border);
-}
-
-.fued-badge--sm {
-  padding: 2px var(--ds-space-2);
-  font-size: var(--ds-text-2xs);
-}
-
-.fued-badge--success {
-  background: var(--ds-success-soft);
-  color: var(--ds-success-ink);
-  border-color: transparent;
-}
-
-.fued-badge--warning {
-  background: var(--ds-warning-soft);
-  color: var(--ds-warning-ink);
-  border-color: transparent;
-}
-
-.fued-badge--danger {
-  background: var(--ds-danger-soft);
-  color: var(--ds-danger-ink);
-  border-color: transparent;
-}
-
-.fued-badge--info {
-  background: var(--ds-info-soft);
-  color: var(--ds-info-ink);
-  border-color: transparent;
-}
-
-/* Baja lógica. Neutro a propósito: convive con el badge de estado
-   (pendiente / aceptada / rechazada) sin competir con él por atención. */
-.fued-badge--removed {
-  background: transparent;
-  color: var(--ds-ink-muted);
-  border: 1px dashed var(--ds-border-strong);
-}
-
-/* ============================================================
-   3-COLUMN WORKSPACE
-   ============================================================ */
-
-.fued-workspace {
+/* ── Tres piezas: escritorio (ofertas | formulario, dossier bajo ofertas); móvil, una columna ── */
+.aoe-layout {
   display: grid;
-  grid-template-columns: 260px minmax(0, 1fr) 380px;
+  grid-template-areas:
+    "offers"
+    "form"
+    "context";
   gap: var(--ds-space-5);
-  align-items: start;
+  min-width: 0;
+}
+.aoe-offers  { grid-area: offers; }
+.aoe-form    { grid-area: form; }
+.aoe-context { grid-area: context; }
+@media (min-width: 1100px) {
+  .aoe-layout {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    /* La segunda fila absorbe la altura sobrante del formulario: sin hueco entre ofertas y dossier. */
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "offers  form"
+      "context form";
+    gap: var(--ds-space-6);
+    align-items: start;
+  }
 }
 
-/* min-width:0 en las 3 columnas: el contenido ancho (títulos, direcciones,
-   nombres) no expande las pistas del grid ni desborda la pantalla. */
-.fued-col-context,
-.fued-col-offers,
-.fued-col-form { min-width: 0; }
-
-/* ============================================================
-   COL 1: Context
-   ============================================================ */
-
-.fued-col-context {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-4);
-  position: sticky;
-  top: var(--ds-space-5);
-  max-height: calc(100vh - 5rem);
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--ds-border) transparent;
-}
-
-.fued-col-context::-webkit-scrollbar {
-  width: 4px;
-}
-
-.fued-col-context::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.fued-col-context::-webkit-scrollbar-thumb {
-  background: var(--ds-border);
-  border-radius: var(--ds-radius-pill);
-}
-
-/* ============================================================
-   COL 2: Offers
-   ============================================================ */
-
-.fued-col-offers {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-5);
-}
-
-/* Offers header */
-.fued-offers-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--ds-space-3);
-}
-
-.fued-offers-header__left {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-2);
-}
-
-.fued-offers-title {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-semibold);
-  color: var(--ds-ink);
-  margin: 0;
-  line-height: 1;
-}
-
-/* Slot indicators */
-.fued-slots-row {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-}
-
-.fued-slot {
-  width: 32px;
-  height: 5px;
-  border-radius: var(--ds-radius-pill);
-  background: var(--ds-border);
-  transition: background var(--ds-duration-fast) var(--ds-ease-out);
-}
-
-.fued-slot--used {
-  background: var(--ds-gold);
-}
-
-/* Nueva oferta button */
-.fued-btn-nueva {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-  padding: var(--ds-space-2) var(--ds-space-4);
-  background: var(--ds-surface);
-  color: var(--ds-ink-secondary);
-  border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-pill);
-  font-family: var(--ds-font-body);
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
-  cursor: pointer;
-  transition: all var(--ds-duration-fast) var(--ds-ease-out);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.fued-btn-nueva:hover:not(:disabled) {
-  background: var(--ds-gold-faint);
-  border-color: var(--ds-gold-soft);
-  color: var(--ds-ink);
-  box-shadow: var(--ds-shadow-gold);
-}
-
-.fued-btn-nueva--active {
-  background: var(--ds-gold);
-  border-color: var(--ds-gold);
-  color: var(--ds-ink-on-accent);
-  box-shadow: var(--ds-shadow-gold);
-}
-
-.fued-btn-nueva--active:hover:not(:disabled) {
-  background: var(--ds-gold-hover);
-  border-color: var(--ds-gold-hover);
-}
-
-.fued-btn-nueva:focus-visible {
-  outline: none;
-  box-shadow: var(--ds-focus-ring);
-}
-
-.fued-btn-nueva:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-/* Offers list */
-.fued-offers-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-3);
-}
-
-/* Offer card */
-.fued-offer-card {
+.aoe-inline-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--ds-space-4);
-  padding: var(--ds-space-4);
-  background: var(--ds-surface);
-  border: 1px solid var(--ds-border);
-  border-left: 3px solid transparent;
-  border-radius: var(--ds-radius-lg);
-  cursor: pointer;
-  transition: all var(--ds-duration-fast) var(--ds-ease-out);
-  box-shadow: var(--ds-shadow-xs);
-  outline: none;
-  user-select: none;
-}
-
-.fued-offer-card:hover {
-  border-color: var(--ds-border-strong);
-  border-left-color: var(--ds-gold-soft);
-  box-shadow: var(--ds-shadow-md);
-}
-
-.fued-offer-card:focus-visible {
-  box-shadow: var(--ds-focus-ring);
-}
-
-.fued-offer-card--active {
-  border-left-color: var(--ds-gold) !important;
-  background: var(--ds-gold-faint);
-  border-color: var(--ds-gold-soft);
-  box-shadow: var(--ds-shadow-sm);
-}
-
-/* Casilla de reparto. 18px con área de pulsación de 32px: cómoda en táctil sin
-   engordar la fila. */
-.fued-check {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--ds-gold-active);
-  cursor: pointer;
-  margin: 0;
-  flex-shrink: 0;
-}
-
-.fued-check:focus-visible {
-  outline: none;
-  box-shadow: var(--ds-focus-ring);
-  border-radius: var(--ds-radius-sm);
-}
-
-.fued-offer-card__pick {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 32px;
-  min-height: 32px;
-  margin: 0;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.fued-offer-card--picked {
-  border-color: var(--ds-gold-soft);
-  background: var(--ds-gold-faint);
-}
-
-/* Offer card: dada de baja.
-   Se retira del primer plano —papel alterno, borde discontinuo, sin sombra ni
-   cursor— pero NO se atenúa con opacity: la tarjeta tiene que seguir leyéndose,
-   que es justamente el motivo por el que ya no se borra físicamente. */
-.fued-offer-card--removed {
-  background: var(--ds-bg-alt);
-  border-style: dashed;
-  border-left-color: var(--ds-border-strong);
-  box-shadow: none;
-  cursor: default;
-}
-
-.fued-offer-card--removed:hover {
-  border-color: var(--ds-border-strong);
-  border-left-color: var(--ds-border-strong);
-  box-shadow: none;
-}
-
-.fued-offer-card--removed .fued-offer-card__name,
-.fued-offer-card--removed .fued-offer-card__price {
-  color: var(--ds-ink-muted);
-  text-decoration: line-through;
-  text-decoration-thickness: 1px;
-  text-decoration-color: var(--ds-border-strong);
-}
-
-.fued-offer-card--removed .fued-offer-card__avatar {
-  background: transparent;
-  border-style: dashed;
-  color: var(--ds-ink-muted);
-}
-
-/* Offer card: avatar */
-.fued-offer-card__avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--ds-radius-circle);
-  background: var(--ds-bg-alt);
-  border: 2px solid var(--ds-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-semibold);
-  color: var(--ds-ink-secondary);
-  flex-shrink: 0;
-  transition: all var(--ds-duration-fast) var(--ds-ease-out);
-}
-
-.fued-offer-card__avatar--active {
-  background: var(--ds-gold-soft);
-  border-color: var(--ds-gold);
-  color: var(--ds-ink);
-}
-
-/* Offer card: content */
-.fued-offer-card__content {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
   gap: var(--ds-space-2);
 }
+.aoe-inline-actions > button { min-height: 44px; }
 
-.fued-offer-card__row1 {
+/* ── Cabecera de «Ofertas recibidas»: título, cupo y nueva oferta ───────── */
+.aoe-head {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--ds-space-3);
-}
-
-.fued-offer-card__name {
-  font-size: var(--ds-text-base);
-  font-weight: var(--ds-weight-medium);
-  color: var(--ds-ink);
-  margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.fued-offer-card__price {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-base);
-  font-weight: var(--ds-weight-semibold);
-  color: var(--ds-ink);
-  margin: 0;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-/* Servicios que cubre la oferta (solo con varios en el expediente). */
-.fued-offer-card__services {
-  display: flex;
-  align-items: baseline;
-  gap: var(--ds-space-1);
-  margin: 2px 0 var(--ds-space-1);
-  font-size: var(--ds-text-xs);
-  color: var(--ds-ink-secondary);
-  overflow-wrap: anywhere;
-}
-.fued-offer-card__services i { color: var(--ds-ink-muted); }
-
-.fued-offer-card__row2 {
-  display: flex;
-  align-items: center;
   flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2) var(--ds-space-4);
+}
+.aoe-slots {
+  display: inline-flex;
+  align-items: center;
   gap: var(--ds-space-2);
+  font-weight: var(--ds-weight-semibold);
+  color: var(--ds-ink-secondary);
 }
-
-.fued-offer-card__meta {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  font-size: var(--ds-text-xs);
-  color: var(--ds-ink-muted);
-}
-
-.fued-offer-card__editing-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  font-size: var(--ds-text-xs);
-  color: var(--ds-gold-ink);
-  font-weight: var(--ds-weight-medium);
-}
-
-/* Offer card: award action */
-.fued-offer-card__award {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-}
-
-.fued-award-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  background: var(--ds-gold-soft);
-  border: 1px solid var(--ds-gold);
+.aoe-slots__bar { display: inline-flex; gap: 3px; }
+.aoe-slots__bar > span {
+  width: 14px;
+  height: 6px;
   border-radius: var(--ds-radius-circle);
-  color: var(--ds-gold-ink);
-  font-size: 13px;
+  background: var(--ds-border-strong);
+}
+.aoe-slots__bar > span.is-used { background: var(--ds-action); }
+.aoe-new {
+  min-height: 44px;
+  margin-left: auto;
+}
+.aoe-new.is-on {
+  --mat-button-outlined-label-text-color: var(--ds-action);
+  --mat-button-outlined-outline-color: var(--ds-action);
+  background: var(--ds-action-faint);
 }
 
-.fued-btn-award {
-  width: 30px;
-  height: 30px;
-  border-radius: var(--ds-radius-md);
-  border: 1px solid var(--ds-border);
-  background: transparent;
-  color: var(--ds-ink-muted);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all var(--ds-duration-fast) var(--ds-ease-out);
-}
-
-.fued-btn-award:hover:not(:disabled) {
-  background: var(--ds-gold-faint);
-  border-color: var(--ds-gold-soft);
-  color: var(--ds-gold-ink);
-}
-
-.fued-btn-award:focus-visible {
-  outline: none;
-  box-shadow: var(--ds-focus-ring);
-}
-
-.fued-btn-award:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-/* Offer card: delete actions */
-.fued-offer-card__actions {
-  display: flex;
+/* ── Adjudicar las marcadas ─────────────────────────────────────────────── */
+.aoe-award { justify-self: start; min-height: 44px; }
+.aoe-award-list {
+  display: grid;
   gap: var(--ds-space-1);
-  flex-shrink: 0;
-  align-items: center;
-}
-
-.fued-btn-del {
-  width: 30px;
-  height: 30px;
-  border-radius: var(--ds-radius-md);
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--ds-ink-muted);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all var(--ds-duration-fast) var(--ds-ease-out);
-}
-
-.fued-btn-del:hover:not(:disabled) {
-  background: var(--ds-danger-soft);
-  border-color: var(--ds-danger-soft);
-  color: var(--ds-danger-ink);
-}
-
-.fued-btn-del:focus-visible {
-  outline: none;
-  box-shadow: var(--ds-focus-ring);
-}
-
-.fued-btn-del:active:not(:disabled) {
-  transform: translateY(1px);
-}
-
-/* Papelera con la confirmación desplegada. Se queda marcada para que se vea de
-   dónde salió la fila de confirmación, y volver a pulsarla la cierra. */
-.fued-btn-del--armed {
-  background: var(--ds-danger-soft);
-  border-color: var(--ds-danger);
-  color: var(--ds-danger-ink);
-}
-
-/* Botón que borra de verdad. Vive en la fila de ancho completo, con etiqueta:
-   nunca debe caer bajo el cursor que acaba de pulsar la papelera. */
-.fued-btn-del-confirm {
-  border-color: var(--ds-danger);
-  background: var(--ds-danger-soft);
-  color: var(--ds-danger-ink);
-  font-weight: var(--ds-weight-semibold);
-}
-
-.fued-btn-del-confirm:hover:not(:disabled) {
-  background: var(--ds-danger);
-  color: var(--ds-ink-inverse);
-}
-
-/* Restaurar: acción constructiva sobre una tarjeta apagada, así que lleva
-   etiqueta y no sólo icono — es la única salida de ese estado. */
-.fued-btn-restore {
-  padding: var(--ds-space-2) var(--ds-space-3);
-  font-size: var(--ds-text-xs);
-}
-
-.fued-btn-restore:hover:not(:disabled) {
-  border-color: var(--ds-gold);
-  background: var(--ds-gold-faint);
-  color: var(--ds-ink);
-}
-
-.fued-btn-del:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-/* En columna estrecha la etiqueta de restaurar estorba; el icono y el title
-   bastan. Nunca se parte en dos líneas. */
-.fued-btn-restore__label {
-  white-space: nowrap;
-}
-
-@media (max-width: 1200px) {
-  .fued-btn-restore__label { display: none; }
-  .fued-btn-restore { padding: var(--ds-space-2); }
-}
-
-/* Offer card: award confirm row (second flex row, full width) */
-.fued-offer-card__confirm-row {
-  flex: 0 0 100%;
-  padding-top: var(--ds-space-3);
-  border-top: 1px solid var(--ds-border-subtle);
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-2);
-}
-
-.fued-offer-card__confirm-msg {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-  font-size: var(--ds-text-sm);
-  color: var(--ds-ink-secondary);
-  margin: 0;
-}
-
-.fued-offer-card__confirm-error {
-  font-size: var(--ds-text-xs);
-  color: var(--ds-danger);
-  margin: 0;
-}
-
-/* Aclara que la baja es reversible: sin esto, confirmar un borrado se lee como
-   una pérdida definitiva y el administrador duda. */
-.fued-offer-card__confirm-note {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-  font-size: var(--ds-text-xs);
-  color: var(--ds-ink-muted);
-  margin: 0;
-}
-
-.fued-offer-card__confirm-btns {
-  display: flex;
-  gap: var(--ds-space-2);
-}
-
-.fued-btn-award-confirm {
-  background: var(--ds-gold);
-  border-color: var(--ds-gold);
-  color: var(--ds-ink-on-accent);
-  font-weight: var(--ds-weight-semibold);
-}
-
-.fued-btn-award-confirm:hover:not(:disabled) {
-  background: var(--ds-gold-hover);
-  border-color: var(--ds-gold-hover);
-  box-shadow: var(--ds-shadow-gold);
-}
-
-/* Awarded card visual variant */
-.fued-offer-card--awarded {
-  border-left-color: var(--ds-gold) !important;
-}
-
-.fued-offer-card__avatar--awarded {
-  background: var(--ds-gold-soft);
-  border-color: var(--ds-gold);
-  color: var(--ds-ink);
-}
-
-/* Offers empty state */
-.fued-offers-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--ds-space-9) var(--ds-space-6);
-  border: 2px dashed var(--ds-border);
-  border-radius: var(--ds-radius-lg);
-  color: var(--ds-ink-muted);
-  text-align: center;
-  gap: var(--ds-space-3);
-}
-
-.fued-offers-empty i {
-  font-size: 2.5rem;
-  opacity: 0.4;
-}
-
-.fued-offers-empty p {
-  margin: 0;
-  font-size: var(--ds-text-base);
-  color: var(--ds-ink-muted);
-}
-
-/* ============================================================
-   COL 3: Form panel (sticky)
-   ============================================================ */
-
-.fued-col-form {
-  position: sticky;
-  top: var(--ds-space-5);
-  max-height: calc(100vh - 5rem);
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--ds-border) transparent;
-}
-
-.fued-col-form::-webkit-scrollbar {
-  width: 4px;
-}
-
-.fued-col-form::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.fued-col-form::-webkit-scrollbar-thumb {
-  background: var(--ds-border);
-  border-radius: var(--ds-radius-pill);
-}
-
-/* Form panel */
-.fued-form-panel {
-  background: var(--ds-surface);
-  border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-lg);
-  box-shadow: var(--ds-shadow-sm);
-  overflow: hidden;
-}
-
-.fued-form-panel__head {
-  padding: var(--ds-space-4) var(--ds-space-5);
-  background: var(--ds-bg-alt);
-  border-bottom: 1px solid var(--ds-border);
-}
-
-.fued-form-panel__mode {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-  font-size: var(--ds-text-2xs);
-  font-weight: var(--ds-weight-semibold);
-  color: var(--ds-ink-muted);
-  text-transform: uppercase;
-  letter-spacing: var(--ds-tracking-widest);
-}
-
-.fued-form-panel__subtitle {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-semibold);
-  color: var(--ds-ink);
-  margin: var(--ds-space-2) 0 0;
-  line-height: var(--ds-leading-snug);
-}
-
-.fued-form-panel__body {
-  padding: var(--ds-space-5);
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-4);
-}
-
-/* ============================================================
-   CARDS (context column)
-   ============================================================ */
-
-.fued-card {
-  background: var(--ds-surface);
-  border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-lg);
-  box-shadow: var(--ds-shadow-xs);
-  overflow: hidden;
-}
-
-.fued-card--grow {
-  flex: 1;
-}
-
-.fued-card__header {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-  padding: var(--ds-space-3) var(--ds-space-4);
-  background: var(--ds-bg-alt);
-  border-bottom: 1px solid var(--ds-border);
-  font-size: var(--ds-text-xs);
-  font-weight: var(--ds-weight-semibold);
-  color: var(--ds-ink-muted);
-  text-transform: uppercase;
-  letter-spacing: var(--ds-tracking-widest);
-}
-
-.fued-card__body {
-  padding: var(--ds-space-4);
-}
-
-/* ============================================================
-   SUMA DE OFERTAS (expediente con varios servicios)
-   ============================================================ */
-
-.fued-offers-sum {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-1);
-  padding: var(--ds-space-3) var(--ds-space-4);
-  margin-bottom: var(--ds-space-3);
-  border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
-  background: var(--ds-bg-alt);
-}
-
-.fued-offers-sum__row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--ds-space-3);
-  font-size: var(--ds-text-sm);
-  color: var(--ds-ink-secondary);
-}
-
-.fued-offers-sum__row strong {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-semibold);
-  color: var(--ds-ink);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.fued-offers-sum__row--sel {
-  padding-top: var(--ds-space-2);
-  border-top: 1px solid var(--ds-border);
-}
-
-.fued-offers-sum__note {
-  display: flex;
-  align-items: baseline;
-  gap: var(--ds-space-1);
-  margin: var(--ds-space-1) 0 0;
-  font-size: var(--ds-text-xs);
-  color: var(--ds-ink-secondary);
-}
-.fued-offers-sum__note i { color: var(--ds-warning-ink); }
-
-/* ============================================================
-   FACT STRIP
-   ============================================================ */
-
-.fued-fact-strip {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-3);
-}
-
-.fued-fact {
-  display: flex;
-  gap: var(--ds-space-3);
-  align-items: flex-start;
-}
-
-.fued-fact__icon-wrap {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--ds-radius-md);
-  background: var(--ds-gold-faint);
-  border: 1px solid var(--ds-gold-soft);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  color: var(--ds-gold-ink);
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.fued-fact__body {
-  flex: 1;
-  min-width: 0;
-}
-
-.fued-fact__label {
-  font-size: var(--ds-text-2xs);
-  font-weight: var(--ds-weight-medium);
-  color: var(--ds-ink-muted);
-  text-transform: uppercase;
-  letter-spacing: var(--ds-tracking-wide);
-  margin: 0 0 2px;
-}
-
-.fued-fact__value {
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
-  color: var(--ds-ink);
-  margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.fued-fact__sub {
-  font-size: var(--ds-text-xs);
-  color: var(--ds-ink-muted);
-  margin: 1px 0 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Varios servicios: uno por línea. A diferencia de __value, aquí el nombre
- * envuelve en vez de cortarse con «…»: en una lista, perder el final de un
- * nombre es perder el dato. */
-.fued-fact__list {
-  list-style: none;
   margin: 0;
   padding: 0;
+  list-style: none;
+}
+.aoe-award-list li {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-1) 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--ds-warning) 30%, transparent);
+  font-weight: var(--ds-weight-semibold);
+  color: var(--ds-ink);
 }
 
-.fued-fact__item {
+/* ── Suma con varios servicios ──────────────────────────────────────────── */
+.aoe-sum { display: grid; gap: var(--ds-space-3); }
+.aoe-sum__list {
+  display: grid;
+  gap: var(--ds-space-1);
+  margin: 0;
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-band);
+}
+.aoe-sum__row {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0 var(--ds-space-2);
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
-  color: var(--ds-ink);
-  overflow-wrap: anywhere;
+  justify-content: space-between;
+  gap: var(--ds-space-1) var(--ds-space-3);
 }
-
-.fued-fact__tag {
-  font-size: var(--ds-text-2xs);
-  font-weight: var(--ds-weight-semibold);
-  letter-spacing: var(--ds-tracking-wide);
-  text-transform: uppercase;
-  color: var(--ds-ink-secondary);
-}
-
-/* ============================================================
-   DIVIDER, PROBLEM BLOCK, COST BANNER
-   ============================================================ */
-
-.fued-divider {
-  height: 1px;
-  background: var(--ds-border-subtle);
-  margin: var(--ds-space-3) 0;
-}
-
-.fued-prob-block {
-  display: flex;
-  gap: var(--ds-space-3);
-  align-items: flex-start;
-  padding: var(--ds-space-3);
-  background: var(--ds-warning-soft);
-  border-radius: var(--ds-radius-md);
-  border-left: 3px solid var(--ds-warning);
-}
-
-.fued-prob-block__icon {
-  color: var(--ds-warning-ink);
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-
-.fued-prob-block__text {
-  font-size: var(--ds-text-sm);
-  color: var(--ds-ink-secondary);
+.aoe-sum__row dt { color: var(--ds-ink-secondary); }
+.aoe-sum__row dd {
   margin: 0;
-  line-height: var(--ds-leading-relaxed);
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.fued-cost-banner {
-  padding: var(--ds-space-3) var(--ds-space-4);
-  background: var(--ds-gold-faint);
-  border: 1px solid var(--ds-gold-soft);
-  border-radius: var(--ds-radius-md);
-  text-align: center;
-}
-
-.fued-cost-banner__label {
-  font-size: var(--ds-text-2xs);
-  font-weight: var(--ds-weight-medium);
-  color: var(--ds-gold-ink);
-  text-transform: uppercase;
-  letter-spacing: var(--ds-tracking-widest);
-  margin: 0 0 var(--ds-space-1);
-}
-
-.fued-cost-banner__value {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-semibold);
-  color: var(--ds-ink);
-  margin: 0;
-}
-
-/* ============================================================
-   MEDIA TABS
-   ============================================================ */
-
-.fued-media-tabs {
-  display: flex;
-  border-bottom: 1px solid var(--ds-border);
-}
-
-.fued-media-tab {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--ds-space-1);
-  padding: var(--ds-space-3) var(--ds-space-2);
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  font-family: var(--ds-font-body);
-  font-size: var(--ds-text-xs);
-  font-weight: var(--ds-weight-medium);
-  color: var(--ds-ink-muted);
-  cursor: pointer;
-  transition: var(--ds-transition-color);
-  margin-bottom: -1px;
-  white-space: nowrap;
-}
-
-.fued-media-tab:hover {
-  color: var(--ds-ink-secondary);
-}
-
-.fued-media-tab--active {
-  color: var(--ds-ink);
-  border-bottom-color: var(--ds-gold);
-}
-
-.fued-count-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 16px;
-  height: 16px;
-  padding: 0 4px;
-  background: var(--ds-gold-soft);
-  color: var(--ds-gold-ink);
-  border-radius: var(--ds-radius-pill);
-  font-size: 10px;
-  font-weight: var(--ds-weight-semibold);
-  line-height: 1;
-}
-
-/* ============================================================
-   TOUR EMBED
-   ============================================================ */
-
-.fued-tour-grid {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-4);
-}
-
-.fued-tour-item {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-2);
-}
-
-.fued-tour-label {
-  font-size: var(--ds-text-xs);
-  color: var(--ds-ink-muted);
-  margin: 0;
-}
-
-.fued-tour-embed {
-  position: relative;
-  padding-bottom: 56.25%;
-  border-radius: var(--ds-radius-md);
-  overflow: hidden;
-  background: var(--ds-bg-alt);
-}
-
-.fued-tour-embed iframe {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-
-/* ============================================================
-   PHOTO GRID
-   ============================================================ */
-
-.fued-photo-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--ds-space-2);
-}
-
-.fued-photo-thumb {
-  border-radius: var(--ds-radius-md);
-  overflow: hidden;
-  aspect-ratio: 4/3;
-  background: var(--ds-bg-alt);
-  cursor: pointer;
-  transition: box-shadow var(--ds-duration-fast) var(--ds-ease-out);
-}
-
-.fued-photo-thumb--zoom:hover {
-  box-shadow: var(--ds-shadow-md);
-}
-
-.fued-photo-thumb__img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform var(--ds-duration-base) var(--ds-ease-out);
-}
-
-.fued-photo-thumb--zoom:hover .fued-photo-thumb__img {
-  transform: scale(1.04);
-}
-
-/* ============================================================
-   FILE ROWS
-   ============================================================ */
-
-.fued-file-row {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-3);
-  padding: var(--ds-space-3);
-  background: var(--ds-bg-alt);
-  border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
-  margin-bottom: var(--ds-space-2);
-}
-
-.fued-file-row:last-child {
-  margin-bottom: 0;
-}
-
-.fued-file-row__icon {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--ds-radius-md);
-  background: var(--ds-surface);
-  border: 1px solid var(--ds-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  color: var(--ds-ink-secondary);
-  flex-shrink: 0;
-}
-
-.fued-file-row__info {
-  flex: 1;
-  min-width: 0;
-}
-
-.fued-file-row__name {
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
-  color: var(--ds-ink);
-  margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.fued-file-row__meta {
-  font-size: var(--ds-text-xs);
-  color: var(--ds-ink-muted);
-  margin: 2px 0 0;
-}
-
-.fued-file-row__actions {
-  display: flex;
-  gap: var(--ds-space-1);
-  flex-shrink: 0;
-}
-
-.fued-btn-icon {
-  width: 30px;
-  height: 30px;
-  border-radius: var(--ds-radius-md);
-  border: 1px solid var(--ds-border);
-  background: var(--ds-surface);
-  color: var(--ds-ink-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  cursor: pointer;
-  transition: var(--ds-transition-color);
-}
-
-.fued-btn-icon:hover {
-  background: var(--ds-gold-faint);
-  border-color: var(--ds-gold-soft);
-  color: var(--ds-gold-ink);
-}
-
-/* ============================================================
-   EMPTY INLINE
-   ============================================================ */
-
-.fued-empty-inline {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--ds-space-2);
-  padding: var(--ds-space-6) var(--ds-space-4);
-  color: var(--ds-ink-muted);
-  text-align: center;
-}
-
-.fued-empty-inline i {
-  font-size: 1.75rem;
-  opacity: 0.4;
-}
-
-.fued-empty-inline p {
-  font-size: var(--ds-text-sm);
-  margin: 0;
-}
-
-/* ============================================================
-   FORM FIELDS
-   ============================================================ */
-
-.fued-field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-2);
-  min-width: 0;
-}
-
-.fued-field-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--ds-space-3);
-}
-
-.fued-label {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
-  color: var(--ds-ink-secondary);
-  line-height: 1;
-}
-
-.fued-req {
-  color: var(--ds-danger);
   font-weight: var(--ds-weight-bold);
-}
-
-.fued-opt {
-  color: var(--ds-ink-muted);
-  font-weight: var(--ds-weight-regular);
-}
-
-.fued-field-hint {
-  font-size: var(--ds-text-sm);
-  color: var(--ds-ink-muted);
-  margin: 0;
-}
-
-.fued-input {
-  width: 100%;
-  padding: var(--ds-space-2) var(--ds-space-3);
-  background: var(--ds-surface-elevated);
-  border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
-  font-family: var(--ds-font-body);
-  font-size: var(--ds-text-sm);
   color: var(--ds-ink);
+}
+.aoe-sum__row.is-sel dt { font-weight: var(--ds-weight-semibold); color: var(--ds-ink); }
+
+/* ── Tarjetas de oferta ─────────────────────────────────────────────────── */
+/* Una columna siempre: los precios quedan alineados y se comparan de un vistazo. */
+.aoe-cards {
+  container-type: inline-size;
+  display: grid;
+  gap: var(--ds-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.aoe-card {
+  display: grid;
+  gap: var(--ds-space-3);
+  align-content: start;
+  min-width: 0;
+  padding: var(--ds-space-4);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-lg);
+  background: var(--ds-surface);
+  cursor: pointer;
   transition: border-color var(--ds-duration-fast) var(--ds-ease-out),
               box-shadow var(--ds-duration-fast) var(--ds-ease-out);
-  box-sizing: border-box;
 }
-
-.fued-input:focus {
-  outline: none;
-  border-color: var(--ds-gold);
-  box-shadow: var(--ds-focus-ring);
+@media (hover: hover) and (pointer: fine) {
+  .aoe-card:hover:not(.is-out, .is-open) { border-color: var(--ds-border-strong); }
 }
-
-/* Campo requerido sin rellenar: el borde se apaga en cuanto es válido.
-   Al enfocar gana el dorado del foco, para no gritar mientras se escribe. */
-.fued-input--invalid {
-  border-color: var(--ds-danger);
-  background: var(--ds-danger-soft);
+.aoe-card.is-marked { background: var(--ds-action-faint); }
+.aoe-card.is-open {
+  border-color: var(--ds-action);
+  box-shadow: inset 0 0 0 1px var(--ds-action);
+  cursor: default;
 }
-.fued-input--invalid:focus {
-  border-color: var(--ds-gold);
-  background: var(--ds-surface-elevated);
-}
-
-.fued-input::placeholder {
-  color: var(--ds-ink-muted);
-}
-
-.fued-select {
-  cursor: pointer;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%237A7770' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right var(--ds-space-3) center;
-  padding-right: var(--ds-space-8);
-}
-
-.fued-textarea {
-  resize: vertical;
-  min-height: 80px;
-}
-
-.fued-input-group {
-  display: flex;
-  align-items: stretch;
-}
-
-.fued-input-prefix {
-  display: flex;
-  align-items: center;
-  padding: 0 var(--ds-space-3);
-  background: var(--ds-bg-alt);
-  border: 1px solid var(--ds-border);
-  border-right: none;
-  border-radius: var(--ds-radius-md) 0 0 var(--ds-radius-md);
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
-  color: var(--ds-ink-muted);
-  white-space: nowrap;
-}
-
-.fued-input-group .fued-input {
-  border-radius: 0 var(--ds-radius-md) var(--ds-radius-md) 0;
-}
-
-/* ============================================================
-   ATTACHMENTS
-   ============================================================ */
-
-.fued-attach-row {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--ds-space-3);
-  padding: var(--ds-space-3);
-  background: var(--ds-bg-alt);
-  border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
-  margin-top: var(--ds-space-2);
-}
-
-.fued-attach-row + .fued-attach-row {
-  margin-top: var(--ds-space-2);
-}
-
-/* Documentos: varios adjuntos + zona de arrastre */
-.fued-attach-row--docs {
+.aoe-card.is-out {
   border-style: dashed;
-  transition: border-color var(--ds-duration-fast) var(--ds-ease-out),
-              background var(--ds-duration-fast) var(--ds-ease-out);
+  cursor: default;
 }
-/* PDF obligatorio al crear la oferta y aún sin adjuntar. El estado de
-   arrastre manda sobre el rojo: prevalece la regla declarada después. */
-.fued-attach-row--invalid {
-  border-color: var(--ds-danger);
-  background: var(--ds-danger-soft);
-}
+.aoe-card.is-out .aoe-card__amount,
+.aoe-card.is-out .aoe-card__name { color: var(--ds-ink-muted); }
 
-.fued-attach-row--drag {
-  border-color: var(--ds-gold-active);
-  background: var(--ds-gold-soft);
-}
-/* Los hijos quedan inertes SOLO mientras se arrastra: si no, `dragleave`
-   salta al pasar sobre ellos y el resalte parpadea. Fuera del arrastre todo
-   conserva sus eventos, asi que los controles de dentro siguen funcionando. */
-.fued-attach-row--drag > * { pointer-events: none; }
-
-.fued-attach-hint {
-  font-size: var(--ds-text-2xs);
-  color: var(--ds-ink-muted);
-  margin: var(--ds-space-1) 0 0;
-}
-
-.fued-doc-remove {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  padding: 0;
-  flex-shrink: 0;
-  background: transparent;
-  border: none;
-  border-radius: var(--ds-radius-sm);
-  color: var(--ds-ink-muted);
-  font-size: var(--ds-text-2xs);
-  cursor: pointer;
-  transition: var(--ds-transition-color);
-}
-.fued-doc-remove:hover:not(:disabled) { background: var(--ds-danger-soft); color: var(--ds-danger-ink); }
-.fued-doc-remove:disabled { opacity: 0.5; cursor: not-allowed; }
-
-.fued-attach-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--ds-radius-md);
+.aoe-card__top {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  flex-shrink: 0;
-}
-
-.fued-attach-icon--pdf {
-  background: var(--ds-danger-soft);
-  color: var(--ds-danger);
-}
-
-.fued-attach-icon--video {
-  background: var(--ds-info-soft);
-  color: var(--ds-info);
-}
-
-.fued-attach-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.fued-attach-name {
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
-  color: var(--ds-ink);
-  margin: 0 0 2px;
-}
-
-.fued-attach-status {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-1);
-  font-size: var(--ds-text-xs);
-  margin: 0;
-}
-
-/* El recorte vive en el nombre, no en la fila: si el contenedor flex recorta,
-   los botones de ver/eliminar quedan fuera de vista e inalcanzables. */
-.fued-attach-fname {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.fued-attach-status > .bi,
-.fued-view-link,
-.fued-doc-remove { flex-shrink: 0; }
-
-.fued-attach-status--new {
-  color: var(--ds-success-ink);
-}
-
-.fued-attach-status--saved {
-  color: var(--ds-success-ink);
-}
-
-.fued-attach-empty {
-  font-size: var(--ds-text-xs);
-  color: var(--ds-ink-muted);
-  margin: 0;
-}
-
-.fued-btn-upload {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-  padding: var(--ds-space-1) var(--ds-space-3);
-  background: var(--ds-surface-elevated);
-  border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
-  font-family: var(--ds-font-body);
-  font-size: var(--ds-text-xs);
-  font-weight: var(--ds-weight-medium);
-  color: var(--ds-ink-secondary);
-  cursor: pointer;
-  transition: var(--ds-transition-color);
-  white-space: nowrap;
-}
-
-.fued-btn-upload:hover {
-  background: var(--ds-gold-faint);
-  border-color: var(--ds-gold-soft);
-  color: var(--ds-ink);
-}
-
-.fued-file-input {
-  display: none;
-}
-
-.fued-view-link {
-  background: none;
-  border: none;
-  padding: 0;
-  font-size: inherit;
-  color: var(--ds-gold-ink);
-  text-decoration: underline;
-  cursor: pointer;
-  font-family: inherit;
-}
-
-.fued-view-link:hover {
-  color: var(--ds-gold-ink);
-}
-
-/* ============================================================
-   PROGRESS STRIP
-   ============================================================ */
-
-.fued-progress-strip {
-  display: flex;
-  gap: var(--ds-space-2);
-  align-items: center;
   flex-wrap: wrap;
-  padding: var(--ds-space-3) var(--ds-space-4);
-  background: var(--ds-bg-alt);
-  border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
-}
-
-.fued-prog-dot {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--ds-radius-circle);
-  background: var(--ds-surface-elevated);
-  border: 1px solid var(--ds-border);
-  display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  color: var(--ds-ink-muted);
-  transition: all var(--ds-duration-fast) var(--ds-ease-out);
+  gap: var(--ds-space-2);
+  min-height: 40px;
+}
+.aoe-card__pick { margin: -8px 0 -8px -8px; }
+.aoe-card__tags {
+  display: inline-flex;
+  flex: 1 1 0;
+  flex-wrap: wrap;
+  gap: var(--ds-space-1);
+  min-width: 0;
 }
 
-.fued-prog-dot--done {
-  background: var(--ds-gold-faint);
-  border-color: var(--ds-gold);
-  color: var(--ds-gold-ink);
+.aoe-card__name {
+  margin: 0;
+  font-size: var(--ds-text-base);
+  font-weight: var(--ds-weight-semibold);
+  line-height: var(--ds-leading-snug);
+  color: var(--ds-ink);
+  overflow-wrap: anywhere;
 }
-
-/* ============================================================
-   ALERTS
-   ============================================================ */
-
-.fued-alert {
-  padding: var(--ds-space-3) var(--ds-space-4);
-  border-radius: var(--ds-radius-md);
-  font-size: var(--ds-text-sm);
-  border: 1px solid transparent;
+.aoe-card__amount {
+  margin: calc(var(--ds-space-2) * -1) 0 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-2xl);
+  font-weight: var(--ds-weight-bold);
+  line-height: var(--ds-leading-tight);
+  color: var(--ds-ink);
+}
+.aoe-card__line {
   display: flex;
   align-items: flex-start;
   gap: var(--ds-space-2);
-}
-
-.fued-alert--danger {
-  background: var(--ds-danger-soft);
-  color: var(--ds-danger-ink);
-  border-color: var(--ds-danger-soft);
-}
-
-.fued-alert--success {
-  background: var(--ds-success-soft);
-  color: var(--ds-success-ink);
-  border-color: var(--ds-success-soft);
-}
-
-/* ============================================================
-   FORM ACTIONS
-   ============================================================ */
-
-.fued-form-actions {
-  display: flex;
-  gap: var(--ds-space-3);
-}
-
-.fued-btn-submit {
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--ds-space-2);
-  padding: var(--ds-space-3) var(--ds-space-4);
-  background: var(--ds-gold);
-  border: 1px solid var(--ds-gold);
-  border-radius: var(--ds-radius-md);
-  font-family: var(--ds-font-body);
+  margin: 0;
   font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-semibold);
-  color: var(--ds-ink-on-accent);
-  cursor: pointer;
-  transition: all var(--ds-duration-fast) var(--ds-ease-out);
-}
-
-.fued-btn-submit:hover:not(:disabled) {
-  background: var(--ds-gold-hover);
-  border-color: var(--ds-gold-hover);
-  box-shadow: var(--ds-shadow-gold);
-}
-
-.fued-btn-submit:focus-visible {
-  outline: none;
-  box-shadow: var(--ds-focus-ring);
-}
-
-.fued-btn-submit:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.fued-btn-draft {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--ds-space-2);
-  padding: var(--ds-space-3) var(--ds-space-4);
-  background: transparent;
-  border: 1px solid var(--ds-border-strong);
-  border-radius: var(--ds-radius-md);
-  font-family: var(--ds-font-body);
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
   color: var(--ds-ink-secondary);
-  cursor: pointer;
-  transition: var(--ds-transition-color);
-  white-space: nowrap;
 }
-
-.fued-btn-draft:hover {
-  background: var(--ds-bg-alt);
-  border-color: var(--ds-ink);
-  color: var(--ds-ink);
-}
-
-/* ============================================================
-   DANGER ZONE
-   ============================================================ */
-
-.fued-danger-zone {
-  padding: var(--ds-space-4) var(--ds-space-5);
-  border-top: 1px solid var(--ds-border);
-  background: var(--ds-bg);
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-3);
-}
-
-.fued-danger-zone__blocked {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-  font-size: var(--ds-text-xs);
+.aoe-card__line mat-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
   color: var(--ds-ink-muted);
-  margin: 0;
+}
+.aoe-card__facts {
+  padding-top: var(--ds-space-3);
+  border-top: 1px solid var(--ds-border-subtle);
 }
 
-.fued-danger-zone__confirm-msg {
+/* Tarjeta ancha: el importe pasa a la derecha del nombre. */
+@container (min-width: 30rem) {
+  .aoe-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: var(--ds-space-5);
+  }
+  .aoe-card > * { grid-column: 1 / -1; }
+  .aoe-card__name {
+    grid-row: 2;
+    grid-column: 1;
+    align-self: center;
+    font-size: var(--ds-text-lg);
+  }
+  .aoe-card__amount {
+    grid-row: 2;
+    grid-column: 2;
+    align-self: center;
+    margin: 0;
+    text-align: right;
+  }
+}
+
+.aoe-card__foot {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--ds-space-2);
-  font-size: var(--ds-text-sm);
-  color: var(--ds-danger);
-  margin: 0;
-  font-weight: var(--ds-weight-medium);
+  cursor: default;
 }
+.aoe-card__foot > button:not(.fi-del) { min-height: 44px; }
+.aoe-card__award { --mat-button-text-horizontal-padding: var(--ds-space-3); }
+.aoe-card__del { margin-left: auto; }
 
-.fued-danger-zone__actions {
-  display: flex;
-  gap: var(--ds-space-2);
-}
-
-.fued-btn-danger {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-  padding: var(--ds-space-2) var(--ds-space-4);
-  background: transparent;
-  border: 1px solid var(--ds-danger-soft);
-  border-radius: var(--ds-radius-md);
-  font-family: var(--ds-font-body);
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
-  color: var(--ds-danger);
-  cursor: pointer;
-  transition: all var(--ds-duration-fast) var(--ds-ease-out);
-}
-
-.fued-btn-danger:hover:not(:disabled) {
-  background: var(--ds-danger-soft);
-  border-color: var(--ds-danger);
-}
-
-.fued-btn-danger:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.fued-btn-danger-confirm {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-  padding: var(--ds-space-2) var(--ds-space-4);
-  background: var(--ds-danger);
+/* ── Baja: en ladrillo, con icono y texto ───────────────────────────────── */
+.aoe-danger {
+  display: grid;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-4);
   border: 1px solid var(--ds-danger);
   border-radius: var(--ds-radius-md);
-  font-family: var(--ds-font-body);
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
-  color: var(--ds-ink-inverse);
-  cursor: pointer;
-  transition: all var(--ds-duration-fast) var(--ds-ease-out);
+  background: var(--ds-danger-soft);
+  color: var(--ds-danger-ink);
+  cursor: default;
+}
+.aoe-danger p { margin: 0; line-height: var(--ds-leading-normal); }
+.aoe-danger__title {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ds-space-2);
+  font-weight: var(--ds-weight-semibold);
+}
+.aoe-danger__title mat-icon { flex-shrink: 0; }
+.aoe-danger__ok {
+  --mat-button-filled-container-color: var(--ds-danger);
+  --mat-button-filled-label-text-color: var(--ds-surface);
+  --mat-button-filled-state-layer-color: var(--ds-surface);
 }
 
-.fued-btn-danger-confirm:hover:not(:disabled) {
-  filter: brightness(0.9);
+.aoe-delete {
+  display: grid;
+  gap: var(--ds-space-3);
+  padding-top: var(--ds-space-4);
+  border-top: 1px solid var(--ds-border);
+}
+.aoe-delete__btn {
+  --mat-button-text-label-text-color: var(--ds-danger-ink);
+  --mat-button-text-state-layer-color: var(--ds-danger);
+  justify-self: start;
+  min-height: 44px;
 }
 
-.fued-btn-danger-confirm:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+/* ── Dossier: servicios y medios ────────────────────────────────────────── */
+.aoe-services {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
-
-.fued-btn-cancel {
-  display: inline-flex;
+.aoe-services > li {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--ds-space-2);
-  padding: var(--ds-space-2) var(--ds-space-4);
-  background: transparent;
-  border: 1px solid var(--ds-border-strong);
-  border-radius: var(--ds-radius-md);
-  font-family: var(--ds-font-body);
-  font-size: var(--ds-text-sm);
-  color: var(--ds-ink-secondary);
-  cursor: pointer;
-  transition: var(--ds-transition-color);
 }
 
-.fued-btn-cancel:hover:not(:disabled) {
-  background: var(--ds-bg-alt);
+.aoe-media { gap: var(--ds-space-4); }
+.aoe-media__panel { display: grid; gap: var(--ds-space-3); min-width: 0; }
+.aoe-tours {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: var(--ds-space-4);
+}
+
+/* ── Formulario ─────────────────────────────────────────────────────────── */
+.aoe-form__head { display: grid; gap: var(--ds-space-1); }
+.aoe-form__who {
+  margin: 0;
+  font-weight: var(--ds-weight-semibold);
+  color: var(--ds-ink-secondary);
+  overflow-wrap: anywhere;
+}
+
+.aoe-attach { display: grid; gap: var(--ds-space-2); min-width: 0; }
+.aoe-attach__name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ds-space-1);
+  margin: 0;
+  font-weight: var(--ds-weight-semibold);
   color: var(--ds-ink);
 }
-
-.fued-btn-cancel:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
+.aoe-ok { color: var(--ds-success); }
+/* Nombres largos: dos líneas como mucho; el nombre completo va en el title. */
+.aoe-attach .fi-file__name {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
-
-@media (max-width: 1200px) {
-  .fued-workspace {
-    grid-template-columns: 220px minmax(0, 1fr) 340px;
-    gap: var(--ds-space-4);
-  }
+.aoe-video {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2) var(--ds-space-3);
+  min-width: 0;
 }
-
-@media (max-width: 960px) {
-  .fued-workspace {
-    grid-template-columns: 1fr 340px;
-  }
-
-  .fued-col-context {
-    grid-column: 1 / 2;
-    grid-row: 1;
-    position: static;
-    max-height: none;
-    overflow-y: visible;
-  }
-
-  .fued-col-offers {
-    grid-column: 1 / 2;
-    grid-row: 2;
-  }
-
-  .fued-col-form {
-    grid-column: 2;
-    grid-row: 1 / 3;
-  }
-}
-
-@media (max-width: 680px) {
-  .fued-root {
-    padding: var(--ds-space-4) var(--ds-space-3) var(--ds-space-8);
-  }
-
-  .fued-workspace {
-    grid-template-columns: 1fr;
-  }
-
-  .fued-col-context {
-    grid-column: 1;
-    grid-row: 1;
-    position: static;
-    max-height: none;
-    overflow-y: visible;
-  }
-
-  .fued-col-offers {
-    grid-column: 1;
-    grid-row: 2;
-  }
-
-  .fued-col-form {
-    grid-column: 1;
-    grid-row: 3;
-    position: static;
-    max-height: none;
-    overflow-y: visible;
-  }
-
-  .fued-header__title {
-    font-size: var(--ds-text-xl);
-  }
-
-  .fued-field-row {
-    grid-template-columns: 1fr;
-  }
-
-  .fued-offer-card__row1 {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--ds-space-1);
-  }
-}
-
-/* ── Adjudicar selección ────────────────────────────────────────────────────
-   Acción dorada y separada de la barra de reparto: es la única de la columna
-   que crea contratos, y conviene que no se confunda con «Aceptar selección». */
-
-.fued-btn-adjudicar {
+.aoe-video__file {
   display: inline-flex;
+  flex: 1 1 12rem;
   align-items: center;
   gap: var(--ds-space-2);
-  width: 100%;
-  justify-content: center;
-  padding: var(--ds-space-3) var(--ds-space-4);
-  border-radius: var(--ds-radius-md);
-  border: 1px solid var(--ds-gold);
-  background: var(--ds-gold-faint);
-  color: var(--ds-gold-ink);
-  font-family: var(--ds-font-body);
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-semibold);
-  cursor: pointer;
-  margin-bottom: var(--ds-space-3);
-  transition: all var(--ds-duration-fast) var(--ds-ease-out);
+  min-width: 0;
 }
-
-.fued-btn-adjudicar:hover:not(:disabled) {
-  background: var(--ds-gold);
-  color: var(--ds-ink-on-accent);
-  box-shadow: var(--ds-shadow-gold);
-  transform: translateY(-1px);
-}
-
-.fued-btn-adjudicar:focus-visible {
-  outline: none;
-  box-shadow: var(--ds-focus-ring);
-}
-
-.fued-btn-adjudicar:active:not(:disabled) {
-  transform: translateY(1px);
-}
-
-.fued-btn-adjudicar:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.fued-adjudicar-confirm {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-2);
-  padding: var(--ds-space-4);
-  background: var(--ds-surface);
-  border: 1px solid var(--ds-gold-soft);
-  border-left: 3px solid var(--ds-gold);
-  border-radius: var(--ds-radius-md);
-  margin-bottom: var(--ds-space-3);
-}
-
-/* Enumerar a quién se adjudica evita el error de confirmar a ciegas cuando la
-   selección se hizo hace varios clics. */
-.fued-adjudicar-list {
-  margin: 0;
-  padding-left: var(--ds-space-5);
-  font-size: var(--ds-text-xs);
-  color: var(--ds-ink-secondary);
-}
-
-.fued-adjudicar-list li + li {
-  margin-top: var(--ds-space-1);
-}
+.aoe-video__icon { flex-shrink: 0; color: var(--ds-ink-muted); }
+.aoe-video__icon.aoe-ok { color: var(--ds-success); }
+.aoe-video > button { min-height: 44px; }
+.aoe-video__pick { margin-left: auto; }
 
 @media (prefers-reduced-motion: reduce) {
-  .fued-btn-adjudicar { transition-duration: 0.01ms; }
-  .fued-btn-adjudicar:hover:not(:disabled) { transform: none; }
+  .aoe-card { transition: none; }
 }

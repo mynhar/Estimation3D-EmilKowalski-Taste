@@ -1,9 +1,12 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { DecimalPipe } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { FormsModule, NgForm } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { map } from 'rxjs';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../services/auth-supabase.service';
@@ -19,17 +22,26 @@ import { ServicioCompleto } from '../../data/servicio.repository';
 import { ServicioOpcion, ServicioSelectorComponent } from '../../shared/ui/servicio-selector/servicio-selector.component';
 import { CampoExtra, CamposFaltantesComponent, listaEstable } from '../../shared/ui/campos-faltantes/campos-faltantes.component';
 import { VideoExpedienteComponent } from '../../shared/ui/presentacion-videos/video-expediente.component';
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../shared/ui/empty-state/empty-state.component';
+import { TourPosterComponent } from '../../shared/ui/tour-poster/tour-poster.component';
+import { abrirVisor } from '../../shared/ui/media-viewer/media-viewer.component';
 
 @Component({
   selector: 'app-make-offer',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, TranslatePipe, DecimalPipe, MatterportInfoComponent, ServicioSelectorComponent, CamposFaltantesComponent, VideoExpedienteComponent],
+  imports: [
+    FormsModule, RouterLink, TranslatePipe,
+    MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule,
+    PageHeaderComponent, EmptyStateComponent, TourPosterComponent,
+    MatterportInfoComponent, ServicioSelectorComponent, CamposFaltantesComponent, VideoExpedienteComponent,
+  ],
   templateUrl: './make-offer.component.html',
   styleUrl: './make-offer.component.css',
 })
 export class MakeOfferComponent implements OnInit {
   private auth              = inject(AuthSupabaseService);
-  private sanitizer         = inject(DomSanitizer);
+  private dialog            = inject(MatDialog);
   private translate         = inject(TranslateService);
   private expedienteService = inject(ExpedienteService);
   private archivoService    = inject(ArchivoService);
@@ -102,9 +114,6 @@ export class MakeOfferComponent implements OnInit {
   exitoMsg   = signal('');
   errorEnvio = signal('');
 
-  fotoAmpliada = signal<string | null>(null);
-  tabMedia     = signal<'fotos' | 'tour' | 'docs'>('tour');
-
   protected expedienteId = '';
 
   /** 5 pasos; 6 si el expediente tiene varios servicios y hay que elegirlos. */
@@ -129,6 +138,18 @@ export class MakeOfferComponent implements OnInit {
     if (this.descripcion.trim()) n++;
     if (this.documentosActuales().length || this.documentosOferta().length) n++;
     return n;
+  }
+
+  /** Lista de comprobación bajo el formulario (el PDF solo cuenta en una oferta nueva). */
+  get checklist(): { label: string; ok: boolean }[] {
+    const l = [
+      { label: 'make_offer.checklist_price',    ok: !!this.precio && this.precio > 0 },
+      { label: 'make_offer.checklist_deadline', ok: !!this.plazoMin && this.plazoMin > 0 && !!this.plazoMax && this.plazoMax >= this.plazoMin },
+      { label: 'make_offer.checklist_start',    ok: !!this.fechaInicio },
+      { label: 'make_offer.checklist_desc',     ok: !!this.descripcion.trim() },
+    ];
+    if (!this.ofertaId()) l.push({ label: 'make_offer.pdf_doc', ok: this.documentosOferta().length > 0 });
+    return l;
   }
 
   /**
@@ -272,6 +293,12 @@ export class MakeOfferComponent implements OnInit {
     }
   }
 
+  /** Envío desde la plantilla: marca los campos para que muestren su error. */
+  enviar(form: NgForm) {
+    form.form.markAllAsTouched();
+    this.enviarOferta();
+  }
+
   async enviarOferta() {
     this.errorEnvio.set('');
     this.exitoMsg.set('');
@@ -389,7 +416,7 @@ export class MakeOfferComponent implements OnInit {
   }
 
   serviciosTexto(): string {
-    return this.serviciosNombres().map(s => s.nombre).join(' · ');
+    return this.serviciosNombres().map(s => s.nombre).join(', ');
   }
 
   servicioDescripcion(): string {
@@ -411,16 +438,16 @@ export class MakeOfferComponent implements OnInit {
     return [raw];
   }
 
-  getSafeUrl(url: string): SafeResourceUrl {
-    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  tituloTour(i: number): string {
+    return this.translate.instant('estimator_file.tour_video_n', { n: i + 1 });
   }
 
-  abrirFoto(archivo: ArchivoRow) {
-    this.fotoAmpliada.set(this.publicUrl(archivo.url_storage));
+  verFoto(archivo: ArchivoRow) {
+    abrirVisor(this.dialog, { tipo: 'foto', url: this.publicUrl(archivo.url_storage), titulo: archivo.nombre_archivo });
   }
 
-  cerrarFoto() {
-    this.fotoAmpliada.set(null);
+  formatPrecio(v: number): string {
+    return new Intl.NumberFormat('fr-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(v);
   }
 
   formatFecha(valor: string): string {

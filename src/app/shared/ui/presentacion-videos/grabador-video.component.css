@@ -1,19 +1,16 @@
 /* component: recorder (dialog + recording overlay)
  * states: default · hover · focus · active · disabled · loading · error · success
- * contrast: pass — texto claro sólo sobre --ds-dark-surface (ardoise, como la sidebar)
+ * contrast: pass — texto claro sólo sobre --ds-dark-surface (abeto)
  */
 :host { display: contents; }
 
-/* Islas oscuras (burbuja, barra y ventana flotante sobre ardoise): el acento
-   es menthe (9.9:1); sapin solo da 2.3:1 sobre ardoise. Se redirige aquí el
-   alias legado --ds-gold* y la tinta sobre acento. */
+/* Islas oscuras (burbuja, barra y ventana flotante sobre abeto): el acento
+   es vélin (9.7:1) con abeto encima; el abeto no se ve sobre sí mismo y el
+   tomate no va sobre abeto. */
 .rec-bubble,
 .rec-bar,
 .rec-float {
-  --ds-gold: var(--ds-scan);
-  --ds-gold-hover: var(--ds-scan-hover);
-  --ds-gold-active: var(--ds-scan);
-  --ds-ink-on-accent: var(--ds-ink);
+  --ds-focus-ring: var(--ds-focus-ring-dark);
 }
 
 /* ── Diálogos ─────────────────────────────────────────────────────────────── */
@@ -42,8 +39,8 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-regular);
-  letter-spacing: var(--ds-tracking-tight);
+  font-weight: var(--ds-weight-bold);
+  font-stretch: var(--ds-stretch-heading);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
   overflow-wrap: anywhere;
@@ -77,71 +74,46 @@
   gap: var(--ds-space-2);
   margin-left: auto;
 }
-.rec-dialog__actions .btn,
-.rec-dialog__foot .btn { white-space: nowrap; }
+.rec-dialog__foot button { white-space: nowrap; }
 
-.rec-icon-btn {
-  display: inline-grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
+.rec-close {
+  --mat-icon-button-icon-color: var(--ds-ink-muted);
   flex-shrink: 0;
-  border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
-  background: var(--ds-surface);
-  color: var(--ds-ink-muted);
-  transition: var(--ds-transition-color);
+  margin-right: calc(-1 * var(--ds-space-2));
 }
-.rec-icon-btn:hover { color: var(--ds-ink); border-color: var(--ds-border-strong); }
-.rec-icon-btn:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); border-color: var(--ds-gold); }
-.rec-icon-btn:active { background: var(--ds-bg-alt); }
 
-/* ── Modo: control segmentado ─────────────────────────────────────────────── */
+/* ── Modo: control segmentado (mat-button-toggle) ─────────────────────────── */
 .rec-modes {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--ds-space-1);
-  margin: 0;
-  padding: var(--ds-space-1);
-  min-width: 0;
-  border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-lg);
-  background: var(--ds-bg-alt);
-}
-@media (min-width: 576px) {
-  .rec-modes { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
-.rec-mode {
+  --mat-button-toggle-height: 44px;
+  --mat-button-toggle-shape: var(--ds-radius-md);
+  --mat-button-toggle-text-color: var(--ds-ink-secondary);
+  --mat-button-toggle-background-color: var(--ds-surface);
+  --mat-button-toggle-selected-state-background-color: var(--ds-action-faint);
+  --mat-button-toggle-selected-state-text-color: var(--ds-action-ink);
+  --mat-button-toggle-divider-color: var(--ds-border);
+  --mat-button-toggle-label-text-size: var(--ds-text-base);
+  --mat-button-toggle-label-text-weight: var(--ds-weight-semibold);
+  --mat-button-toggle-disabled-state-text-color: var(--ds-ink-faint);
+  --mat-button-toggle-disabled-state-background-color: var(--ds-bg-alt);
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--ds-space-2);
-  min-height: 44px;
-  margin: 0;
-  padding: var(--ds-space-2) var(--ds-space-3);
-  border: 1px solid transparent;
-  border-radius: var(--ds-radius-md);
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
-  color: var(--ds-ink-secondary);
-  white-space: nowrap;
-  cursor: pointer;
-  transition: var(--ds-transition-color),
-              box-shadow var(--ds-duration-fast) var(--ds-ease-out);
+  width: 100%;
 }
-.rec-mode .bi { font-size: 1.05rem; }
-.rec-mode:hover { color: var(--ds-ink); background: var(--ds-surface); }
-.rec-mode.is-active {
-  background: var(--ds-surface-elevated);
-  border-color: var(--ds-border);
-  color: var(--ds-ink);
-  box-shadow: var(--ds-shadow-xs);
+.rec-modes mat-button-toggle { flex: 1 1 0; min-width: 0; }
+.rec-modes mat-icon { width: 20px; height: 20px; margin-right: var(--ds-space-1); font-size: 20px; vertical-align: -4px; }
+/* Tres modos no caben en una fila de móvil: se apilan, cada uno con su borde. */
+@media (max-width: 575.98px) {
+  .rec-modes {
+    --mat-button-toggle-divider-color: transparent;
+    display: grid;
+    gap: var(--ds-space-2);
+    overflow: visible;
+    border: 0;
+  }
+  .rec-modes mat-button-toggle {
+    border: 1px solid var(--ds-border);
+    border-radius: var(--ds-radius-md);
+  }
 }
-.rec-mode.is-active .bi { color: var(--ds-gold-ink); }
-.rec-mode:has(input:focus-visible) { box-shadow: var(--ds-focus-ring); border-color: var(--ds-gold); }
-.rec-mode:active { background: var(--ds-gold-faint); }
-.rec-mode.is-disabled { color: var(--ds-ink-muted); cursor: not-allowed; opacity: 0.6; }
-.rec-mode.is-disabled:hover { background: transparent; }
 
 /* ── Vista previa ─────────────────────────────────────────────────────────── */
 .rec-preview {
@@ -163,7 +135,7 @@
   padding: var(--ds-space-5) var(--ds-space-6);
   text-align: center;
 }
-.rec-preview__screen .bi { font-size: 2rem; color: var(--ds-ink-faint); }
+.rec-preview__screen mat-icon { width: 32px; height: 32px; font-size: 32px; color: var(--ds-ink-muted); }
 .rec-preview__screen p {
   max-width: 30rem;
   margin: 0;
@@ -187,20 +159,25 @@
   height: auto;
   aspect-ratio: 1;
   border-radius: var(--ds-radius-circle);
-  box-shadow: 0 0 0 3px var(--ds-gold), var(--ds-shadow-md);
+  box-shadow: 0 0 0 3px var(--ds-action), var(--ds-shadow-md);
 }
 .rec-preview[data-modo='pantalla_camara'].has-cam .rec-preview__screen { padding-left: 32%; }
+/* En móvil, 16:9 deja muy poca altura para el aviso: se pasa a 4:3. */
+@media (max-width: 575.98px) {
+  .rec-preview { aspect-ratio: 4 / 3; }
+  .rec-preview__screen { padding: var(--ds-space-4); }
+}
 
 /* ── Dispositivos ─────────────────────────────────────────────────────────── */
-.rec-label {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-semibold);
+.rec-devices {
+  display: grid;
+  gap: var(--ds-space-4);
 }
-.rec-label .bi { color: var(--ds-ink-muted); }
-.form-select:focus { border-color: var(--ds-gold); box-shadow: var(--ds-focus-ring); }
+@media (min-width: 768px) {
+  .rec-devices.has-cam { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.rec-devices mat-form-field { width: 100%; }
+.rec-devices [matPrefix] { margin-inline: var(--ds-space-3) var(--ds-space-1); color: var(--ds-ink-muted); }
 
 /* Medidor del micro: escala en X escrita a 60 fps desde el componente. */
 .rec-meter {
@@ -219,10 +196,10 @@
   transform-origin: left center;
 }
 
-.rec-switch .form-check-label { font-size: var(--ds-text-sm); color: var(--ds-ink); }
-.rec-switch small { font-size: var(--ds-text-xs); color: var(--ds-ink-muted); }
-.rec-switch .form-check-input:checked { background-color: var(--ds-gold-active); border-color: var(--ds-gold-active); }
-.rec-switch .form-check-input:focus { border-color: var(--ds-gold); box-shadow: var(--ds-focus-ring); }
+.rec-switch__label,
+.rec-switch__hint { display: block; padding-left: var(--ds-space-2); }
+.rec-switch__label { font-size: var(--ds-text-base); color: var(--ds-ink); }
+.rec-switch__hint { font-size: var(--ds-text-sm); color: var(--ds-ink-muted); }
 
 .rec-hints:empty { display: none; }
 .rec-hint {
@@ -234,44 +211,28 @@
   border-radius: var(--ds-radius-md);
   background: var(--ds-warning-soft);
   color: var(--ds-warning-ink);
-  font-size: var(--ds-text-xs);
+  font-size: var(--ds-text-sm);
   line-height: var(--ds-leading-normal);
 }
 .rec-hint + .rec-hint { margin-top: var(--ds-space-2); }
-.rec-hint .bi { margin-top: 1px; }
+.rec-hint mat-icon { flex-shrink: 0; width: 20px; height: 20px; font-size: 20px; }
 
 .rec-limit {
   display: inline-flex;
   align-items: center;
   gap: var(--ds-space-1);
-  font-size: var(--ds-text-xs);
+  font-size: var(--ds-text-sm);
   color: var(--ds-ink-muted);
   white-space: nowrap;
 }
+.rec-limit mat-icon { width: 18px; height: 18px; font-size: 18px; }
 
-/* Punto de grabación dentro del CTA dorado. */
-.rec-dot {
-  display: inline-block;
-  width: 9px;
-  height: 9px;
-  margin-right: var(--ds-space-1);
-  border-radius: var(--ds-radius-circle);
-  background: var(--ds-danger);
-  vertical-align: 1px;
-}
-.btn:disabled .rec-dot { background: var(--ds-ink-faint); }
-
+/* Descartar la grabación es irreversible: relleno ladrillo, con icono y texto. */
 .rec-btn-danger {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-  border: 1px solid var(--ds-danger);
-  background: transparent;
-  color: var(--ds-danger-ink);
+  --mat-button-filled-container-color: var(--ds-danger);
+  --mat-button-filled-label-text-color: var(--ds-surface);
+  --mat-button-filled-state-layer-color: var(--ds-surface);
 }
-.rec-btn-danger:hover { background: var(--ds-danger-soft); color: var(--ds-danger-ink); border-color: var(--ds-danger); }
-.rec-btn-danger:focus-visible { box-shadow: var(--ds-focus-ring); }
-.rec-btn-danger:active { background: var(--ds-danger-soft); border-color: var(--ds-danger-ink); }
 
 /* ── Capa de grabación (vive en <body>) ───────────────────────────────────── */
 .rec-layer { position: relative; }
@@ -293,10 +254,11 @@
   height: 8.5rem;
   border-radius: var(--ds-radius-circle);
   background: var(--ds-surface-elevated);
-  box-shadow: 0 0 0 6px var(--ds-gold), var(--ds-shadow-xl);
+  box-shadow: 0 0 0 6px var(--ds-action), var(--ds-shadow-xl);
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-5xl);
-  font-weight: var(--ds-weight-regular);
+  font-weight: var(--ds-weight-bold);
+  font-stretch: var(--ds-stretch-figure);
   line-height: 1;
   color: var(--ds-ink);
   font-variant-numeric: tabular-nums;
@@ -346,11 +308,11 @@
   border-radius: var(--ds-radius-circle);
   transform: scaleX(-1);
   background: var(--ds-dark-surface);
-  box-shadow: 0 0 0 3px var(--ds-gold), var(--ds-shadow-lg);
+  box-shadow: 0 0 0 3px var(--ds-ink-inverse), var(--ds-shadow-lg);
   pointer-events: none;
 }
 .rec-bubble:focus-visible { outline: none; }
-.rec-bubble:focus-visible video { box-shadow: 0 0 0 3px var(--ds-gold), 0 0 0 7px var(--ds-ink), var(--ds-shadow-lg); }
+.rec-bubble:focus-visible video { box-shadow: 0 0 0 3px var(--ds-ink-inverse), 0 0 0 7px var(--ds-ink), var(--ds-shadow-lg); }
 .rec-bubble__tools {
   position: absolute;
   top: calc(-1 * var(--ds-space-4));
@@ -379,7 +341,7 @@
   transition: var(--ds-transition-color);
 }
 .rec-bubble__tools button:hover { background: color-mix(in oklch, var(--ds-ink-inverse) 24%, transparent); }
-.rec-bubble__tools button:focus-visible { outline: 2px solid var(--ds-gold); outline-offset: 1px; }
+.rec-bubble__tools button:focus-visible { outline: 2px solid var(--ds-ink-inverse); outline-offset: 1px; }
 .rec-bubble__tools button:active { background: color-mix(in oklch, var(--ds-ink-inverse) 32%, transparent); }
 
 /* ── Barra de control: chrome oscuro cálido, como la sidebar ──────────────── */
@@ -410,16 +372,18 @@
   animation: rec-pulse 1.4s var(--ds-ease-in-out) infinite;
 }
 .is-paused .rec-bar__dot,
-.is-saving .rec-bar__dot { animation: none; background: var(--ds-gold); }
+.is-saving .rec-bar__dot { animation: none; background: var(--ds-ink-inverse); }
 .rec-bar__time {
   min-width: 4ch;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-sm);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-base);
+  font-weight: var(--ds-weight-semibold);
+  font-stretch: var(--ds-stretch-figure);
   font-variant-numeric: tabular-nums;
 }
-.rec-bar__max { color: color-mix(in oklch, var(--ds-ink-inverse) 62%, transparent); }
-/* Últimos 15 s: el contador pasa a dorado (sobre oscuro sí contrasta). */
-.rec-bar__time.is-near-limit { color: var(--ds-gold); }
+.rec-bar__max { color: color-mix(in oklch, var(--ds-ink-inverse) 72%, transparent); }
+/* Últimos 15 s: el contador toma el color del punto de grabación (6.1:1 sobre abeto). */
+.rec-bar__time.is-near-limit { color: var(--ds-danger-on-dark); }
 .rec-bar__sep {
   width: 1px;
   height: 20px;
@@ -442,12 +406,16 @@
 }
 .rec-bar__btn:hover { background: color-mix(in oklch, var(--ds-ink-inverse) 22%, transparent); }
 .rec-bar__btn:focus-visible,
-.rec-bar__stop:focus-visible { outline: 2px solid var(--ds-gold); outline-offset: 2px; }
+.rec-bar__stop:focus-visible { outline: 2px solid var(--ds-ink-inverse); outline-offset: 2px; }
 .rec-bar__btn:active { background: color-mix(in oklch, var(--ds-ink-inverse) 30%, transparent); }
 .rec-bar__btn:disabled,
 .rec-bar__stop:disabled { opacity: 0.45; cursor: default; }
-.rec-bar__btn--stop { background: var(--ds-gold); color: var(--ds-ink-on-accent); }
-.rec-bar__btn--stop:hover { background: var(--ds-gold-hover); }
+.rec-bar__btn--stop { background: var(--ds-ink-inverse); color: var(--ds-action); }
+.rec-bar__btn--stop:hover { background: var(--ds-surface-elevated); }
+.rec-bar__btn mat-icon,
+.rec-bar__stop mat-icon,
+.rec-bubble__tools mat-icon,
+.rec-float__size mat-icon { width: 20px; height: 20px; font-size: 20px; }
 
 .rec-bar__stop {
   display: inline-flex;
@@ -457,15 +425,15 @@
   padding: 0 var(--ds-space-4) 0 var(--ds-space-3);
   border: 0;
   border-radius: var(--ds-radius-md);
-  background: var(--ds-gold);
-  color: var(--ds-ink-on-accent);
+  background: var(--ds-ink-inverse);
+  color: var(--ds-action);
   font-size: var(--ds-text-sm);
   font-weight: var(--ds-weight-semibold);
   cursor: pointer;
   transition: var(--ds-transition-color);
 }
-.rec-bar__stop:hover { background: var(--ds-gold-hover); }
-.rec-bar__stop:active { background: var(--ds-gold-active); }
+.rec-bar__stop:hover { background: var(--ds-surface-elevated); }
+.rec-bar__stop:active { background: var(--ds-ink-inverse); }
 
 @media (max-width: 479.98px) {
   .rec-bar { gap: var(--ds-space-1); padding-left: var(--ds-space-3); }
@@ -495,7 +463,7 @@
   border-radius: var(--ds-radius-circle);
   transform: scaleX(-1);
   background: var(--ds-dark-surface-deep);
-  box-shadow: 0 0 0 3px var(--ds-gold);
+  box-shadow: 0 0 0 3px var(--ds-ink-inverse);
 }
 .rec-float__size {
   position: absolute;
@@ -516,7 +484,7 @@
   color: var(--ds-ink-inverse);
 }
 .rec-float__size button:hover { background: var(--ds-dark-surface-deep); }
-.rec-float__size button:focus-visible { outline: 2px solid var(--ds-gold); outline-offset: 1px; }
+.rec-float__size button:focus-visible { outline: 2px solid var(--ds-ink-inverse); outline-offset: 1px; }
 .rec-float__bar {
   display: flex;
   align-items: center;
@@ -553,9 +521,11 @@
   display: grid;
   place-items: center;
   background: color-mix(in oklch, var(--ds-dark-surface) 86%, transparent);
-  color: var(--ds-gold);
+  color: var(--ds-ink-inverse);
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-5xl);
+  font-weight: var(--ds-weight-bold);
+  font-stretch: var(--ds-stretch-figure);
   line-height: 1;
 }
 

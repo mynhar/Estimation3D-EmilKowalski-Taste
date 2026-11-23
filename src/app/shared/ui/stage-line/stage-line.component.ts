@@ -4,7 +4,7 @@ import { ETAPAS } from '../../util/etapas';
 
 /**
  * Línea de etapas del dossier, dibujada como una cota arquitectónica: una línea
- * de medida con una marca por etapa y el tramo recorrido en menthe.
+ * de medida con una marca por etapa y el tramo recorrido en abeto.
  *
  * - Completa: título, «Étape n sur 6» y el nombre de cada etapa. En anchos
  *   estrechos (contenedor < 30rem) solo se ve el nombre de la etapa actual; las

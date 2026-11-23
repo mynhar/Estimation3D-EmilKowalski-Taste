@@ -1,28 +1,29 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ToastService } from '../../services/toast.service';
 
+/**
+ * Avisos efímeros (Trait rouge): pila abajo a la derecha (abajo a lo ancho en móvil), cada aviso
+ * con su tono suave, borde, icono y texto, como los avisos en línea de las pantallas. Se cierran
+ * solos (ToastService, 6 s) o con la cruz. Errores en ladrillo, nunca en tomate.
+ */
 @Component({
   selector: 'app-toast',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
-      @for (t of toast.toasts(); track t.id) {
-        <div class="toast show align-items-center border-0 mb-2"
-             [class]="'text-bg-' + t.type"
-             role="alert" aria-live="assertive">
-          <div class="d-flex">
-            <div class="toast-body">{{ t.message }}</div>
-            <button type="button"
-                    class="btn-close btn-close-white me-2 m-auto"
-                    aria-label="Cerrar"
-                    (click)="toast.dismiss(t.id)">
-            </button>
-          </div>
-        </div>
-      }
-    </div>
-  `,
+  imports: [MatButtonModule, MatIconModule, TranslatePipe],
+  templateUrl: './toast.component.html',
+  styleUrl: './toast.component.css',
 })
 export class ToastComponent {
   toast = inject(ToastService);
+
+  /** Icono por tipo de aviso. */
+  readonly ICONO = {
+    success: { matIcon: 'check_circle' },
+    danger:  { matIcon: 'error' },
+    warning: { matIcon: 'warning' },
+    info:    { matIcon: 'info' },
+  } as const;
 }

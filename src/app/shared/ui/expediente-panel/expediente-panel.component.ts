@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe } from '@ngx-translate/core';
 
 let siguienteId = 0;
@@ -16,7 +17,7 @@ let siguienteId = 0;
 @Component({
   selector: 'app-expediente-panel',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, MatIconModule],
   templateUrl: './expediente-panel.component.html',
   styleUrl: './expediente-panel.component.css',
 })

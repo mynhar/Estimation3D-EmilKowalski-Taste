@@ -1,7 +1,14 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, effect, inject, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../services/auth-supabase.service';
 import { ExpedienteService } from '../../services/expediente.service';
@@ -11,20 +18,26 @@ import {
   ContratoObraResumen,
   ExpedienteRow,
   ESTADOS_ESTIMADO,
-  ESTADO_BADGE_ESTIMADOR,
   nombreServicio,
 } from '../../models';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
 import { coincideBusqueda, direccionLinea1, direccionLinea2, direccionCompleta } from '../../shared/util/busqueda';
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../shared/ui/empty-state/empty-state.component';
+import { StatusChipComponent } from '../../shared/ui/status-chip/status-chip.component';
 
 type VistaExpedientes = 'tabla' | 'tarjetas';
 
 @Component({
   selector: 'app-estimated-files',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, TranslatePipe, PaginationComponent],
+  imports: [
+    NgTemplateOutlet, FormsModule, RouterLink, TranslatePipe,
+    MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTooltipModule,
+    PageHeaderComponent, EmptyStateComponent, StatusChipComponent, PaginationComponent,
+  ],
   templateUrl: './estimated-files.component.html',
-  styleUrl:    './estimated-files.component.css',
+  styleUrls:   ['../../shared/ui/lista/lista.css', './estimated-files.component.css'],
 })
 export class EstimatedFilesComponent implements OnInit {
   private auth               = inject(AuthSupabaseService);
@@ -54,13 +67,9 @@ export class EstimatedFilesComponent implements OnInit {
   /** Ids cuya miniatura 3D falló al cargar → se muestra el marcador de posición. */
   private fotosFallidas = signal<Set<string>>(new Set<string>());
 
-  readonly estadoChips: { value: string }[] = [
-    { value: 'estimado'   },
-    { value: 'en_oferta'  },
-    { value: 'adjudicado' },
-    { value: 'contratado' },
-    { value: 'cancelado'  },
-  ];
+  /** Estados del filtro, en el orden del recorrido; solo se muestran los que tienen dossiers. */
+  private readonly estadosFiltro = ['estimado', 'en_oferta', 'adjudicado', 'contratado', 'cancelado', 'archivado'];
+  estadosConDatos = computed(() => this.estadosFiltro.filter(e => this.contarEstado(e) > 0));
 
   expedientesFiltrados = computed(() => {
     const q = this.busqueda().trim();
@@ -134,7 +143,7 @@ export class EstimatedFilesComponent implements OnInit {
   /** Servicios del contrato, que es lo que lo distingue de los demás del expediente. */
   serviciosContrato(c: ContratoObraResumen): string {
     const lang = this.translate.currentLang;
-    return c.servicios.map(s => nombreServicio(s, lang)).filter(Boolean).join(' · ');
+    return c.servicios.map(s => nombreServicio(s, lang)).filter(Boolean).join(', ');
   }
 
   /** Si falla, la lista se ve igual que antes: sin marcas. */
@@ -149,14 +158,6 @@ export class EstimatedFilesComponent implements OnInit {
     } catch (e: any) {
       console.error('[EstimatedFiles] obra:', e?.message);
     }
-  }
-
-  badgeClass(estado: string | undefined): string {
-    return ESTADO_BADGE_ESTIMADOR[estado ?? ''] ?? 'bg-light text-dark';
-  }
-
-  estadoLabel(estado: string | undefined): string {
-    return 'state.' + (estado ?? '');
   }
 
   servicioNombre(exp: ExpedienteRow): string {

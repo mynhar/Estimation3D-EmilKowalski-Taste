@@ -5,7 +5,7 @@
         @if (soloLectura()) {
           <h2 id="plTitulo" class="pl-title pl-title--fijo">{{ v.titulo }}</h2>
         } @else {
-          <label class="visually-hidden" for="plTitulo">{{ 'presentation_videos.player.title_label' | translate }}</label>
+          <label class="cdk-visually-hidden" for="plTitulo">{{ 'presentation_videos.player.title_label' | translate }}</label>
           <input #tituloInput id="plTitulo" class="pl-title" type="text" maxlength="120"
                  [value]="v.titulo" [disabled]="guardandoTitulo()"
                  [title]="'presentation_videos.player.title_hint' | translate"
@@ -14,16 +14,15 @@
                  (blur)="guardarTitulo(tituloInput)">
         }
         <p class="pl-meta">
-          <span>{{ fecha() }}</span>
+          <span class="pl-fig">{{ fecha() }}</span>
           @if (!soloLectura()) {
-            <span class="pl-meta__sep" aria-hidden="true">·</span>
-            <span>{{ vistasTexto(v.vistas) }}</span>
+            <span class="pl-fig">{{ vistasTexto(v.vistas) }}</span>
           }
         </p>
       </div>
-      <button type="button" class="pl-icon-btn" (click)="cerrar()"
-              [attr.aria-label]="'common.close' | translate" [title]="'common.close' | translate">
-        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      <button mat-icon-button class="pl-close" type="button" (click)="cerrar()"
+              [attr.aria-label]="'common.close' | translate">
+        <mat-icon>close</mat-icon>
       </button>
     </header>
 
@@ -35,34 +34,37 @@
                (play)="alReproducir()"></video>
       } @else if (errorCarga()) {
         <div class="pl-stage__msg" role="alert">
-          <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+          <mat-icon aria-hidden="true">error</mat-icon>
           <p>{{ 'presentation_videos.errors.load_video' | translate }}</p>
         </div>
       } @else {
         <div class="pl-stage__msg" aria-busy="true">
-          <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+          <span class="pl-spinner" aria-hidden="true"></span>
           <p>{{ 'common.loading' | translate }}</p>
         </div>
       }
     </div>
 
     <div class="pl-row">
-      <div class="pl-speed" role="group" [attr.aria-label]="'presentation_videos.player.speed' | translate">
-        <span class="pl-speed__label" aria-hidden="true">{{ 'presentation_videos.player.speed' | translate }}</span>
-        @for (r of velocidades; track r) {
-          <button type="button" class="pl-speed__btn"
-                  [class.is-active]="velocidad() === r"
-                  [attr.aria-pressed]="velocidad() === r"
-                  (click)="cambiarVelocidad(r)">{{ r }}×</button>
-        }
+      <div class="pl-speed">
+        <span class="pl-speed__label" id="plVelocidad">{{ 'presentation_videos.player.speed' | translate }}</span>
+        <mat-button-toggle-group class="pl-speed__group" hideSingleSelectionIndicator
+                                 aria-labelledby="plVelocidad"
+                                 [value]="velocidad()" (change)="cambiarVelocidad($event.value)">
+          @for (r of velocidades; track r) {
+            <mat-button-toggle [value]="r"><span class="pl-fig">{{ r }}×</span></mat-button-toggle>
+          }
+        </mat-button-toggle-group>
       </div>
       @if (acciones() && !soloLectura()) {
         <div class="pl-actions">
-          <button type="button" class="btn btn-sm btn-outline-secondary" (click)="pedirDescarga()">
-            <i class="bi bi-download me-1" aria-hidden="true"></i>{{ 'presentation_videos.actions.download' | translate }}
+          <button mat-stroked-button type="button" (click)="pedirDescarga()">
+            <mat-icon aria-hidden="true">download</mat-icon>
+            {{ 'presentation_videos.actions.download' | translate }}
           </button>
-          <button type="button" class="btn btn-sm pl-btn-danger" (click)="pedirEliminar()">
-            <i class="bi bi-trash3 me-1" aria-hidden="true"></i>{{ 'presentation_videos.actions.delete' | translate }}
+          <button mat-stroked-button class="pl-danger" type="button" (click)="pedirEliminar()">
+            <mat-icon aria-hidden="true">delete</mat-icon>
+            {{ 'presentation_videos.actions.delete' | translate }}
           </button>
         </div>
       }

@@ -1,20 +1,32 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../../services/auth-supabase.service';
 import { ToastService } from '../../../services/toast.service';
 import { ImprevistoCatalogoRepository, ImprevistoCatalogo, FichaNormativaRepository, FichaNormativa } from '../../../data';
 import { CAMPOS_FALTANTES } from '../../../shared/ui/campos-faltantes/campos-faltantes.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
 
 interface ServicioOpcion { id: number; nombre: string; }
 
 @Component({
   selector: 'app-admin-imprevistos-edit',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, TranslatePipe, ...CAMPOS_FALTANTES],
+  imports: [
+    NgTemplateOutlet, ReactiveFormsModule, TranslatePipe,
+    MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSelectModule, MatSlideToggleModule,
+    PageHeaderComponent, ...CAMPOS_FALTANTES,
+  ],
   templateUrl: './edit.component.html',
-  styleUrls: ['../../_shared/crud-form.css'],
+  styleUrls: ['../../../shared/ui/alta/alta.css', '../../_shared/catalogo-form.css'],
 })
 export class AdminImprevistosEditComponent implements OnInit {
   private fb        = inject(FormBuilder);
@@ -37,11 +49,7 @@ export class AdminImprevistosEditComponent implements OnInit {
   servicios = signal<ServicioOpcion[]>([]);
   fichas    = signal<FichaNormativa[]>([]);
 
-  readonly langs = [
-    { c: 'fr', b: 'FR' },
-    { c: 'en', b: 'EN' },
-    { c: 'es', b: 'ES' },
-  ];
+  readonly idiomas = ['fr', 'en', 'es'] as const;
 
   form = this.fb.group({
     servicio_id:  [''],
@@ -62,7 +70,6 @@ export class AdminImprevistosEditComponent implements OnInit {
   });
 
   get f() { return this.form.controls; }
-  ctrl(name: string) { return this.form.get(name); }
 
   async ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -109,7 +116,7 @@ export class AdminImprevistosEditComponent implements OnInit {
   fichaLabel(fi: FichaNormativa): string {
     const l = (this.translate.currentLang || 'fr').slice(0, 2);
     const t = l === 'en' ? fi.titulo_en : l === 'es' ? fi.titulo_es : fi.titulo_fr;
-    return `${fi.codigo} · ${t}`;
+    return `${t} (${fi.codigo})`;
   }
 
   async onSubmit() {
@@ -161,6 +168,12 @@ export class AdminImprevistosEditComponent implements OnInit {
   }
 
   cancelar() { this.router.navigate(['/admin/imprevisto']); }
+
+  /** Título del imprevisto en el idioma de la interfaz, para el bloque de identidad. */
+  titulo(it: ImprevistoCatalogo): string {
+    const l = (this.translate.currentLang || 'fr').slice(0, 2);
+    return l === 'en' ? it.titulo_en : l === 'es' ? it.titulo_es : it.titulo_fr;
+  }
 
   private mensaje(e: unknown, fallbackKey: string): string {
     const raw = e instanceof Error ? e.message : '';

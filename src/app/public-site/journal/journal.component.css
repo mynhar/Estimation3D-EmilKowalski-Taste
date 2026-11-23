@@ -1,51 +1,141 @@
-/* ═══════════════════════════════════════════════════════════════════════════
-   Le Journal — rejilla de artículos, filtro por categoría y ficha destacada.
-   Portado del bloque JOURNAL de assets/site.css (líneas 489-517).
-   El armazón (tokens, cabecera, pie, conmutadores) llega desde site-chrome.css.
-   ═══════════════════════════════════════════════════════════════════════════ */
+/* component: Le Journal (página pública, Trait rouge)
+ * states: categoría default · hover (solo puntero fino) · focus-visible · active · elegida (aria-pressed)
+ *         rejilla con fichas · filtro sin fichas no ocurre (toda categoría tiene alguna)
+ * contrast: título ink sobre crema 11.8:1 · resumen ink-secondary sobre vélin 9.6:1 · fecha ink-muted 7.0:1
+ *           categoría elegida: vélin sobre abeto 9.7:1 · destacado sobre kraft: ink 10.9:1
+ *           tomate: «Créer mon dossier» de la cabecera, el único de la página
+ * type: título 125 % (display), fichas 112 %
+ * motion: ninguna automática; solo el color de las categorías al pasar o pulsar.
+ */
+:host {
+  display: block;
+  min-height: 100dvh;
+  background: var(--ds-bg);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-body);
+  font-size: var(--ds-text-base);
+  line-height: var(--ds-leading-normal);
+  -webkit-tap-highlight-color: transparent;
 
-/* Las secciones encadenadas del original llevaban `style="padding-top:0"`
-   inline; aquí son clases para no dejar estilos sueltos en la plantilla. */
-.pt-0{ padding-top:0; }
-.pt-30{ padding-top:30px; }
-
-/* ─────────── FILTRO POR CATEGORÍA ─────────── */
-.cat-row{ display:flex; flex-wrap:wrap; gap:10px; padding:8px 0 0; }
-.chip{
-  font-family:var(--mono); font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;
-  color:var(--white-dim); padding:10px 18px; border:1px solid var(--line); border-radius:100px;
-  transition:color .25s, border-color .25s, background .25s;
+  --hd-h: 64px;
 }
-.chip:hover{ border-color:var(--gold); color:var(--gold-text); }
-.chip.active{ background:var(--gold); color:var(--on-gold); border-color:var(--gold); }
+@media (min-width: 1200px) {
+  :host { --hd-h: 72px; }
+}
 
-/* ─────────── REJILLA ───────────
-   El `gap:1px` sobre un fondo de línea dibuja los filetes entre fichas: cada
-   ficha repinta `--void` encima, así que la retícula queda de un solo píxel. */
-.jgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line-2); border:1px solid var(--line-2); }
-@media(max-width:980px){ .jgrid{ grid-template-columns:repeat(2,1fr); } }
-@media(max-width:620px){ .jgrid{ grid-template-columns:1fr; } }
+/* La primera sección arranca más cerca de la cabecera: es la cabeza de la página. */
+.jr { padding-top: var(--ds-space-6); }
+@media (min-width: 992px) {
+  .jr { padding-top: var(--ds-space-8); }
+}
 
-.jcard{ background:var(--void); padding:34px 30px 28px; display:flex; flex-direction:column; min-height:300px; position:relative; overflow:hidden; transition:background .35s; }
-.jcard::after{ content:""; position:absolute; left:0; top:0; height:2px; width:0; background:linear-gradient(90deg,var(--gold-bright),transparent); transition:width .5s var(--ease); }
-.jcard:hover{ background:var(--void-2); }
-.jcard:hover::after{ width:100%; }
-.jcard .jc-cat{ font-family:var(--mono); font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; color:var(--gold-text); }
-.jcard h3{ font-size:1.34rem; line-height:1.12; margin:16px 0 12px; }
-/* `margin-bottom:auto` empuja la meta al fondo aunque el resumen sea corto:
-   así todas las fichas de una fila alinean su filete inferior. */
-.jcard .jc-sum{ font-size:.92rem; color:var(--white-dim); margin:0 0 auto; }
-.jcard .jc-meta{ margin-top:24px; padding-top:16px; border-top:1px solid var(--line-2); font-family:var(--mono); font-size:.68rem; letter-spacing:.06em; color:var(--white-faint); display:flex; justify-content:space-between; align-items:center; }
-.jcard .jc-meta .arrow{ color:var(--gold-text); transition:transform .3s; }
-.jcard:hover .jc-meta .arrow{ transform:translateX(4px); }
+/* Miga de pan: .crumbs, en site-base.css. */
+.jr-head { display: grid; gap: var(--ds-space-4); max-width: 46rem; margin-bottom: var(--ds-space-7); }
+.jr-title {
+  max-width: 16ch;
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: clamp(2.125rem, 3.4vw + 1.1rem, 4.25rem);
+  font-weight: var(--ds-weight-black);
+  font-stretch: var(--ds-stretch-display);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
 
-/* ─────────── EN VEDETTE ─────────── */
-.featured-wrap{ display:grid; grid-template-columns:1.05fr .95fr; gap:0; border:1px solid var(--line); }
-@media(max-width:860px){ .featured-wrap{ grid-template-columns:1fr; } }
-.featured-img{ position:relative; min-height:360px; overflow:hidden; background:var(--void-2); }
-.featured-img img{ width:100%; height:100%; object-fit:cover; filter:var(--img-filter); }
-.featured-img .ftag{ position:absolute; top:16px; left:16px; z-index:2; }
-.featured-body{ padding:48px 44px; display:flex; flex-direction:column; justify-content:center; background:var(--void); }
-.featured-body h3{ font-size:clamp(1.6rem,2.6vw,2.4rem); line-height:1.05; margin:18px 0 16px; }
-.featured-body .read{ font-family:var(--mono); font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; color:var(--gold-text); margin-top:24px; display:inline-flex; gap:10px; align-items:center; }
-@media(max-width:620px){ .featured-body{ padding:36px 26px; } }
+/* Categorías: botones de filtro; la elegida, rellena de abeto. */
+.jr-cats { display: flex; flex-wrap: wrap; gap: var(--ds-space-2); margin-bottom: var(--ds-space-6); }
+.jr-cat {
+  min-height: 44px;
+  padding: 0 var(--ds-space-4);
+  border: 1px solid var(--ds-border-strong);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-surface);
+  color: var(--ds-ink-secondary);
+  font: inherit;
+  font-weight: var(--ds-weight-semibold);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color var(--ds-duration-fast) var(--ds-ease-out),
+              color var(--ds-duration-fast) var(--ds-ease-out),
+              border-color var(--ds-duration-fast) var(--ds-ease-out);
+}
+.jr-cat:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
+.jr-cat:active { background: var(--ds-bg-alt); }
+.jr-cat[aria-pressed='true'] {
+  border-color: var(--ds-action);
+  background: var(--ds-action);
+  color: var(--ds-on-action);
+}
+@media (hover: hover) and (pointer: fine) {
+  .jr-cat:hover:not([aria-pressed='true']) { border-color: var(--ds-ink-faint); color: var(--ds-ink); }
+}
+
+/* Rejilla: fichas de igual alto y mismos márgenes. */
+.jr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+  gap: var(--ds-space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.jr-grid > li { display: grid; }
+.jr-card {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-6);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-lg);
+  background: var(--ds-surface);
+}
+.jr-card__cat { margin: 0; font-size: var(--ds-text-sm); font-weight: var(--ds-weight-bold); color: var(--ds-action); }
+.jr-card__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-xl);
+  font-weight: var(--ds-weight-bold);
+  font-stretch: var(--ds-stretch-heading);
+  line-height: var(--ds-leading-snug);
+  text-wrap: balance;
+}
+.jr-card__sum { margin: 0; color: var(--ds-ink-secondary); text-wrap: pretty; }
+.jr-card__meta {
+  margin: 0;
+  padding-top: var(--ds-space-3);
+  border-top: 1px solid var(--ds-border-subtle);
+  font-size: var(--ds-text-sm);
+  color: var(--ds-ink-muted);
+}
+
+/* Destacado: foto real del escaneo y texto, sin pie de foto. */
+.jr-feat {
+  display: grid;
+  gap: var(--ds-space-6);
+  align-items: center;
+}
+@media (min-width: 992px) {
+  .jr-feat { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--ds-space-8); }
+}
+.jr-feat__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--ds-radius-lg);
+  background: var(--ds-dark-surface);
+  object-fit: cover;
+}
+.jr-feat__body { display: grid; gap: var(--ds-space-4); max-width: 34rem; }
+.jr-feat__body .jr-card__meta { border-top-color: var(--ds-border-strong); }
+.jr-feat__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: clamp(1.5rem, 1.2vw + 1.1rem, 2rem);
+  font-weight: var(--ds-weight-bold);
+  font-stretch: var(--ds-stretch-heading);
+  line-height: 1.15;
+  text-wrap: balance;
+}
+.jr-feat__text { margin: 0; font-size: var(--ds-text-lg); color: var(--ds-ink-secondary); text-wrap: pretty; }

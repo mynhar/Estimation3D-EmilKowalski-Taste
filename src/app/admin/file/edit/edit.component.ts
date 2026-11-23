@@ -4,6 +4,14 @@ import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angu
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { LowerCasePipe } from '@angular/common';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatTabsModule } from '@angular/material/tabs';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../../services/auth-supabase.service';
 import { ExpedienteService } from '../../../services/expediente.service';
@@ -19,6 +27,10 @@ import { AvisoArchivadoComponent } from '../../../shared/ui/aviso-archivado/avis
 import { ArchivarExpedienteComponent } from '../../../shared/ui/archivar-expediente/archivar-expediente.component';
 import { BotonArchivarComponent } from '../../../shared/ui/archivar-expediente/boton-archivar.component';
 import { CAMPOS_FALTANTES, CampoExtra } from '../../../shared/ui/campos-faltantes/campos-faltantes.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
+import { StatusChipComponent } from '../../../shared/ui/status-chip/status-chip.component';
+import { StageLineComponent } from '../../../shared/ui/stage-line/stage-line.component';
 
 interface ClienteRow {
   id: string;
@@ -35,24 +47,22 @@ interface ClienteRow {
   direccion_codigo_postal: string | null;
 }
 
-// Avance del contrato — pasos y porcentajes (paridad con el panel del cliente)
-const CONTRATO_PASOS = [
-  { key: 'generado',     pct: 25,  icon: 'bi-file-earmark-text' },
-  { key: 'firmado',      pct: 50,  icon: 'bi-pen'               },
-  { key: 'en_ejecucion', pct: 75,  icon: 'bi-tools'             },
-  { key: 'completado',   pct: 100, icon: 'bi-house-check'       },
-] as const;
-
-const CONTRATO_PCT: Record<string, number> = {
-  generado: 25, firmado: 50, en_ejecucion: 75, completado: 100, cancelado: 0, archivado: 0,
-};
+// Avance del contrato: sus etapas, en orden (paridad con el panel del cliente).
+const CONTRATO_PASOS = ['generado', 'firmado', 'en_ejecucion', 'completado'] as const;
 
 @Component({
   selector: 'app-admin-file-edit',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, FormsModule, TranslatePipe, AdminFileEstimatorReportComponent, AdminFileBuilderBidsComponent, ServicioSelectorComponent, AvisoArchivadoComponent, ArchivarExpedienteComponent, BotonArchivarComponent, ...CAMPOS_FALTANTES],
+  imports: [
+    ReactiveFormsModule, FormsModule, TranslatePipe, LowerCasePipe,
+    MatAutocompleteModule, MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule,
+    MatSelectModule, MatTabsModule,
+    PageHeaderComponent, EmptyStateComponent, StatusChipComponent, StageLineComponent,
+    AdminFileEstimatorReportComponent, AdminFileBuilderBidsComponent, ServicioSelectorComponent,
+    AvisoArchivadoComponent, ArchivarExpedienteComponent, BotonArchivarComponent, ...CAMPOS_FALTANTES,
+  ],
   templateUrl: './edit.component.html',
-  styleUrl: './edit.component.css',
+  styleUrls: ['../../../shared/ui/ficha/ficha.css', '../../../shared/ui/alta/alta.css', './edit.component.css'],
 })
 export class AdminFileEditComponent implements OnInit {
   private auth              = inject(AuthSupabaseService);
@@ -93,7 +103,6 @@ export class AdminFileEditComponent implements OnInit {
   clienteId        = signal<string | null>(null);
   clienteRequerido = signal(false);
   busquedaCliente  = signal('');
-  dropdownVisible  = signal(false);
 
   clienteSeleccionado = computed(() =>
     this.clientes().find(c => c.id === this.clienteId()) ?? null
@@ -174,19 +183,15 @@ export class AdminFileEditComponent implements OnInit {
   readonly CA_POSTAL_RE     = /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/;
 
   readonly tiposInmueble = [
-    { value: 'casa',            label: 'file_create.type_casa',            icon: 'bi-house-door'  },
-    { value: 'apartamento',     label: 'file_create.type_apartamento',     icon: 'bi-building'    },
-    { value: 'edificio',        label: 'file_create.type_edificio',        icon: 'bi-buildings'   },
-    { value: 'local_comercial', label: 'file_create.type_local_comercial', icon: 'bi-shop'        },
-    { value: 'otro',            label: 'file_create.type_otro',            icon: 'bi-three-dots'  },
+    { value: 'casa',            label: 'file_create.type_casa',            matIcon: 'house'      },
+    { value: 'apartamento',     label: 'file_create.type_apartamento',     matIcon: 'apartment'  },
+    { value: 'edificio',        label: 'file_create.type_edificio',        matIcon: 'domain'     },
+    { value: 'local_comercial', label: 'file_create.type_local_comercial', matIcon: 'storefront' },
+    { value: 'otro',            label: 'file_create.type_otro',            matIcon: 'more_horiz' },
   ];
 
-  // ── Pipeline (paridad visual con my-file) ──────────────────────────────────
-  readonly ESTADO_PROGRESO: Record<string, number> = {
-    nuevo: 15, en_estimacion: 30, estimado: 50, en_oferta: 65,
-    adjudicado: 80, contratado: 100, cancelado: 0, archivado: 0,
-  };
-  readonly PASOS: { key: string; tkey: string }[] = [
+  // ── Línea de etapas del dossier (recorrido interno, con la etapa de elección) ──
+  private readonly PASOS: { key: string; tkey: string }[] = [
     { key: 'nuevo',         tkey: 'pipeline.received' },
     { key: 'en_estimacion', tkey: 'pipeline.review'   },
     { key: 'estimado',      tkey: 'state.estimado'    },
@@ -194,32 +199,9 @@ export class AdminFileEditComponent implements OnInit {
     { key: 'adjudicado',    tkey: 'pipeline.chosen'   },
     { key: 'contratado',    tkey: 'pipeline.signed'   },
   ];
-
-  readonly ESTADO_CLASE: Record<string, string> = {
-    nuevo:         'bg-primary-subtle text-primary-emphasis',
-    en_estimacion: 'bg-info-subtle text-info-emphasis',
-    estimado:      'bg-success-subtle text-success-emphasis',
-    en_oferta:     'bg-warning-subtle text-warning-emphasis',
-    adjudicado:    'bg-warning-subtle text-warning-emphasis',
-    contratado:    'bg-success-subtle text-success-emphasis',
-    cancelado:     'bg-secondary-subtle text-secondary',
-    archivado:     'badge-archivado',
-  };
-  estadoClase(estado: string): string {
-    return this.ESTADO_CLASE[estado] ?? 'bg-secondary-subtle text-secondary';
-  }
-
-  progreso(estado: string): number { return this.ESTADO_PROGRESO[estado] ?? 0; }
-
-  pasoActivo(pasoKey: string, estadoActual: string): 'done' | 'active' | 'pending' {
-    if (estadoActual === 'cancelado' || estadoActual === 'archivado') return 'pending';
-    const keys    = ['nuevo', 'en_estimacion', 'estimado', 'en_oferta', 'adjudicado', 'contratado'];
-    const iActual = keys.indexOf(estadoActual);
-    const iPaso   = keys.indexOf(pasoKey);
-    if (iPaso < iActual)  return 'done';
-    if (iPaso === iActual) return 'active';
-    return 'pending';
-  }
+  readonly etapasExpediente = this.PASOS.map(p => p.tkey);
+  /** Etapa actual, 1-based. Cancelado y archivado no la usan: se muestran como cerrados. */
+  pasoExpediente = computed(() => this.PASOS.findIndex(p => p.key === this.estadoActual()) + 1);
 
   expCancelado = computed(() => this.estadoActual() === 'cancelado');
   expArchivado = computed(() => this.estadoActual() === 'archivado');
@@ -240,15 +222,20 @@ export class AdminFileEditComponent implements OnInit {
   };
 
   // ── Avance del contrato ────────────────────────────────────────────────────
-  readonly CONTRATO_PASOS = CONTRATO_PASOS;
-
   // Cada contrato lleva su propio avance: uno puede estar firmado y otro aún
   // generado, así que el progreso no se puede calcular a nivel de expediente.
+  readonly etapasContrato = CONTRATO_PASOS.map(k => 'contrato_estado.' + k);
+
+  /** Etapa del contrato, 1-based (solo para los que siguen en el flujo). */
+  contratoPaso(c: ContratoExpedienteView): number {
+    return (CONTRATO_PASOS as readonly string[]).indexOf(c.estado) + 1;
+  }
+
   contratoCancelado(c: ContratoExpedienteView): boolean {
     return c.estado === 'cancelado';
   }
 
-  /** Fuera del flujo (cancelado o archivado): sin pasos ni porcentaje. */
+  /** Fuera del flujo (cancelado o archivado): sin línea de etapas. */
   contratoCerrado(c: ContratoExpedienteView): boolean {
     return c.estado === 'cancelado' || c.estado === 'archivado';
   }
@@ -256,19 +243,6 @@ export class AdminFileEditComponent implements OnInit {
   /** Contrato archivado: el estado que tenía al archivarse (vuelve a él al desarchivar). */
   contratoAlArchivar(c: ContratoExpedienteView): string | null {
     return c.estado === 'archivado' ? c.estado_anterior : null;
-  }
-
-  contratoProgreso(c: ContratoExpedienteView): number {
-    return CONTRATO_PCT[c.estado] ?? 0;
-  }
-
-  contratoPasoActivo(c: ContratoExpedienteView, pasoKey: string): 'done' | 'active' | 'pending' {
-    if (this.contratoCerrado(c)) return 'pending';
-    const pct     = this.contratoProgreso(c);
-    const pasoPct = CONTRATO_PCT[pasoKey] ?? 0;
-    if (pct > pasoPct)               return 'done';
-    if (pct === pasoPct && pct > 0)  return 'active';
-    return 'pending';
   }
 
   // ── Formularios base ───────────────────────────────────────────────────────
@@ -400,16 +374,18 @@ export class AdminFileEditComponent implements OnInit {
     return new Intl.NumberFormat('fr-CA', { style: 'currency', currency: 'CAD' }).format(valor);
   }
 
-  // ── Selector de cliente ────────────────────────────────────────────────────
+  // ── Selector de cliente (mat-autocomplete) ─────────────────────────────────
+  /** Texto del campo para la opción elegida (`displayWith`). */
+  nombreCliente = (c: ClienteRow | string | null): string =>
+    typeof c === 'string' ? c : c ? `${c.nombre} ${c.apellido}` : '';
+
   setBusquedaCliente(e: Event) {
     this.busquedaCliente.set((e.target as HTMLInputElement).value);
     this.clienteId.set(null);
-    this.dropdownVisible.set(true);
   }
   seleccionarCliente(c: ClienteRow) {
     this.clienteId.set(c.id);
     this.busquedaCliente.set(`${c.nombre} ${c.apellido}`);
-    this.dropdownVisible.set(false);
     this.clienteRequerido.set(false);
     // En edición la localización ya existe: cambiar de cliente no la pisa.
     // El administrador la recupera con el botón «usar la dirección del cliente».
@@ -417,11 +393,7 @@ export class AdminFileEditComponent implements OnInit {
   limpiarCliente() {
     this.clienteId.set(null);
     this.busquedaCliente.set('');
-    this.dropdownVisible.set(false);
     // La dirección se queda: pertenece al inmueble, no al cliente.
-  }
-  cerrarDropdown() {
-    setTimeout(() => this.dropdownVisible.set(false), 160);
   }
 
   private parseDireccionCanada(dir: string): { unit: string; civic: string; street: string } {

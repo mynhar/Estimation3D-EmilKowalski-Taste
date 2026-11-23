@@ -1,0 +1,82 @@
+/* component: avisos efímeros (Trait rouge)
+ * Pila fija abajo a la derecha; en móvil, abajo a lo ancho con el margen de la página.
+ *
+ * states: éxito (abeto suave) · error (ladrillo suave) · aviso (ámbar suave) · información (azul
+ *         suave) · entrando · saliendo · cerrar: hover, focus-visible
+ * contrast: success-ink/-soft 8.4:1 · danger-ink/-soft 5.8:1 · warning-ink/-soft 5.8:1 ·
+ *           info-ink/-soft 5.8:1
+ * motion: entra desde abajo (8px) con opacidad en duration-base y ease-out; sale solo con
+ *         opacidad, más rápida (duration-fast). Sin movimiento con prefers-reduced-motion.
+ * Sin tomate: un aviso no es la siguiente etapa; los errores van en ladrillo con icono y texto.
+ */
+:host { display: contents; }
+
+.tst {
+  position: fixed;
+  right: var(--ds-space-5);
+  bottom: var(--ds-space-5);
+  z-index: var(--ds-z-toast);
+  display: grid;
+  gap: var(--ds-space-2);
+  width: min(26rem, calc(100vw - 2 * var(--ds-space-4)));
+  pointer-events: none;
+}
+
+.tst-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-3) var(--ds-space-2) var(--ds-space-3) var(--ds-space-4);
+  border: 1px solid var(--tst-line);
+  border-radius: var(--ds-radius-lg);
+  background: var(--tst-bg);
+  color: var(--tst-ink);
+  box-shadow: var(--ds-shadow-md);
+  pointer-events: auto;
+}
+.tst-item.is-success { --tst-bg: var(--ds-success-soft); --tst-ink: var(--ds-success-ink); --tst-line: var(--ds-success); }
+.tst-item.is-danger  { --tst-bg: var(--ds-danger-soft);  --tst-ink: var(--ds-danger-ink);  --tst-line: var(--ds-danger); }
+.tst-item.is-warning { --tst-bg: var(--ds-warning-soft); --tst-ink: var(--ds-warning-ink); --tst-line: var(--ds-warning); }
+.tst-item.is-info    { --tst-bg: var(--ds-info-soft);    --tst-ink: var(--ds-info-ink);    --tst-line: var(--ds-info); }
+
+.tst-icon { flex-shrink: 0; margin-top: 10px; }
+.tst-text {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding-block: 10px;
+  font-weight: var(--ds-weight-medium);
+  line-height: var(--ds-leading-normal);
+  overflow-wrap: anywhere;
+}
+.tst-close {
+  --mat-icon-button-icon-color: var(--tst-ink);
+  --mat-icon-button-state-layer-color: var(--tst-ink);
+  flex-shrink: 0;
+}
+
+/* Entrada y salida (animate.enter / animate.leave) */
+.tst-enter { animation: tst-in var(--ds-duration-base) var(--ds-ease-out); }
+.tst-leave { animation: tst-out var(--ds-duration-fast) var(--ds-ease-out) forwards; }
+@keyframes tst-in {
+  from { opacity: 0; transform: translateY(8px); }
+}
+@keyframes tst-out {
+  to { opacity: 0; }
+}
+@keyframes tst-fade-in {
+  from { opacity: 0; }
+}
+
+@media (max-width: 575.98px) {
+  .tst {
+    right: var(--ds-space-4);
+    bottom: var(--ds-space-4);
+    left: var(--ds-space-4);
+    width: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tst-enter { animation-name: tst-fade-in; }
+}

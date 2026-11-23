@@ -3,6 +3,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../../services/auth-supabase.service';
 import { ExpedienteService } from '../../../services/expediente.service';
@@ -14,6 +21,8 @@ import { EdgeErrorService } from '../../../services/edge-error.service';
 import { MatterportService } from '../../../services/matterport.service';
 import { MatterportModelo } from '../../../models/matterport.model';
 import { MatterportInfoComponent } from '../../../shared/ui/matterport-info/matterport-info.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
 import { AvisoArchivadoComponent } from '../../../shared/ui/aviso-archivado/aviso-archivado.component';
 import { ArchivarExpedienteComponent } from '../../../shared/ui/archivar-expediente/archivar-expediente.component';
 import { BotonArchivarComponent } from '../../../shared/ui/archivar-expediente/boton-archivar.component';
@@ -25,9 +34,14 @@ import { CampoExtra, CamposFaltantesComponent, listaEstable } from '../../../sha
 @Component({
   selector: 'app-admin-to-estimate-edit',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, TranslatePipe, MatterportInfoComponent, AvisoArchivadoComponent, ArchivarExpedienteComponent, BotonArchivarComponent, CamposFaltantesComponent],
+  imports: [
+    FormsModule, TranslatePipe,
+    MatButtonModule, MatCheckboxModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSelectModule, MatTooltipModule,
+    PageHeaderComponent, EmptyStateComponent, MatterportInfoComponent, AvisoArchivadoComponent,
+    ArchivarExpedienteComponent, BotonArchivarComponent, CamposFaltantesComponent,
+  ],
   templateUrl: './edit.component.html',
-  styleUrl:    './edit.component.css',
+  styleUrls:   ['../../../shared/ui/ficha/ficha.css', './edit.component.css'],
 })
 export class AdminToEstimateEditComponent implements OnInit {
   private auth              = inject(AuthSupabaseService);
@@ -132,6 +146,19 @@ export class AdminToEstimateEditComponent implements OnInit {
 
   get borradorValido(): boolean {
     return !!this.estimadorSeleccionadoId();
+  }
+
+  /** Lista de comprobación del informe (decorativa: el resumen de faltantes es el que se anuncia). */
+  get checklist(): { label: string; ok: boolean; opcional?: boolean }[] {
+    return [
+      { label: 'admin_estimate.estimador_label',   ok: !!this.estimadorSeleccionadoId() },
+      { label: 'estimator_file.check_visit_date',  ok: !!this.fechaVisita },
+      { label: 'estimator_file.check_visit_time',  ok: !!this.horaVisita },
+      { label: 'estimator_file.problems_observed', ok: !!this.descripcionProblema.trim() },
+      { label: 'estimator_file.tour_title',        ok: this.urlsTour().length > 0, opcional: true },
+      { label: 'estimator_file.approx_cost',
+        ok: this.costoMin !== null && this.costoMax !== null && this.costoValido, opcional: true },
+    ];
   }
 
   get costoValido(): boolean {

@@ -1,6 +1,5 @@
 import { ApplicationConfig, ErrorHandler, importProvidersFrom, inject, provideAppInitializer, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter, withInMemoryScrolling, withViewTransitions } from '@angular/router';
-import { provideAnimations } from '@angular/platform-browser/animations';
 import { HttpClient, provideHttpClient, withInterceptors, withXhr } from '@angular/common/http';
 import { httpErrorInterceptor } from './core/interceptors/http-error.interceptor';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
@@ -23,7 +22,6 @@ export const appConfig: ApplicationConfig = {
     // sección de la landing (`routerLink="/" fragment="processus"`). Sólo actúa
     // en navegaciones que llevan fragmento; el resto de la app no lo usa.
     provideRouter(routes, withViewTransitions(), withInMemoryScrolling({ anchorScrolling: 'enabled' })),
-    provideAnimations(),
     provideHttpClient(withXhr(), withInterceptors([httpErrorInterceptor])),
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
     // mat-icon con ligadura (p. ej. «home») usa Material Symbols Outlined,

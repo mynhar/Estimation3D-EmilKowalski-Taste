@@ -1,7 +1,7 @@
 <section class="mpi-card">
   <header class="mpi-card__header">
     <div class="mpi-card__title">
-      <i class="bi bi-house-gear"></i>
+      <mat-icon aria-hidden="true">home_work</mat-icon>
       {{ 'matterport.title' | translate }}
       @if (modelos().length > 1) {
         <span class="mpi-badge">{{ modelos().length }}</span>
@@ -16,7 +16,7 @@
         @if (sincronizando()) {
           <span class="mpi-spinner" aria-hidden="true"></span>{{ 'matterport.syncing' | translate }}
         } @else {
-          <i class="bi bi-arrow-repeat"></i>{{ 'matterport.sync' | translate }}
+          <mat-icon aria-hidden="true">sync</mat-icon>{{ 'matterport.sync' | translate }}
         }
       </button>
     }
@@ -25,12 +25,12 @@
   <div class="mpi-card__body">
     @if (errorClave()) {
       <p class="mpi-alert mpi-alert--danger" role="alert">
-        <i class="bi bi-exclamation-triangle"></i>{{ errorClave() | translate }}
+        <mat-icon aria-hidden="true">error</mat-icon>{{ errorClave() | translate }}
       </p>
     }
     @if (exitoClave()) {
       <p class="mpi-alert mpi-alert--success" role="status">
-        <i class="bi bi-check-circle"></i>{{ exitoClave() | translate }}
+        <mat-icon aria-hidden="true">check_circle</mat-icon>{{ exitoClave() | translate }}
       </p>
     }
 
@@ -43,7 +43,7 @@
             <img class="mpi-masthead__thumb" [src]="vm.portada" alt="" loading="lazy" />
           } @else {
             <span class="mpi-masthead__thumb mpi-masthead__thumb--empty" aria-hidden="true">
-              <i class="bi bi-badge-3d"></i>
+              <mat-icon>view_in_ar</mat-icon>
             </span>
           }
 
@@ -54,7 +54,7 @@
 
             @if (vm.ubicacion) {
               <p class="mpi-masthead__where">
-                <i class="bi bi-geo-alt"></i>{{ vm.ubicacion }}
+                <mat-icon aria-hidden="true">location_on</mat-icon>{{ vm.ubicacion }}
               </p>
             }
 
@@ -67,7 +67,7 @@
               }
               <a class="mpi-link" [href]="vm.modelo.share_url || vm.modelo.url_tour"
                  target="_blank" rel="noopener noreferrer">
-                {{ 'matterport.open_tour' | translate }}<i class="bi bi-box-arrow-up-right"></i>
+                {{ 'matterport.open_tour' | translate }}<mat-icon aria-hidden="true">open_in_new</mat-icon>
               </a>
             </p>
           </div>
@@ -158,8 +158,11 @@
           <button type="button" class="mpi-toggle"
                   (click)="alternarDetalle(vm.modelo.id)"
                   [attr.aria-expanded]="estaDesplegado(vm.modelo.id)">
-            <i class="bi" [class.bi-chevron-down]="!estaDesplegado(vm.modelo.id)"
-                          [class.bi-chevron-up]="estaDesplegado(vm.modelo.id)"></i>
+            @if (estaDesplegado(vm.modelo.id)) {
+              <mat-icon aria-hidden="true">expand_less</mat-icon>
+            } @else {
+              <mat-icon aria-hidden="true">expand_more</mat-icon>
+            }
             {{ (estaDesplegado(vm.modelo.id) ? 'matterport.hide_rooms' : 'matterport.show_rooms')
                 | translate:{ n: vm.modelo.habitaciones.length } }}
           </button>
@@ -203,7 +206,7 @@
       </article>
     } @empty {
       <div class="mpi-vacio">
-        <i class="bi bi-house-gear"></i>
+        <mat-icon aria-hidden="true">home_work</mat-icon>
         <p>{{ 'matterport.empty' | translate }}</p>
         @if (puedeSincronizar()) {
           <p class="mpi-vacio__hint">{{ 'matterport.empty_hint' | translate }}</p>

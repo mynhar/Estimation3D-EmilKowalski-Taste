@@ -1,7 +1,9 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ArchivoService } from '../../services/archivo.service';
 import { AuthSupabaseService } from '../../services/auth-supabase.service';
@@ -12,18 +14,24 @@ import { ServicioCompleto } from '../../data/servicio.repository';
 import { AvisoArchivadoComponent } from '../../shared/ui/aviso-archivado/aviso-archivado.component';
 import { VideoExpedienteComponent } from '../../shared/ui/presentacion-videos/video-expediente.component';
 import { VideosExpedienteLecturaComponent } from '../../shared/ui/presentacion-videos/videos-expediente-lectura.component';
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../shared/ui/empty-state/empty-state.component';
+import { StatusChipComponent } from '../../shared/ui/status-chip/status-chip.component';
+import { TourPosterComponent } from '../../shared/ui/tour-poster/tour-poster.component';
+import { abrirVisor } from '../../shared/ui/media-viewer/media-viewer.component';
 
-const ESTADO_ICON: Record<string, string> = {
-  pendiente: 'bi-hourglass',
-  aceptada:  'bi-check-circle',
-  rechazada: 'bi-x-circle',
-  archivado: 'bi-archive',
-};
+/** Lo que devuelve el servicio cuando falta un dato del expediente. */
+const SIN_DATO = '—';
 
 @Component({
   selector: 'app-my-offer',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, AvisoArchivadoComponent, VideoExpedienteComponent, VideosExpedienteLecturaComponent],
+  imports: [
+    RouterLink, TranslatePipe,
+    MatButtonModule, MatIconModule,
+    PageHeaderComponent, EmptyStateComponent, StatusChipComponent, TourPosterComponent,
+    AvisoArchivadoComponent, VideoExpedienteComponent, VideosExpedienteLecturaComponent,
+  ],
   templateUrl: './my-offer.component.html',
   styleUrl: './my-offer.component.css',
 })
@@ -32,10 +40,12 @@ export class MyOfferComponent implements OnInit {
   private expedienteService = inject(ExpedienteService);
   private archivoService    = inject(ArchivoService);
   private auth              = inject(AuthSupabaseService);
-  private sanitizer      = inject(DomSanitizer);
-  private translate      = inject(TranslateService);
-  private route          = inject(ActivatedRoute);
-  private router         = inject(Router);
+  private dialog            = inject(MatDialog);
+  private translate         = inject(TranslateService);
+  private route             = inject(ActivatedRoute);
+  private router            = inject(Router);
+
+  protected readonly SIN_DATO = SIN_DATO;
 
   /** El constructor: dueño de la oferta y de su video de presentación. */
   user       = toSignal(this.auth.user$);
@@ -49,17 +59,10 @@ export class MyOfferComponent implements OnInit {
 
   fotosExp      = signal<ArchivoRow[]>([]);
   documentosExp = signal<ArchivoRow[]>([]);
-  tabMedia      = signal<'tour' | 'fotos' | 'docs'>('tour');
-
-  fotoAmpliada = signal<string | null>(null);
-  videoActivo  = signal<ArchivoRow | null>(null);
-
-  private ofertaId = '';
 
   async ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) { this.cargando.set(false); return; }
-    this.ofertaId = id;
 
     try {
       const [detalle, archivosOferta] = await Promise.all([
@@ -99,10 +102,6 @@ export class MyOfferComponent implements OnInit {
     return [raw];
   }
 
-  getSafeUrl(url: string): SafeResourceUrl {
-    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
-  }
-
   servicioNombre(): string {
     const d = this.detalle();
     if (!d) return '';
@@ -120,31 +119,28 @@ export class MyOfferComponent implements OnInit {
 
   serviciosTexto(): string {
     const nombres = this.serviciosNombres();
-    return nombres.length ? nombres.join(' · ') : this.servicioNombre();
+    return nombres.length ? nombres.join(', ') : this.servicioNombre();
   }
 
-  estadoIcon(estado: string): string {
-    return ESTADO_ICON[estado] ?? 'bi-circle';
-  }
-
-  toggleVideo(video: ArchivoRow) {
-    this.videoActivo.set(this.videoActivo()?.id === video.id ? null : video);
+  /** Un expediente archivado llega sin número, servicio ni dirección. */
+  hay(valor: string | null | undefined): boolean {
+    return !!valor && valor !== SIN_DATO;
   }
 
   publicUrl(path: string): string {
     return this.archivoService.publicUrl(path);
   }
 
-  verArchivo(archivo: ArchivoRow) {
-    window.open(this.archivoService.publicUrl(archivo.url_storage), '_blank');
+  tituloTour(i: number): string {
+    return this.translate.instant('estimator_file.tour_video_n', { n: i + 1 });
   }
 
-  abrirFoto(archivo: ArchivoRow) {
-    this.fotoAmpliada.set(this.publicUrl(archivo.url_storage));
+  verFoto(archivo: ArchivoRow) {
+    abrirVisor(this.dialog, { tipo: 'foto', url: this.publicUrl(archivo.url_storage), titulo: archivo.nombre_archivo });
   }
 
-  cerrarFoto() {
-    this.fotoAmpliada.set(null);
+  verVideo(archivo: ArchivoRow) {
+    abrirVisor(this.dialog, { tipo: 'video', url: this.publicUrl(archivo.url_storage), titulo: archivo.nombre_archivo });
   }
 
   editarOferta() {
@@ -157,34 +153,30 @@ export class MyOfferComponent implements OnInit {
   }
 
   formatFecha(valor: string): string {
-    if (!valor) return '—';
+    if (!valor) return SIN_DATO;
     const raw = valor.includes('T') ? valor.split('T')[0] : valor;
     const d   = new Date(`${raw}T00:00:00`);
-    if (isNaN(d.getTime())) return '—';
+    if (isNaN(d.getTime())) return SIN_DATO;
     const localeMap: Record<string, string> = { es: 'es-CA', en: 'en-US', fr: 'fr-CA' };
     const locale = localeMap[this.translate.currentLang] ?? 'fr-CA';
     return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' }).format(d);
   }
 
   formatHora(valor: string): string {
-    if (!valor || !valor.includes('T')) return '—';
-    return valor.split('T')[1]?.slice(0, 5) ?? '—';
+    if (!valor || !valor.includes('T')) return SIN_DATO;
+    return valor.split('T')[1]?.slice(0, 5) ?? SIN_DATO;
   }
 
   formatPlazo(min: number | null, max: number | null): string {
-    if (!min && !max) return '—';
+    if (!min && !max) return SIN_DATO;
     const w = this.translate.instant('offer.weeks');
     if (min === max) return `${min} ${w}`;
-    return `${min ?? '?'} – ${max ?? '?'} ${w}`;
+    return `${min ?? '?'}–${max ?? '?'} ${w}`;
   }
 
   formatTamano(bytes: number): string {
     if (bytes < 1_024)     return `${bytes} B`;
     if (bytes < 1_048_576) return `${(bytes / 1_024).toFixed(1)} KB`;
     return `${(bytes / 1_048_576).toFixed(1)} MB`;
-  }
-
-  volver() {
-    this.router.navigate(['/builder/my-offers']);
   }
 }

@@ -1,626 +1,350 @@
-<div class="adm-root">
+<div class="page-wrapper ad">
 
-  <!-- ══════════════════════════════════════════════════════════
-       HEADER — sticky, KPI band inline
-       ══════════════════════════════════════════════════════════ -->
-  <header class="adm-header">
-
-    <div class="adm-header__left">
-      <p class="page-eyebrow">
-        <i class="bi bi-shield-check" aria-hidden="true"></i>
-        {{ 'admin_dashboard.eyebrow' | translate }}
-      </p>
-      <h1 class="adm-header__title">
-        {{ bienvenida
-          ? (('dashboard_client.welcome' | translate) + ', ' + bienvenida)
-          : ('admin_dashboard.title' | translate) }}
-      </h1>
-    </div>
-
-    @if (!cargando() && !error() && stats()) {
-      <div class="adm-kpi-band" role="region" aria-label="Métricas principales">
-        <a class="adm-kpi adm-kpi--link" routerLink="/admin/file">
-          <span class="adm-kpi__n">{{ stats()!.expedientes.total }}</span>
-          <span class="adm-kpi__l">{{ 'admin_dashboard.kpi_exp' | translate }}</span>
-        </a>
-        <div class="adm-kpi-sep" aria-hidden="true"></div>
-        <a class="adm-kpi adm-kpi--link" routerLink="/admin/to-estimate">
-          <span class="adm-kpi__n">{{ stats()!.estimaciones.total }}</span>
-          <span class="adm-kpi__l">{{ 'admin_dashboard.kpi_est' | translate }}</span>
-        </a>
-        <div class="adm-kpi-sep" aria-hidden="true"></div>
-        <a class="adm-kpi adm-kpi--link" routerLink="/admin/user" [queryParams]="{rol: 'constructor'}">
-          <span class="adm-kpi__n">{{ stats()!.ofertas.constructoresActivos }}</span>
-          <span class="adm-kpi__l">{{ 'admin_dashboard.kpi_con' | translate }}</span>
-        </a>
-        <div class="adm-kpi-sep" aria-hidden="true"></div>
-        <div class="adm-kpi">
-          <span class="adm-kpi__n adm-kpi__n--gold">{{ formatPrecio(stats()!.contratos.valorTotal) }}</span>
-          <span class="adm-kpi__l">{{ 'admin_dashboard.mini_contract_value' | translate }}</span>
-        </div>
-      </div>
-    }
-
-    <div class="adm-header__right">
+  <app-page-header
+    [titulo]="bienvenida ? ('dashboard_client.welcome' | translate) + ', ' + bienvenida : ('admin_dashboard.title' | translate)"
+    [contexto]="'admin_dashboard.subtitle' | translate">
+    <!-- Sin tomate: el tablero solo resume; cada etapa se decide en su lista. -->
+    <div actions class="ad-refresh">
       @if (refreshedAt()) {
-        <span class="adm-refresh-ts">
-          <i class="bi bi-clock" aria-hidden="true"></i>
-          {{ refreshedAt() }}
+        <span class="ad-refresh__ts">
+          <mat-icon aria-hidden="true">schedule</mat-icon>
+          {{ 'admin_dashboard.refreshed_at' | translate }} <span class="ad-fig">{{ refreshedAt() }}</span>
         </span>
       }
-      <button class="adm-btn-refresh" (click)="recargar()" [disabled]="cargando()"
-              [attr.aria-label]="'admin_dashboard.refresh' | translate">
-        <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+      <button mat-stroked-button type="button" (click)="recargar()" [disabled]="cargando()">
+        <mat-icon>refresh</mat-icon>
         {{ 'admin_dashboard.refresh' | translate }}
       </button>
     </div>
+  </app-page-header>
 
-  </header>
-
-  <!-- ══════════════════════════════════════════════════════════
-       BODY
-       ══════════════════════════════════════════════════════════ -->
-  <div class="adm-body page-wrapper">
-
-    <!-- ── Skeleton ────────────────────────────────────────── -->
-    @if (cargando()) {
-      <div class="adm-grid">
-        <div class="adm-skel adm-skel--exp"></div>
-        <div class="adm-skel adm-skel--est"></div>
-        <div class="adm-skel adm-skel--con"></div>
-        <div class="adm-skel adm-skel--ctr"></div>
+  <!-- ── Cargando ────────────────────────────────────────────────────────── -->
+  @if (cargando()) {
+    <div class="ad-skel" role="status">
+      <span class="cdk-visually-hidden">{{ 'common.loading' | translate }}</span>
+      <span class="skel ad-skel__sum" aria-hidden="true"></span>
+      <div class="ad-grid">
+        @for (_ of [1, 2, 3, 4]; track $index) {
+          <span class="skel ad-skel__panel" aria-hidden="true"></span>
+        }
       </div>
-      <div class="adm-skel adm-skel--tl"></div>
+    </div>
 
-    <!-- ── Error ───────────────────────────────────────────── -->
-    } @else if (error()) {
-      <div class="adm-error" role="alert">
-        <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
-        <span>{{ error() }}</span>
-        <button class="adm-btn-refresh adm-btn-refresh--inline"
-                (click)="recargar()"
-                [attr.aria-label]="'admin_dashboard.retry' | translate">
-          <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
-          {{ 'admin_dashboard.retry' | translate }}
-        </button>
-      </div>
+  <!-- ── Error ───────────────────────────────────────────────────────────── -->
+  } @else if (error()) {
+    <div class="ad-error" role="alert">
+      <p class="ls-error"><mat-icon aria-hidden="true">error</mat-icon>{{ error() }}</p>
+      <button mat-stroked-button type="button" (click)="recargar()">
+        <mat-icon>refresh</mat-icon>
+        {{ 'admin_dashboard.retry' | translate }}
+      </button>
+    </div>
 
-    <!-- ── Contenido ───────────────────────────────────────── -->
-    } @else {
+  } @else if (stats(); as s) {
 
-      <!-- Grid de 4 paneles -->
-      <div class="adm-grid" role="region" aria-label="Paneles de métricas">
+    <!-- ── Resumen sobre banda kraft ─────────────────────────────────────── -->
+    <section class="ad-sum" [attr.aria-label]="'admin_dashboard.eyebrow' | translate">
+      <dl class="ad-sum__lead">
+        <dt>{{ 'admin_dashboard.mini_contract_value' | translate }}</dt>
+        <dd class="ad-sum__amount">{{ formatPrecio(s.contratos.valorTotal) }}</dd>
+      </dl>
+      <dl class="ad-sum__counts">
+        <div>
+          <dt><a routerLink="/admin/file">{{ 'admin_dashboard.kpi_exp' | translate }}</a></dt>
+          <dd class="ad-fig">{{ s.expedientes.total }}</dd>
+        </div>
+        <div>
+          <dt><a routerLink="/admin/to-estimate">{{ 'admin_dashboard.kpi_est' | translate }}</a></dt>
+          <dd class="ad-fig">{{ s.estimaciones.total }}</dd>
+        </div>
+        <div>
+          <dt><a routerLink="/admin/user" [queryParams]="{ rol: 'constructor' }">{{ 'admin_dashboard.kpi_con' | translate }}</a></dt>
+          <dd class="ad-fig">{{ s.ofertas.constructoresActivos }}</dd>
+        </div>
+      </dl>
+    </section>
 
-        <!-- ── EXPEDIENTES ───────────────────────────────── -->
-        <section class="adm-panel adm-panel--exp" aria-labelledby="panel-exp-title">
-          <div class="adm-panel__header adm-panel__header--exp">
-            <div class="adm-panel__header-icon adm-panel__header-icon--exp" aria-hidden="true">
-              <i class="bi bi-folder2-open"></i>
-            </div>
-            <div class="adm-panel__header-text">
-              <h2 class="adm-panel__title" id="panel-exp-title">
-                {{ 'admin_dashboard.panel_exp' | translate }}
-              </h2>
-              <p class="adm-panel__subtitle">
-                {{ stats()!.expedientes.total }} {{ 'admin_dashboard.panel_total_suffix' | translate }}
-              </p>
-            </div>
+    <div class="ad-grid">
+
+      <!-- ── Dossiers ──────────────────────────────────────────────────── -->
+      <section class="ad-panel" aria-labelledby="ad-exp-title">
+        <header class="ad-panel__head">
+          <h2 class="ad-h2" id="ad-exp-title">{{ 'admin_dashboard.panel_exp' | translate }}</h2>
+          <p class="ad-sub"><span class="ad-fig">{{ s.expedientes.total }}</span> {{ 'admin_dashboard.panel_total_suffix' | translate }}</p>
+        </header>
+        <ul class="ad-bars">
+          @for (item of funnelExp(); track item.estado) {
+            <li class="ad-bar-row">
+              <span class="ad-bar-row__label">{{ 'admin_file.status_' + item.estado | translate }}</span>
+              <span class="ad-bar-row__n ad-fig">{{ item.count }}</span>
+              <span class="ad-bar" aria-hidden="true"><span class="ad-bar__fill" [style.width.%]="barWidth(item.count, s.expedientes.total)"></span></span>
+            </li>
+          }
+          @if (expCancelados() > 0) {
+            <li class="ad-bar-row is-muted is-split">
+              <span class="ad-bar-row__label">{{ 'admin_file.status_cancelado' | translate }}</span>
+              <span class="ad-bar-row__n ad-fig">{{ expCancelados() }}</span>
+              <span class="ad-bar" aria-hidden="true"><span class="ad-bar__fill" [style.width.%]="barWidth(expCancelados(), s.expedientes.total)"></span></span>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <!-- ── Estimations ───────────────────────────────────────────────── -->
+      <section class="ad-panel" aria-labelledby="ad-est-title">
+        <header class="ad-panel__head">
+          <h2 class="ad-h2" id="ad-est-title">{{ 'admin_dashboard.panel_est' | translate }}</h2>
+          <p class="ad-sub"><span class="ad-fig">{{ s.estimaciones.total }}</span> {{ 'admin_dashboard.panel_completed_suffix' | translate }}</p>
+        </header>
+        <!-- Cada fila abre la lista de estimaciones filtrada por esa etapa. -->
+        <ul class="ad-bars">
+          <li class="ad-bar-row is-link">
+            <a class="ad-bar-row__label" routerLink="/admin/to-estimate" [queryParams]="{ estado: 'nuevo' }">{{ 'admin_dashboard.est_label_unassigned' | translate }}</a>
+            <span class="ad-bar-row__n ad-fig">{{ expSinAsignar() }}</span>
+            <span class="ad-bar" aria-hidden="true"><span class="ad-bar__fill" [style.width.%]="barWidth(expSinAsignar(), s.expedientes.total)"></span></span>
+          </li>
+          <li class="ad-bar-row is-link">
+            <a class="ad-bar-row__label" routerLink="/admin/to-estimate" [queryParams]="{ estado: 'en_estimacion' }">{{ 'admin_dashboard.est_label_in_estimation' | translate }}</a>
+            <span class="ad-bar-row__n ad-fig">{{ expEnEstimacion() }}</span>
+            <span class="ad-bar" aria-hidden="true"><span class="ad-bar__fill" [style.width.%]="barWidth(expEnEstimacion(), s.expedientes.total)"></span></span>
+          </li>
+          <li class="ad-bar-row is-link">
+            <a class="ad-bar-row__label" routerLink="/admin/to-estimate" [queryParams]="{ estado: 'estimado' }">{{ 'admin_dashboard.est_label_estimated' | translate }}</a>
+            <span class="ad-bar-row__n ad-fig">{{ s.estimaciones.total }}</span>
+            <span class="ad-bar" aria-hidden="true"><span class="ad-bar__fill" [style.width.%]="barWidth(s.estimaciones.total, s.expedientes.total)"></span></span>
+          </li>
+        </ul>
+        @if (s.estimaciones.promedioMin) {
+          <dl class="ad-note">
+            <dt>{{ 'admin_dashboard.cost_avg' | translate }}</dt>
+            <dd class="ad-fig">
+              {{ formatPrecio(s.estimaciones.promedioMin) }}
+              @if (s.estimaciones.promedioMax) { – {{ formatPrecio(s.estimaciones.promedioMax) }} }
+            </dd>
+          </dl>
+        }
+      </section>
+
+      <!-- ── Entrepreneurs et offres ───────────────────────────────────── -->
+      <section class="ad-panel" aria-labelledby="ad-con-title">
+        <header class="ad-panel__head">
+          <h2 class="ad-h2" id="ad-con-title">{{ 'admin_dashboard.panel_con' | translate }}</h2>
+          <p class="ad-sub"><span class="ad-fig">{{ s.ofertas.constructoresActivos }}</span> {{ 'admin_dashboard.panel_active_suffix' | translate }}</p>
+        </header>
+        <ul class="ad-tiles">
+          <li>
+            <a class="ad-tile" routerLink="/admin/user" [queryParams]="{ rol: 'constructor', activo: 'activo' }">
+              <span class="ad-tile__n ad-fig">{{ s.ofertas.constructoresActivos }}</span>
+              <span class="ad-tile__l">{{ 'admin_dashboard.mini_builders' | translate }}</span>
+            </a>
+          </li>
+          <li>
+            <a class="ad-tile" routerLink="/admin/offer" [queryParams]="{ estado: 'en_oferta' }">
+              <span class="ad-tile__n ad-fig">{{ s.ofertas.total }}</span>
+              <span class="ad-tile__l">{{ 'admin_dashboard.mini_offers_total' | translate }}</span>
+            </a>
+          </li>
+          <li>
+            <a class="ad-tile" routerLink="/admin/offer" [queryParams]="{ estado: 'estimado' }">
+              <span class="ad-tile__n ad-fig">{{ s.expedientes.porEstado['en_oferta'] }}</span>
+              <span class="ad-tile__l">{{ 'admin_dashboard.mini_files_on_offer' | translate }}</span>
+            </a>
+          </li>
+        </ul>
+        <ul class="ad-bars">
+          @for (item of funnelOfe(); track item.estado) {
+            <li class="ad-bar-row" [class.is-muted]="item.estado === 'rechazada'">
+              <span class="ad-bar-row__label">{{ 'state.' + item.estado | translate }}</span>
+              <span class="ad-bar-row__n ad-fig">{{ item.count }}</span>
+              <span class="ad-bar" aria-hidden="true"><span class="ad-bar__fill" [style.width.%]="barWidth(item.count, s.ofertas.total)"></span></span>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <!-- ── Contrats ──────────────────────────────────────────────────── -->
+      <section class="ad-panel" aria-labelledby="ad-ctr-title">
+        <header class="ad-panel__head">
+          <h2 class="ad-h2" id="ad-ctr-title">{{ 'admin_dashboard.panel_ctr' | translate }}</h2>
+          <p class="ad-sub"><span class="ad-fig">{{ s.contratos.total }}</span> {{ 'admin_dashboard.panel_total_suffix' | translate }}</p>
+        </header>
+        <ul class="ad-bars">
+          @for (item of funnelCtr(); track item.estado) {
+            <li class="ad-bar-row" [class.is-muted]="item.estado === 'cancelado'" [class.is-split]="item.estado === 'cancelado'">
+              <span class="ad-bar-row__label">{{ 'admin_dashboard.contract_' + item.estado | translate }}</span>
+              <span class="ad-bar-row__n ad-fig">{{ item.count }}</span>
+              <span class="ad-bar" aria-hidden="true"><span class="ad-bar__fill" [style.width.%]="barWidth(item.count, s.contratos.total)"></span></span>
+            </li>
+          }
+        </ul>
+      </section>
+    </div>
+
+    <!-- ── Suivi de chantier ─────────────────────────────────────────────── -->
+    @if (obrasTotal() > 0) {
+      <section class="ad-panel ad-obra" aria-labelledby="ad-obra-title">
+        <header class="ad-panel__head">
+          <h2 class="ad-h2" id="ad-obra-title">{{ 'admin_dashboard.panel_obra' | translate }}</h2>
+          <p class="ad-sub"><span class="ad-fig">{{ obrasTotal() }}</span> {{ 'admin_dashboard.panel_total_suffix' | translate }}</p>
+        </header>
+
+        <div class="ad-obra__body">
+          <div class="ad-obra__avg">
+            <span class="ad-obra__pct ad-fig" id="ad-obra-avg">{{ avanceMedioObra() }} %</span>
+            <span class="ad-obra__lbl">{{ 'admin_dashboard.obra_avg' | translate }}</span>
+            <span class="ad-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+                  [attr.aria-valuenow]="avanceMedioObra()" aria-labelledby="ad-obra-avg">
+              <span class="ad-bar__fill" [style.width.%]="avanceMedioObra()"></span>
+            </span>
           </div>
 
-          <div class="adm-panel__body">
-            <div class="adm-funnel" role="list">
-              @for (item of funnelExp(); track item.estado) {
-                <div class="adm-funnel-row" role="listitem">
-                  <div class="adm-funnel-label">
-                    <span class="adm-dot adm-dot--exp-{{ item.estado }}" aria-hidden="true"></span>
-                    <span class="adm-funnel-name">{{ 'admin_file.status_' + item.estado | translate }}</span>
-                  </div>
-                  <div class="adm-funnel-track" role="progressbar"
-                       [attr.aria-valuenow]="barWidth(item.count, stats()!.expedientes.total)"
-                       aria-valuemin="0" aria-valuemax="100">
-                    <div class="adm-funnel-fill adm-funnel-fill--exp-{{ item.estado }}"
-                         [style.width.%]="barWidth(item.count, stats()!.expedientes.total)"></div>
-                  </div>
-                  <span class="adm-funnel-num">{{ item.count }}</span>
-                </div>
-              }
-              @if (expCancelados() > 0) {
-                <div class="adm-funnel-sep" aria-hidden="true"></div>
-                <div class="adm-funnel-row adm-funnel-row--muted" role="listitem">
-                  <div class="adm-funnel-label">
-                    <span class="adm-dot adm-dot--cancelado" aria-hidden="true"></span>
-                    <span class="adm-funnel-name">{{ 'admin_file.status_cancelado' | translate }}</span>
-                  </div>
-                  <div class="adm-funnel-track">
-                    <div class="adm-funnel-fill adm-funnel-fill--cancelado"
-                         [style.width.%]="barWidth(expCancelados(), stats()!.expedientes.total)"></div>
-                  </div>
-                  <span class="adm-funnel-num">{{ expCancelados() }}</span>
-                </div>
-              }
-            </div>
-          </div>
-        </section>
+          <div class="ad-obra__detail">
+            <ul class="ad-tiles">
+              <li>
+                <a class="ad-tile" routerLink="/admin/construction-monitoring/list" [queryParams]="{ estado: 'todos' }">
+                  <span class="ad-tile__n ad-fig">{{ obrasTotal() }}</span>
+                  <span class="ad-tile__l">{{ 'admin_dashboard.obra_total' | translate }}</span>
+                </a>
+              </li>
+              <li>
+                <a class="ad-tile" routerLink="/admin/construction-monitoring/list" [queryParams]="{ estado: 'en_ejecucion' }">
+                  <span class="ad-tile__n ad-fig">{{ obrasEnProgreso() }}</span>
+                  <span class="ad-tile__l">{{ 'seguimiento_estado.en_progreso' | translate }}</span>
+                </a>
+              </li>
+              <li>
+                <a class="ad-tile" routerLink="/admin/construction-monitoring/list" [queryParams]="{ estado: 'completado' }">
+                  <span class="ad-tile__n ad-fig">{{ obrasCompletadas() }}</span>
+                  <span class="ad-tile__l">{{ 'seguimiento_estado.completado' | translate }}</span>
+                </a>
+              </li>
+            </ul>
 
-        <!-- ── ESTIMACIONES ──────────────────────────────── -->
-        <section class="adm-panel adm-panel--est" aria-labelledby="panel-est-title">
-          <div class="adm-panel__header adm-panel__header--est">
-            <div class="adm-panel__header-icon adm-panel__header-icon--est" aria-hidden="true">
-              <i class="bi bi-clipboard-data"></i>
-            </div>
-            <div class="adm-panel__header-text">
-              <h2 class="adm-panel__title" id="panel-est-title">
-                {{ 'admin_dashboard.panel_est' | translate }}
-              </h2>
-              <p class="adm-panel__subtitle">
-                {{ stats()!.estimaciones.total }} {{ 'admin_dashboard.panel_completed_suffix' | translate }}
-              </p>
-            </div>
-          </div>
-
-          <div class="adm-panel__body">
-
-            <div class="adm-stat-row">
-              <div class="adm-stat-box adm-stat-box--clickable" role="button" tabindex="0"
-                   (click)="irAEstimaciones('nuevo')"
-                   (keydown.enter)="irAEstimaciones('nuevo')"
-                   (keydown.space)="$event.preventDefault(); irAEstimaciones('nuevo')">
-                <span class="adm-stat__n">{{ expSinAsignar() }}</span>
-                <span class="adm-stat__l">{{ 'admin_dashboard.mini_unassigned' | translate }}</span>
-              </div>
-              <div class="adm-stat-box adm-stat-box--clickable" role="button" tabindex="0"
-                   (click)="irAEstimaciones('en_estimacion')"
-                   (keydown.enter)="irAEstimaciones('en_estimacion')"
-                   (keydown.space)="$event.preventDefault(); irAEstimaciones('en_estimacion')">
-                <span class="adm-stat__n">{{ expEnEstimacion() }}</span>
-                <span class="adm-stat__l">{{ 'admin_dashboard.mini_in_progress' | translate }}</span>
-              </div>
-              <div class="adm-stat-box adm-stat-box--highlight adm-stat-box--clickable" role="button" tabindex="0"
-                   (click)="irAEstimaciones('estimado')"
-                   (keydown.enter)="irAEstimaciones('estimado')"
-                   (keydown.space)="$event.preventDefault(); irAEstimaciones('estimado')">
-                <span class="adm-stat__n adm-stat__n--accent">{{ stats()!.estimaciones.total }}</span>
-                <span class="adm-stat__l">{{ 'admin_dashboard.mini_completed' | translate }}</span>
-              </div>
-            </div>
-
-            @if (stats()!.estimaciones.promedioMin) {
-              <div class="adm-cost-band">
-                <span class="adm-cost-band__lbl">{{ 'admin_dashboard.cost_avg' | translate }}</span>
-                <span class="adm-cost-band__val">
-                  {{ formatPrecio(stats()!.estimaciones.promedioMin) }}
-                  @if (stats()!.estimaciones.promedioMax) {
-                    &nbsp;–&nbsp;{{ formatPrecio(stats()!.estimaciones.promedioMax) }}
-                  }
-                </span>
-              </div>
-            }
-
-            <div class="adm-funnel" role="list">
-              <div class="adm-funnel-row adm-funnel-row--clickable" role="button" tabindex="0"
-                   (click)="irAEstimaciones('nuevo')"
-                   (keydown.enter)="irAEstimaciones('nuevo')"
-                   (keydown.space)="$event.preventDefault(); irAEstimaciones('nuevo')">
-                <div class="adm-funnel-label">
-                  <span class="adm-dot adm-dot--exp-nuevo" aria-hidden="true"></span>
-                  <span class="adm-funnel-name">{{ 'admin_dashboard.est_label_unassigned' | translate }}</span>
-                </div>
-                <div class="adm-funnel-track">
-                  <div class="adm-funnel-fill adm-funnel-fill--exp-nuevo"
-                       [style.width.%]="barWidth(expSinAsignar(), stats()!.expedientes.total)"></div>
-                </div>
-                <span class="adm-funnel-num">{{ expSinAsignar() }}</span>
-              </div>
-              <div class="adm-funnel-row adm-funnel-row--clickable" role="button" tabindex="0"
-                   (click)="irAEstimaciones('en_estimacion')"
-                   (keydown.enter)="irAEstimaciones('en_estimacion')"
-                   (keydown.space)="$event.preventDefault(); irAEstimaciones('en_estimacion')">
-                <div class="adm-funnel-label">
-                  <span class="adm-dot adm-dot--exp-en_estimacion" aria-hidden="true"></span>
-                  <span class="adm-funnel-name">{{ 'admin_dashboard.est_label_in_estimation' | translate }}</span>
-                </div>
-                <div class="adm-funnel-track">
-                  <div class="adm-funnel-fill adm-funnel-fill--exp-en_estimacion"
-                       [style.width.%]="barWidth(expEnEstimacion(), stats()!.expedientes.total)"></div>
-                </div>
-                <span class="adm-funnel-num">{{ expEnEstimacion() }}</span>
-              </div>
-              <div class="adm-funnel-row adm-funnel-row--clickable" role="button" tabindex="0"
-                   (click)="irAEstimaciones('estimado')"
-                   (keydown.enter)="irAEstimaciones('estimado')"
-                   (keydown.space)="$event.preventDefault(); irAEstimaciones('estimado')">
-                <div class="adm-funnel-label">
-                  <span class="adm-dot adm-dot--exp-contratado" aria-hidden="true"></span>
-                  <span class="adm-funnel-name">{{ 'admin_dashboard.est_label_estimated' | translate }}</span>
-                </div>
-                <div class="adm-funnel-track">
-                  <div class="adm-funnel-fill adm-funnel-fill--exp-contratado"
-                       [style.width.%]="barWidth(stats()!.estimaciones.total, stats()!.expedientes.total)"></div>
-                </div>
-                <span class="adm-funnel-num">{{ stats()!.estimaciones.total }}</span>
-              </div>
-            </div>
-
-          </div>
-        </section>
-
-        <!-- ── CONTRATOS ─────────────────────────────────── -->
-        <section class="adm-panel adm-panel--ctr" aria-labelledby="panel-ctr-title">
-          <div class="adm-panel__header adm-panel__header--ctr">
-            <div class="adm-panel__header-icon adm-panel__header-icon--ctr" aria-hidden="true">
-              <i class="bi bi-file-earmark-check"></i>
-            </div>
-            <div class="adm-panel__header-text">
-              <h2 class="adm-panel__title" id="panel-ctr-title">
-                {{ 'admin_dashboard.panel_ctr' | translate }}
-              </h2>
-              <p class="adm-panel__subtitle">
-                {{ stats()!.contratos.total }} {{ 'admin_dashboard.panel_total_suffix' | translate }}
-              </p>
-            </div>
-          </div>
-
-          <div class="adm-panel__body">
-
-            <div class="adm-valor-box">
-              <span class="adm-valor__n">{{ formatPrecio(stats()!.contratos.valorTotal) }}</span>
-              <span class="adm-valor__l">{{ 'admin_dashboard.mini_contract_value' | translate }}</span>
-            </div>
-
-            <div class="adm-funnel" role="list">
-              @for (item of funnelCtr(); track item.estado) {
-                <div class="adm-funnel-row" role="listitem">
-                  <div class="adm-funnel-label">
-                    <span class="adm-dot adm-dot--ctr-{{ item.estado }}" aria-hidden="true"></span>
-                    <span class="adm-funnel-name">{{ 'admin_dashboard.contract_' + item.estado | translate }}</span>
-                  </div>
-                  <div class="adm-funnel-track">
-                    <div class="adm-funnel-fill adm-funnel-fill--ctr-{{ item.estado }}"
-                         [style.width.%]="barWidth(item.count, stats()!.contratos.total)"></div>
-                  </div>
-                  <span class="adm-funnel-num">{{ item.count }}</span>
-                </div>
-              }
-            </div>
-
-          </div>
-        </section>
-
-        <!-- ── CONSTRUCTORES & OFERTAS ───────────────────── -->
-        <section class="adm-panel adm-panel--con" aria-labelledby="panel-con-title">
-          <div class="adm-panel__header adm-panel__header--con">
-            <div class="adm-panel__header-icon adm-panel__header-icon--con" aria-hidden="true">
-              <i class="bi bi-person-workspace"></i>
-            </div>
-            <div class="adm-panel__header-text">
-              <h2 class="adm-panel__title" id="panel-con-title">
-                {{ 'admin_dashboard.panel_con' | translate }}
-              </h2>
-              <p class="adm-panel__subtitle">
-                {{ stats()!.ofertas.constructoresActivos }} {{ 'admin_dashboard.panel_active_suffix' | translate }}
-              </p>
-            </div>
-          </div>
-
-          <div class="adm-panel__body">
-
-            <div class="adm-stat-row">
-              <div class="adm-stat-box adm-stat-box--clickable" role="button" tabindex="0"
-                   (click)="irAConstructoresActivos()"
-                   (keydown.enter)="irAConstructoresActivos()"
-                   (keydown.space)="$event.preventDefault(); irAConstructoresActivos()">
-                <span class="adm-stat__n">{{ stats()!.ofertas.constructoresActivos }}</span>
-                <span class="adm-stat__l">{{ 'admin_dashboard.mini_builders' | translate }}</span>
-              </div>
-              <div class="adm-stat-box adm-stat-box--clickable" role="button" tabindex="0"
-                   (click)="irAOfertas('en_oferta')"
-                   (keydown.enter)="irAOfertas('en_oferta')"
-                   (keydown.space)="$event.preventDefault(); irAOfertas('en_oferta')">
-                <span class="adm-stat__n">{{ stats()!.ofertas.total }}</span>
-                <span class="adm-stat__l">{{ 'admin_dashboard.mini_offers_total' | translate }}</span>
-              </div>
-              <div class="adm-stat-box adm-stat-box--clickable" role="button" tabindex="0"
-                   (click)="irAOfertas('estimado')"
-                   (keydown.enter)="irAOfertas('estimado')"
-                   (keydown.space)="$event.preventDefault(); irAOfertas('estimado')">
-                <span class="adm-stat__n">{{ stats()!.expedientes.porEstado['en_oferta'] }}</span>
-                <span class="adm-stat__l">{{ 'admin_dashboard.mini_files_on_offer' | translate }}</span>
-              </div>
-            </div>
-
-            <div class="adm-funnel" role="list">
-              @for (item of funnelOfe(); track item.estado) {
-                <div class="adm-funnel-row" role="listitem">
-                  <div class="adm-funnel-label">
-                    <span class="adm-dot adm-dot--ofe-{{ item.estado }}" aria-hidden="true"></span>
-                    <span class="adm-funnel-name">{{ 'state.' + item.estado | translate }}</span>
-                  </div>
-                  <div class="adm-funnel-track">
-                    <div class="adm-funnel-fill adm-funnel-fill--ofe-{{ item.estado }}"
-                         [style.width.%]="barWidth(item.count, stats()!.ofertas.total)"></div>
-                  </div>
-                  <span class="adm-funnel-num">{{ item.count }}</span>
-                </div>
-              }
-            </div>
-
-          </div>
-        </section>
-
-      </div><!-- /adm-grid -->
-
-      <!-- ── SEGUIMIENTO DE OBRA — avance de los trabajos ──── -->
-      @if (obrasTotal() > 0) {
-        <section class="adm-panel adm-obra-panel" aria-labelledby="panel-obra-title">
-          <div class="adm-panel__header adm-panel__header--obra">
-            <div class="adm-panel__header-icon adm-panel__header-icon--obra" aria-hidden="true">
-              <i class="bi bi-hammer"></i>
-            </div>
-            <div class="adm-panel__header-text">
-              <h2 class="adm-panel__title" id="panel-obra-title">
-                {{ 'admin_dashboard.panel_obra' | translate }}
-              </h2>
-              <p class="adm-panel__subtitle">
-                {{ obrasTotal() }} {{ 'admin_dashboard.panel_total_suffix' | translate }}
-              </p>
-            </div>
-          </div>
-
-          <div class="adm-panel__body adm-obra-body">
-
-            <!-- Avance medio como métrica hero -->
-            <div class="adm-obra-hero">
-              <span class="adm-obra-hero__pct">{{ avanceMedioObra() }}<span>%</span></span>
-              <span class="adm-obra-hero__lbl">{{ 'admin_dashboard.obra_avg' | translate }}</span>
-              <div class="adm-obra-hero__track" role="progressbar"
-                   [attr.aria-valuenow]="avanceMedioObra()" aria-valuemin="0" aria-valuemax="100">
-                <span class="adm-obra-hero__fill" [style.width.%]="avanceMedioObra()"></span>
-              </div>
-            </div>
-
-            <!-- Desglose -->
-            <div class="adm-obra-right">
-              <div class="adm-stat-row">
-                <div class="adm-stat-box adm-stat-box--clickable" role="button" tabindex="0"
-                     (click)="irASeguimientoObra('todos')"
-                     (keydown.enter)="irASeguimientoObra('todos')"
-                     (keydown.space)="$event.preventDefault(); irASeguimientoObra('todos')">
-                  <span class="adm-stat__n">{{ obrasTotal() }}</span>
-                  <span class="adm-stat__l">{{ 'admin_dashboard.obra_total' | translate }}</span>
-                </div>
-                <div class="adm-stat-box adm-stat-box--clickable" role="button" tabindex="0"
-                     (click)="irASeguimientoObra('en_ejecucion')"
-                     (keydown.enter)="irASeguimientoObra('en_ejecucion')"
-                     (keydown.space)="$event.preventDefault(); irASeguimientoObra('en_ejecucion')">
-                  <span class="adm-stat__n">{{ obrasEnProgreso() }}</span>
-                  <span class="adm-stat__l">{{ 'seguimiento_estado.en_progreso' | translate }}</span>
-                </div>
-                <div class="adm-stat-box adm-stat-box--highlight adm-stat-box--clickable" role="button" tabindex="0"
-                     (click)="irASeguimientoObra('completado')"
-                     (keydown.enter)="irASeguimientoObra('completado')"
-                     (keydown.space)="$event.preventDefault(); irASeguimientoObra('completado')">
-                  <span class="adm-stat__n adm-stat__n--accent">{{ obrasCompletadas() }}</span>
-                  <span class="adm-stat__l">{{ 'seguimiento_estado.completado' | translate }}</span>
-                </div>
-              </div>
-
-              <div class="adm-obra-estados" role="list">
-                @for (item of funnelObra(); track item.estado) {
-                  <div class="adm-obra-estado" role="listitem">
-                    <span class="adm-dot adm-dot--obra-{{ item.estado }}" aria-hidden="true"></span>
-                    <div class="adm-obra-estado__main">
-                      <div class="adm-obra-estado__top">
-                        <span class="adm-obra-estado__name">{{ 'seguimiento_estado.' + item.estado | translate }}</span>
-                        <span class="adm-obra-estado__count">{{ item.count }}</span>
-                      </div>
-                      <p class="adm-obra-estado__desc">{{ 'seguimiento_estado_desc.' + item.estado | translate }}</p>
-                      <div class="adm-obra-estado__track" role="progressbar"
-                           [attr.aria-valuenow]="barWidth(item.count, obrasTotal())"
-                           aria-valuemin="0" aria-valuemax="100">
-                        <div class="adm-funnel-fill adm-funnel-fill--obra-{{ item.estado }}"
-                             [style.width.%]="barWidth(item.count, obrasTotal())"></div>
-                      </div>
-                    </div>
-                  </div>
-                }
-              </div>
-            </div>
-
-          </div>
-        </section>
-      }
-
-      <!-- ── Timeline ──────────────────────────────────────── -->
-      @defer (on viewport) {
-        <section class="adm-tl" aria-labelledby="tl-title">
-
-          <div class="adm-tl__head">
-            <div class="adm-tl__head-left">
-              <div class="adm-tl__head-icon" aria-hidden="true">
-                <i class="bi bi-clock-history"></i>
-              </div>
-              <div>
-                <h2 class="adm-tl__title" id="tl-title">
-                  {{ 'admin_dashboard.tl_title' | translate }}
-                </h2>
-                <p class="adm-tl__subtitle">{{ 'admin_dashboard.tl_subtitle' | translate }}</p>
-              </div>
-            </div>
-            <nav class="adm-tl__filters" [attr.aria-label]="'admin_dashboard.tl_title' | translate">
-              @for (f of timelineFiltros; track f.key) {
-                <button class="adm-tl-filter"
-                        [class.adm-tl-filter--active]="filtroTimeline() === f.key"
-                        (click)="setFiltroTimeline(f.key)">
-                  {{ f.labelKey | translate }}
-                </button>
-              }
-            </nav>
-            <div class="adm-tl__viewtoggle" role="group" [attr.aria-label]="'admin_dashboard.view_toggle' | translate">
-              <button type="button" class="adm-tl-view"
-                      [class.adm-tl-view--active]="vistaTimeline() === 'tabla'"
-                      (click)="vistaTimeline.set('tabla')"
-                      [attr.aria-pressed]="vistaTimeline() === 'tabla'"
-                      [title]="'admin_dashboard.view_table' | translate">
-                <i class="bi bi-list-ul" aria-hidden="true"></i>
-                <span class="adm-tl-view__label">{{ 'admin_dashboard.view_table' | translate }}</span>
-              </button>
-              <button type="button" class="adm-tl-view"
-                      [class.adm-tl-view--active]="vistaTimeline() === 'tarjetas'"
-                      (click)="vistaTimeline.set('tarjetas')"
-                      [attr.aria-pressed]="vistaTimeline() === 'tarjetas'"
-                      [title]="'admin_dashboard.view_cards' | translate">
-                <i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>
-                <span class="adm-tl-view__label">{{ 'admin_dashboard.view_cards' | translate }}</span>
-              </button>
-            </div>
-          </div>
-
-          @if (cargandoTimeline()) {
-            <div class="adm-tl__empty">
-              <span class="adm-spinner" role="status" [attr.aria-label]="'common.loading' | translate"></span>
-            </div>
-
-          } @else if (timelineFiltrada().length === 0) {
-            <div class="adm-tl__empty">
-              <div class="adm-tl__empty-icon" aria-hidden="true">
-                <i class="bi bi-clock-history"></i>
-              </div>
-              <p>{{ 'admin_dashboard.tl_empty' | translate }}</p>
-            </div>
-
-          } @else {
-            @if (vistaTimeline() === 'tabla') {
-            <ul class="adm-tl__list">
-              @for (ev of timelinePaginada(); track ev.id) {
-                <li class="adm-tl__event"
-                    [class.adm-tl__event--clickable]="!!ev.entityId"
-                    [attr.role]="ev.entityId ? 'button' : null"
-                    [attr.tabindex]="ev.entityId ? 0 : null"
-                    (click)="onTimelineClick(ev)"
-                    (keydown.enter)="onTimelineClick(ev)"
-                    (keydown.space)="ev.entityId && $event.preventDefault(); onTimelineClick(ev)">
-
-                  <div class="adm-tl__dot adm-tl__dot--{{ ev.tipo }}" aria-hidden="true">
-                    <i class="{{ tipoIcon(ev.tipo) }}"></i>
-                  </div>
-
-                  <div class="adm-tl__content">
-                    <p class="adm-tl__desc">
-                      <span class="adm-tl__ref">{{ ev.referencia }}</span>
-                      {{ ev.descKey | translate }}
-                      @if (ev.precio) { <span class="adm-tl__price">· {{ ev.precio }}</span> }
-                      @if (servicioEvento(ev)) {
-                        <span class="adm-tl__svc">· {{ servicioEvento(ev) }}</span>
-                      }
-                      @if (ev.avance != null) {
-                        <span class="adm-tl__avance">· {{ ev.avance }}%</span>
-                      }
-                      @if (ev.estadoObra) {
-                        <span class="adm-tl__estado adm-tl__estado--{{ ev.estadoObra }}">
-                          {{ 'seguimiento_estado.' + ev.estadoObra | translate }}
-                        </span>
-                      }
-                    </p>
-                    <p class="adm-tl__meta">
-                      <i class="bi bi-person" aria-hidden="true"></i>
-                      {{ ev.autor }}
-                      <span class="adm-tl__sep" aria-hidden="true">·</span>
-                      <time>{{ formatTs(ev.timestamp) }}</time>
-                    </p>
-                  </div>
-
-                  <div class="adm-tl__event-right">
-                    <span class="adm-tl__badge adm-tl__badge--{{ ev.tipo }}">
-                      {{ 'admin_dashboard.tipo_' + ev.tipo | translate }}
-                    </span>
-                    @if (ev.entityId) {
-                      <i class="bi bi-arrow-right adm-tl__nav-icon" aria-hidden="true"></i>
-                    }
-                  </div>
-
+            <ul class="ad-bars ad-bars--desc">
+              @for (item of funnelObra(); track item.estado) {
+                <li class="ad-bar-row">
+                  <span class="ad-bar-row__label">{{ 'seguimiento_estado.' + item.estado | translate }}</span>
+                  <span class="ad-bar-row__n ad-fig">{{ item.count }}</span>
+                  <span class="ad-bar-row__desc">{{ 'seguimiento_estado_desc.' + item.estado | translate }}</span>
+                  <span class="ad-bar" aria-hidden="true"><span class="ad-bar__fill" [style.width.%]="barWidth(item.count, obrasTotal())"></span></span>
                 </li>
               }
             </ul>
+          </div>
+        </div>
+      </section>
+    }
 
-          } @else {
-            <!-- Vista de tarjetas (con foto del expediente extraída del tour 3D) -->
-            <div class="adm-tl-cards">
-              @for (ev of timelinePaginada(); track ev.id) {
-                <article class="adm-tl-card"
-                    [class.adm-tl-card--clickable]="!!ev.entityId"
-                    [attr.role]="ev.entityId ? 'button' : null"
-                    [attr.tabindex]="ev.entityId ? 0 : null"
-                    (click)="onTimelineClick(ev)"
-                    (keydown.enter)="onTimelineClick(ev)"
-                    (keydown.space)="ev.entityId && $event.preventDefault(); onTimelineClick(ev)">
+    <!-- ── Activité récente ──────────────────────────────────────────────── -->
+    @defer (on viewport) {
+      <section class="ad-tl" aria-labelledby="ad-tl-title">
+        <header class="ad-panel__head">
+          <h2 class="ad-h2" id="ad-tl-title">{{ 'admin_dashboard.tl_title' | translate }}</h2>
+          <p class="ad-sub">{{ 'admin_dashboard.tl_subtitle' | translate }}</p>
+        </header>
 
-                  <div class="adm-tl-card__media">
-                    <div class="adm-tl-card__media-fallback adm-tl__dot--{{ ev.tipo }}" aria-hidden="true">
-                      <i class="{{ tipoIcon(ev.tipo) }}"></i>
-                    </div>
-                    @if (ev.foto) {
-                      <img class="adm-tl-card__img" [src]="ev.foto" alt="" loading="lazy"
-                           referrerpolicy="no-referrer"
-                           (error)="$any($event.target).style.display='none'">
-                    }
-                    <span class="adm-tl__badge adm-tl__badge--{{ ev.tipo }} adm-tl-card__badge">
-                      {{ 'admin_dashboard.tipo_' + ev.tipo | translate }}
-                    </span>
-                  </div>
-
-                  <div class="adm-tl-card__body">
-                    <p class="adm-tl__desc">
-                      <span class="adm-tl__ref">{{ ev.referencia }}</span>
-                      {{ ev.descKey | translate }}
-                      @if (ev.precio) { <span class="adm-tl__price">· {{ ev.precio }}</span> }
-                      @if (servicioEvento(ev)) {
-                        <span class="adm-tl__svc">· {{ servicioEvento(ev) }}</span>
-                      }
-                      @if (ev.avance != null) {
-                        <span class="adm-tl__avance">· {{ ev.avance }}%</span>
-                      }
-                      @if (ev.estadoObra) {
-                        <span class="adm-tl__estado adm-tl__estado--{{ ev.estadoObra }}">
-                          {{ 'seguimiento_estado.' + ev.estadoObra | translate }}
-                        </span>
-                      }
-                    </p>
-                    <p class="adm-tl__meta">
-                      <i class="bi bi-person" aria-hidden="true"></i>
-                      {{ ev.autor }}
-                      <span class="adm-tl__sep" aria-hidden="true">·</span>
-                      <time>{{ formatTs(ev.timestamp) }}</time>
-                      @if (ev.entityId) {
-                        <i class="bi bi-arrow-right adm-tl-card__nav" aria-hidden="true"></i>
-                      }
-                    </p>
-                  </div>
-
-                </article>
+        <div class="ad-tl__tools">
+          <div class="ls-filter is-grid">
+            <mat-button-toggle-group class="ls-toggle" hideSingleSelectionIndicator
+                                     aria-labelledby="ad-tl-title"
+                                     [value]="filtroTimeline()" (change)="setFiltroTimeline($event.value)">
+              @for (f of timelineFiltros; track f.key) {
+                <mat-button-toggle [value]="f.key">{{ f.labelKey | translate }}</mat-button-toggle>
               }
-            </div>
-            }
+            </mat-button-toggle-group>
+          </div>
 
-            <div class="adm-tl__footer">
-              <app-pagination
-                [total]="timelineFiltrada().length"
-                [page]="paginaTl()"
-                [pageSize]="TL_POR_PAGINA"
-                (pageChange)="paginaTl.set($event)">
-              </app-pagination>
-            </div>
+          <mat-button-toggle-group class="ls-toggle ls-view" hideSingleSelectionIndicator
+                                   [attr.aria-label]="'admin_dashboard.view_toggle' | translate"
+                                   [value]="vistaTimeline()" (change)="vistaTimeline.set($event.value)">
+            <mat-button-toggle value="tabla" [aria-label]="'admin_dashboard.view_table' | translate"
+                               [matTooltip]="'admin_dashboard.view_table' | translate">
+              <mat-icon>view_agenda</mat-icon>
+            </mat-button-toggle>
+            <mat-button-toggle value="tarjetas" [aria-label]="'admin_dashboard.view_cards' | translate"
+                               [matTooltip]="'admin_dashboard.view_cards' | translate">
+              <mat-icon>grid_view</mat-icon>
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+
+        @if (cargandoTimeline()) {
+          <span class="skel ad-skel__tl" role="status">
+            <span class="cdk-visually-hidden">{{ 'admin_dashboard.tl_loading' | translate }}</span>
+          </span>
+
+        } @else if (timelineFiltrada().length === 0) {
+          <p class="ad-tl__empty">
+            <mat-icon aria-hidden="true">history</mat-icon>
+            {{ 'admin_dashboard.tl_empty' | translate }}
+          </p>
+
+        } @else {
+          <!-- Lista (por defecto; en móvil, siempre) -->
+          <ul class="ad-evs" [class.is-mobile-only]="vistaTimeline() === 'tarjetas'">
+            @for (ev of timelinePaginada(); track ev.id) {
+              <li class="ad-ev" [class.is-link]="!!rutaEvento(ev)">
+                <span class="ad-ev__icon" aria-hidden="true"><mat-icon>{{ TIPO_ICON[ev.tipo].matIcon }}</mat-icon></span>
+                <ng-container [ngTemplateOutlet]="tplEvento" [ngTemplateOutletContext]="{ $implicit: ev }" />
+                <span class="ls-tag ad-ev__tipo">{{ 'admin_dashboard.tipo_' + ev.tipo | translate }}</span>
+              </li>
+            }
+          </ul>
+
+          <!-- Tarjetas con la miniatura del tour 3D (solo escritorio) -->
+          @if (vistaTimeline() === 'tarjetas') {
+            <ul class="ad-cards">
+              @for (ev of timelinePaginada(); track ev.id) {
+                <li class="ad-card" [class.is-link]="!!rutaEvento(ev)">
+                  <span class="ad-card__media">
+                    <mat-icon aria-hidden="true">{{ TIPO_ICON[ev.tipo].matIcon }}</mat-icon>
+                    @if (ev.foto) {
+                      <img [src]="ev.foto" alt="" loading="lazy" referrerpolicy="no-referrer"
+                           (error)="$any($event.target).hidden = true" />
+                    }
+                    <span class="ls-tag ad-card__tipo">{{ 'admin_dashboard.tipo_' + ev.tipo | translate }}</span>
+                  </span>
+                  <ng-container [ngTemplateOutlet]="tplEvento" [ngTemplateOutletContext]="{ $implicit: ev }" />
+                </li>
+              }
+            </ul>
           }
 
-        </section>
+          <app-pagination [total]="timelineFiltrada().length" [page]="paginaTl()"
+                          [pageSize]="TL_POR_PAGINA" (pageChange)="paginaTl.set($event)" />
+        }
+      </section>
+    } @placeholder {
+      <span class="skel ad-skel__tl" role="status">
+        <span class="cdk-visually-hidden">{{ 'admin_dashboard.tl_loading' | translate }}</span>
+      </span>
+    }
+  }
+</div>
 
-      } @placeholder {
-        <div class="adm-tl-placeholder">
-          <span class="adm-spinner" role="status"></span>
-          <span>{{ 'admin_dashboard.tl_loading' | translate }}</span>
-        </div>
+<!-- Texto de un evento, común a la lista y a las tarjetas. Con destino, la referencia
+     es el enlace y su ::after cubre la fila entera. -->
+<ng-template #tplEvento let-ev>
+  <div class="ad-ev__body">
+    <p class="ad-ev__title">
+      @if (rutaEvento(ev); as ruta) {
+        <a class="ad-ev__ref ad-fig" [routerLink]="ruta">{{ ev.referencia }}</a>
+      } @else {
+        <span class="ad-ev__ref ad-fig">{{ ev.referencia }}</span>
       }
-
-    }<!-- /contenido -->
-
-  </div><!-- /adm-body -->
-</div><!-- /adm-root -->
+      <span>{{ ev.descKey | translate }}</span>
+      @if (ev.precio) { <span class="ad-ev__price ad-fig">{{ ev.precio }}</span> }
+    </p>
+    @if (servicioEvento(ev) || ev.avance != null || ev.estadoObra) {
+      <p class="ad-ev__extra">
+        @if (servicioEvento(ev)) { <span>{{ servicioEvento(ev) }}</span> }
+        @if (ev.avance != null) { <span class="ad-fig">{{ ev.avance }} %</span> }
+        @if (ev.estadoObra) { <app-status-chip [estado]="ev.estadoObra" prefijo="seguimiento_estado." /> }
+      </p>
+    }
+    <p class="ad-ev__meta">
+      <span><mat-icon aria-hidden="true">person</mat-icon>{{ ev.autor }}</span>
+      <time class="ad-fig" [dateTime]="ev.timestamp">{{ formatTs(ev.timestamp) }}</time>
+    </p>
+  </div>
+</ng-template>

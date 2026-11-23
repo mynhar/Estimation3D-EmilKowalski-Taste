@@ -1,15 +1,16 @@
-/* component: multi-select card group
- * states: default · hover · focus · active · disabled · error · selected
- * (loading lo pinta el padre mientras carga el catálogo)
- * contrast: casilla vacía --ds-ink-muted ≈ 4.3:1 sobre --ds-surface
+/* component: selección de servicios (tarjetas con casilla)
+ * states: default · hover · focus-visible · active · disabled · error · marcada
+ *         (la carga la pinta el padre mientras llega el catálogo)
+ * contrast: nombre ink (13.6:1 sobre vélin) · descripción ink-secondary (9.6:1)
+ *           casilla vacía con borde ink-muted (6.8:1) · marcada: abeto con check vélin (9.7:1)
+ *           error danger (5.9:1) con icono
  *
- * Compartido por admin/file/create y admin/file/edit; por eso el prefijo
- * propio `srv-` en vez de heredar el de ninguno de los dos. Sólo tokens --ds-*.
+ * Compartida por las altas y ediciones de dossier de cliente, estimador y administración.
  */
 
 :host { display: block; }
 
-.srv { min-width: 0; }
+.srv { min-width: 0; margin: 0; padding: 0; border: 0; }
 
 /* ── Barra: contador + «todos» ─────────────────────────────────────────── */
 .srv-toolbar {
@@ -23,24 +24,16 @@
 
 .srv-count {
   margin: 0;
-  font-size: var(--ds-text-xs);
-  color: var(--ds-ink-secondary);
+  font-size: var(--ds-text-sm);
   font-variant-numeric: tabular-nums;
+  color: var(--ds-ink-secondary);
 }
 
 .srv-all {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-space-1);
-  font-size: var(--ds-text-xs);
-  font-weight: var(--ds-weight-semibold);
-  white-space: nowrap;
+  --mat-button-text-horizontal-padding: var(--ds-space-2);
+  min-height: 44px;
+  margin-right: calc(var(--ds-space-2) * -1);
 }
-.srv-all:focus-visible {
-  outline: var(--ds-focus-outline);
-  outline-offset: 2px;
-}
-.srv-all:disabled { color: var(--ds-ink-muted); }
 
 /* ── Rejilla ───────────────────────────────────────────────────────────── */
 .srv-grid {
@@ -56,61 +49,52 @@
   padding: var(--ds-space-4);
   border: 1px solid var(--ds-border-strong);
   border-radius: var(--ds-radius-md);
-  cursor: pointer;
   background: var(--ds-surface);
-  transition:
-    border-color var(--ds-duration-fast) var(--ds-ease-out),
-    background-color var(--ds-duration-fast) var(--ds-ease-out),
-    box-shadow var(--ds-duration-fast) var(--ds-ease-out),
-    transform var(--ds-duration-fast) var(--ds-ease-out);
+  cursor: pointer;
+  transition: border-color var(--ds-duration-fast) var(--ds-ease-out),
+              background-color var(--ds-duration-fast) var(--ds-ease-out),
+              transform var(--ds-duration-fast) var(--ds-ease-out);
+  -webkit-tap-highlight-color: transparent;
 }
-.srv-card:hover:not(:has(:disabled)) {
-  border-color: var(--ds-gold);
-  background: var(--ds-gold-faint);
-  box-shadow: var(--ds-shadow-sm);
+@media (hover: hover) and (pointer: fine) {
+  .srv-card:hover:not(:has(:disabled)) { border-color: var(--ds-action); }
 }
-.srv-card:has(:focus-visible) {
-  outline: var(--ds-focus-outline);
-  outline-offset: 2px;
-}
-.srv-card:active:not(:has(:disabled)) { transform: translateY(1px); }
+.srv-card:has(:focus-visible) { box-shadow: var(--ds-focus-ring); }
+.srv-card:active:not(:has(:disabled)) { transform: scale(0.99); }
 .srv-card--selected {
-  border-color: var(--ds-gold);
-  background: var(--ds-gold-faint);
-  box-shadow: var(--ds-shadow-gold);
+  border-color: var(--ds-action);
+  background: var(--ds-action-faint);
 }
-.srv-card:has(:disabled) {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
+.srv-card:has(:disabled) { opacity: 0.6; cursor: not-allowed; }
 
 .srv-icon {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 2.25rem; height: 2.25rem;
-  border-radius: var(--ds-radius-circle);
-  background: var(--ds-bg-alt);
-  font-size: 1rem;
-  color: var(--ds-ink-muted);
+  display: inline-grid;
   flex-shrink: 0;
-  transition: var(--ds-transition-color);
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--ds-radius-circle);
+  background: var(--ds-band);
+  color: var(--ds-ink-secondary);
 }
-.srv-card--selected .srv-icon { background: var(--ds-gold-soft); color: var(--ds-gold-ink); }
+.srv-icon mat-icon { width: 22px; height: 22px; font-size: 22px; }
+.srv-card--selected .srv-icon { background: var(--ds-surface); color: var(--ds-action); }
 
 .srv-text { flex: 1 1 auto; min-width: 0; }
 .srv-name {
   display: block;
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-semibold);
-  color: var(--ds-ink);
+  font-size: var(--ds-text-base);
+  font-weight: var(--ds-weight-bold);
   line-height: var(--ds-leading-snug);
+  color: var(--ds-ink);
   overflow-wrap: anywhere;
 }
 .srv-desc {
   display: block;
   margin-top: var(--ds-space-1);
-  font-size: var(--ds-text-xs);
-  color: var(--ds-ink-secondary);
+  font-size: var(--ds-text-sm);
   line-height: var(--ds-leading-normal);
+  color: var(--ds-ink-secondary);
 }
 
 /* ── Etiquetas: principal (con 2+ marcados) e inactivo ─────────────────── */
@@ -122,62 +106,58 @@
 }
 .srv-tag {
   display: inline-flex;
-  padding: 0.125rem var(--ds-space-2);
-  border: 1px solid var(--ds-border-strong);
+  padding: 2px var(--ds-space-2);
   border-radius: var(--ds-radius-pill);
-  background: var(--ds-bg-alt);
-  font-size: var(--ds-text-2xs);
+  background: var(--ds-band);
+  font-size: var(--ds-text-sm);
   font-weight: var(--ds-weight-semibold);
-  letter-spacing: var(--ds-tracking-wide);
-  text-transform: uppercase;
   color: var(--ds-ink-secondary);
 }
-.srv-tag--principal {
-  border-color: var(--ds-gold-soft);
-  background: var(--ds-surface);
-  color: var(--ds-ink);
-}
+.srv-tag--principal { background: var(--ds-surface); color: var(--ds-action-ink); }
 
 /* ── Casilla dibujada ──────────────────────────────────────────────────── */
-/* Borde vacío en --ds-ink-muted: --ds-border-strong no llega a 3:1 sobre
- * crema. Marcada, la contrasta el check en tinta sobre dorado. */
 .srv-box {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 1.25rem; height: 1.25rem;
-  margin-top: 2px;
+  display: inline-grid;
   flex-shrink: 0;
-  border: 1.5px solid var(--ds-ink-muted);
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  margin-top: 2px;
+  border: 2px solid var(--ds-ink-muted);
   border-radius: var(--ds-radius-sm);
   background: var(--ds-surface);
   color: transparent;
-  font-size: 0.8rem;
-  transition: var(--ds-transition-color);
+  transition: background-color var(--ds-duration-fast) var(--ds-ease-out),
+              border-color var(--ds-duration-fast) var(--ds-ease-out);
 }
-.srv-card:hover:not(:has(:disabled)) .srv-box { border-color: var(--ds-gold-active); }
+.srv-box mat-icon { width: 18px; height: 18px; font-size: 18px; }
 .srv-card--selected .srv-box {
-  background: var(--ds-gold);
-  border-color: var(--ds-gold-active);
-  color: var(--ds-ink);
+  border-color: var(--ds-action);
+  background: var(--ds-action);
+  color: var(--ds-on-action);
 }
 
 /* ── Compacto (columnas estrechas: formulario de oferta) ────────────────── */
 :host(.srv-compacto) .srv-grid {
-  grid-template-columns: repeat(auto-fill, minmax(min(12rem, 100%), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(14rem, 100%), 1fr));
   gap: var(--ds-space-2);
 }
-:host(.srv-compacto) .srv-card {
-  align-items: center;
-  padding: var(--ds-space-2) var(--ds-space-3);
-}
-:host(.srv-compacto) .srv-icon { width: 1.75rem; height: 1.75rem; font-size: 0.85rem; }
+:host(.srv-compacto) .srv-card { align-items: center; padding: var(--ds-space-2) var(--ds-space-3); }
+:host(.srv-compacto) .srv-icon { width: 32px; height: 32px; }
+:host(.srv-compacto) .srv-icon mat-icon { width: 18px; height: 18px; font-size: 18px; }
 :host(.srv-compacto) .srv-box  { margin-top: 0; }
 
 /* ── Error ─────────────────────────────────────────────────────────────── */
 .srv-error {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--ds-space-1);
   margin: var(--ds-space-3) 0 0;
-  font-size: var(--ds-text-xs);
+  font-size: var(--ds-text-sm);
   color: var(--ds-danger);
+}
+.srv-error mat-icon { flex-shrink: 0; width: 18px; height: 18px; font-size: 18px; margin-top: 1px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .srv-card, .srv-box { transition: none; }
 }

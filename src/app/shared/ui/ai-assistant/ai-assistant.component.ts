@@ -12,6 +12,12 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { TextFieldModule } from '@angular/cdk/text-field';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../../services/auth-supabase.service';
 import { EdgeErrorService } from '../../../services/edge-error.service';
@@ -20,6 +26,9 @@ import {
   AsistenteIaService,
   ChatMensaje,
 } from '../../../services/asistente-ia.service';
+import { PageHeaderComponent } from '../page-header/page-header.component';
+import { EmptyStateComponent } from '../empty-state/empty-state.component';
+import { ClaudeIconComponent } from '../claude-icon/claude-icon.component';
 
 interface ExpedienteOpcion {
   id:     string;
@@ -46,7 +55,10 @@ type Burbuja = ChatMensaje | BurbujaError;
 @Component({
   selector: 'app-ai-assistant',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, FormsModule],
+  imports: [
+    TranslatePipe, FormsModule, TextFieldModule, MatButtonModule, MatFormFieldModule, MatIconModule,
+    MatInputModule, MatSelectModule, PageHeaderComponent, EmptyStateComponent, ClaudeIconComponent,
+  ],
   templateUrl: './ai-assistant.component.html',
   styleUrl: './ai-assistant.component.css',
 })
@@ -72,8 +84,7 @@ export class AiAssistantComponent implements OnInit {
   borrador     = signal('');
   rol          = signal<string>('cliente');
 
-  // Eyebrow / tagline / intro adaptados al rol.
-  eyebrowKey   = computed(() => `role.${this.rol()}`);
+  // Tagline / intro adaptados al rol.
   taglineKey   = computed(() => `ai_assistant.tagline_${this.rol()}`);
   introLeadKey = computed(() => `ai_assistant.intro_lead_${this.rol()}`);
 
@@ -111,12 +122,12 @@ export class AiAssistantComponent implements OnInit {
   };
   faqs = computed(() => this.FAQS_POR_ROL[this.rol()] ?? this.FAQS_POR_ROL['cliente']);
 
-  // Capacidades para el estado vacío (clave icono / título / descripción).
+  // Lo que sabe hacer (icono / título / descripción).
   readonly capacidades = [
-    { icon: 'bi-clipboard-data', title: 'ai_assistant.cap_analiza_title',  desc: 'ai_assistant.cap_analiza_desc' },
-    { icon: 'bi-translate',      title: 'ai_assistant.cap_jargon_title',   desc: 'ai_assistant.cap_jargon_desc' },
-    { icon: 'bi-shield-check',   title: 'ai_assistant.cap_riesgos_title',  desc: 'ai_assistant.cap_riesgos_desc' },
-    { icon: 'bi-signpost-split', title: 'ai_assistant.cap_decide_title',   desc: 'ai_assistant.cap_decide_desc' },
+    { matIcon: 'query_stats',   title: 'ai_assistant.cap_analiza_title',  desc: 'ai_assistant.cap_analiza_desc' },
+    { matIcon: 'translate',     title: 'ai_assistant.cap_jargon_title',   desc: 'ai_assistant.cap_jargon_desc' },
+    { matIcon: 'verified_user', title: 'ai_assistant.cap_riesgos_title',  desc: 'ai_assistant.cap_riesgos_desc' },
+    { matIcon: 'alt_route',     title: 'ai_assistant.cap_decide_title',   desc: 'ai_assistant.cap_decide_desc' },
   ];
 
   constructor() {

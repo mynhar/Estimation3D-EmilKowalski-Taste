@@ -1,80 +1,74 @@
 @if (activas().length > 0) {
   @if (bloqueado()) {
-    <p class="rep-blocked">
-      <i class="bi bi-lock" aria-hidden="true"></i>
+    <p class="rp-note">
+      <mat-icon aria-hidden="true">lock</mat-icon>
       {{ 'admin_offer.reparto_bloqueado' | translate }}
     </p>
   } @else {
-    <div class="rep-bar">
-      <label class="rep-bar__all">
-        <input type="checkbox" class="rep-check"
-               [checked]="todasSeleccionadas()"
-               (change)="alternarTodas()">
-        <span>{{ 'admin_offer.reparto_todas' | translate }}</span>
-      </label>
+    <div class="rp">
+      <div class="rp-bar">
+        <mat-checkbox class="rp-bar__all"
+                      [checked]="todasSeleccionadas()"
+                      [indeterminate]="seleccionadas().length > 0 && !todasSeleccionadas()"
+                      (change)="alternarTodas()">
+          {{ 'admin_offer.reparto_todas' | translate }}
+        </mat-checkbox>
 
-      @if (seleccionadas().length > 0) {
-        <span class="rep-bar__count">
-          {{ 'admin_offer.reparto_contador' | translate:{ n: seleccionadas().length, total: activas().length } }}
-        </span>
-        <button class="rep-link" type="button" (click)="limpiar()">
-          {{ 'admin_offer.reparto_limpiar' | translate }}
-        </button>
-      }
-    </div>
-
-    @if (seleccionadas().length > 0) {
-      <div class="rep-actions">
-        <button class="rep-btn rep-btn--reject" type="button"
-                (click)="confirmando.set('rechazar')" [disabled]="aplicando()">
-          <i class="bi bi-x-circle" aria-hidden="true"></i>
-          {{ 'admin_offer.reparto_rechazar' | translate }}
-        </button>
-        @if (seleccionadasRechazadas().length > 0) {
-          <button class="rep-btn" type="button"
-                  (click)="confirmando.set('reactivar')" [disabled]="aplicando()">
-            <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-            {{ 'admin_offer.reparto_reactivar' | translate:{ n: seleccionadasRechazadas().length } }}
+        @if (seleccionadas().length > 0) {
+          <span class="rp-bar__count" aria-live="polite">
+            {{ 'admin_offer.reparto_contador' | translate:{ n: seleccionadas().length, total: activas().length } }}
+          </span>
+          <button mat-button type="button" class="rp-bar__clear" (click)="limpiar()">
+            {{ 'admin_offer.reparto_limpiar' | translate }}
           </button>
         }
       </div>
-    }
 
-    <!-- La confirmación da los números exactos antes de aplicar. -->
-    @if (confirmando()) {
-      <div class="rep-confirm">
-        <p class="rep-confirm__msg">
-          @if (confirmando() === 'rechazar') {
-            <i class="bi bi-x-circle" aria-hidden="true"></i>
-            {{ 'admin_offer.reparto_confirm_rechazar' | translate:{ n: seleccionadas().length } }}
-          } @else {
-            <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-            {{ 'admin_offer.reparto_confirm_reactivar' | translate:{ n: seleccionadasRechazadas().length } }}
+      @if (seleccionadas().length > 0 && !confirmando()) {
+        <div class="rp-actions">
+          <button mat-stroked-button type="button" (click)="confirmando.set('rechazar')" [disabled]="aplicando()">
+            <mat-icon>block</mat-icon>
+            {{ 'admin_offer.reparto_rechazar' | translate }}
+          </button>
+          @if (seleccionadasRechazadas().length > 0) {
+            <button mat-stroked-button type="button" (click)="confirmando.set('reactivar')" [disabled]="aplicando()">
+              <mat-icon>undo</mat-icon>
+              {{ 'admin_offer.reparto_reactivar' | translate:{ n: seleccionadasRechazadas().length } }}
+            </button>
           }
-        </p>
-        <div class="rep-confirm__btns">
-          <button class="rep-btn rep-btn--primary" type="button"
-                  (click)="aplicar()" [disabled]="aplicando()">
-            @if (aplicando()) {
-              <span class="rep-spinner"></span>
-            } @else {
-              <i class="bi bi-check-lg" aria-hidden="true"></i>
-            }
-            {{ 'common.confirm' | translate }}
-          </button>
-          <button class="rep-btn" type="button"
-                  (click)="confirmando.set(null)" [disabled]="aplicando()">
-            {{ 'common.cancel' | translate }}
-          </button>
         </div>
-      </div>
-    }
+      }
 
-    @if (error()) {
-      <p class="rep-error">
-        <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
-        {{ error() }}
-      </p>
-    }
+      <!-- La confirmación da los números exactos antes de aplicar. -->
+      @if (confirmando()) {
+        <div class="rp-confirm" role="alertdialog" aria-labelledby="rp-confirm-msg">
+          <p class="rp-confirm__msg" id="rp-confirm-msg">
+            @if (confirmando() === 'rechazar') {
+              <mat-icon aria-hidden="true">block</mat-icon>
+              {{ 'admin_offer.reparto_confirm_rechazar' | translate:{ n: seleccionadas().length } }}
+            } @else {
+              <mat-icon aria-hidden="true">undo</mat-icon>
+              {{ 'admin_offer.reparto_confirm_reactivar' | translate:{ n: seleccionadasRechazadas().length } }}
+            }
+          </p>
+          <div class="rp-confirm__btns">
+            <button mat-flat-button type="button" (click)="aplicar()" [disabled]="aplicando()" [attr.aria-busy]="aplicando()">
+              @if (aplicando()) { <span class="rp-spinner" aria-hidden="true"></span> } @else { <mat-icon>check</mat-icon> }
+              {{ 'common.confirm' | translate }}
+            </button>
+            <button mat-button type="button" (click)="confirmando.set(null)" [disabled]="aplicando()">
+              {{ 'common.cancel' | translate }}
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (error()) {
+        <p class="rp-error" role="alert">
+          <mat-icon aria-hidden="true">error</mat-icon>
+          {{ error() }}
+        </p>
+      }
+    </div>
   }
 }

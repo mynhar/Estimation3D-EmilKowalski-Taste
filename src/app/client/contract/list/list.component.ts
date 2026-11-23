@@ -1,11 +1,19 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy, Component, Injector, OnInit, afterNextRender, computed, inject, signal,
+} from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { Router } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ExpedientePanelComponent } from '../../../shared/ui/expediente-panel/expediente-panel.component';
 import { AvisoArchivadoComponent } from '../../../shared/ui/aviso-archivado/aviso-archivado.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
+import { StatusChipComponent } from '../../../shared/ui/status-chip/status-chip.component';
 import { AuthSupabaseService } from '../../../services/auth-supabase.service';
 import { ContratoService } from '../../../services/contrato.service';
 import { ToastService } from '../../../services/toast.service';
@@ -14,7 +22,11 @@ import { ContratoListItem, nombreServicio, serviciosParaContrato } from '../../.
 @Component({
   selector: 'app-contract-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, NgTemplateOutlet, ExpedientePanelComponent, AvisoArchivadoComponent],
+  imports: [
+    TranslatePipe, NgTemplateOutlet, MatButtonModule, MatCheckboxModule, MatIconModule,
+    ExpedientePanelComponent, AvisoArchivadoComponent, PageHeaderComponent, EmptyStateComponent,
+    StatusChipComponent,
+  ],
   templateUrl: './list.component.html',
   styleUrl: './list.component.css',
 })
@@ -25,6 +37,7 @@ export class ContractListComponent implements OnInit {
   private translate       = inject(TranslateService);
   private router          = inject(Router);
   private sanitizer       = inject(DomSanitizer);
+  private injector        = inject(Injector);
 
   user      = toSignal(this.auth.user$);
   contratos = signal<ContratoListItem[]>([]);
@@ -82,6 +95,16 @@ export class ContractListComponent implements OnInit {
     };
   });
 
+  /**
+   * La firma es la siguiente etapa y lleva el único botón tomate de la vista:
+   * el contrato con el panel de firma abierto o, si no, el primero pendiente.
+   * Las demás firmas pendientes van en abeto.
+   */
+  ctaId = computed(() =>
+    this.confirmandoId()
+    ?? this.grupos().flatMap(g => g.activos).find(c => c.estado === 'generado')?.id
+    ?? null);
+
   /** Cerrados: completados, cancelados y archivados (expediente archivado). */
   esCerrado(estado: string): boolean { return estado === 'completado' || estado === 'cancelado' || estado === 'archivado'; }
   toggle(key: string): void {
@@ -101,15 +124,9 @@ export class ContractListComponent implements OnInit {
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   }
 
-  iconoEstado(estado: string): string {
-    switch (estado) {
-      case 'firmado':      return 'bi-patch-check';
-      case 'en_ejecucion': return 'bi-hammer';
-      case 'completado':   return 'bi-check-circle';
-      case 'cancelado':    return 'bi-x-circle';
-      case 'archivado':    return 'bi-archive';
-      default:             return 'bi-clock-history';  // generado
-    }
+  /** Lleva el foco a un elemento que aparece con el siguiente render (paneles de firma y cancelación). */
+  private enfocar(selector: string): void {
+    afterNextRender(() => document.querySelector<HTMLElement>(selector)?.focus(), { injector: this.injector });
   }
 
   async ngOnInit() {
@@ -134,10 +151,14 @@ export class ContractListComponent implements OnInit {
     this.confirmCancelId.set(c.id);
     this.confirmandoId.set(null);
     this.aceptado.set(false);
+    // La salida segura («Non, conserver») recibe el foco, no la confirmación.
+    this.enfocar(`#ct-cancel-keep-${c.id}`);
   }
 
   cerrarPanelCancelacion(): void {
+    const id = this.confirmCancelId();
     this.confirmCancelId.set(null);
+    if (id) this.enfocar(`#ct-cancel-open-${id}`);
   }
 
   async confirmarCancelacion(c: ContratoListItem): Promise<void> {
@@ -164,11 +185,14 @@ export class ContractListComponent implements OnInit {
     this.confirmandoId.set(id);
     this.confirmCancelId.set(null);
     this.aceptado.set(false);
+    this.enfocar(`#ct-sign-${id} input[type="checkbox"]`);
   }
 
   cerrarPanelFirma(): void {
+    const id = this.confirmandoId();
     this.confirmandoId.set(null);
     this.aceptado.set(false);
+    if (id) this.enfocar(`#ct-sign-open-${id}`);
   }
 
   toggleAceptado(): void {
@@ -299,23 +323,11 @@ export class ContractListComponent implements OnInit {
   servicioNombre(c: ContratoListItem): string {
     const lang = this.translate.currentLang;
     if (c.servicios?.length) {
-      return c.servicios.map(s => nombreServicio(s, lang)).filter(Boolean).join(' · ');
+      return c.servicios.map(s => nombreServicio(s, lang)).filter(Boolean).join(', ');
     }
     if (lang === 'en') return c.servicio_nombre_en || c.servicio_nombre;
     if (lang === 'fr') return c.servicio_nombre_fr || c.servicio_nombre;
     return c.servicio_nombre;
-  }
-
-  estadoBadge(estado: string): string {
-    const map: Record<string, string> = {
-      generado:     'badge-generado',
-      firmado:      'badge-firmado',
-      en_ejecucion: 'badge-en-ejecucion',
-      completado:   'badge-completado',
-      cancelado:    'badge-cancelado',
-      archivado:    'badge-archivado',
-    };
-    return map[estado] ?? 'badge-generado';
   }
 
   formatPlazo(c: ContratoListItem): string {

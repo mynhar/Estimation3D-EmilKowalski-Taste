@@ -2,6 +2,9 @@ import {
   ChangeDetectionStrategy, Component, ElementRef, computed, effect, inject, input, output,
   signal, untracked, viewChild,
 } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { LangService } from '../../../services/lang.service';
 import { PerfilVideoService } from '../../../services/perfil-video.service';
@@ -22,7 +25,7 @@ import { extensionDeMime, formatoDuracion, formatoTamano } from './grabacion';
 @Component({
   selector: 'app-reproductor-video',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, MatButtonModule, MatButtonToggleModule, MatIconModule],
   templateUrl: './reproductor-video.component.html',
   styleUrl: './reproductor-video.component.css',
 })

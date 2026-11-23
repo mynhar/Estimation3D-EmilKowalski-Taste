@@ -1,6 +1,6 @@
 /* component: banner
  * states: default · compacto (no interactivo: sin hover/focus/active/disabled)
- * contrast: --ds-info-ink sobre --ds-info-soft 5.0:1 (AA)
+ * contrast: --ds-info-ink sobre --ds-info-soft 5.8:1 (AA)
  *
  * Archivado = estado administrativo, no error: paleta info (pizarra), distinta
  * del borgoña de cancelado y del verde de completado. Filete izquierdo en el
@@ -21,8 +21,9 @@
 
 .aviso__icon {
   flex-shrink: 0;
-  font-size: var(--ds-text-lg);
-  line-height: 1.2;
+  width: 22px;
+  height: 22px;
+  font-size: 22px;
 }
 
 .aviso__body { flex: 1; min-width: 0; }
@@ -30,8 +31,8 @@
 .aviso__title {
   margin: 0;
   font-family: var(--ds-font-body);
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-semibold);
+  font-size: var(--ds-text-base);
+  font-weight: var(--ds-weight-bold);
   color: var(--ds-info-ink);
   overflow-wrap: anywhere;
 }
@@ -45,7 +46,8 @@
 
 .aviso__meta {
   margin: var(--ds-space-1) 0 0;
-  font-size: var(--ds-text-xs);
+  font-size: var(--ds-text-sm);
+  font-variant-numeric: tabular-nums;
   color: var(--ds-info-ink);
 }
 
@@ -55,6 +57,6 @@
   gap: var(--ds-space-2);
   padding: var(--ds-space-2) var(--ds-space-3);
 }
-.aviso--compacto .aviso__icon  { font-size: var(--ds-text-sm); }
-.aviso--compacto .aviso__title { font-size: var(--ds-text-xs); }
+.aviso--compacto .aviso__icon  { width: 18px; height: 18px; font-size: 18px; }
+.aviso--compacto .aviso__title { font-size: var(--ds-text-sm); }
 .aviso--compacto .aviso__text  { display: none; }

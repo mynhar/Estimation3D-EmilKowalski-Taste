@@ -1,382 +1,206 @@
-/* Ofertas de constructores — estilos extraídos de admin/file/edit
-   (tarjeta de ofertas + oferta editable). Tokens del sistema. */
+/* Ofertas de los contratistas, administración (Trait rouge)
+ * Base en shared/ui/ficha/ficha.css (tarjetas, datos, archivos, formulario, avisos);
+ * aquí: tarjetas de oferta, confirmación de adjudicar en bloque y pie de adjudicación.
+ *
+ * states: oferta: default · hover (puntero fino) · abierta (borde abeto) · marcada · retirada (atenuada)
+ *         adjudicar: confirmando · procesando (spinner) · error · éxito · aviso de sustitución
+ *         formulario: editable · bloqueado (dossier contratado) · guardando · error · guardado
+ * contrast: importes ink 13.6:1 · etiquetas ink-muted 6.8:1 sobre vélin
+ * type: importes, plazos y fechas al 75 % con tabular-nums
+ * Sin tomate: adjudicar y guardar son acciones de la administración, en abeto.
+ */
 :host { display: block; }
 
-/* ════════════════════════════════════════════════════════════════════════════
-   TARJETA
-════════════════════════════════════════════════════════════════════════════ */
-.detail-card {
-  background: var(--ds-surface); border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-xl); overflow: hidden; box-shadow: var(--ds-shadow-xs);
+.bb-inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2);
 }
-.detail-card::before { content: ''; display: block; height: 3px; background: var(--ds-gold); }
-.detail-card__head {
-  display: flex; align-items: center; padding: var(--ds-space-3) var(--ds-space-5);
-  border-bottom: 1px solid var(--ds-border); background: var(--ds-bg-alt);
+.bb-inline-actions > button { min-height: 44px; }
+
+.bb-award { justify-self: start; min-height: 44px; }
+.bb-award-list {
+  display: grid;
+  gap: var(--ds-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
-.detail-card__body { padding: var(--ds-space-5); }
-.detail-card__foot {
-  display: flex; align-items: center; justify-content: space-between; gap: var(--ds-space-3);
-  padding: var(--ds-space-3) var(--ds-space-5); border-top: 1px solid var(--ds-border);
-  background: var(--ds-bg-alt); flex-wrap: wrap;
+.bb-award-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-1) 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--ds-warning) 30%, transparent);
+  font-weight: var(--ds-weight-semibold);
+  color: var(--ds-ink);
 }
 
-.section-label {
-  font-size: var(--ds-text-2xs); font-weight: var(--ds-weight-bold);
-  letter-spacing: var(--ds-tracking-widest); text-transform: uppercase; color: var(--ds-ink-muted); margin-bottom: 0;
+/* ── Tarjetas de oferta ─────────────────────────────────────────────────── */
+.bb-offers {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  gap: var(--ds-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
-.section-label__icon { color: var(--ds-gold-ink); }
-
-.archivo-count {
-  display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px;
-  font-size: var(--ds-text-2xs); font-weight: var(--ds-weight-bold);
-  background: var(--ds-gold-faint); color: var(--ds-gold-ink);
-  border-radius: var(--ds-radius-pill); padding: 0 5px;
-}
-
-/* ════════════════════════════════════════════════════════════════════════════
-   FORMULARIO
-════════════════════════════════════════════════════════════════════════════ */
-.form-label { font-size: var(--ds-text-sm); font-weight: var(--ds-weight-medium); color: var(--ds-ink-secondary); margin-bottom: var(--ds-space-2); }
-.req-mark   { color: var(--ds-danger); margin-left: 2px; }
-.opt-label  { font-size: var(--ds-text-xs); color: var(--ds-ink-muted); font-weight: var(--ds-weight-regular); margin-left: var(--ds-space-1); }
-
-.pending-notice {
-  display: flex; align-items: center; background: var(--ds-bg-alt); border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-md); padding: 0.75rem var(--ds-space-4);
-  font-size: var(--ds-text-sm); color: var(--ds-ink-secondary);
-}
-
-/* Constructor seleccionado */
-.constructor-chip { display: flex; align-items: center; gap: 0.75rem; }
-.constructor-avatar {
-  width: 48px; height: 48px; border-radius: var(--ds-radius-circle); background: var(--ds-gold-faint);
-  color: var(--ds-gold-ink); display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; border: 1px solid var(--ds-gold-soft);
-}
-.constructor-nombre { font-size: var(--ds-text-base); font-weight: var(--ds-weight-bold); color: var(--ds-ink); }
-
-/* ════════════════════════════════════════════════════════════════════════════
-   GUARDADO
-════════════════════════════════════════════════════════════════════════════ */
-.btn-save {
-  display: inline-flex; align-items: center; justify-content: center;
-  padding: var(--ds-space-2) var(--ds-space-4); background: var(--ds-gold); border: none;
-  border-radius: var(--ds-radius-md); color: var(--ds-ink);
-  font-family: var(--ds-font-body); font-size: var(--ds-text-sm); font-weight: var(--ds-weight-semibold);
-  cursor: pointer; margin-left: auto;
-  transition: background var(--ds-duration-fast) var(--ds-ease-out),
-              transform var(--ds-duration-fast) var(--ds-ease-out),
+.bb-offer {
+  display: grid;
+  gap: var(--ds-space-3);
+  align-content: start;
+  min-width: 0;
+  padding: var(--ds-space-4);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-lg);
+  background: var(--ds-surface);
+  cursor: pointer;
+  transition: border-color var(--ds-duration-fast) var(--ds-ease-out),
               box-shadow var(--ds-duration-fast) var(--ds-ease-out);
 }
-.btn-save:hover:not(:disabled) { background: var(--ds-gold-hover); transform: translateY(-1px); box-shadow: var(--ds-shadow-gold); }
-.btn-save:active:not(:disabled) { background: var(--ds-gold-active); transform: translateY(0); box-shadow: none; }
-.btn-save:focus-visible { outline: var(--ds-focus-outline); outline-offset: 2px; }
-.btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
-
-.save-msg { display: inline-flex; align-items: center; font-size: var(--ds-text-xs); font-weight: var(--ds-weight-medium); color: var(--ds-ink-muted); }
-.save-msg--ok   { color: var(--ds-success-ink); }
-.save-msg--err  { color: var(--ds-danger); }
-.save-msg--warn { color: var(--ds-warning-ink); }
-
-/* ════════════════════════════════════════════════════════════════════════════
-   OFERTAS DE CONSTRUCTORES (selección + adjudicación)
-════════════════════════════════════════════════════════════════════════════ */
-.offers-grid {
-  display: grid; gap: var(--ds-space-3);
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+@media (hover: hover) and (pointer: fine) {
+  .bb-offer:hover:not(.is-out) { border-color: var(--ds-border-strong); }
 }
-.offer-card {
-  display: flex; flex-direction: column; gap: var(--ds-space-3);
-  padding: var(--ds-space-4); background: var(--ds-surface);
-  border: 1.5px solid var(--ds-border); border-radius: var(--ds-radius-lg);
-  cursor: pointer; position: relative;
-  transition: border-color var(--ds-duration-fast) var(--ds-ease-out),
-              box-shadow var(--ds-duration-fast) var(--ds-ease-out),
-              transform var(--ds-duration-fast) var(--ds-ease-out);
+.bb-offer.is-marked { background: var(--ds-action-faint); }
+.bb-offer.is-selected {
+  border-color: var(--ds-action);
+  box-shadow: inset 0 0 0 1px var(--ds-action);
 }
-.offer-card:hover { border-color: var(--ds-gold); box-shadow: var(--ds-shadow-md); transform: translateY(-1px); }
-.offer-card:focus-visible { outline: var(--ds-focus-outline); outline-offset: 2px; }
-.offer-card--selected { border-color: var(--ds-gold); box-shadow: 0 0 0 3px var(--ds-gold-soft); }
-.offer-card--aceptada { border-color: var(--ds-success); }
-.offer-card--rechazada { opacity: 0.62; }
-.offer-card--rechazada:hover { opacity: 1; }
-
-.offer-card__top { display: flex; align-items: center; justify-content: space-between; gap: var(--ds-space-2); }
-.offer-card__index {
-  font-family: var(--ds-font-display); font-size: var(--ds-text-sm);
-  color: var(--ds-ink-muted); letter-spacing: var(--ds-tracking-tight);
-}
-.selected-badge {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 18px; height: 18px; border-radius: var(--ds-radius-circle);
-  background: var(--ds-gold); color: var(--ds-ink-on-accent); flex-shrink: 0;
-}
-
-.offer-card__price-block { display: flex; flex-direction: column; gap: 2px; }
-.offer-price {
-  font-family: var(--ds-font-display); font-size: var(--ds-text-2xl);
-  font-weight: var(--ds-weight-regular); color: var(--ds-ink);
-  line-height: 1; letter-spacing: var(--ds-tracking-tight);
-}
-.offer-price-label {
-  font-size: var(--ds-text-2xs); text-transform: uppercase;
-  letter-spacing: var(--ds-tracking-wide); color: var(--ds-ink-muted);
-}
-
-.offer-card__section { display: flex; flex-direction: column; gap: 2px; }
-.offer-meta-label {
-  font-size: var(--ds-text-2xs); font-weight: var(--ds-weight-semibold);
-  text-transform: uppercase; letter-spacing: var(--ds-tracking-wide);
-  color: var(--ds-ink-muted); margin-bottom: 0;
-}
-.offer-builder-name { font-size: var(--ds-text-sm); font-weight: var(--ds-weight-semibold); color: var(--ds-ink); }
-.offer-contact {
-  font-size: var(--ds-text-xs); color: var(--ds-gold-ink); text-decoration: none; width: fit-content;
-}
-.offer-contact:hover { text-decoration: underline; }
-.offer-desc {
-  font-size: var(--ds-text-xs); color: var(--ds-ink-secondary);
-  line-height: var(--ds-leading-relaxed); white-space: pre-line;
-}
-.offer-card__meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ds-space-2); }
-.offer-meta-item { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-.offer-meta-value { font-size: var(--ds-text-xs); font-weight: var(--ds-weight-medium); color: var(--ds-ink); }
-
-.offer-video-btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: var(--ds-space-2);
-  padding: var(--ds-space-2); background: var(--ds-bg-alt);
-  border: 1px solid var(--ds-border); border-radius: var(--ds-radius-md);
-  color: var(--ds-ink-secondary); font-size: var(--ds-text-xs);
-  font-weight: var(--ds-weight-medium); cursor: pointer;
-  transition: var(--ds-transition-color);
-}
-.offer-video-btn:hover { border-color: var(--ds-gold); color: var(--ds-gold-ink); }
-.offer-video-el { width: 100%; border-radius: var(--ds-radius-md); background: var(--ds-ink); display: block; }
-
-.offer-docs { display: flex; flex-direction: column; gap: var(--ds-space-1); }
-.offer-doc-chip {
-  display: flex; align-items: center; gap: var(--ds-space-2);
-  padding: var(--ds-space-1) var(--ds-space-2); background: var(--ds-bg-alt);
-  border: 1px solid var(--ds-border); border-radius: var(--ds-radius-sm);
-  color: var(--ds-ink-secondary); font-size: var(--ds-text-xs);
-  cursor: pointer; text-align: left; transition: var(--ds-transition-color);
-}
-.offer-doc-chip:hover { border-color: var(--ds-gold); color: var(--ds-gold-ink); }
-.offer-doc-chip__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.offer-doc-chip__size { color: var(--ds-ink-muted); flex-shrink: 0; }
-
-/* ════════════════════════════════════════════════════════════════════════════
-   RESPONSIVE
-════════════════════════════════════════════════════════════════════════════ */
-@media (max-width: 767.98px) {
-  .detail-card__body { padding: var(--ds-space-4); }
-  .detail-card__foot { padding: var(--ds-space-3) var(--ds-space-4); }
-}
-@media (max-width: 575.98px) {
-  .btn-save { width: 100%; }
-  .offers-grid { grid-template-columns: 1fr; }
-}
-
-/* ── Reparto en bloque ──────────────────────────────────────────────────────
-   La barra vive en <app-oferta-reparto>; aquí sólo lo que toca a la tarjeta:
-   la casilla y los dos estados que añade (marcada / dada de baja). */
-
-.offer-card__pick {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 32px;
-  min-height: 32px;
-  margin: 0;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-/* La encapsulación de Angular aísla el CSS del hijo, así que la casilla que se
-   pinta aquí necesita su propia declaración. */
-.rep-check {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--ds-gold-active);
-  cursor: pointer;
-  margin: 0;
-  flex-shrink: 0;
-}
-
-.rep-check:focus-visible {
-  outline: none;
-  box-shadow: var(--ds-focus-ring);
-  border-radius: var(--ds-radius-sm);
-}
-
-.offer-card--marcada {
-  border-color: var(--ds-gold-soft);
-  background: var(--ds-gold-faint);
-}
-
-/* Dada de baja: se retira del primer plano pero sigue legible — ése es el
-   motivo de que ya no se borre físicamente. Sin opacity. */
-.offer-card--eliminada {
-  background: var(--ds-bg-alt);
+.bb-offer.is-out {
   border-style: dashed;
-  box-shadow: none;
   cursor: default;
 }
+.bb-offer.is-out .bb-offer__amount,
+.bb-offer.is-out .bb-offer__name { color: var(--ds-ink-muted); }
 
-.offer-card--eliminada .offer-price,
-.offer-card--eliminada .offer-builder-name {
-  color: var(--ds-ink-muted);
-  text-decoration: line-through;
-  text-decoration-thickness: 1px;
-  text-decoration-color: var(--ds-border-strong);
-}
-
-.offer-card__removed-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px var(--ds-space-2);
-  border-radius: var(--ds-radius-pill);
-  border: 1px dashed var(--ds-border-strong);
-  font-size: var(--ds-text-2xs);
-  color: var(--ds-ink-muted);
-  white-space: nowrap;
-}
-
-/* ── Adjudicar selección ────────────────────────────────────────────────────
-   Acción dorada y separada de la barra de reparto: es la única que crea
-   contratos, y no debe confundirse con rechazar o reactivar. */
-
-.bids-btn-adjudicar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--ds-space-2);
-  width: 100%;
-  padding: var(--ds-space-3) var(--ds-space-4);
-  border-radius: var(--ds-radius-md);
-  border: 1px solid var(--ds-gold);
-  background: var(--ds-gold-faint);
-  color: var(--ds-gold-ink);
-  font-family: var(--ds-font-body);
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-semibold);
-  cursor: pointer;
-  margin-bottom: var(--ds-space-4);
-  transition: all var(--ds-duration-fast) var(--ds-ease-out);
-}
-
-.bids-btn-adjudicar:hover:not(:disabled) {
-  background: var(--ds-gold);
-  color: var(--ds-ink-on-accent);
-  box-shadow: var(--ds-shadow-gold);
-  transform: translateY(-1px);
-}
-
-.bids-btn-adjudicar:focus-visible {
-  outline: none;
-  box-shadow: var(--ds-focus-ring);
-}
-
-.bids-btn-adjudicar:active:not(:disabled) { transform: translateY(1px); }
-.bids-btn-adjudicar:disabled { opacity: 0.45; cursor: not-allowed; }
-
-.bids-adjudicar-confirm {
+.bb-offer__top {
   display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-2);
-  padding: var(--ds-space-4);
-  background: var(--ds-surface);
-  border: 1px solid var(--ds-gold-soft);
-  border-left: 3px solid var(--ds-gold);
-  border-radius: var(--ds-radius-md);
-  margin-bottom: var(--ds-space-4);
-}
-
-.bids-confirm-msg {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--ds-space-2);
-  font-size: var(--ds-text-sm);
-  color: var(--ds-ink);
-  margin: 0;
-}
-
-.bids-confirm-note {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--ds-space-2);
-  font-size: var(--ds-text-xs);
-  color: var(--ds-ink-muted);
-  margin: 0;
-}
-
-/* Enumerar a quién se adjudica evita confirmar a ciegas una selección hecha
-   varios clics antes. */
-.bids-adjudicar-list {
-  margin: 0;
-  padding-left: var(--ds-space-5);
-  font-size: var(--ds-text-xs);
-  color: var(--ds-ink-secondary);
-}
-
-.bids-adjudicar-list li + li { margin-top: var(--ds-space-1); }
-
-.bids-confirm-btns {
-  display: flex;
-  gap: var(--ds-space-2);
   flex-wrap: wrap;
-}
-
-.bids-btn-confirm,
-.bids-btn-cancel {
-  display: inline-flex;
   align-items: center;
   gap: var(--ds-space-2);
-  padding: var(--ds-space-2) var(--ds-space-4);
-  border-radius: var(--ds-radius-md);
-  font-family: var(--ds-font-body);
+  min-height: 40px;
+}
+.bb-offer__pick { margin: -8px 0 -8px -8px; }
+.bb-offer__index {
+  font-weight: var(--ds-weight-bold);
+  color: var(--ds-ink-muted);
+}
+.bb-offer__tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-1);
+  margin-left: auto;
+}
+
+.bb-offer__price,
+.bb-offer__builder { display: grid; gap: 2px; min-width: 0; }
+.bb-offer__amount {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-2xl);
+  font-weight: var(--ds-weight-bold);
+  line-height: var(--ds-leading-tight);
+  color: var(--ds-ink);
+}
+.bb-offer__label {
   font-size: var(--ds-text-sm);
   font-weight: var(--ds-weight-medium);
-  cursor: pointer;
-  transition: all var(--ds-duration-fast) var(--ds-ease-out);
+  color: var(--ds-ink-muted);
 }
-
-.bids-btn-confirm {
-  border: 1px solid var(--ds-gold);
-  background: var(--ds-gold);
-  color: var(--ds-ink-on-accent);
+.bb-offer__name {
   font-weight: var(--ds-weight-semibold);
-}
-
-.bids-btn-confirm:hover:not(:disabled) {
-  background: var(--ds-gold-hover);
-  border-color: var(--ds-gold-hover);
-  box-shadow: var(--ds-shadow-gold);
-}
-
-.bids-btn-cancel {
-  border: 1px solid var(--ds-border-strong);
-  background: var(--ds-surface);
-  color: var(--ds-ink-secondary);
-}
-
-.bids-btn-cancel:hover:not(:disabled) {
-  border-color: var(--ds-ink-muted);
   color: var(--ds-ink);
+  overflow-wrap: anywhere;
+}
+.bb-offer__tel {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: var(--ds-space-1);
+  min-height: 32px;
+  border-radius: var(--ds-radius-sm);
+  color: var(--ds-action);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.bb-offer__tel mat-icon { width: 18px; height: 18px; font-size: 18px; }
+.bb-offer__tel:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
+
+.bb-offer__facts {
+  padding-top: var(--ds-space-3);
+  border-top: 1px solid var(--ds-border-subtle);
 }
 
-.bids-btn-confirm:focus-visible,
-.bids-btn-cancel:focus-visible {
-  outline: none;
-  box-shadow: var(--ds-focus-ring);
+.bb-offer__media { display: grid; gap: var(--ds-space-2); justify-items: start; cursor: default; }
+.bb-offer__media > button { min-height: 44px; }
+.bb-offer__video {
+  width: 100%;
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-ink);
+}
+.bb-offer__docs { cursor: default; }
+/* Nombres largos: dos líneas como mucho; el nombre completo va en el title. */
+.bb-offer__docs .fi-file__name {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
-.bids-btn-confirm:disabled,
-.bids-btn-cancel:disabled { opacity: 0.45; cursor: not-allowed; }
+.bb-offer__open { justify-self: start; min-height: 44px; }
+.bb-offer.is-selected .bb-offer__open {
+  --mat-button-outlined-label-text-color: var(--ds-action);
+  --mat-button-outlined-outline-color: var(--ds-action);
+}
+
+/* ── Adjudicar la oferta abierta ────────────────────────────────────────── */
+.bb-foot {
+  display: grid;
+  gap: var(--ds-space-3);
+  padding-top: var(--ds-space-4);
+  border-top: 1px solid var(--ds-border-subtle);
+}
+.bb-foot__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+}
+.bb-foot__btn {
+  --mat-button-filled-container-height: 48px;
+  margin-left: auto;
+}
+
+/* ── Oferta abierta ─────────────────────────────────────────────────────── */
+.bb-sel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2) var(--ds-space-3);
+}
+.bb-sel__avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--ds-radius-circle);
+  background: var(--ds-action-faint);
+  color: var(--ds-action);
+}
+.bb-sel__name {
+  flex: 1;
+  min-width: 0;
+  font-weight: var(--ds-weight-bold);
+  color: var(--ds-ink);
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 575.98px) {
+  .bb-foot__btn { width: 100%; }
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .bids-btn-adjudicar { transition-duration: 0.01ms; }
-  .bids-btn-adjudicar:hover:not(:disabled) { transform: none; }
+  .bb-offer { transition: none; }
 }

@@ -8,11 +8,20 @@ import {
   signal,
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ExpedienteService } from '../../../services/expediente.service';
 import { EstimacionService } from '../../../services/estimacion.service';
 import { ExpedienteParaEstimar } from '../../../models';
 import { PaginationComponent } from '../../../shared/pagination/pagination.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
+import { StatusChipComponent } from '../../../shared/ui/status-chip/status-chip.component';
 import {
   coincideBusqueda, direccionLinea1, direccionLinea2, direccionCompleta,
 } from '../../../shared/util/busqueda';
@@ -22,9 +31,13 @@ type VistaExpedientes = 'tabla' | 'tarjetas';
 @Component({
   selector: 'app-admin-to-estimate-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, TranslatePipe, PaginationComponent],
+  imports: [
+    RouterLink, TranslatePipe,
+    MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTooltipModule,
+    PaginationComponent, PageHeaderComponent, EmptyStateComponent, StatusChipComponent,
+  ],
   templateUrl: './list.component.html',
-  styleUrl: './list.component.css',
+  styleUrls: ['../../../shared/ui/lista/lista.css', './list.component.css'],
 })
 export class AdminToEstimateListComponent implements OnInit {
   private expedienteService = inject(ExpedienteService);
@@ -134,15 +147,6 @@ export class AdminToEstimateListComponent implements OnInit {
     if (lang === 'en') return exp.servicio_nombre_en || exp.servicio_nombre;
     if (lang === 'fr') return exp.servicio_nombre_fr || exp.servicio_nombre;
     return exp.servicio_nombre;
-  }
-
-  estadoBadge(estado: string): string {
-    const map: Record<string, string> = {
-      nuevo:         'badge-nuevo',
-      en_estimacion: 'badge-en_estimacion',
-      estimado:      'badge-estimado',
-    };
-    return map[estado] ?? 'badge-nuevo';
   }
 
   editRoute(exp: ExpedienteParaEstimar): string[] {

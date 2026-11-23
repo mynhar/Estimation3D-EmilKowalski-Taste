@@ -10,9 +10,9 @@
 
   } @else if (errorCarga()) {
     <div class="ve-error" role="alert">
-      <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+      <mat-icon aria-hidden="true">error</mat-icon>
       <p>{{ 'expediente_video.errors.load_others' | translate }}</p>
-      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="cargar()">
+      <button mat-stroked-button type="button" (click)="cargar()">
         {{ 'common.retry' | translate }}
       </button>
     </div>
@@ -30,7 +30,7 @@
 
   } @else {
     <div class="ve-empty">
-      <i class="bi bi-person-video3" aria-hidden="true"></i>
+      <mat-icon aria-hidden="true">co_present</mat-icon>
       <p>{{ vacio() | translate }}</p>
     </div>
   }

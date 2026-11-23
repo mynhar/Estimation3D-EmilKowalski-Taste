@@ -1,18 +1,29 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ToastService } from '../../../services/toast.service';
 import { FichaNormativaRepository, FichaNormativa } from '../../../data';
 import { parseKeywords, joinKeywords } from '../keywords.util';
 import { CAMPOS_FALTANTES } from '../../../shared/ui/campos-faltantes/campos-faltantes.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
 
 @Component({
   selector: 'app-admin-fichas-edit',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, TranslatePipe, ...CAMPOS_FALTANTES],
+  imports: [
+    NgTemplateOutlet, ReactiveFormsModule, TranslatePipe,
+    MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSlideToggleModule,
+    PageHeaderComponent, ...CAMPOS_FALTANTES,
+  ],
   templateUrl: './edit.component.html',
-  styleUrls: ['../../_shared/crud-form.css'],
+  styleUrls: ['../../../shared/ui/alta/alta.css', '../../_shared/catalogo-form.css'],
 })
 export class AdminFichasEditComponent implements OnInit {
   private fb        = inject(FormBuilder);
@@ -31,11 +42,7 @@ export class AdminFichasEditComponent implements OnInit {
   error     = signal<string | null>(null);
   ficha     = signal<FichaNormativa | null>(null);
 
-  readonly langs = [
-    { c: 'fr', b: 'FR' },
-    { c: 'en', b: 'EN' },
-    { c: 'es', b: 'ES' },
-  ];
+  readonly idiomas = ['fr', 'en', 'es'] as const;
 
   form = this.fb.group({
     codigo:     ['', [Validators.required, Validators.pattern(/^[A-Z0-9_]+$/)]],
@@ -51,7 +58,6 @@ export class AdminFichasEditComponent implements OnInit {
   });
 
   get f() { return this.form.controls; }
-  ctrl(name: string) { return this.form.get(name); }
 
   async ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -123,6 +129,12 @@ export class AdminFichasEditComponent implements OnInit {
   }
 
   cancelar() { this.router.navigate(['/admin/ficha']); }
+
+  /** Título de la ficha en el idioma de la interfaz, para el bloque de identidad. */
+  titulo(f: FichaNormativa): string {
+    const l = (this.translate.currentLang || 'fr').slice(0, 2);
+    return l === 'en' ? f.titulo_en : l === 'es' ? f.titulo_es : f.titulo_fr;
+  }
 
   private mensaje(e: unknown, fallbackKey: string): string {
     const raw = e instanceof Error ? e.message : '';

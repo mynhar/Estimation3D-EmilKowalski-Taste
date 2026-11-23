@@ -1,21 +1,34 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../services/auth-supabase.service';
 import { ExpedienteService } from '../../services/expediente.service';
 import { ExpedienteRow } from '../../models';
 import { coincideBusqueda, direccionLinea1, direccionLinea2, direccionCompleta } from '../../shared/util/busqueda';
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../shared/ui/empty-state/empty-state.component';
 
 type VistaExpedientes = 'tabla' | 'tarjetas';
 
 @Component({
   selector: 'app-files-under-estimation',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, TranslatePipe],
+  imports: [
+    NgTemplateOutlet, FormsModule, RouterLink, TranslatePipe,
+    MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTooltipModule,
+    PageHeaderComponent, EmptyStateComponent,
+  ],
   templateUrl: './files-under-estimation.component.html',
-  styleUrl:    './files-under-estimation.component.css',
+  styleUrls:   ['../../shared/ui/lista/lista.css', './files-under-estimation.component.css'],
 })
 export class FilesUnderEstimationComponent implements OnInit {
   private auth              = inject(AuthSupabaseService);
@@ -68,6 +81,9 @@ export class FilesUnderEstimationComponent implements OnInit {
   );
 
   hayFiltros = computed(() => this.busqueda() !== '' || this.soloUrgentes());
+
+  /** Tomate solo en el primer dossier de la lista: la siguiente etapa es terminar su estimación. */
+  ctaId = computed(() => this.expedientesFiltrados()[0]?.id ?? null);
 
   async ngOnInit() {
     const userId = this.user()?.id;

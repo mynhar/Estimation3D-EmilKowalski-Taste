@@ -1,7 +1,12 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import {
+  ChangeDetectionStrategy, Component, Injector, OnInit, afterNextRender, computed, inject, signal,
+} from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../services/auth-supabase.service';
 import { ExpedienteService } from '../../services/expediente.service';
@@ -16,7 +21,6 @@ import {
   ArchivoRow,
   EstimacionDetalle,
   ExpedienteDetalleCliente,
-  ESTADO_BADGE_OFERTA,
   OfertaConConstructor,
   descripcionServicio,
   nombreServicio,
@@ -26,17 +30,27 @@ import {
 import { ServicioCompleto } from '../../data/servicio.repository';
 import { AvisoArchivadoComponent } from '../../shared/ui/aviso-archivado/aviso-archivado.component';
 import { VideoFichaComponent } from '../../shared/ui/presentacion-videos/video-ficha.component';
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../shared/ui/empty-state/empty-state.component';
+import { StatusChipComponent } from '../../shared/ui/status-chip/status-chip.component';
+import { TourPosterComponent } from '../../shared/ui/tour-poster/tour-poster.component';
+import { abrirVisor } from '../../shared/ui/media-viewer/media-viewer.component';
 
 @Component({
   selector: 'app-builder-offer',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, AvisoArchivadoComponent, VideoFichaComponent],
+  imports: [
+    TranslatePipe, NgTemplateOutlet, RouterLink, MatButtonModule, MatIconModule,
+    AvisoArchivadoComponent, VideoFichaComponent, PageHeaderComponent, EmptyStateComponent,
+    StatusChipComponent, TourPosterComponent,
+  ],
   templateUrl: './builder-offer.component.html',
   styleUrl: './builder-offer.component.css',
 })
 export class BuilderOfferComponent implements OnInit {
   private auth              = inject(AuthSupabaseService);
-  private sanitizer         = inject(DomSanitizer);
+  private dialog            = inject(MatDialog);
+  private injector          = inject(Injector);
   private translate         = inject(TranslateService);
   private expedienteService = inject(ExpedienteService);
   private estimacionService = inject(EstimacionService);
@@ -46,7 +60,6 @@ export class BuilderOfferComponent implements OnInit {
   private contratoService   = inject(ContratoService);
   private perfilVideoService = inject(PerfilVideoService);
   private route             = inject(ActivatedRoute);
-  private router            = inject(Router);
 
   user = toSignal(this.auth.user$);
 
@@ -75,12 +88,6 @@ export class BuilderOfferComponent implements OnInit {
   // Varias a la vez: una para todos los servicios, una para cada servicio o
   // varias para el mismo. Al aceptar, un contrato por oferta (adjudicar_ofertas).
   seleccion = signal<ReadonlySet<string>>(new Set());
-
-  // ── Lightbox de fotos ─────────────────────────────────────────────────────
-  fotoAmpliada = signal<string | null>(null);
-
-  // ── Video inline — sección oferta (almacena { ofertaId, url }) ───────────
-  videoOfertaActiva = signal<{ ofertaId: string; url: string } | null>(null);
 
   // ── Videos de presentación (sólo para ver) ────────────────────────────────
   // RLS deja al cliente, en su expediente, los del estimador y los de los
@@ -207,6 +214,18 @@ export class BuilderOfferComponent implements OnInit {
     return this.seleccion().has(ofertaId);
   }
 
+  /**
+   * Clic en cualquier punto libre de la tarjeta: marca o desmarca, como antes.
+   * Los controles de dentro (casilla, enlaces, vídeos) hacen lo suyo; tampoco
+   * cuenta si el usuario está seleccionando texto. El teclado usa la casilla.
+   */
+  alClicarOferta(ofertaId: string, ev: MouseEvent) {
+    const destino = ev.target as HTMLElement | null;
+    if (destino?.closest('a, button, label, input, video, app-video-ficha')) return;
+    if (window.getSelection()?.toString()) return;
+    this.seleccionar(ofertaId);
+  }
+
   /** Una oferta sin servicios (no debería existir) cubre el expediente entero. */
   cubre(oferta: OfertaConConstructor, servicioId: number): boolean {
     const ids = oferta.servicio_ids ?? [];
@@ -215,7 +234,7 @@ export class BuilderOfferComponent implements OnInit {
 
   /** Nombres de los servicios que cubre la oferta, en el orden del expediente. */
   serviciosDeOfertaTexto(oferta: OfertaConConstructor): string {
-    return serviciosDeOferta(this.servicios(), oferta).map(s => this.nombreDe(s)).join(' · ');
+    return serviciosDeOferta(this.servicios(), oferta).map(s => this.nombreDe(s)).join(', ');
   }
 
   /**
@@ -320,6 +339,18 @@ export class BuilderOfferComponent implements OnInit {
 
   // ── Rechazo de las ofertas aceptadas ──────────────────────────────────────
 
+  /** Abre la confirmación y deja el foco en «Retour», la salida segura. */
+  pedirRechazo() {
+    this.confirmandoRechazo.set(true);
+    afterNextRender(() => document.getElementById('bo-reject-cancel')?.focus(), { injector: this.injector });
+  }
+
+  /** Cierra la confirmación y devuelve el foco al botón que la abrió. */
+  cancelarRechazo() {
+    this.confirmandoRechazo.set(false);
+    afterNextRender(() => document.getElementById('bo-reject-open')?.focus(), { injector: this.injector });
+  }
+
   /**
    * Con la selección vacía, rechaza todas las aceptadas: sus contratos sin
    * firmar se eliminan y el expediente vuelve a 'estimado' (la base solo lo
@@ -357,24 +388,14 @@ export class BuilderOfferComponent implements OnInit {
     }
   }
 
-  // ── Lightbox de fotos ─────────────────────────────────────────────────────
+  // ── Visor de fotos y vídeos ───────────────────────────────────────────────
 
-  abrirFoto(archivo: ArchivoRow) {
-    this.fotoAmpliada.set(this.publicUrl(archivo.url_storage));
+  verFoto(url: string, nombre: string): void {
+    abrirVisor(this.dialog, { tipo: 'foto', url, titulo: nombre });
   }
 
-  /** Abre el visor con la URL ya resuelta del VM (fotos del estimador). */
-  abrirFotoVM(foto: ArchivoVM) {
-    this.fotoAmpliada.set(foto.url);
-  }
-
-  /** Abre un documento del estimador (URL ya resuelta del VM). */
-  verDocumentoVM(doc: ArchivoVM) {
-    window.open(doc.url, '_blank', 'noopener');
-  }
-
-  cerrarFoto() {
-    this.fotoAmpliada.set(null);
+  verVideo(url: string, nombre: string): void {
+    abrirVisor(this.dialog, { tipo: 'video', url, titulo: nombre });
   }
 
   /**
@@ -412,31 +433,10 @@ export class BuilderOfferComponent implements OnInit {
     }
   }
 
-  // ── Video inline — oferta ─────────────────────────────────────────────────
-
-  toggleVideoOferta(ofertaId: string, archivo: ArchivoRow) {
-    const url    = this.publicUrl(archivo.url_storage);
-    const actual = this.videoOfertaActiva();
-    if (actual?.ofertaId === ofertaId && actual?.url === url) {
-      this.videoOfertaActiva.set(null);
-    } else {
-      this.videoOfertaActiva.set({ ofertaId, url });
-    }
-  }
-
-  videoOfertaUrl(ofertaId: string): string | null {
-    const a = this.videoOfertaActiva();
-    return a?.ofertaId === ofertaId ? a.url : null;
-  }
-
   // ── Archivos generales ────────────────────────────────────────────────────
 
   publicUrl(path: string): string {
     return this.archivoService.publicUrl(path);
-  }
-
-  verDocumento(archivo: ArchivoRow) {
-    window.open(this.publicUrl(archivo.url_storage), '_blank');
   }
 
   // ── Servicio i18n ─────────────────────────────────────────────────────────
@@ -479,8 +479,9 @@ export class BuilderOfferComponent implements OnInit {
     return [raw];
   }
 
-  getSafeUrl(url: string): SafeResourceUrl {
-    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  tituloTour(i: number): string {
+    const base = this.translate.instant('builder_offer.virtual_tour');
+    return this.urlsTour.length > 1 ? `${base} ${i + 1}` : base;
   }
 
   // ── Formatters ────────────────────────────────────────────────────────────
@@ -524,27 +525,5 @@ export class BuilderOfferComponent implements OnInit {
     if (bytes < 1_024)     return `${bytes} B`;
     if (bytes < 1_048_576) return `${(bytes / 1_024).toFixed(1)} KB`;
     return `${(bytes / 1_048_576).toFixed(1)} MB`;
-  }
-
-  ofertaBadgeClass(estado: string): string {
-    return ESTADO_BADGE_OFERTA[estado] ?? 'bg-secondary';
-  }
-
-  ofertaLabel(estado: string): string {
-    return 'state.' + estado;
-  }
-
-  expedienteBadgeClass(estado: string): string {
-    const map: Record<string, string> = {
-      'en_oferta':  'bg-primary',
-      'adjudicado': 'bg-warning text-dark',
-      'contratado': 'bg-success',
-      'cancelado':  'bg-secondary',
-    };
-    return map[estado] ?? 'bg-primary';
-  }
-
-  volver() {
-    this.router.navigate(['/client/offers-received']);
   }
 }

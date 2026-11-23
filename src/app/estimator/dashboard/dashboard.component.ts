@@ -1,6 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../services/auth-supabase.service';
 import { ExpedienteService } from '../../services/expediente.service';
@@ -8,34 +12,17 @@ import { EstimacionService } from '../../services/estimacion.service';
 import { SeguimientoService } from '../../services/seguimiento.service';
 import { ExpedienteRow, ESTADOS_ESTIMADO } from '../../models';
 import { EstadoExpediente } from '../../types/supabase';
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../shared/ui/empty-state/empty-state.component';
+import { StatusChipComponent } from '../../shared/ui/status-chip/status-chip.component';
+import { StageLineComponent } from '../../shared/ui/stage-line/stage-line.component';
 
-// Config por estado. La etiqueta es la clave i18n `state.<estado>` que resuelve
-// la plantilla; el color vive en el CSS como clase semántica (token); aquí solo
-// el icono, el % del pipeline y la clase — nunca hex inline.
-interface EstadoCfg {
-  icon: string;
-  pct:  number;
-  cls:  string;
-}
-
-const ESTADO_CFG: Record<string, EstadoCfg> = {
-  en_estimacion: { icon: 'bi-pencil-square',   pct: 30,  cls: 'is-info'        },
-  estimado:      { icon: 'bi-clipboard-check', pct: 55,  cls: 'is-gold'        },
-  en_oferta:     { icon: 'bi-people',          pct: 70,  cls: 'is-warning'     },
-  adjudicado:    { icon: 'bi-award',           pct: 85,  cls: 'is-gold-strong' },
-  contratado:    { icon: 'bi-check-circle',    pct: 100, cls: 'is-success'     },
-  cancelado:     { icon: 'bi-x-circle',        pct: 0,   cls: 'is-muted'       },
-  archivado:     { icon: 'bi-archive',         pct: 0,   cls: 'is-muted'       },
-};
-
+// Recorrido de un dossier tras la estimación (las etapas de la línea de cota).
 const PIPELINE_STEPS: string[] = [
   'en_estimacion', 'estimado', 'en_oferta', 'adjudicado', 'contratado',
 ];
 
 type VistaPipeline = 'tabla' | 'tarjetas';
-
-const R             = 54;
-const CIRCUMFERENCE = 2 * Math.PI * R;
 
 // Resumen de una obra (expediente contratado en construcción).
 interface ObraResumen {
@@ -53,7 +40,10 @@ interface ObraResumen {
 @Component({
   selector: 'app-estimator-dashboard',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, TranslatePipe],
+  imports: [
+    RouterLink, TranslatePipe, MatButtonModule, MatButtonToggleModule, MatIconModule, MatTooltipModule,
+    PageHeaderComponent, EmptyStateComponent, StatusChipComponent, StageLineComponent,
+  ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })
@@ -119,45 +109,16 @@ export class EstimatorDashboardComponent implements OnInit {
     return o.length === 0 ? 0 : Math.round(o.reduce((s, x) => s + x.avance, 0) / o.length);
   });
 
-  // ── Donut SVG ─────────────────────────────────────────────────────────────
-  readonly R             = R;
-  readonly CIRCUMFERENCE = CIRCUMFERENCE;
-  readonly pipelineSteps = PIPELINE_STEPS;
+  // ── Línea de etapas ────────────────────────────────────────────────────
+  readonly etapas = PIPELINE_STEPS.map(e => 'state.' + e);
 
-  donutSegments = computed(() => {
-    const total = this.expedientes().length;
-    if (!total) return [];
-    let offset = 0;
-    const segs: { cls: string; dasharray: string; dashoffset: number }[] = [];
-    for (const key of [...PIPELINE_STEPS, 'cancelado']) {
-      const count = this.expedientes().filter(e => e.estado === key).length;
-      if (!count) continue;
-      const portion = (count / total) * CIRCUMFERENCE;
-      segs.push({
-        cls:        ESTADO_CFG[key].cls,
-        dasharray:  `${portion} ${CIRCUMFERENCE}`,
-        dashoffset: -offset,
-      });
-      offset += portion;
-    }
-    return segs;
-  });
+  /** Etapa del recorrido (1-based); 0 si el dossier salió de él (cancelado, archivado). */
+  paso(estado: string | null | undefined): number {
+    return PIPELINE_STEPS.indexOf(estado ?? '') + 1;
+  }
 
-  estadoBreakdown = computed(() =>
-    ([...PIPELINE_STEPS, 'cancelado'] as string[])
-      .map(key => ({
-        key,
-        ...ESTADO_CFG[key],
-        count: this.expedientes().filter(e => e.estado === key).length,
-        pct:   this.expedientes().length > 0
-          ? Math.round(
-              this.expedientes().filter(e => e.estado === key).length /
-              this.expedientes().length * 100
-            )
-          : 0,
-      }))
-      .filter(e => e.count > 0)
-  );
+  /** La siguiente etapa del estimador es terminar la estimación más antigua en curso. */
+  primeraActiva = computed(() => this.activos()[0]?.id ?? null);
 
   // ── Ciclo de vida ─────────────────────────────────────────────────────────
   async ngOnInit() {
@@ -233,40 +194,6 @@ export class EstimatorDashboardComponent implements OnInit {
     this.fotosFallidas.update(set => new Set(set).add(id));
   }
 
-  cfg(estado: string): EstadoCfg {
-    return ESTADO_CFG[estado] ?? ESTADO_CFG['estimado'];
-  }
-
-  obraEstadoCls(estado: string): string {
-    return estado === 'completado'  ? 'is-success'
-         : estado === 'en_progreso' ? 'is-gold-strong'
-         : estado === 'pausado'     ? 'is-warning'
-         : 'is-info';
-  }
-
-  obraEstadoLabel(estado: string): string {
-    // estado del seguimiento → clave i18n
-    return 'seguimiento_estado.' + estado;
-  }
-
-  stepDone(currentEstado: string, step: string): boolean {
-    const ci = PIPELINE_STEPS.indexOf(currentEstado);
-    const si = PIPELINE_STEPS.indexOf(step);
-    return ci > si && ci >= 0 && si >= 0;
-  }
-
-  stepActive(currentEstado: string, step: string): boolean {
-    return currentEstado === step;
-  }
-
-  // Clase completa del punto del pipeline (color por token + done/active).
-  pDotClass(currentEstado: string, step: string): string {
-    let c = 'estd-p-dot ' + this.cfg(step).cls;
-    if (this.stepDone(currentEstado, step))   c += ' estd-p-dot--done';
-    if (this.stepActive(currentEstado, step)) c += ' estd-p-dot--active';
-    return c;
-  }
-
   urgencia(fechaVisita: string): 'vencida' | 'hoy' | 'proxima' | null {
     if (!fechaVisita) return null;
     const d    = new Date(`${fechaVisita}T00:00:00`);
@@ -321,13 +248,5 @@ export class EstimatorDashboardComponent implements OnInit {
     return o.servicioNombre;
   }
 
-  irAEstimar(id: string) { this.router.navigate(['/estimator/file-under-estimation', id]); }
-  irAVer(id: string)     { this.router.navigate(['/estimator/estimated-file', id]); }
-
-  // La KPI "obras en curso" lleva a la sección de Seguimiento de obra de este
-  // mismo dashboard (el estimador no tiene una ruta de seguimiento propia).
-  scrollAObras(): void {
-    document.getElementById('estd-obra-section')
-      ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
+  irAVer(id: string) { this.router.navigate(['/estimator/estimated-file', id]); }
 }

@@ -1,225 +1,153 @@
-<div class="container-fluid py-4 px-3 px-xl-4">
+<div class="page-wrapper ls">
 
-  <!-- ── Encabezado ──────────────────────────────────────────────────────────── -->
-  <header class="page-header p-4 mb-4">
-    <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
-      <div>
-        <p class="page-eyebrow">
-          <i class="bi bi-shield-check"></i>{{ 'role.administrateur' | translate }}
-        </p>
-        <h4 class="mb-1">{{ 'admin_offer.title' | translate }}</h4>
-        <p class="text-muted small mb-0">{{ 'admin_offer.subtitle' | translate }}</p>
-      </div>
-      @if (!cargando() && !error()) {
-        <span class="kpi-pill">
-          <i class="bi bi-tags"></i>
-          @if (hayFiltros()) {
-            {{ expedientesFiltrados().length }} / {{ total }}
-          } @else {
-            {{ total }}
-          }
-          {{ 'admin_offer.count' | translate }}
-        </span>
+  <app-page-header [titulo]="'admin_offer.title' | translate"
+                   [contexto]="'admin_offer.subtitle' | translate" />
+
+  <!-- ── Cargando ────────────────────────────────────────────────────────── -->
+  @if (cargando()) {
+    <div class="ls-grid" role="status">
+      <span class="cdk-visually-hidden">{{ 'common.loading' | translate }}</span>
+      @for (_ of [1, 2, 3]; track $index) {
+        <span class="skel" aria-hidden="true"></span>
       }
     </div>
-  </header>
 
-  <!-- ── Skeleton ────────────────────────────────────────────────────────────── -->
-  @if (cargando()) {
-    <div class="skeleton-wrap">
-      <div class="skeleton-toolbar mb-3">
-        <div class="skel skel--search"></div>
-        <div class="d-flex gap-2 mt-3">
-          @for (i of [1,2,3,4]; track i) { <div class="skel skel--chip"></div> }
-        </div>
-      </div>
-      <div class="skeleton-table">
-        @for (i of [1,2,3,4,5,6,7,8]; track i) {
-          <div class="skeleton-row">
-            <div class="skel skel--xs"></div>
-            <div class="skel skel--lg"></div>
-            <div class="skel skel--sm"></div>
-            <div class="skel skel--md"></div>
-            <div class="skel skel--md"></div>
-            <div class="skel skel--sm"></div>
-            <div class="skel skel--sm"></div>
-            <div class="skel skel--sm"></div>
-          </div>
-        }
-      </div>
-    </div>
-
-  <!-- ── Error ────────────────────────────────────────────────────────────────── -->
+  <!-- ── Error ───────────────────────────────────────────────────────────── -->
   } @else if (error()) {
-    <div class="empty-state">
-      <div class="empty-state__icon empty-state__icon--danger">
-        <i class="bi bi-exclamation-triangle"></i>
-      </div>
-      <p class="empty-state__title">{{ 'common.error' | translate }}</p>
-      <p class="empty-state__desc">{{ error() }}</p>
-    </div>
+    <p class="ls-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ error() }}</p>
 
-  <!-- ── Contenido ────────────────────────────────────────────────────────────── -->
+  <!-- ── Sin dossiers ────────────────────────────────────────────────────── -->
+  } @else if (total === 0) {
+    <app-empty-state class="ls-empty" matIcon="request_quote"
+                     [titulo]="'admin_offer.no_data' | translate"
+                     [texto]="'admin_offer.no_data_hint' | translate" />
+
   } @else {
 
-    <!-- ── Filtros ────────────────────────────────────────────────────────────── -->
-    <div class="filter-bar mb-3">
-
-      <div class="filter-bar__search">
-        <div class="input-group">
-          <span class="input-group-text search-icon">
-            <i class="bi bi-search"></i>
-          </span>
-          <input type="text" class="form-control search-input"
-                 [placeholder]="'admin_offer.search_placeholder' | translate"
-                 [value]="busqueda()"
-                 (input)="setBusqueda($event)">
-          @if (busqueda()) {
-            <button class="btn search-clear" type="button" (click)="busqueda.set('')"
-                    [title]="'common.clear' | translate">
-              <i class="bi bi-x-lg"></i>
-            </button>
-          }
-        </div>
-      </div>
-
-      <div class="filter-bar__chips">
-        <div class="status-chips" role="group">
-          @for (estado of estados; track estado) {
-            <button type="button" class="status-chip"
-                    [class.status-chip--active]="filtroEstado() === estado"
-                    (click)="filtroEstado.set(estado)">
-              <span class="status-chip__label">
-                {{ estado === 'todos'
-                    ? ('common.all' | translate)
-                    : (('admin_offer.status_' + estado) | translate) }}
-              </span>
-              <span class="status-chip__count">
-                {{ estado === 'todos' ? total : (estadoCounts()[estado] || 0) }}
-              </span>
-            </button>
-          }
-        </div>
-        @if (hayFiltros()) {
-          <button class="btn-clear-filters" (click)="limpiarFiltros()">
-            <i class="bi bi-x-circle"></i>{{ 'common.clear_filters' | translate }}
+    <!-- ── Búsqueda, estado y vista (filtrado en el cliente) ─────────────── -->
+    <div class="ls-tools">
+      <mat-form-field class="ls-search" appearance="outline" subscriptSizing="dynamic">
+        <mat-label>{{ 'common.search' | translate }}</mat-label>
+        <mat-icon matPrefix aria-hidden="true">search</mat-icon>
+        <input matInput type="search" autocomplete="off"
+               [placeholder]="'admin_offer.search_placeholder' | translate"
+               [value]="busqueda()" (input)="setBusqueda($event)" />
+        @if (busqueda()) {
+          <button mat-icon-button matSuffix type="button"
+                  [attr.aria-label]="'common.clear' | translate" (click)="busqueda.set('')">
+            <mat-icon>close</mat-icon>
           </button>
         }
+      </mat-form-field>
+
+      <div class="ls-filter is-grid">
+        <span class="ls-filter__label" id="aol-state-label">{{ 'admin_offer.col_exp_status' | translate }}</span>
+        <mat-button-toggle-group class="ls-toggle" hideSingleSelectionIndicator
+                                 aria-labelledby="aol-state-label"
+                                 [value]="filtroEstado()" (change)="filtroEstado.set($event.value)">
+          @for (estado of estados; track estado) {
+            <mat-button-toggle [value]="estado">
+              {{ (estado === 'todos' ? 'common.all' : 'admin_offer.status_' + estado) | translate }}
+              <span class="ls-count">{{ estado === 'todos' ? total : (estadoCounts()[estado] || 0) }}</span>
+            </mat-button-toggle>
+          }
+        </mat-button-toggle-group>
       </div>
 
-      <div class="offer-view-toggle" role="group" [attr.aria-label]="'common.view_toggle' | translate">
-        <button type="button" class="offer-view" [class.offer-view--active]="vista() === 'tabla'"
-                (click)="vista.set('tabla')" [attr.aria-pressed]="vista() === 'tabla'"
-                [title]="'common.view_table' | translate">
-          <i class="bi bi-list-ul" aria-hidden="true"></i>
-          <span class="offer-view__label">{{ 'common.view_table' | translate }}</span>
-        </button>
-        <button type="button" class="offer-view" [class.offer-view--active]="vista() === 'tarjetas'"
-                (click)="vista.set('tarjetas')" [attr.aria-pressed]="vista() === 'tarjetas'"
-                [title]="'common.view_cards' | translate">
-          <i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>
-          <span class="offer-view__label">{{ 'common.view_cards' | translate }}</span>
-        </button>
-      </div>
-
+      <mat-button-toggle-group class="ls-toggle ls-view" hideSingleSelectionIndicator
+                               [attr.aria-label]="'common.view_toggle' | translate"
+                               [value]="vista()" (change)="vista.set($event.value)">
+        <mat-button-toggle value="tarjetas" [aria-label]="'common.view_cards' | translate"
+                           [matTooltip]="'common.view_cards' | translate">
+          <mat-icon>grid_view</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="tabla" [aria-label]="'common.view_table' | translate"
+                           [matTooltip]="'common.view_table' | translate">
+          <mat-icon>table_rows</mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
     </div>
 
-    <!-- ── Lista de expedientes/ofertas ─────────────────────────────────────── -->
-    <div class="table-card">
+    @if (hayFiltros()) {
+      <div class="ls-status">
+        <p class="ls-showing" role="status">
+          <span class="ls-fig">{{ expedientesFiltrados().length }} / {{ total }}</span> {{ 'admin_offer.count' | translate }}
+        </p>
+        <button mat-button type="button" class="ls-clear" (click)="limpiarFiltros()">
+          <mat-icon>close</mat-icon>
+          {{ 'common.clear_filters' | translate }}
+        </button>
+      </div>
+    }
 
-      @if (expedientesFiltrados().length === 0) {
-        <div class="empty-state empty-state--table">
-          @if (hayFiltros()) {
-            <div class="empty-state__icon">
-              <i class="bi bi-funnel"></i>
-            </div>
-            <p class="empty-state__title">{{ 'admin_offer.no_results' | translate }}</p>
-            <p class="empty-state__desc">{{ 'admin_offer.no_results_hint' | translate }}</p>
-            <button class="btn btn-outline-primary btn-sm mt-2" (click)="limpiarFiltros()">
-              <i class="bi bi-x-circle me-1"></i>{{ 'common.clear_filters' | translate }}
-            </button>
-          } @else {
-            <div class="empty-state__icon">
-              <i class="bi bi-tags"></i>
-            </div>
-            <p class="empty-state__title">{{ 'admin_offer.no_data' | translate }}</p>
-            <p class="empty-state__desc">{{ 'admin_offer.no_data_hint' | translate }}</p>
-          }
-        </div>
+    @if (expedientesFiltrados().length === 0) {
+      <app-empty-state class="ls-empty" matIcon="filter_alt_off"
+                       [titulo]="'admin_offer.no_results' | translate"
+                       [texto]="'admin_offer.no_results_hint' | translate">
+        <button actions mat-stroked-button type="button" (click)="limpiarFiltros()">
+          {{ 'common.clear_filters' | translate }}
+        </button>
+      </app-empty-state>
 
-      } @else if (vista() === 'tabla') {
+    } @else {
 
-        <!-- Escritorio: tabla con filas clicables -->
-        <div class="table-responsive d-none d-xl-block">
-          <table class="table table-admin align-middle mb-0">
+      <!-- ── Tabla (desde 1200px, si se elige) ───────────────────────────── -->
+      @if (vista() === 'tabla') {
+        <div class="ls-table-wrap">
+          <table class="ls-table">
             <thead>
               <tr>
-                <th class="col-num">{{ 'admin_offer.col_number' | translate }}</th>
-                <th class="col-identity">{{ 'admin_offer.col_client' | translate }} / {{ 'admin_offer.col_service' | translate }}</th>
-                <th class="col-person">{{ 'admin_offer.col_estimator' | translate }}</th>
-                <th>{{ 'admin_offer.col_exp_status' | translate }}</th>
-                <th class="col-person">{{ 'admin_offer.col_constructor' | translate }}</th>
-                <th class="col-count">{{ 'admin_offer.col_offers' | translate }}</th>
-                <th class="col-precio">{{ 'admin_offer.col_price' | translate }}</th>
-                <th class="col-date">{{ 'admin_offer.col_start_date' | translate }}</th>
-                <th>{{ 'admin_offer.col_offer_status' | translate }}</th>
-                <th class="col-actions"></th>
+                <th scope="col">{{ 'admin_offer.col_number' | translate }}</th>
+                <th scope="col">{{ 'admin_offer.col_client' | translate }}</th>
+                <th scope="col">{{ 'admin_offer.col_estimator' | translate }}</th>
+                <th scope="col">{{ 'admin_offer.col_exp_status' | translate }}</th>
+                <th scope="col">{{ 'admin_offer.col_constructor' | translate }}</th>
+                <th scope="col" class="is-right">{{ 'admin_offer.col_offers' | translate }}</th>
+                <th scope="col" class="is-right">{{ 'admin_offer.col_price' | translate }}</th>
+                <th scope="col">{{ 'admin_offer.col_offer_status' | translate }}</th>
+                <th scope="col"><span class="cdk-visually-hidden">{{ 'admin_offer.ver_btn' | translate }}</span></th>
               </tr>
             </thead>
             <tbody>
               @for (e of expedientesPaginados(); track e.id) {
-                <tr class="table-row table-row--clickable" (click)="irAEditar(e.id)">
-                  <td class="col-num">
-                    <span class="exp-num">{{ e.numero }}</span>
-                  </td>
-                  <td class="col-identity">
-                    <span class="cell-primary">{{ e.cliente_nombre }}</span>
-                    <span class="cell-secondary">{{ servicioNombre(e) }}</span>
-                  </td>
-                  <td class="col-person">
-                    @if (e.estimador_nombre) {
-                      <span class="cell-primary">{{ e.estimador_nombre }}</span>
-                    } @else {
-                      <span class="cell-muted">—</span>
-                    }
-                  </td>
-                  <td>
-                    <span class="estado-badge {{ estadoBadgeExp(e.estado) }}">
-                      {{ ('admin_offer.status_' + e.estado) | translate }}
+                <tr class="ls-table__row is-link" (click)="irAEditar(e.id)">
+                  <td class="ls-fig">{{ e.numero }}</td>
+                  <td class="aol-client">
+                    <span class="ls-table__text">
+                      <a class="ls-table__link" [id]="'aol-t-' + e.id" [routerLink]="['/admin/offer/edit', e.id]"
+                         (click)="$event.stopPropagation()">{{ e.cliente_nombre }}</a>
+                      <span class="ls-table__sub">{{ servicioNombre(e) }}</span>
                     </span>
                   </td>
-                  <td class="col-person">
-                    @if (e.constructor_nombre) {
-                      <span class="cell-primary">{{ e.constructor_nombre }}</span>
-                    } @else {
-                      <span class="cell-muted">—</span>
-                    }
+                  <td>{{ e.estimador_nombre || '—' }}</td>
+                  <td><app-status-chip [estado]="e.estado" prefijo="admin_offer.status_" /></td>
+                  <td>{{ e.constructor_nombre || '—' }}</td>
+                  <td class="is-right">
+                    <span class="ls-fig" [class.aol-zero]="e.total_ofertas === 0">{{ e.total_ofertas }}</span>
                   </td>
-                  <td class="col-count">
-                    <span class="offers-count" [class.offers-count--zero]="e.total_ofertas === 0">
-                      {{ e.total_ofertas }}
-                    </span>
-                  </td>
-                  <td class="col-precio">
-                    <span class="cell-precio">{{ formatPrecio(e.oferta_precio) }}</span>
-                  </td>
-                  <td class="col-date">
-                    <span class="cell-primary">{{ formatFecha(e.oferta_fecha_inicio) }}</span>
+                  <td class="is-right">
+                    @if (e.oferta_precio != null) {
+                      <span class="ls-table__text">
+                        <span class="ls-fig aol-price">{{ formatPrecio(e.oferta_precio) }}</span>
+                        @if (e.oferta_fecha_inicio) {
+                          <span class="ls-table__sub">
+                            {{ 'admin_offer.col_start_date' | translate }} <span class="ls-fig">{{ formatFecha(e.oferta_fecha_inicio) }}</span>
+                          </span>
+                        }
+                      </span>
+                    } @else { — }
                   </td>
                   <td>
                     @if (e.oferta_estado) {
-                      <span class="estado-badge {{ estadoBadgeOferta(e.oferta_estado) }}">
-                        {{ ('admin_offer.oferta_' + e.oferta_estado) | translate }}
-                      </span>
-                    } @else {
-                      <span class="cell-muted">—</span>
-                    }
+                      <app-status-chip [estado]="e.oferta_estado" prefijo="admin_offer.oferta_" />
+                    } @else { — }
                   </td>
-                  <td class="col-actions" (click)="$event.stopPropagation()">
-                    <a [routerLink]="['/admin/offer/edit', e.id]"
-                       class="action-btn"
-                       [title]="'admin_offer.ver_btn' | translate">
-                      <i class="bi bi-eye"></i>
+                  <td class="ls-table__action" (click)="$event.stopPropagation()">
+                    <a mat-icon-button [routerLink]="['/admin/offer/edit', e.id]"
+                       [attr.aria-label]="'admin_offer.ver_btn' | translate"
+                       [attr.aria-describedby]="'aol-t-' + e.id"
+                       [matTooltip]="'admin_offer.ver_btn' | translate">
+                      <mat-icon>visibility</mat-icon>
                     </a>
                   </td>
                 </tr>
@@ -227,121 +155,76 @@
             </tbody>
           </table>
         </div>
+      }
 
-        <!-- Móvil/tablet: tarjetas clicables (sin scroll lateral) -->
-        <div class="cm-cards d-xl-none">
-          @for (e of expedientesPaginados(); track e.id) {
-            <button type="button" class="cm-card" (click)="irAEditar(e.id)">
-              <div class="cm-card__top">
-                <span class="exp-num">{{ e.numero }}</span>
-                <span class="estado-badge {{ estadoBadgeExp(e.estado) }}">
-                  {{ ('admin_offer.status_' + e.estado) | translate }}
-                </span>
-              </div>
-              <div class="cm-card__body">
-                <span class="cm-card__name">{{ e.cliente_nombre }}</span>
-                <span class="cm-card__svc">{{ servicioNombre(e) }}</span>
-              </div>
-              <div class="cm-card__meta">
-                <span class="cm-meta">
-                  <i class="bi bi-person-badge" aria-hidden="true"></i>{{ e.estimador_nombre || '—' }}
-                </span>
-                <span class="cm-meta">
-                  <i class="bi bi-hard-hat" aria-hidden="true"></i>{{ e.constructor_nombre || '—' }}
-                </span>
-              </div>
-              <div class="cm-card__meta">
-                <span class="cm-meta">
-                  <i class="bi bi-tags" aria-hidden="true"></i>{{ e.total_ofertas }} {{ 'admin_offer.col_offers' | translate }}
-                </span>
-                <span class="cm-meta">
-                  <i class="bi bi-cash-coin" aria-hidden="true"></i>{{ formatPrecio(e.oferta_precio) }}
-                </span>
-                <span class="cm-meta">
-                  <i class="bi bi-calendar-event" aria-hidden="true"></i>{{ formatFecha(e.oferta_fecha_inicio) }}
-                </span>
+      <!-- ── Tarjetas (siempre por debajo de 1200px; arriba, salvo vista tabla) -->
+      <ul class="ls-grid" [class.is-mobile-only]="vista() === 'tabla'">
+        @for (e of expedientesPaginados(); track e.id) {
+          <li class="ls-card" [class.is-out]="e.estado === 'archivado'">
+            <span class="ls-card__photo">
+              <mat-icon aria-hidden="true">view_in_ar</mat-icon>
+              @if (e.foto) {
+                <img [src]="e.foto" loading="lazy" alt="" referrerpolicy="no-referrer"
+                     (error)="$any($event.target).hidden = true" />
+              }
+            </span>
+
+            <div class="ls-card__body">
+              <span class="ls-tags">
+                <app-status-chip [estado]="e.estado" prefijo="admin_offer.status_" />
                 @if (e.oferta_estado) {
-                  <span class="estado-badge {{ estadoBadgeOferta(e.oferta_estado) }}">
-                    {{ ('admin_offer.oferta_' + e.oferta_estado) | translate }}
+                  <app-status-chip [estado]="e.oferta_estado" prefijo="admin_offer.oferta_" />
+                }
+                @if (e.oferta_precio != null) { <span class="ls-tag ls-fig">{{ formatPrecio(e.oferta_precio) }}</span> }
+              </span>
+
+              <h2 class="ls-card__title">
+                <a class="ls-card__link" [routerLink]="['/admin/offer/edit', e.id]">{{ e.cliente_nombre }}</a>
+              </h2>
+              <p class="ls-card__num">{{ e.numero }}</p>
+
+              <p class="ls-card__line">
+                <mat-icon aria-hidden="true">construction</mat-icon>
+                <span>{{ servicioNombre(e) }}</span>
+              </p>
+              @if (direccionLinea1(e) || direccionLinea2(e)) {
+                <p class="ls-card__line" [title]="direccionCompleta(e)">
+                  <mat-icon aria-hidden="true">location_on</mat-icon>
+                  <span>
+                    @if (direccionLinea1(e)) { {{ direccionLinea1(e) }} }
+                    @if (direccionLinea2(e)) { <span class="ls-card__sub">{{ direccionLinea2(e) }}</span> }
+                  </span>
+                </p>
+              }
+              <p class="ls-card__line">
+                <mat-icon aria-hidden="true">badge</mat-icon>
+                <span><span class="cdk-visually-hidden">{{ 'admin_offer.col_estimator' | translate }} : </span>{{ e.estimador_nombre || '—' }}</span>
+              </p>
+              <p class="ls-card__line">
+                <mat-icon aria-hidden="true">engineering</mat-icon>
+                <span><span class="cdk-visually-hidden">{{ 'admin_offer.col_constructor' | translate }} : </span>{{ e.constructor_nombre || '—' }}</span>
+              </p>
+
+              <div class="ls-card__foot">
+                <span>
+                  <mat-icon aria-hidden="true">request_quote</mat-icon>
+                  <strong class="ls-fig">{{ e.total_ofertas }}</strong> {{ 'admin_offer.col_offers' | translate }}
+                </span>
+                @if (e.oferta_fecha_inicio) {
+                  <span>
+                    <mat-icon aria-hidden="true">event</mat-icon>
+                    {{ 'admin_offer.col_start_date' | translate }}
+                    <strong class="ls-fig">{{ formatFecha(e.oferta_fecha_inicio) }}</strong>
                   </span>
                 }
               </div>
-            </button>
-          }
-        </div>
+            </div>
+          </li>
+        }
+      </ul>
 
-      } @else {
-
-        <!-- Vista de tarjetas (con foto del expediente extraída del tour 3D) -->
-        <div class="offer-cards">
-          @for (e of expedientesPaginados(); track e.id) {
-            <article class="offer-card" role="button" tabindex="0"
-                     (click)="irAEditar(e.id)"
-                     (keydown.enter)="irAEditar(e.id)"
-                     (keydown.space)="$event.preventDefault(); irAEditar(e.id)">
-              <div class="offer-card__media">
-                <div class="offer-card__fallback" aria-hidden="true"><i class="bi bi-box-seam"></i></div>
-                @if (e.foto) {
-                  <img class="offer-card__img" [src]="e.foto" alt="" loading="lazy"
-                       referrerpolicy="no-referrer"
-                       (error)="$any($event.target).style.display='none'">
-                }
-                <span class="estado-badge {{ estadoBadgeExp(e.estado) }} offer-card__badge">
-                  {{ ('admin_offer.status_' + e.estado) | translate }}
-                </span>
-              </div>
-              <div class="offer-card__body">
-                <div class="offer-card__head">
-                  <span class="exp-num">{{ e.numero }}</span>
-                  <span class="cell-precio">{{ formatPrecio(e.oferta_precio) }}</span>
-                </div>
-                <span class="offer-card__client">{{ e.cliente_nombre }}</span>
-                <span class="offer-card__svc">{{ servicioNombre(e) }}</span>
-                @if (direccionLinea1(e) || direccionLinea2(e)) {
-                  <p class="offer-card__addr" [title]="direccionCompleta(e)">
-                    <i class="bi bi-geo-alt offer-card__addr-icon" aria-hidden="true"></i>
-                    <span class="offer-card__addr-text">
-                      @if (direccionLinea1(e)) {
-                        <span class="offer-card__addr-line">{{ direccionLinea1(e) }}</span>
-                      }
-                      @if (direccionLinea2(e)) {
-                        <span class="offer-card__addr-line offer-card__addr-line--muted">{{ direccionLinea2(e) }}</span>
-                      }
-                    </span>
-                  </p>
-                }
-                <div class="offer-card__meta">
-                  <span class="cm-meta"><i class="bi bi-person-badge" aria-hidden="true"></i>{{ e.estimador_nombre || '—' }}</span>
-                  <span class="cm-meta"><i class="bi bi-hard-hat" aria-hidden="true"></i>{{ e.constructor_nombre || '—' }}</span>
-                  <span class="cm-meta"><i class="bi bi-tags" aria-hidden="true"></i>{{ e.total_ofertas }} {{ 'admin_offer.col_offers' | translate }}</span>
-                  <span class="cm-meta"><i class="bi bi-calendar-event" aria-hidden="true"></i>{{ formatFecha(e.oferta_fecha_inicio) }}</span>
-                </div>
-                @if (e.oferta_estado) {
-                  <span class="estado-badge {{ estadoBadgeOferta(e.oferta_estado) }}">
-                    {{ ('admin_offer.oferta_' + e.oferta_estado) | translate }}
-                  </span>
-                }
-              </div>
-            </article>
-          }
-        </div>
-
-      }
-
-      <!-- ── Paginación ──────────────────────────────────────────────────────── -->
-      @if (expedientesFiltrados().length > 0) {
-        <div class="table-footer">
-          <app-pagination
-            [total]="expedientesFiltrados().length"
-            [page]="paginaActual()"
-            [pageSize]="POR_PAGINA"
-            (pageChange)="paginaActual.set($event)">
-          </app-pagination>
-        </div>
-      }
-
-    </div>
-
+      <app-pagination [total]="expedientesFiltrados().length" [page]="paginaActual()"
+                      [pageSize]="POR_PAGINA" (pageChange)="paginaActual.set($event)" />
+    }
   }
-
 </div>

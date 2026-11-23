@@ -2,40 +2,35 @@
 <dialog #dialogo class="rec-dialog" aria-labelledby="recTitulo" (close)="alCerrarDialogo()">
   <div class="rec-dialog__head">
     <h2 id="recTitulo" class="rec-dialog__title">{{ 'presentation_videos.recorder.title' | translate }}</h2>
-    <button type="button" class="rec-icon-btn" (click)="cerrar()"
+    <button mat-icon-button type="button" class="rec-close" (click)="cerrar()"
             [attr.aria-label]="'common.close' | translate" [title]="'common.close' | translate">
-      <i class="bi bi-x-lg" aria-hidden="true"></i>
+      <mat-icon>close</mat-icon>
     </button>
   </div>
 
   <div class="rec-dialog__body">
-    <fieldset class="rec-modes">
-      <legend class="visually-hidden">{{ 'presentation_videos.recorder.what' | translate }}</legend>
+    <mat-button-toggle-group class="rec-modes" hideSingleSelectionIndicator
+                             [attr.aria-label]="'presentation_videos.recorder.what' | translate"
+                             [value]="modo()" (change)="cambiarModo($event.value)">
       @for (m of modos; track m.valor) {
-        <label class="rec-mode"
-               [class.is-active]="modo() === m.valor"
-               [class.is-disabled]="!pantallaDisponible && m.valor !== 'camara'">
-          <input type="radio" name="recModo" class="visually-hidden"
-                 [value]="m.valor" [checked]="modo() === m.valor"
-                 [disabled]="!pantallaDisponible && m.valor !== 'camara'"
-                 (change)="cambiarModo(m.valor)">
-          <i class="bi {{ m.icono }}" aria-hidden="true"></i>
-          <span>{{ m.clave | translate }}</span>
-        </label>
+        <mat-button-toggle [value]="m.valor" [disabled]="!pantallaDisponible && m.valor !== 'camara'">
+          <mat-icon aria-hidden="true">{{ m.matIcon }}</mat-icon>
+          {{ m.clave | translate }}
+        </mat-button-toggle>
       }
-    </fieldset>
+    </mat-button-toggle-group>
 
     <!-- Vista previa: en los modos de pantalla, la cámara se ve como la burbuja
          que aparecerá encima de lo que se grabe. -->
     <div class="rec-preview" [attr.data-modo]="modo()" [class.has-cam]="!!streamCam()">
       @if (modo() !== 'camara') {
         <div class="rec-preview__screen">
-          <i class="bi bi-display" aria-hidden="true"></i>
+          <mat-icon aria-hidden="true">desktop_windows</mat-icon>
           <p>{{ 'presentation_videos.recorder.screen_hint' | translate }}</p>
         </div>
       } @else if (!streamCam()) {
         <div class="rec-preview__screen">
-          <i class="bi bi-camera-video-off" aria-hidden="true"></i>
+          <mat-icon aria-hidden="true">videocam_off</mat-icon>
           <p>{{ 'presentation_videos.recorder.camera_off' | translate }}</p>
         </div>
       }
@@ -44,14 +39,14 @@
       }
     </div>
 
-    <div class="row g-3">
+    <!-- Selects nativos (matNativeControl): la lista de mat-select se abre en el
+         overlay del CDK, que queda debajo de un <dialog> modal. -->
+    <div class="rec-devices" [class.has-cam]="modo() !== 'pantalla'">
       @if (modo() !== 'pantalla') {
-        <div class="col-12 col-md-6">
-          <label class="form-label rec-label" for="recCam">
-            <i class="bi bi-camera-video" aria-hidden="true"></i>
-            {{ 'presentation_videos.recorder.camera' | translate }}
-          </label>
-          <select id="recCam" class="form-select" (change)="elegirCamara($any($event.target).value)">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-icon matPrefix aria-hidden="true">videocam</mat-icon>
+          <mat-label>{{ 'presentation_videos.recorder.camera' | translate }}</mat-label>
+          <select matNativeControl id="recCam" (change)="elegirCamara($any($event.target).value)">
             @for (d of camaras(); track d.deviceId) {
               <option [value]="d.deviceId" [selected]="d.deviceId === camSeleccion()">
                 {{ etiquetaDispositivo(d, $index, 'cam') }}
@@ -61,57 +56,54 @@
               {{ 'presentation_videos.recorder.no_camera' | translate }}
             </option>
           </select>
-        </div>
+        </mat-form-field>
       }
 
-      <div class="col-12" [class.col-md-6]="modo() !== 'pantalla'">
-        <label class="form-label rec-label" for="recMic">
-          <i class="bi bi-mic" aria-hidden="true"></i>
-          {{ 'presentation_videos.recorder.microphone' | translate }}
-        </label>
-        <select id="recMic" class="form-select" (change)="elegirMicro($any($event.target).value)">
+      <div class="rec-mic">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-icon matPrefix aria-hidden="true">mic</mat-icon>
+          <mat-label>{{ 'presentation_videos.recorder.microphone' | translate }}</mat-label>
+          <select matNativeControl id="recMic" (change)="elegirMicro($any($event.target).value)">
           @for (d of micros(); track d.deviceId) {
             <option [value]="d.deviceId" [selected]="d.deviceId === micSeleccion()">
               {{ etiquetaDispositivo(d, $index, 'mic') }}
             </option>
           }
-          <option value="none" [selected]="micSeleccion() === 'none'">
-            {{ 'presentation_videos.recorder.no_microphone' | translate }}
-          </option>
-        </select>
+            <option value="none" [selected]="micSeleccion() === 'none'">
+              {{ 'presentation_videos.recorder.no_microphone' | translate }}
+            </option>
+          </select>
+        </mat-form-field>
         <span class="rec-meter" aria-hidden="true"><span #medidor></span></span>
       </div>
     </div>
 
     @if (modo() !== 'camara') {
-      <div class="form-check form-switch rec-switch">
-        <input class="form-check-input" type="checkbox" role="switch" id="recSistema"
-               [checked]="audioSistema()" (change)="alternarAudioSistema($any($event.target).checked)">
-        <label class="form-check-label" for="recSistema">
-          {{ 'presentation_videos.recorder.system_audio' | translate }}
-          <small class="d-block">{{ 'presentation_videos.recorder.system_audio_hint' | translate }}</small>
-        </label>
-      </div>
+      <mat-slide-toggle class="rec-switch" [checked]="audioSistema()"
+                        (change)="alternarAudioSistema($event.checked)">
+        <span class="rec-switch__label">{{ 'presentation_videos.recorder.system_audio' | translate }}</span>
+        <span class="rec-switch__hint">{{ 'presentation_videos.recorder.system_audio_hint' | translate }}</span>
+      </mat-slide-toggle>
     }
 
     <div class="rec-hints" role="status" aria-live="polite">
       @for (a of avisos(); track a) {
-        <p class="rec-hint"><i class="bi bi-info-circle" aria-hidden="true"></i>{{ a | translate }}</p>
+        <p class="rec-hint"><mat-icon aria-hidden="true">info</mat-icon>{{ a | translate }}</p>
       }
     </div>
   </div>
 
   <div class="rec-dialog__foot">
     <span class="rec-limit">
-      <i class="bi bi-stopwatch" aria-hidden="true"></i>
+      <mat-icon aria-hidden="true">timer</mat-icon>
       {{ 'presentation_videos.recorder.limit' | translate:{ max: maxTexto } }}
     </span>
     <div class="rec-dialog__actions">
-      <button type="button" class="btn btn-outline-secondary" (click)="cerrar()">
+      <button mat-button type="button" (click)="cerrar()">
         {{ 'common.cancel' | translate }}
       </button>
-      <button type="button" class="btn btn-primary" (click)="empezar()" [disabled]="!puedeEmpezar()">
-        <span class="rec-dot" aria-hidden="true"></span>
+      <button mat-flat-button type="button" (click)="empezar()" [disabled]="!puedeEmpezar()">
+        <mat-icon>fiber_manual_record</mat-icon>
         {{ 'presentation_videos.recorder.start' | translate }}
       </button>
     </div>
@@ -126,11 +118,11 @@
     <p class="rec-dialog__text">{{ 'presentation_videos.recorder.discard_body' | translate }}</p>
   </div>
   <div class="rec-dialog__foot rec-dialog__foot--end">
-    <button type="button" class="btn btn-outline-secondary" (click)="confirmarDescarte(false)">
+    <button mat-button type="button" (click)="confirmarDescarte(false)">
       {{ 'presentation_videos.recorder.keep_recording' | translate }}
     </button>
-    <button type="button" class="btn rec-btn-danger" (click)="confirmarDescarte(true)">
-      <i class="bi bi-trash3" aria-hidden="true"></i>
+    <button mat-flat-button type="button" class="rec-btn-danger" (click)="confirmarDescarte(true)">
+      <mat-icon>delete</mat-icon>
       {{ 'presentation_videos.recorder.discard' | translate }}
     </button>
   </div>
@@ -142,7 +134,7 @@
   @if (cuenta() !== null && !flotante()) {
     <div class="rec-count" role="status" aria-live="assertive">
       <span class="rec-count__num">{{ cuenta() }}</span>
-      <span class="visually-hidden">{{ 'presentation_videos.recorder.starting_in' | translate:{ n: cuenta() } }}</span>
+      <span class="cdk-visually-hidden">{{ 'presentation_videos.recorder.starting_in' | translate:{ n: cuenta() } }}</span>
     </div>
   }
 
@@ -166,17 +158,17 @@
           <button type="button" (click)="redimensionarBurbuja(-40)"
                   [attr.aria-label]="'presentation_videos.recorder.smaller' | translate"
                   [title]="'presentation_videos.recorder.smaller' | translate">
-            <i class="bi bi-dash-lg" aria-hidden="true"></i>
+            <mat-icon aria-hidden="true">remove</mat-icon>
           </button>
           <button type="button" (click)="redimensionarBurbuja(40)"
                   [attr.aria-label]="'presentation_videos.recorder.bigger' | translate"
                   [title]="'presentation_videos.recorder.bigger' | translate">
-            <i class="bi bi-plus-lg" aria-hidden="true"></i>
+            <mat-icon aria-hidden="true">add</mat-icon>
           </button>
           <button type="button" (click)="alternarCamara()"
                   [attr.aria-label]="'presentation_videos.recorder.hide_camera' | translate"
                   [title]="'presentation_videos.recorder.hide_camera' | translate">
-            <i class="bi bi-camera-video-off" aria-hidden="true"></i>
+            <mat-icon aria-hidden="true">videocam_off</mat-icon>
           </button>
         </div>
       </div>
@@ -201,11 +193,15 @@
               [disabled]="fase() !== 'grabando'"
               [attr.aria-label]="(pausada() ? 'presentation_videos.recorder.resume' : 'presentation_videos.recorder.pause') | translate"
               [title]="(pausada() ? 'presentation_videos.recorder.resume' : 'presentation_videos.recorder.pause') | translate">
-        <i class="bi" [class.bi-play]="pausada()" [class.bi-pause]="!pausada()" aria-hidden="true"></i>
+        @if (pausada()) {
+          <mat-icon aria-hidden="true">play_arrow</mat-icon>
+        } @else {
+          <mat-icon aria-hidden="true">pause</mat-icon>
+        }
       </button>
 
       <button type="button" class="rec-bar__stop" (click)="terminar()" [disabled]="guardando()">
-        <i class="bi bi-stop" aria-hidden="true"></i>
+        <mat-icon aria-hidden="true">stop</mat-icon>
         {{ 'presentation_videos.recorder.finish' | translate }}
       </button>
 
@@ -213,21 +209,25 @@
         <button type="button" class="rec-bar__btn" (click)="alternarCamara()" [disabled]="guardando()"
                 [attr.aria-label]="(camOculta() ? 'presentation_videos.recorder.show_camera' : 'presentation_videos.recorder.hide_camera') | translate"
                 [title]="(camOculta() ? 'presentation_videos.recorder.show_camera' : 'presentation_videos.recorder.hide_camera') | translate">
-          <i class="bi" [class.bi-camera-video]="camOculta()" [class.bi-camera-video-off]="!camOculta()" aria-hidden="true"></i>
+          @if (camOculta()) {
+            <mat-icon aria-hidden="true">videocam</mat-icon>
+          } @else {
+            <mat-icon aria-hidden="true">videocam_off</mat-icon>
+          }
         </button>
       }
 
       <button type="button" class="rec-bar__btn" (click)="pedirDescarte()" [disabled]="guardando()"
               [attr.aria-label]="'presentation_videos.recorder.discard' | translate"
               [title]="'presentation_videos.recorder.discard' | translate">
-        <i class="bi bi-trash3" aria-hidden="true"></i>
+        <mat-icon aria-hidden="true">delete</mat-icon>
       </button>
 
       @if (puedeFlotar()) {
         <button type="button" class="rec-bar__btn" (click)="flotar(true)" [disabled]="guardando()"
                 [attr.aria-label]="'presentation_videos.recorder.float' | translate"
                 [title]="'presentation_videos.recorder.float' | translate">
-          <i class="bi bi-pip" aria-hidden="true"></i>
+          <mat-icon aria-hidden="true">picture_in_picture_alt</mat-icon>
         </button>
       }
     </div>
@@ -244,12 +244,12 @@
       <button type="button" (click)="redimensionarVentana(-40)"
               [attr.aria-label]="'presentation_videos.recorder.smaller' | translate"
               [title]="'presentation_videos.recorder.smaller' | translate">
-        <i class="bi bi-dash-lg" aria-hidden="true"></i>
+        <mat-icon aria-hidden="true">remove</mat-icon>
       </button>
       <button type="button" (click)="redimensionarVentana(40)"
               [attr.aria-label]="'presentation_videos.recorder.bigger' | translate"
               [title]="'presentation_videos.recorder.bigger' | translate">
-        <i class="bi bi-plus-lg" aria-hidden="true"></i>
+        <mat-icon aria-hidden="true">add</mat-icon>
       </button>
     </div>
     <div class="rec-float__bar" role="toolbar" [attr.aria-label]="'presentation_videos.recorder.controls' | translate">
@@ -260,18 +260,26 @@
       <button type="button" class="rec-bar__btn" (click)="alternarPausa()" [disabled]="fase() !== 'grabando'"
               [attr.aria-label]="(pausada() ? 'presentation_videos.recorder.resume' : 'presentation_videos.recorder.pause') | translate"
               [title]="(pausada() ? 'presentation_videos.recorder.resume' : 'presentation_videos.recorder.pause') | translate">
-        <i class="bi" [class.bi-play]="pausada()" [class.bi-pause]="!pausada()" aria-hidden="true"></i>
+        @if (pausada()) {
+          <mat-icon aria-hidden="true">play_arrow</mat-icon>
+        } @else {
+          <mat-icon aria-hidden="true">pause</mat-icon>
+        }
       </button>
       <button type="button" class="rec-bar__btn rec-bar__btn--stop" (click)="terminar()" [disabled]="guardando()"
               [attr.aria-label]="'presentation_videos.recorder.finish' | translate"
               [title]="'presentation_videos.recorder.finish' | translate">
-        <i class="bi bi-stop" aria-hidden="true"></i>
+        <mat-icon aria-hidden="true">stop</mat-icon>
       </button>
       @if (puedeAlternarCam() && !hayExtension()) {
         <button type="button" class="rec-bar__btn" (click)="alternarCamara()"
                 [attr.aria-label]="(camOculta() ? 'presentation_videos.recorder.show_camera' : 'presentation_videos.recorder.hide_camera') | translate"
                 [title]="(camOculta() ? 'presentation_videos.recorder.show_camera' : 'presentation_videos.recorder.hide_camera') | translate">
-          <i class="bi" [class.bi-camera-video]="camOculta()" [class.bi-camera-video-off]="!camOculta()" aria-hidden="true"></i>
+          @if (camOculta()) {
+            <mat-icon aria-hidden="true">videocam</mat-icon>
+          } @else {
+            <mat-icon aria-hidden="true">videocam_off</mat-icon>
+          }
         </button>
       }
     </div>

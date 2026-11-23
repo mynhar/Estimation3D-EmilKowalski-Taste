@@ -1,79 +1,62 @@
-<div class="cm-page">
+<div class="page-wrapper cm">
 
-  <!-- Encabezado de página -->
-  <header class="cm-pagehead">
-    <span class="cm-eyebrow">{{ 'client_monitoring.eyebrow' | translate }}</span>
-    <h1 class="cm-pagetitle">{{ 'client_monitoring.title' | translate }}</h1>
-    <p class="cm-pagesub">{{ 'client_monitoring.subtitle' | translate }}</p>
-  </header>
+  <app-page-header [titulo]="'client_monitoring.title' | translate"
+                   [contexto]="'client_monitoring.subtitle' | translate" />
 
-  <!-- Cargando -->
   @if (cargando()) {
-    <div class="cm-loading">
-      <span class="cm-spinner"></span>
+    <div class="cm-skel" aria-hidden="true">
+      <span class="skel skel--strip"></span>
+      <span class="skel skel--panel"></span>
     </div>
-  }
 
-  <!-- Error -->
-  @else if (error()) {
-    <div class="cm-alert cm-alert--error">
-      <i class="bi bi-exclamation-triangle"></i>
-      <p>{{ error() }}</p>
-    </div>
-  }
+  } @else if (error()) {
+    <p class="cm-error" role="alert">
+      <mat-icon aria-hidden="true">error</mat-icon>
+      {{ error() }}
+    </p>
 
-  <!-- Vacío -->
-  @else if (obras().length === 0) {
-    <div class="cm-empty">
-      <i class="bi bi-hammer"></i>
-      <p class="cm-empty__title">{{ 'client_monitoring.empty_title' | translate }}</p>
-      <p class="cm-empty__hint">{{ 'client_monitoring.empty_hint' | translate }}</p>
-    </div>
-  }
+  } @else if (obras().length === 0) {
+    <app-empty-state class="cm-empty"
+                     matIcon="construction"
+                     [titulo]="'client_monitoring.empty_title' | translate"
+                     [texto]="'client_monitoring.empty_hint' | translate" />
 
-  @else {
-    <!-- Franja de resumen (como Mis documentos) -->
-    <div class="cm-stats">
+  } @else {
+    <dl class="cm-summary">
       <div class="cm-stat">
-        <span class="cm-stat__num">{{ resumen().obras }}</span>
-        <span class="cm-stat__label">{{ 'client_monitoring.stat_obras' | translate }}</span>
+        <dt>{{ 'client_monitoring.stat_obras' | translate }}</dt>
+        <dd>{{ resumen().obras }}</dd>
       </div>
       <div class="cm-stat">
-        <span class="cm-stat__num">{{ resumen().enCurso }}</span>
-        <span class="cm-stat__label">{{ 'client_monitoring.stat_en_curso' | translate }}</span>
+        <dt>{{ 'client_monitoring.stat_en_curso' | translate }}</dt>
+        <dd>{{ resumen().enCurso }}</dd>
       </div>
       <div class="cm-stat">
-        <span class="cm-stat__num">{{ resumen().terminadas }}</span>
-        <span class="cm-stat__label">{{ 'client_monitoring.stat_terminadas' | translate }}</span>
+        <dt>{{ 'client_monitoring.stat_terminadas' | translate }}</dt>
+        <dd>{{ resumen().terminadas }}</dd>
       </div>
-      <div class="cm-stat cm-stat--accent">
-        <span class="cm-stat__num">{{ resumen().expedientes }}</span>
-        <span class="cm-stat__label">{{ 'client_monitoring.stat_expedientes' | translate }}</span>
+      <div class="cm-stat">
+        <dt>{{ 'client_monitoring.stat_expedientes' | translate }}</dt>
+        <dd>{{ resumen().expedientes }}</dd>
       </div>
-    </div>
+    </dl>
 
-    <!-- Una tarjeta plegable por expediente; dentro, una tarjeta por obra -->
+    <!-- Una tarjeta plegable por expediente; dentro, una tarjeta por obra. -->
     <div class="cm-accordion">
       @for (g of grupos(); track g.numero) {
         <app-expediente-panel [numero]="g.numero" [abierto]="isExpandido(g.numero)" [bandeja]="true"
                               (alternar)="toggle(g.numero)">
           <span panelMeta class="cm-meta">
             <span class="cm-meta__item">
-              <i class="bi bi-hammer" aria-hidden="true"></i>
-              @if (g.obras.length === 1) {
-                {{ 'client_monitoring.obras_one' | translate }}
-              } @else {
-                {{ 'client_monitoring.obras_n' | translate: { n: g.obras.length } }}
-              }
+              <mat-icon aria-hidden="true">construction</mat-icon>
+              {{ (g.obras.length === 1 ? 'client_monitoring.obras_one' : 'client_monitoring.obras_n') | translate: { n: g.obras.length } }}
             </span>
-            <span class="cm-meta__item cm-meta__avance">
-              {{ 'client_monitoring.avance_medio' | translate: { n: g.avanceMedio } }}
-            </span>
+            <span class="cm-meta__item cm-fig">{{ 'client_monitoring.avance_medio' | translate: { n: g.avanceMedio } }}</span>
             @if (g.terminadas > 0) {
-              <span class="tag tag-gold cm-meta__obra"
-                    [title]="'monitoring.obra_terminada_badge' | translate">
-                <i class="bi bi-flag" aria-hidden="true"></i>{{ g.terminadas }}
-                <span class="visually-hidden">{{ 'monitoring.obra_terminada_badge' | translate }}</span>
+              <span class="cm-obra">
+                <mat-icon aria-hidden="true">flag</mat-icon>
+                <span class="cm-fig">{{ g.terminadas }}</span>
+                <span class="cdk-visually-hidden">{{ 'monitoring.obra_terminada_badge' | translate }}</span>
               </span>
             }
           </span>

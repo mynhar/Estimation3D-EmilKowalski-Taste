@@ -9,15 +9,15 @@
       </p>
     </div>
     <div class="pv__actions">
-      <button type="button" class="btn btn-outline-primary pv-btn" (click)="nuevaGrabacion()">
-        <span class="pv-dot" aria-hidden="true"></span>
+      <button mat-stroked-button type="button" class="pv-btn" (click)="nuevaGrabacion()">
+        <mat-icon class="pv-rec">radio_button_checked</mat-icon>
         {{ 'presentation_videos.actions.new_recording' | translate }}
       </button>
-      <button type="button" class="btn btn-outline-secondary pv-btn" (click)="elegirArchivos()">
-        <i class="bi bi-upload" aria-hidden="true"></i>
+      <button mat-stroked-button type="button" class="pv-btn" (click)="elegirArchivos()">
+        <mat-icon>upload</mat-icon>
         {{ 'presentation_videos.actions.upload' | translate }}
       </button>
-      <input #archivoInput type="file" class="d-none" multiple
+      <input #archivoInput type="file" hidden multiple
              accept="video/mp4,video/webm,video/quicktime"
              (change)="alElegirArchivos($event)">
     </div>
@@ -41,16 +41,16 @@
 
   } @else if (errorCarga()) {
     <div class="pv-state pv-state--error" role="alert">
-      <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+      <mat-icon aria-hidden="true">error</mat-icon>
       <p>{{ 'presentation_videos.errors.load_list' | translate }}</p>
-      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="cargar()">
+      <button mat-stroked-button type="button" (click)="cargar()">
         {{ 'common.retry' | translate }}
       </button>
     </div>
 
   } @else if (!videos().length && !pendientes().length) {
     <div class="pv-state">
-      <i class="bi bi-camera-reels" aria-hidden="true"></i>
+      <mat-icon aria-hidden="true">co_present</mat-icon>
       <p class="pv-state__title">{{ 'presentation_videos.empty_title' | translate }}</p>
       <p class="pv-state__text">{{ 'presentation_videos.empty_text' | translate }}</p>
     </div>
@@ -58,22 +58,21 @@
   } @else {
     @if (videos().length) {
       <div class="pv-toolbar">
-        <label class="pv-search">
-          <i class="bi bi-search" aria-hidden="true"></i>
-          <span class="visually-hidden">{{ 'presentation_videos.search' | translate }}</span>
-          <input type="search" class="pv-search__input"
-                 [value]="consulta()" (input)="consulta.set($any($event.target).value)"
-                 [placeholder]="'presentation_videos.search' | translate">
-        </label>
-        <p class="pv-count" aria-live="polite">{{ resumen() }}</p>
-        <label class="pv-sort">
-          <span class="pv-sort__label">{{ 'presentation_videos.sort.label' | translate }}</span>
-          <select class="form-select form-select-sm" (change)="cambiarOrden($any($event.target).value)">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="pv-search">
+          <mat-icon matPrefix aria-hidden="true">search</mat-icon>
+          <mat-label>{{ 'presentation_videos.search' | translate }}</mat-label>
+          <input matInput type="search"
+                 [value]="consulta()" (input)="consulta.set($any($event.target).value)">
+        </mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="pv-sort">
+          <mat-label>{{ 'presentation_videos.sort.label' | translate }}</mat-label>
+          <mat-select [value]="orden()" (selectionChange)="cambiarOrden($event.value)">
             @for (o of ordenes; track o.valor) {
-              <option [value]="o.valor" [selected]="orden() === o.valor">{{ o.clave | translate }}</option>
+              <mat-option [value]="o.valor">{{ o.clave | translate }}</mat-option>
             }
-          </select>
-        </label>
+          </mat-select>
+        </mat-form-field>
+        <p class="pv-count" aria-live="polite">{{ resumen() }}</p>
       </div>
     }
 
@@ -82,7 +81,7 @@
         @for (p of pendientes(); track p.clave) {
           <li class="pv-card pv-card--pending" aria-busy="true">
             <div class="pv-thumb">
-              <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+              <span class="pv-spinner" aria-hidden="true"></span>
             </div>
             <div class="pv-card__body">
               <div class="pv-card__text">
@@ -100,9 +99,9 @@
               @if (miniaturas()[v.id]; as src) {
                 <img [src]="src" alt="" loading="lazy">
               } @else {
-                <i class="bi bi-camera-video pv-thumb__fallback" aria-hidden="true"></i>
+                <mat-icon class="pv-thumb__fallback" aria-hidden="true">videocam</mat-icon>
               }
-              <span class="pv-thumb__play" aria-hidden="true"><i class="bi bi-play"></i></span>
+              <span class="pv-thumb__play" aria-hidden="true"><mat-icon>play_arrow</mat-icon></span>
               <span class="pv-thumb__dur">{{ duracion(v) }}</span>
             </button>
 
@@ -110,34 +109,30 @@
               <div class="pv-card__text">
                 <button type="button" class="pv-card__title pv-card__title--link" (click)="ver(v)">{{ v.titulo }}</button>
                 <p class="pv-card__meta">
-                  {{ relativo(v) }}<span class="pv-card__sep" aria-hidden="true">·</span>{{ vistas(v.vistas) }}
+                  <span>{{ relativo(v) }}</span>
+                  <span>{{ vistas(v.vistas) }}</span>
                 </p>
               </div>
 
-              <div class="pv-menu">
-                <button type="button" class="pv-more"
-                        [cdkMenuTriggerFor]="pvMenu" [cdkMenuPosition]="menuPosiciones"
-                        [attr.aria-label]="'presentation_videos.actions.options' | translate:{ titulo: v.titulo }">
-                  <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
+              <button mat-icon-button type="button" class="pv-more" [matMenuTriggerFor]="pvMenu"
+                      [attr.aria-label]="'presentation_videos.actions.options' | translate:{ titulo: v.titulo }">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #pvMenu="matMenu" xPosition="before">
+                <button mat-menu-item type="button" (click)="pedirRenombrar(v)">
+                  <mat-icon>edit</mat-icon>
+                  <span>{{ 'presentation_videos.actions.rename' | translate }}</span>
                 </button>
-                <ng-template #pvMenu>
-                  <div cdkMenu class="dropdown-menu show pv-menu__list">
-                    <button type="button" cdkMenuItem class="dropdown-item" (cdkMenuItemTriggered)="pedirRenombrar(v)">
-                      <i class="bi bi-pencil" aria-hidden="true"></i>
-                      {{ 'presentation_videos.actions.rename' | translate }}
-                    </button>
-                    <button type="button" cdkMenuItem class="dropdown-item" (cdkMenuItemTriggered)="descargar(v)">
-                      <i class="bi bi-download" aria-hidden="true"></i>
-                      {{ 'presentation_videos.actions.download' | translate }}
-                    </button>
-                    <div class="dropdown-divider" role="separator"></div>
-                    <button type="button" cdkMenuItem class="dropdown-item pv-menu__danger" (cdkMenuItemTriggered)="pedirEliminar(v)">
-                      <i class="bi bi-trash3" aria-hidden="true"></i>
-                      {{ 'presentation_videos.actions.delete' | translate }}
-                    </button>
-                  </div>
-                </ng-template>
-              </div>
+                <button mat-menu-item type="button" (click)="descargar(v)">
+                  <mat-icon>download</mat-icon>
+                  <span>{{ 'presentation_videos.actions.download' | translate }}</span>
+                </button>
+                <mat-divider />
+                <button mat-menu-item type="button" class="pv-menu__danger" (click)="pedirEliminar(v)">
+                  <mat-icon>delete</mat-icon>
+                  <span>{{ 'presentation_videos.actions.delete' | translate }}</span>
+                </button>
+              </mat-menu>
             </div>
           </li>
         }
@@ -166,17 +161,21 @@
   <form (submit)="confirmarRenombrar($event, renInput)">
     <div class="pv-dialog__body">
       <h2 id="pvRenTitulo" class="pv-dialog__title">{{ 'presentation_videos.rename_title' | translate }}</h2>
-      <label class="form-label" for="pvRenInput">{{ 'presentation_videos.player.title_label' | translate }}</label>
-      <input #renInput id="pvRenInput" class="form-control" type="text" maxlength="120" required
-             [value]="renombrar()?.titulo ?? ''" [disabled]="ocupado()">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="pv-dialog__field">
+        <mat-label>{{ 'presentation_videos.player.title_label' | translate }}</mat-label>
+        <input matInput #renInput id="pvRenInput" type="text" maxlength="120" required
+               [value]="renombrar()?.titulo ?? ''" [disabled]="ocupado()">
+      </mat-form-field>
     </div>
     <div class="pv-dialog__foot">
-      <button type="button" class="btn btn-outline-secondary" (click)="cerrarDialogo(dlgRenombrar)" [disabled]="ocupado()">
+      <button mat-button type="button" (click)="cerrarDialogo(dlgRenombrar)" [disabled]="ocupado()">
         {{ 'common.cancel' | translate }}
       </button>
-      <button type="submit" class="btn btn-primary" [disabled]="ocupado()">
+      <button mat-flat-button type="submit" [disabled]="ocupado()">
         @if (ocupado()) {
-          <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+          <span class="pv-spinner" aria-hidden="true"></span>
+        } @else {
+          <mat-icon>check</mat-icon>
         }
         {{ 'common.save' | translate }}
       </button>
@@ -194,14 +193,14 @@
     </p>
   </div>
   <div class="pv-dialog__foot">
-    <button type="button" class="btn btn-outline-secondary" (click)="cerrarDialogo(dlgEliminar)" [disabled]="ocupado()">
+    <button mat-button type="button" (click)="cerrarDialogo(dlgEliminar)" [disabled]="ocupado()">
       {{ 'common.cancel' | translate }}
     </button>
-    <button type="button" class="btn pv-btn-danger" (click)="confirmarEliminar()" [disabled]="ocupado()">
+    <button mat-flat-button type="button" class="pv-btn-danger" (click)="confirmarEliminar()" [disabled]="ocupado()">
       @if (ocupado()) {
-        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+        <span class="pv-spinner" aria-hidden="true"></span>
       } @else {
-        <i class="bi bi-trash3 me-1" aria-hidden="true"></i>
+        <mat-icon>delete</mat-icon>
       }
       {{ 'presentation_videos.actions.delete' | translate }}
     </button>

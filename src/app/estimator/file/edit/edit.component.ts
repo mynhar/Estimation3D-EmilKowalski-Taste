@@ -1,5 +1,12 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal, computed } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { LowerCasePipe } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
@@ -11,6 +18,8 @@ import { ServicioOpcion, ServicioSelectorComponent, resumirServicios } from '../
 import { TipoInmueble } from '../../../types/supabase';
 import { AvisoArchivadoComponent } from '../../../shared/ui/aviso-archivado/aviso-archivado.component';
 import { CAMPOS_FALTANTES, CampoExtra } from '../../../shared/ui/campos-faltantes/campos-faltantes.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
+import { StatusChipComponent } from '../../../shared/ui/status-chip/status-chip.component';
 
 interface ClienteRow {
   id: string;
@@ -37,9 +46,13 @@ interface ClienteRow {
 @Component({
   selector: 'app-estimator-file-edit',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, ServicioSelectorComponent, AvisoArchivadoComponent, ...CAMPOS_FALTANTES],
+  imports: [
+    ReactiveFormsModule, TranslatePipe, LowerCasePipe,
+    MatAutocompleteModule, MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSelectModule,
+    PageHeaderComponent, StatusChipComponent, ServicioSelectorComponent, AvisoArchivadoComponent, ...CAMPOS_FALTANTES,
+  ],
   templateUrl: './edit.component.html',
-  styleUrl: './edit.component.css',
+  styleUrls: ['../../../shared/ui/alta/alta.css', './edit.component.css'],
 })
 export class EstimatorFileEditComponent implements OnInit {
   private auth              = inject(AuthSupabaseService);
@@ -71,7 +84,6 @@ export class EstimatorFileEditComponent implements OnInit {
   clienteId        = signal<string | null>(null);
   clienteRequerido = signal(false);
   busquedaCliente  = signal('');
-  dropdownVisible  = signal(false);
 
   clienteSeleccionado = computed(() =>
     this.clientes().find(c => c.id === this.clienteId()) ?? null
@@ -163,27 +175,20 @@ export class EstimatorFileEditComponent implements OnInit {
   readonly provinciasCanada = PROVINCIAS_CANADA;
   readonly CA_POSTAL_RE     = /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/;
 
-  readonly STEPS = [
-    'admin_file_create.step2_name',
-    'service_selector.name',
-    'file_create.step3_name',
-    'file_create.step4_name',
-  ];
-
-  /** Etiquetas + icono de cada fila del resumen lateral. Mismo orden que STEPS. */
+  /** Etiqueta + icono de cada fila del resumen lateral, en el orden de las secciones. */
   readonly RESUMEN_META = [
-    { label: 'admin_file_create.step2_name', icon: 'bi-person'    },
-    { label: 'service_selector.name',        icon: 'bi-tools'     },
-    { label: 'file_create.step3_name',       icon: 'bi-calendar3' },
-    { label: 'file_create.step4_name',       icon: 'bi-geo-alt'   },
+    { label: 'admin_file_create.step2_name', matIcon: 'person'       },
+    { label: 'service_selector.name',        matIcon: 'construction' },
+    { label: 'file_create.step3_name',       matIcon: 'event'        },
+    { label: 'file_create.step4_name',       matIcon: 'location_on'  },
   ];
 
   readonly tiposInmueble = [
-    { value: 'casa',            label: 'file_create.type_casa',            icon: 'bi-house-door'  },
-    { value: 'apartamento',     label: 'file_create.type_apartamento',     icon: 'bi-building'    },
-    { value: 'edificio',        label: 'file_create.type_edificio',        icon: 'bi-buildings'   },
-    { value: 'local_comercial', label: 'file_create.type_local_comercial', icon: 'bi-shop'        },
-    { value: 'otro',            label: 'file_create.type_otro',            icon: 'bi-three-dots'  },
+    { value: 'casa',            label: 'file_create.type_casa',            matIcon: 'house'      },
+    { value: 'apartamento',     label: 'file_create.type_apartamento',     matIcon: 'apartment'  },
+    { value: 'edificio',        label: 'file_create.type_edificio',        matIcon: 'domain'     },
+    { value: 'local_comercial', label: 'file_create.type_local_comercial', matIcon: 'storefront' },
+    { value: 'otro',            label: 'file_create.type_otro',            matIcon: 'more_horiz' },
   ];
 
   // ── Forms ──────────────────────────────────────────────────────────────────
@@ -240,7 +245,7 @@ export class EstimatorFileEditComponent implements OnInit {
     const lv  = this.localizacionValue();
 
     const visita = ev.fecha_visita && ev.hora_visita
-      ? `${ev.fecha_visita} · ${ev.hora_visita}`
+      ? `${ev.fecha_visita}, ${ev.hora_visita}`
       : null;
 
     const partes = [lv.calle, lv.ciudad, lv.provincia_ca, lv.codigo_postal];
@@ -271,10 +276,6 @@ export class EstimatorFileEditComponent implements OnInit {
     return [this.step1Complete(), this.step2Complete(), this.step3Complete(), this.step4Complete()][idx] ?? false;
   }
 
-  estadoLabel(): string {
-    return this.estado() ? `state.${this.estado()}` : 'common.none';
-  }
-
   invalid(form: ReturnType<FormBuilder['group']>, campo: string): boolean {
     const ctrl = form.get(campo);
     return !!(ctrl?.invalid && ctrl?.touched);
@@ -284,22 +285,23 @@ export class EstimatorFileEditComponent implements OnInit {
   setBusquedaCliente(e: Event) {
     this.busquedaCliente.set((e.target as HTMLInputElement).value);
     this.clienteId.set(null);
-    this.dropdownVisible.set(true);
   }
 
   seleccionarCliente(c: ClienteRow) {
     this.clienteId.set(c.id);
-    this.busquedaCliente.set(`${c.nombre} ${c.apellido}`);
-    this.dropdownVisible.set(false);
+    this.busquedaCliente.set(this.nombreCliente(c));
     this.clienteRequerido.set(false);
     // En edición la localización ya existe: cambiar de cliente no la pisa.
     // El estimador la recupera con el botón «usar la dirección del cliente».
   }
 
+  /** Texto que el autocompletado deja en el campo al elegir un cliente. */
+  nombreCliente = (c: ClienteRow | string | null): string =>
+    typeof c === 'string' ? c : c ? `${c.nombre} ${c.apellido}` : '';
+
   limpiarCliente() {
     this.clienteId.set(null);
     this.busquedaCliente.set('');
-    this.dropdownVisible.set(false);
     // La dirección se queda: pertenece al inmueble, no al cliente.
   }
 
@@ -327,10 +329,6 @@ export class EstimatorFileEditComponent implements OnInit {
     const a = (nombre ?? '').trim()[0] ?? '';
     const b = (apellido ?? '').trim()[0] ?? '';
     return (a + b).toUpperCase() || '?';
-  }
-
-  cerrarDropdown() {
-    setTimeout(() => this.dropdownVisible.set(false), 160);
   }
 
   // ── GPS ────────────────────────────────────────────────────────────────────

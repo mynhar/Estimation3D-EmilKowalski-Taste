@@ -1,244 +1,208 @@
-:host {
+/* component: inspecciones de una obra (Trait rouge)
+ * states: sin inspecciones · con inspecciones · agenda abierta · guardando · borrando · error · calendario
+ *         interactivos: default · hover · focus-visible · active · disabled · seleccionado
+ * contrast: texto ink / ink-secondary (≥ 9.6:1 sobre vélin) · fechas ink · error danger-ink sobre danger-soft (5.8:1)
+ *           calendario: trabajado action-ink sobre action-faint · hoy, anillo abeto
+ *           tomate: solo el punto de inspección del calendario (--ds-mark, trazo de aviso), nunca junto al abeto
+ * type: título 112 %; día, hora y cifras 75 % con tabular-nums
+ */
+
+/* minmax(0, 1fr): la columna implícita (auto) no encoge por debajo del min-content
+   del selector de visitante y desbordaba el panel estrecho. */
+:host { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--ds-space-4); min-width: 0; }
+.oi-form,
+.oi-cal { grid-template-columns: minmax(0, 1fr); }
+.oi-form mat-form-field { width: 100%; }
+
+.oi-fig { font-stretch: var(--ds-stretch-figure); font-variant-numeric: tabular-nums; }
+
+.oi-head {
   display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-3);
-  font-family: var(--ds-font-body);
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-2);
+}
+.oi-title {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ds-space-2);
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-base);
+  font-weight: var(--ds-weight-bold);
+  font-stretch: var(--ds-stretch-heading);
   color: var(--ds-ink);
 }
+.oi-title mat-icon { flex-shrink: 0; color: var(--ds-ink-muted); }
+.oi-agenda-toggle { min-height: 44px; }
 
-/* ── Cabecera ── */
-.oi-head {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: var(--ds-space-2);
-}
-.oi-head__title {
-  display: inline-flex; align-items: center; gap: var(--ds-space-2);
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-semibold);
-}
-.oi-head__title i { color: var(--ds-gold-ink); }
-
-/* ── Botones ── */
-.oi-btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  gap: var(--ds-space-2);
-  border-radius: var(--ds-radius-md);
-  font-family: var(--ds-font-body);
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
-  cursor: pointer;
-  padding: var(--ds-space-2) var(--ds-space-3);
-  border: 1px solid transparent;
-  transition: var(--ds-transition-color), box-shadow var(--ds-duration-fast) var(--ds-ease-out);
-}
-.oi-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-.oi-btn:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
-
-.oi-btn--ghost {
-  background: transparent;
-  color: var(--ds-ink-secondary);
-  border-color: var(--ds-border);
-  font-size: var(--ds-text-xs);
-  padding: var(--ds-space-1) var(--ds-space-2);
-}
-.oi-btn--ghost:hover { background: var(--ds-bg-alt); color: var(--ds-ink); }
-
-.oi-btn--agenda {
-  width: 100%;
-  background: var(--ds-gold-faint);
-  color: var(--ds-gold-ink);
-  border: 1px dashed var(--ds-gold);
-}
-.oi-btn--agenda:hover { background: var(--ds-gold-soft); }
-
-.oi-btn--primary {
-  background: var(--ds-gold);
-  color: var(--ds-ink-on-accent);
-  border-color: var(--ds-gold-active);
-}
-.oi-btn--primary:hover:not(:disabled) { background: var(--ds-gold-hover); }
-
-.oi-btn--outline {
-  background: transparent;
-  color: var(--ds-ink-secondary);
-  border-color: var(--ds-border-strong);
-}
-.oi-btn--outline:hover { background: var(--ds-bg-alt); color: var(--ds-ink); }
-
-/* ── Lista de inspecciones ── */
-.oi-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--ds-space-2); }
+/* Lista */
+.oi-list { display: grid; margin: 0; padding: 0; list-style: none; }
 .oi-item {
-  display: flex; align-items: center; gap: var(--ds-space-3);
-  padding: var(--ds-space-2) var(--ds-space-3);
-  background: var(--ds-surface);
-  border: 1px solid var(--ds-border-subtle);
-  border-radius: var(--ds-radius-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-2) 0;
+  border-bottom: 1px solid var(--ds-border-subtle);
 }
-.oi-item__when {
-  display: flex; flex-direction: column; align-items: center;
-  min-width: 38px; color: var(--ds-gold-ink);
+.oi-item:last-child { border-bottom: 0; }
+.oi-when {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 48px;
+  padding: var(--ds-space-1) 0;
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-band);
+  line-height: 1.1;
 }
-.oi-item__when strong { font-size: var(--ds-text-lg); line-height: 1; }
-.oi-item__when small {
-  font-size: var(--ds-text-2xs);
-  text-transform: uppercase; letter-spacing: var(--ds-tracking-wide);
+.oi-when strong {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-lg);
+  font-stretch: var(--ds-stretch-figure);
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-ink);
 }
-.oi-item__info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
-.oi-item__tipo { font-size: var(--ds-text-sm); font-weight: var(--ds-weight-medium); }
-.oi-item__motivo { font-size: var(--ds-text-xs); color: var(--ds-ink-muted); }
-.oi-item__del {
-  border: none; background: transparent;
-  color: var(--ds-ink-muted);
-  cursor: pointer; padding: var(--ds-space-1);
-  border-radius: var(--ds-radius-sm);
-  display: grid; place-items: center;
-  transition: var(--ds-transition-color);
+.oi-when small { font-size: var(--ds-text-sm); color: var(--ds-ink-secondary); }
+.oi-info { display: grid; flex: 1; gap: 2px; min-width: 0; }
+.oi-info__tipo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-1) var(--ds-space-3);
+  font-weight: var(--ds-weight-semibold);
+  color: var(--ds-ink);
 }
-.oi-item__del:hover:not(:disabled) { background: var(--ds-danger-soft); color: var(--ds-danger-ink); }
-.oi-item__del:disabled { opacity: 0.5; cursor: not-allowed; }
+.oi-info__tipo .oi-fig { font-weight: var(--ds-weight-regular); color: var(--ds-ink-secondary); }
+.oi-info__motivo { font-size: var(--ds-text-sm); color: var(--ds-ink-secondary); overflow-wrap: anywhere; }
+.oi-del { --mat-icon-button-icon-color: var(--ds-ink-secondary); flex-shrink: 0; }
 
 .oi-empty {
-  color: var(--ds-ink-muted);
-  font-size: var(--ds-text-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
   margin: 0;
-  display: inline-flex; align-items: center; gap: var(--ds-space-2);
-}
-
-/* ── Formulario de agenda ── */
-.oi-form {
-  display: flex; flex-direction: column; gap: var(--ds-space-3);
-  padding: var(--ds-space-3);
-  background: var(--ds-surface);
-  border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
-}
-.oi-form-row { display: flex; gap: var(--ds-space-3); }
-.oi-form-row .oi-field { flex: 1; }
-.oi-field { display: flex; flex-direction: column; gap: var(--ds-space-1); }
-.oi-label {
-  font-size: var(--ds-text-2xs);
-  text-transform: uppercase; letter-spacing: var(--ds-tracking-wide);
   color: var(--ds-ink-muted);
 }
-.oi-input {
-  width: 100%;
-  font-family: var(--ds-font-body);
-  font-size: var(--ds-text-sm);
-  color: var(--ds-ink);
-  background: var(--ds-surface-elevated);
-  border: 1px solid var(--ds-border-strong);
-  border-radius: var(--ds-radius-md);
-  padding: var(--ds-space-2) var(--ds-space-3);
-  transition: var(--ds-transition-color), box-shadow var(--ds-duration-fast) var(--ds-ease-out);
-}
-.oi-input:focus { outline: none; border-color: var(--ds-gold); box-shadow: var(--ds-focus-ring); }
+.oi-empty mat-icon { flex-shrink: 0; }
 
-.oi-tipo-row { display: flex; gap: var(--ds-space-2); }
-.oi-tipo-btn {
-  flex: 1;
-  display: inline-flex; align-items: center; justify-content: center; gap: var(--ds-space-2);
-  padding: var(--ds-space-2);
-  font-size: var(--ds-text-sm);
+.oi-schedule { justify-self: start; min-height: 44px; }
+
+/* Formulario */
+.oi-form {
+  display: grid;
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-4);
+  border-radius: var(--ds-radius-md);
   background: var(--ds-bg);
-  color: var(--ds-ink-secondary);
-  border: 1px solid var(--ds-border-strong);
+}
+.oi-field { display: grid; gap: var(--ds-space-2); margin-bottom: var(--ds-space-3); }
+.oi-label { font-size: var(--ds-text-sm); font-weight: var(--ds-weight-semibold); color: var(--ds-ink-secondary); }
+.oi-tipo {
+  --mat-button-toggle-height: 44px;
+  --mat-button-toggle-shape: var(--ds-radius-md);
+  --mat-button-toggle-text-color: var(--ds-ink-secondary);
+  --mat-button-toggle-background-color: var(--ds-surface);
+  --mat-button-toggle-selected-state-background-color: var(--ds-action-faint);
+  --mat-button-toggle-selected-state-text-color: var(--ds-action-ink);
+  --mat-button-toggle-divider-color: var(--ds-border);
+  justify-self: start;
+  max-width: 100%;
+  overflow-x: auto;
+}
+.oi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: 0 var(--ds-space-3);
+}
+.oi-error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ds-space-2);
+  margin: 0;
+  padding: var(--ds-space-3);
   border-radius: var(--ds-radius-md);
-  cursor: pointer;
-  transition: var(--ds-transition-color);
-}
-.oi-tipo-btn:hover { background: var(--ds-bg-alt); }
-.oi-tipo-btn.is-active {
-  background: var(--ds-gold-soft);
-  border-color: var(--ds-gold);
-  color: var(--ds-gold-ink);
-  font-weight: var(--ds-weight-semibold);
-}
-
-.oi-form-actions { display: flex; gap: var(--ds-space-2); }
-.oi-form-actions .oi-btn { flex: 1; }
-
-.oi-alert {
-  display: flex; align-items: center; gap: var(--ds-space-2);
-  padding: var(--ds-space-2) var(--ds-space-3);
   background: var(--ds-danger-soft);
   color: var(--ds-danger-ink);
-  border-radius: var(--ds-radius-sm);
-  font-size: var(--ds-text-xs);
 }
+.oi-error mat-icon { flex-shrink: 0; width: 20px; height: 20px; font-size: 20px; }
+.oi-actions { display: flex; flex-wrap: wrap; gap: var(--ds-space-2); }
+.oi-actions button { min-height: 44px; }
 
-/* ── Calendario ── */
-.oi-cal {
-  padding: var(--ds-space-3);
-  background: var(--ds-surface);
-  border: 1px solid var(--ds-border-subtle);
-  border-radius: var(--ds-radius-md);
+.oi-spinner {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-right: var(--ds-space-2);
+  border: 2px solid color-mix(in srgb, currentColor 30%, transparent);
+  border-top-color: currentColor;
+  border-radius: var(--ds-radius-circle);
+  vertical-align: middle;
+  animation: oi-spin 0.8s linear infinite;
 }
-.oi-cal__month {
-  text-align: center;
+.oi-del .oi-spinner { margin: 0; }
+@keyframes oi-spin { to { transform: rotate(360deg); } }
+
+/* Calendario */
+.oi-cal {
+  display: grid;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-4);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-bg);
+}
+.oi-cal__month { margin: 0; font-weight: var(--ds-weight-bold); color: var(--ds-ink); }
+.oi-cal__grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; }
+.oi-cal__hdr {
+  padding-bottom: var(--ds-space-1);
   font-size: var(--ds-text-sm);
   font-weight: var(--ds-weight-semibold);
-  margin: 0 0 var(--ds-space-2);
-}
-.oi-cal__grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 3px;
-}
-.oi-cal__hdr {
-  text-align: center;
-  font-size: var(--ds-text-2xs);
-  font-weight: var(--ds-weight-semibold);
   color: var(--ds-ink-muted);
-  padding-bottom: var(--ds-space-1);
+  text-align: center;
 }
 .oi-cal__day {
+  position: relative;
+  display: grid;
+  place-items: center;
   aspect-ratio: 1;
-  display: grid; place-items: center;
-  font-size: var(--ds-text-xs);
   border-radius: var(--ds-radius-sm);
+  font-size: var(--ds-text-sm);
+  font-stretch: var(--ds-stretch-figure);
+  font-variant-numeric: tabular-nums;
   color: var(--ds-ink-secondary);
 }
-.oi-cal__day.is-empty { background: transparent; }
-.oi-cal__day.is-worked {
-  background: var(--ds-gold-soft);
-  color: var(--ds-gold-ink);
-  font-weight: var(--ds-weight-semibold);
-}
-.oi-cal__day.is-today {
-  background: var(--ds-gold);
-  color: var(--ds-ink-on-accent);
-  font-weight: var(--ds-weight-bold);
-}
-.oi-cal__day.is-insp {
-  background: var(--ds-info-soft);
-  color: var(--ds-info-ink);
-  font-weight: var(--ds-weight-semibold);
-}
-.oi-cal__legend {
-  display: flex; flex-wrap: wrap; align-items: center;
-  gap: 2px;
-  margin-top: var(--ds-space-3);
-  font-size: var(--ds-text-2xs);
-  color: var(--ds-ink-muted);
-}
-.oi-cal__dot {
-  display: inline-block;
-  width: 10px; height: 10px;
-  border-radius: var(--ds-radius-sm);
-  margin-right: 3px;
-}
-.oi-cal__dot--worked { background: var(--ds-gold-soft); }
-.oi-cal__dot--today  { background: var(--ds-gold); }
-.oi-cal__dot--insp   { background: var(--ds-info-soft); }
-
-/* ── Spinner ── */
-.oi-spinner {
-  width: 16px; height: 16px;
-  border: 2px solid color-mix(in srgb, var(--ds-ink-on-accent) 40%, transparent);
-  border-top-color: var(--ds-ink-on-accent);
+.oi-cal__day.is-empty { visibility: hidden; }
+.oi-cal__day.is-worked { background: var(--ds-action-faint); color: var(--ds-action-ink); font-weight: var(--ds-weight-semibold); }
+.oi-cal__day.is-today { box-shadow: inset 0 0 0 2px var(--ds-action); color: var(--ds-ink); font-weight: var(--ds-weight-bold); }
+/* Punto de aviso tomate bajo el número, sobre crema: nunca sobre abeto. */
+.oi-cal__day.is-insp { background: var(--ds-surface); color: var(--ds-ink); font-weight: var(--ds-weight-bold); }
+.oi-cal__day.is-insp::after {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  width: 6px;
+  height: 6px;
   border-radius: var(--ds-radius-circle);
-  animation: oi-spin 0.7s linear infinite;
-  display: inline-block;
+  background: var(--ds-mark);
 }
-.oi-spinner--sm { width: 13px; height: 13px; }
-@keyframes oi-spin { to { transform: rotate(360deg); } }
+
+.oi-cal__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--ds-text-sm);
+  color: var(--ds-ink-secondary);
+}
+.oi-cal__legend li { display: inline-flex; align-items: center; gap: var(--ds-space-2); }
+.oi-cal__key { width: 14px; height: 14px; border-radius: var(--ds-radius-sm); }
+.oi-cal__key--worked { background: var(--ds-action-faint); box-shadow: inset 0 0 0 1px var(--ds-action); }
+.oi-cal__key--today { box-shadow: inset 0 0 0 2px var(--ds-action); }
+.oi-cal__key--insp { width: 8px; height: 8px; margin: 0 3px; border-radius: var(--ds-radius-circle); background: var(--ds-mark); }
+
+@media (prefers-reduced-motion: reduce) {
+  .oi-spinner { animation-duration: 2s; }
+}

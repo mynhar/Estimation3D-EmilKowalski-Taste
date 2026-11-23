@@ -2,9 +2,16 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } 
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDialog } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { FILE_LIMITS, validateFile } from '../../../shared/validators/file.validator';
 import { ExpedienteService } from '../../../services/expediente.service';
@@ -25,16 +32,28 @@ import {
   ServicioOpcion, ServicioSelectorComponent, resumirServicios,
 } from '../../../shared/ui/servicio-selector/servicio-selector.component';
 import { CampoExtra, CamposFaltantesComponent, listaEstable } from '../../../shared/ui/campos-faltantes/campos-faltantes.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
+import { StatusChipComponent } from '../../../shared/ui/status-chip/status-chip.component';
+import { TourPosterComponent } from '../../../shared/ui/tour-poster/tour-poster.component';
+import { abrirVisor } from '../../../shared/ui/media-viewer/media-viewer.component';
 
 @Component({
   selector: 'app-admin-offer-edit',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, TranslatePipe, DecimalPipe, OfertaRepartoComponent, ServicioSelectorComponent, AvisoArchivadoComponent, ArchivarExpedienteComponent, BotonArchivarComponent, CamposFaltantesComponent],
+  imports: [
+    FormsModule, TranslatePipe,
+    MatButtonModule, MatCheckboxModule, MatFormFieldModule, MatIconModule, MatInputModule,
+    MatSelectModule, MatTabsModule, MatTooltipModule,
+    PageHeaderComponent, EmptyStateComponent, StatusChipComponent, TourPosterComponent,
+    OfertaRepartoComponent, ServicioSelectorComponent, AvisoArchivadoComponent,
+    ArchivarExpedienteComponent, BotonArchivarComponent, CamposFaltantesComponent,
+  ],
   templateUrl: './edit.component.html',
-  styleUrl: './edit.component.css',
+  styleUrls: ['../../../shared/ui/ficha/ficha.css', './edit.component.css'],
 })
 export class AdminOfferEditComponent implements OnInit {
-  private sanitizer         = inject(DomSanitizer);
+  private dialog            = inject(MatDialog);
   private translate         = inject(TranslateService);
   private expedienteService = inject(ExpedienteService);
   private archivoService    = inject(ArchivoService);
@@ -219,8 +238,7 @@ export class AdminOfferEditComponent implements OnInit {
     if (abierta) this.popularFormulario(abierta);
   }
 
-  fotoAmpliada = signal<string | null>(null);
-  tabMedia     = signal<'fotos' | 'tour' | 'docs'>('tour');
+  tabMedia = signal<'fotos' | 'tour' | 'docs'>('tour');
 
   todasLasOfertas = signal<OfertaConConstructor[]>([]);
   /**
@@ -235,17 +253,23 @@ export class AdminOfferEditComponent implements OnInit {
     return !!oferta.eliminada_en;
   }
 
-  get completedSteps(): number {
-    let n = 0;
-    if (this.constructorSeleccionadoId()) n++;
-    if (this.multiServicio() && this.servicioIdsOferta().length) n++;
-    if (this.precio && this.precio > 0) n++;
-    if (this.plazoMin && this.plazoMin > 0 && this.plazoMax && this.plazoMax >= (this.plazoMin ?? 0)) n++;
-    if (this.fechaInicio) n++;
-    if (this.descripcion.trim()) n++;
-    if (this.documentosActuales().length || this.documentosOferta().length) n++;
-    return n;
+  /** Lo que falta, de un vistazo, bajo los adjuntos. Mismos criterios que `faltantes`. */
+  get checklist(): { label: string; ok: boolean }[] {
+    const l = [
+      { label: 'admin_offer.constructor_label',   ok: !this.constructorInvalido },
+      { label: 'make_offer.checklist_price',      ok: !this.precioInvalido },
+      { label: 'make_offer.checklist_deadline',   ok: !this.plazoMinInvalido && !this.plazoMaxInvalido },
+      { label: 'make_offer.checklist_start',      ok: !this.fechaInicioInvalida },
+      { label: 'make_offer.checklist_desc',       ok: !this.descripcionInvalida },
+    ];
+    if (this.multiServicio()) l.splice(1, 0, { label: 'offer_services.label', ok: !this.serviciosOfertaInvalidos });
+    // El PDF solo es obligatorio al crear la oferta.
+    if (!this.ofertaId()) l.push({ label: 'make_offer.pdf_doc', ok: this.documentosOferta().length > 0 });
+    return l;
   }
+
+  /** Cupo de ofertas vivas por dossier: la barra de la cabecera de «Ofertas recibidas». */
+  readonly CUPO = [1, 2, 3, 4, 5];
 
   // ── Validez por campo ──────────────────────────────────────────────────────
   // Mismos criterios que las guardas de enviarOferta(), para que el borde rojo
@@ -659,16 +683,26 @@ export class AdminOfferEditComponent implements OnInit {
     return [raw];
   }
 
-  getSafeUrl(url: string): SafeResourceUrl {
-    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  tituloTour(i: number): string {
+    return this.translate.instant('estimator_file.tour_video_n', { n: i + 1 });
   }
 
+  /** La foto a pantalla completa, en el visor compartido (foco atrapado, Escape cierra). */
   abrirFoto(archivo: ArchivoRow) {
-    this.fotoAmpliada.set(this.publicUrl(archivo.url_storage));
+    abrirVisor(this.dialog, { tipo: 'foto', url: this.publicUrl(archivo.url_storage), titulo: archivo.nombre_archivo });
   }
 
-  cerrarFoto() {
-    this.fotoAmpliada.set(null);
+  /** Importes sin decimales, en dólares canadienses. */
+  formatCosto(valor: number | null | undefined): string {
+    if (valor === null || valor === undefined) return '—';
+    return new Intl.NumberFormat('fr-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(valor);
+  }
+
+  formatPlazo(min: number | null, max: number | null): string {
+    if (!min && !max) return '—';
+    const w = this.translate.instant('offer.weeks');
+    if (min === max) return `${min} ${w}`;
+    return `${min ?? '?'} – ${max ?? '?'} ${w}`;
   }
 
   formatFecha(valor: string): string {
@@ -920,16 +954,11 @@ export class AdminOfferEditComponent implements OnInit {
   /**
    * `estado` viaja como `string` en el modelo, así que un valor nuevo del enum
    * `estado_oferta` se colaría hasta la plantilla y ngx-translate pintaría la
-   * clave cruda («admin_offer.oferta_retirada»). Ante lo desconocido, el propio
-   * valor es más legible que una clave sin traducir.
+   * clave cruda («admin_offer.oferta_retirada»). Ante lo desconocido, la
+   * plantilla pinta el propio valor, más legible que una clave sin traducir.
    */
-  estadoOfertaKey(estado: string): string {
-    const conocidos = ['pendiente', 'aceptada', 'rechazada'];
-    return conocidos.includes(estado) ? `admin_offer.oferta_${estado}` : estado;
-  }
-
-  initiales(nombre: string): string {
-    return nombre.split(' ').slice(0, 2).map(p => p[0] ?? '').join('').toUpperCase();
+  estadoConocido(estado: string): boolean {
+    return ['pendiente', 'aceptada', 'rechazada'].includes(estado);
   }
 
   // Un archivado no sale en admin/offer: se vuelve a su propia lista.

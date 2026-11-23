@@ -1,6 +1,7 @@
 /* component: empty state
  * states: default (con o sin pasos, con o sin acción)
- * contrast: título ink (13.9:1), texto ink-secondary (≥ 9:1); icono ink-secondary sobre stone
+ * contrast: título ink (13.6:1 sobre vélin), texto ink-secondary (10:1); icono ink-secondary sobre band
+ * acción: si es la siguiente etapa, el padre la marca con .ds-cta (tomate)
  */
 :host {
   display: grid;
@@ -18,7 +19,7 @@
   width: 48px;
   height: 48px;
   border-radius: var(--ds-radius-md);
-  background: var(--ds-stone);
+  background: var(--ds-band);
   color: var(--ds-ink-secondary);
 }
 
@@ -27,6 +28,7 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-2xl);
   font-weight: var(--ds-weight-bold);
+  font-stretch: var(--ds-stretch-heading);
   line-height: var(--ds-leading-snug);
   letter-spacing: normal;
   color: var(--ds-ink);

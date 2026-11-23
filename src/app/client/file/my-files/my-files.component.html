@@ -1,402 +1,193 @@
-<!-- Change: filter-bar merged into header (eliminates duplicate stats);
-     grid → 4 cols at xl; empty states scoped to mf-empty. -->
-<div class="page-wrapper mf-root">
+<div class="page-wrapper mf">
 
-  <!-- ══════════════════════════════════════════════════════════
-       HEADER EDITORIAL — título + filtros en un solo bloque
-       ══════════════════════════════════════════════════════════ -->
-  <header class="mf-header">
-    <div class="mf-header__accent" aria-hidden="true"></div>
-
-    <!-- Fila superior: eyebrow + título + CTA -->
-    <div class="mf-header__top">
-      <div class="mf-header__info">
-        <p class="page-eyebrow">
-          <i class="bi bi-person-circle" aria-hidden="true"></i>
-          {{ 'role.client' | translate }}
-        </p>
-        <h1 class="mf-header__title">{{ 'file.my_files' | translate }}</h1>
-      </div>
-
-      <a routerLink="/client/file/create" class="btn btn-primary mf-header__cta">
-        <i class="bi bi-plus-lg" aria-hidden="true"></i>
-        <span class="d-none d-sm-inline">{{ 'file.new_file' | translate }}</span>
-        <span class="d-sm-none">{{ 'common.new' | translate }}</span>
-      </a>
-    </div>
-
-    <!-- Fila inferior: chips de filtro (actúan también como KPIs) -->
+  <app-page-header [titulo]="'file.my_files' | translate">
     @if (!cargando() && expedientes().length > 0) {
-      <div class="mf-header__filter-row"
-           role="group"
-           [attr.aria-label]="'file.filter_label' | translate">
-        <div class="status-chips">
-
-          <button class="status-chip"
-                  [class.status-chip--active]="filtro() === 'todos'"
-                  (click)="filtro.set('todos')">
-            <i class="bi bi-grid-2x2" aria-hidden="true"></i>
-            {{ 'common.all' | translate }}
-            <span class="status-chip__count">{{ countTodos() }}</span>
-          </button>
-
-          <button class="status-chip mf-chip--activos"
-                  [class.status-chip--active]="filtro() === 'activos'"
-                  (click)="filtro.set('activos')">
-            <i class="bi bi-lightning-charge" aria-hidden="true"></i>
-            {{ 'file.active' | translate }}
-            <span class="status-chip__count">{{ countActivos() }}</span>
-          </button>
-
-          <button class="status-chip mf-chip--finalizados"
-                  [class.status-chip--active]="filtro() === 'finalizados'"
-                  (click)="filtro.set('finalizados')">
-            <i class="bi bi-check2-circle" aria-hidden="true"></i>
-            {{ 'file.finished' | translate }}
-            <span class="status-chip__count">{{ countFinalizados() }}</span>
-          </button>
-
-        </div>
-
-        @if (filtro() !== 'todos') {
-          <span class="mf-filter-info">
-            {{ 'common.showing' | translate }}
-            {{ expedientesFiltrados().length }}
-            {{ 'common.of' | translate }}
-            {{ countTodos() }}
-          </span>
-        }
-
-        <div class="view-toggle d-none d-md-inline-flex" role="group"
-             [class.ms-auto]="filtro() === 'todos'"
-             [attr.aria-label]="'file.view_table' | translate">
-          <button type="button" class="view-toggle__btn"
-                  [class.view-toggle__btn--active]="vista() === 'tabla'"
-                  [attr.aria-pressed]="vista() === 'tabla'"
-                  (click)="setVista('tabla')"
-                  [title]="'file.view_table' | translate">
-            <i class="bi bi-table" aria-hidden="true"></i>
-          </button>
-          <button type="button" class="view-toggle__btn"
-                  [class.view-toggle__btn--active]="vista() === 'tarjetas'"
-                  [attr.aria-pressed]="vista() === 'tarjetas'"
-                  (click)="setVista('tarjetas')"
-                  [title]="'file.view_cards' | translate">
-            <i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>
-          </button>
-        </div>
-      </div>
-
-    } @else if (!cargando()) {
-      <!-- Sin expedientes: hint sutil debajo del título -->
-      <div class="mf-header__hint">
-        <span class="mf-stat-text">{{ 'file.no_files_yet' | translate }}</span>
-      </div>
+      <a actions mat-stroked-button class="mf-new" routerLink="/client/file/create">
+        <mat-icon>add</mat-icon>
+        {{ 'file.new_file' | translate }}
+      </a>
     }
+  </app-page-header>
 
-  </header>
+  <!-- Filtros (hacen también de recuento) y, en escritorio, tabla o tarjetas -->
+  @if (!cargando() && expedientes().length > 0) {
+    <div class="mf-tools">
+      <mat-button-toggle-group class="mf-filter" hideSingleSelectionIndicator
+                               [value]="filtro()" (change)="filtro.set($event.value)"
+                               [attr.aria-label]="'file.filter_label' | translate">
+        <mat-button-toggle value="todos">
+          {{ 'common.all' | translate }} <span class="mf-count">{{ countTodos() }}</span>
+        </mat-button-toggle>
+        <mat-button-toggle value="activos">
+          {{ 'file.active' | translate }} <span class="mf-count">{{ countActivos() }}</span>
+        </mat-button-toggle>
+        <mat-button-toggle value="finalizados">
+          {{ 'file.finished' | translate }} <span class="mf-count">{{ countFinalizados() }}</span>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
 
-  <!-- ══════════════════════════════════════════════════════════
-       SKELETON — shimmer de 8 cards (4 col en xl)
-       ══════════════════════════════════════════════════════════ -->
+      @if (filtro() !== 'todos') {
+        <p class="mf-showing" role="status">
+          {{ 'common.showing' | translate }} {{ expedientesFiltrados().length }}
+          {{ 'common.of' | translate }} {{ countTodos() }}
+        </p>
+      }
+
+      <mat-button-toggle-group class="mf-view" hideSingleSelectionIndicator
+                               [value]="vista()" (change)="setVista($event.value)">
+        <mat-button-toggle value="tarjetas" [aria-label]="'file.view_cards' | translate"
+                           [matTooltip]="'file.view_cards' | translate">
+          <mat-icon>grid_view</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="tabla" [aria-label]="'file.view_table' | translate"
+                           [matTooltip]="'file.view_table' | translate">
+          <mat-icon>table_rows</mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+  }
+
+  <!-- ── Cargando ────────────────────────────────────────────────────────── -->
   @if (cargando()) {
-    <div class="row g-4 row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4"
-         aria-hidden="true">
-      @for (_ of [1,2,3,4,5,6,7,8]; track $index) {
-        <div class="col">
-          <div class="mf-skel-card h-100">
-            <div class="mf-skel-card__bar"></div>
-            <div class="mf-skel-card__body">
-              <div class="mf-skel-row mf-skel-row--between">
-                <div class="mf-skel mf-skel--num"></div>
-                <div class="mf-skel mf-skel--badge"></div>
-              </div>
-              <div class="mf-skel mf-skel--title"></div>
-              <div class="mf-skel mf-skel--title mf-skel--short"></div>
-              <div class="mf-skel mf-skel--date"></div>
-              <div class="mf-skel-divider"></div>
-              <div class="mf-skel-pipeline">
-                @for (i of [1,2,3,4,5]; track i) {
-                  <div class="mf-skel mf-skel--dot"></div>
-                  @if (i < 5) { <div class="mf-skel mf-skel--line"></div> }
-                }
-              </div>
-              <div class="mf-skel mf-skel--hint"></div>
-              <div class="mf-skel mf-skel--btn"></div>
-            </div>
-          </div>
-        </div>
+    <div class="mf-grid" aria-hidden="true">
+      @for (_ of [1, 2, 3, 4, 5, 6]; track $index) {
+        <span class="skel"></span>
       }
     </div>
 
-  <!-- ══════════════════════════════════════════════════════════
-       SIN EXPEDIENTES
-       ══════════════════════════════════════════════════════════ -->
+  <!-- ── Sin expedientes ─────────────────────────────────────────────────── -->
   } @else if (expedientes().length === 0) {
-    <div class="mf-empty">
-      <div class="mf-empty__rings" aria-hidden="true">
-        <div class="mf-empty__ring mf-empty__ring--3"></div>
-        <div class="mf-empty__ring mf-empty__ring--2"></div>
-        <div class="mf-empty__ring mf-empty__ring--1"></div>
-        <div class="mf-empty__icon">
-          <i class="bi bi-folder2-open"></i>
-        </div>
-      </div>
-      <div class="mf-empty__copy">
-        <h2 class="mf-empty__title">{{ 'file.no_files_title' | translate }}</h2>
-        <p class="mf-empty__desc">{{ 'file.no_files_3d_text' | translate }}</p>
-      </div>
-      <a routerLink="/client/file/create" class="btn btn-primary">
-        <i class="bi bi-plus-lg" aria-hidden="true"></i>
+    <app-empty-state class="mf-empty"
+                     matIcon="create_new_folder"
+                     [titulo]="'file.no_files_title' | translate"
+                     [texto]="'file.no_files_3d_text' | translate">
+      <a actions mat-flat-button class="ds-cta" routerLink="/client/file/create">
+        <mat-icon>add</mat-icon>
         {{ 'dashboard_client.create_first' | translate }}
       </a>
-    </div>
+    </app-empty-state>
 
-  <!-- ══════════════════════════════════════════════════════════
-       GRID DE EXPEDIENTES
-       ══════════════════════════════════════════════════════════ -->
+  <!-- ── Filtro sin resultados ───────────────────────────────────────────── -->
+  } @else if (expedientesFiltrados().length === 0) {
+    <app-empty-state class="mf-empty"
+                     matIcon="filter_alt_off"
+                     [titulo]="'common.no_results' | translate"
+                     [texto]="'file.no_match' | translate">
+      <button actions mat-stroked-button type="button" (click)="filtro.set('todos')">
+        {{ 'common.clear_filter' | translate }}
+      </button>
+    </app-empty-state>
+
   } @else {
 
-    <!-- Sin resultados con filtro activo -->
-    @if (expedientesFiltrados().length === 0) {
-      <div class="mf-empty mf-empty--filter">
-        <div class="mf-empty__icon mf-empty__icon--sm">
-          <i class="bi bi-funnel"></i>
-        </div>
-        <div class="mf-empty__copy">
-          <h2 class="mf-empty__title mf-empty__title--sm">{{ 'common.no_results' | translate }}</h2>
-          <p class="mf-empty__desc">{{ 'file.no_match' | translate }}</p>
-        </div>
-        <button class="btn btn-outline-secondary btn-sm" (click)="filtro.set('todos')">
-          <i class="bi bi-x-lg" aria-hidden="true"></i>
-          {{ 'common.clear_filter' | translate }}
-        </button>
-      </div>
-
-    <!-- Grid 1 → 2 → 3 → 4 columnas -->
-    } @else {
-
-      <!-- ── Vista tabla (escritorio) ─────────────────────────────────────── -->
-      <div class="mf-table-card d-none" [class.d-md-block]="vista() === 'tabla'">
+    <!-- ── Tabla (escritorio, si se elige) ──────────────────────────────── -->
+    @if (vista() === 'tabla') {
+      <div class="mf-table-wrap">
         <table class="mf-table">
           <thead>
             <tr>
-              <th class="mf-table__col-photo" aria-hidden="true"></th>
-              <th class="mf-table__col-num">{{ 'file.col_number' | translate }}</th>
-              <th>{{ 'file.col_service' | translate }}</th>
-              <th class="mf-table__col-date">{{ 'file.col_visit' | translate }}</th>
-              <th>{{ 'file.col_status' | translate }}</th>
-              <th class="mf-table__col-action" aria-hidden="true"></th>
+              <th scope="col">{{ 'file.col_service' | translate }}</th>
+              <th scope="col">{{ 'file.col_number' | translate }}</th>
+              <th scope="col">{{ 'file.col_visit' | translate }}</th>
+              <th scope="col">{{ 'file.col_status' | translate }}</th>
             </tr>
           </thead>
           <tbody>
             @for (exp of expedientesPaginados(); track exp.id) {
-              <!-- Clic en cualquier parte de la fila abre el expediente. La fila sale
-                   del orden de tabulación (tabindex -1): el foco de teclado va al
-                   enlace del número, que sí responde a Enter. -->
-              <tr class="mf-table__row" [routerLink]="['/client/file/my-file', exp.id]"
-                  tabindex="-1"
-                  [attr.data-estado]="exp.estado">
-                <td class="mf-table__col-photo">
-                  <div class="mf-table__thumb">
-                    @if (fotoExpediente(exp); as foto) {
-                      <img [src]="foto" loading="lazy" [alt]="exp.numero" (error)="onFotoError(exp.id)" />
-                    } @else {
-                      <i class="bi bi-badge-3d" aria-hidden="true"></i>
-                    }
+              <!-- La fila entera abre el dossier; el foco de teclado va al enlace del servicio. -->
+              <tr class="mf-table__row" (click)="abrir(exp.id)">
+                <td>
+                  <div class="mf-table__svc">
+                    <span class="mf-thumb">
+                      @if (fotoExpediente(exp); as foto) {
+                        <img [src]="foto" loading="lazy" alt="" (error)="onFotoError(exp.id)" />
+                      } @else {
+                        <mat-icon aria-hidden="true">view_in_ar</mat-icon>
+                      }
+                    </span>
+                    <span class="mf-table__svc-text">
+                      <a class="mf-table__link" [routerLink]="['/client/file/my-file', exp.id]"
+                         (click)="$event.stopPropagation()">{{ servicioNombre(exp.servicio) }}</a>
+                      @for (c of obrasTerminadasDe(exp); track c.id) {
+                        <span class="mf-obra">
+                          <mat-icon aria-hidden="true">flag</mat-icon>
+                          <span><strong>{{ 'monitoring.obra_terminada_badge' | translate }}</strong>
+                            <span class="mf-obra__svc">{{ serviciosContrato(c) }}</span></span>
+                        </span>
+                      }
+                    </span>
                   </div>
                 </td>
-                <td class="mf-table__col-num">
-                  <a class="mf-table__link" [routerLink]="['/client/file/my-file', exp.id]"
-                     (click)="$event.stopPropagation()">
-                    <span class="mf-card__num">{{ exp.numero }}</span>
-                  </a>
-                </td>
-                <td>
-                  <span class="mf-table__service">{{ servicioNombre(exp.servicio) }}</span>
-                </td>
-                <td class="mf-table__col-date">{{ formatFecha(exp.fecha_visita) }}</td>
-                <td>
-                  <span class="status-badge {{ estadoCfg(exp.estado).clase }}">
-                    <i class="bi {{ estadoCfg(exp.estado).icono }}" aria-hidden="true"></i>
-                    {{ ('state.' + exp.estado) | translate }}
-                  </span>
-                  @if (obrasTerminadasDe(exp).length > 0) {
-                    <ul class="mf-obras mf-obras--table">
-                      @for (c of obrasTerminadasDe(exp); track c.id) {
-                        <li class="mf-obra">
-                          <span class="tag tag-gold mf-obra__tag">
-                            <i class="bi bi-flag" aria-hidden="true"></i>{{ 'monitoring.obra_terminada_badge' | translate }}
-                          </span>
-                          <span class="mf-obra__svc">{{ serviciosContrato(c) }}</span>
-                        </li>
-                      }
-                    </ul>
-                  }
-                </td>
-                <td class="mf-table__col-action">
-                  <i class="bi bi-chevron-right" aria-hidden="true"></i>
-                </td>
+                <td class="mf-fig">{{ exp.numero }}</td>
+                <td class="mf-fig">{{ formatFecha(exp.fecha_visita) }}</td>
+                <td><app-status-chip [estado]="exp.estado" /></td>
               </tr>
             }
           </tbody>
         </table>
       </div>
 
-      <!-- ── Grid de tarjetas (móvil siempre · escritorio en vista tarjetas) ─ -->
-      <div class="row g-4 row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4"
-           [class.d-md-none]="vista() === 'tabla'">
-        @for (exp of expedientesPaginados(); track exp.id) {
-          <div class="col">
-            <article class="mf-card h-100"
-                     [class.mf-card--cancelado]="exp.estado === 'cancelado'"
-                     [class.mf-card--oferta]="exp.estado === 'en_oferta'"
-                     [attr.data-estado]="exp.estado">
-
-              <!-- Barra lateral de color de estado -->
-              <div class="mf-card__bar" aria-hidden="true"></div>
-
-              <div class="mf-card__body">
-
-                <!-- Foto del expediente (miniatura del tour 3D) -->
-                <div class="mf-card__photo">
-                  @if (fotoExpediente(exp); as foto) {
-                    <img class="mf-card__photo-img" [src]="foto" loading="lazy"
-                         [alt]="exp.numero" (error)="onFotoError(exp.id)" />
-                  } @else {
-                    <div class="mf-card__photo-empty"
-                         [title]="'file.photo_none' | translate">
-                      <i class="bi bi-badge-3d" aria-hidden="true"></i>
-                    </div>
-                  }
-                </div>
-
-                <!-- Número + badge -->
-                <div class="mf-card__head">
-                  <span class="mf-card__num">{{ exp.numero }}</span>
-                  <span class="status-badge {{ estadoCfg(exp.estado).clase }}">
-                    <i class="bi {{ estadoCfg(exp.estado).icono }}" aria-hidden="true"></i>
-                    {{ ('state.' + exp.estado) | translate }}
-                  </span>
-                </div>
-
-                <!-- Servicio -->
-                <p class="mf-card__service">{{ servicioNombre(exp.servicio) }}</p>
-
-                <!-- Fecha de visita -->
-                <p class="mf-card__date">
-                  <i class="bi bi-calendar3" aria-hidden="true"></i>
-                  {{ formatFecha(exp.fecha_visita) }}
-                </p>
-
-                <div class="mf-card__divider" aria-hidden="true"></div>
-
-                <!-- Pipeline de progreso -->
-                @if (exp.estado !== 'cancelado') {
-                  <div class="mf-pipeline"
-                       role="list"
-                       [attr.aria-label]="'file.pipeline_label' | translate">
-                    @for (step of PIPELINE; let i = $index; track step.label) {
-                      @if (i > 0) {
-                        <div class="mf-pipe-line"
-                             [class.mf-pipe-line--done]="connectorBlue(exp.estado, i)"
-                             aria-hidden="true"></div>
-                      }
-                      <div class="mf-pipe-node" role="listitem"
-                           [class.mf-pipe-node--done]="dotActive(exp.estado, i) && !dotCurrent(exp.estado, i)"
-                           [class.mf-pipe-node--current]="dotCurrent(exp.estado, i)">
-                        <div class="mf-pipe-dot" aria-hidden="true">
-                          @if (dotActive(exp.estado, i) && !dotCurrent(exp.estado, i)) {
-                            <i class="bi bi-check-lg mf-pipe-check"></i>
-                          }
-                        </div>
-                        <span class="mf-pipe-lbl">{{ step.label | translate }}</span>
-                      </div>
-                    }
-                  </div>
-
-                } @else {
-                  <div class="mf-card__cancelled">
-                    <i class="bi bi-x-circle" aria-hidden="true"></i>
-                    {{ 'file.cancelled' | translate }}
-                  </div>
-                }
-
-                <!-- Hint contextual -->
-                <div class="mf-card__hint">
-                  <i class="bi {{ estadoCfg(exp.estado).icono }} mf-card__hint-icon" aria-hidden="true"></i>
-                  <p class="mf-card__hint-text">{{ ('state_hint.' + exp.estado) | translate }}</p>
-                </div>
-
-                <!-- Una marca por contrato con la obra al 100 % (contrato aún abierto) -->
-                @if (obrasTerminadasDe(exp).length > 0) {
-                  <ul class="mf-obras">
-                    @for (c of obrasTerminadasDe(exp); track c.id) {
-                      <li class="mf-obra">
-                        <span class="tag tag-gold mf-obra__tag">
-                          <i class="bi bi-flag" aria-hidden="true"></i>{{ 'monitoring.obra_terminada_badge' | translate }}
-                        </span>
-                        <span class="mf-obra__svc">{{ serviciosContrato(c) }}</span>
-                      </li>
-                    }
-                  </ul>
-                }
-
-                <!-- Descripción breve -->
-                @if (exp.descripcion) {
-                  <p class="mf-card__desc">{{ exp.descripcion }}</p>
-                }
-
-                <!-- Acciones -->
-                <div class="mf-card__actions">
-                  <!-- Enlace principal estirado (::after) sobre toda la tarjeta: un clic
-                       en cualquier parte abre el expediente. -->
-                  <a [routerLink]="['/client/file/my-file', exp.id]"
-                     class="btn btn-outline-primary btn-sm mf-card__btn-main"
-                     [attr.aria-label]="('file.see_file' | translate) + ' ' + exp.numero">
-                    <i class="bi bi-folder2-open" aria-hidden="true"></i>
-                    {{ 'file.see_file' | translate }}
-                  </a>
-
-                  @if (exp.estado === 'en_oferta') {
-                    <a routerLink="/client/offers-received" class="mf-card__btn-offer">
-                      <i class="bi bi-eye" aria-hidden="true"></i>
-                      {{ 'file.review_offers_received' | translate }}
-                      <i class="bi bi-arrow-right" aria-hidden="true"></i>
-                    </a>
-                  }
-
-                  @if (exp.estado === 'contratado') {
-                    <div class="mf-card__contracted">
-                      <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
-                      {{ 'file.contracted_active' | translate }}
-                    </div>
-                  }
-                </div>
-
-              </div>
-            </article>
-          </div>
-        }
-      </div>
-
-      <app-pagination
-        [total]="expedientesFiltrados().length"
-        [page]="paginaActual()"
-        [pageSize]="POR_PAGINA"
-        (pageChange)="paginaActual.set($event)">
-      </app-pagination>
-
     }
 
-  }
+    <!-- ── Tarjetas (en móvil siempre; en escritorio, salvo vista tabla) ── -->
+    <ul class="mf-grid" [class.is-mobile-only]="vista() === 'tabla'">
+        @for (exp of expedientesPaginados(); track exp.id) {
+          <li class="mf-card" [class.is-out]="etapa(exp) === 0">
+            <span class="mf-card__photo">
+              @if (fotoExpediente(exp); as foto) {
+                <img [src]="foto" loading="lazy" alt="" (error)="onFotoError(exp.id)" />
+              } @else {
+                <mat-icon aria-hidden="true">view_in_ar</mat-icon>
+              }
+            </span>
 
-  <!-- FAB flotante: acceso al Asistente IA -->
-  <a routerLink="/client/ai-assistant" class="ai-fab"
-     [attr.aria-label]="'common.floating_ask' | translate"
-     [title]="'common.floating_ask' | translate">
-    <span class="ai-fab__icon" aria-hidden="true"><app-claude-icon /></span>
-    <span class="ai-fab__label">{{ 'common.floating_ask' | translate }}</span>
-  </a>
+            <div class="mf-card__body">
+              <!-- El enlace del título cubre la tarjeta entera (::after). -->
+              <h2 class="mf-card__title">
+                <a class="mf-card__link" [routerLink]="['/client/file/my-file', exp.id]">
+                  {{ servicioNombre(exp.servicio) }}
+                </a>
+              </h2>
+              <p class="mf-card__num">{{ exp.numero }}</p>
+              <app-status-chip class="mf-card__chip" [estado]="exp.estado" />
+
+              @if (etapa(exp) > 0) {
+                <app-stage-line class="mf-card__line" [actual]="etapa(exp)" [compact]="true" />
+              }
+
+              @if (etapa(exp) > 0) {
+                <p class="mf-card__hint">{{ ('state_hint.' + exp.estado) | translate }}</p>
+              }
+
+              <p class="mf-card__meta">
+                <mat-icon aria-hidden="true">event</mat-icon>
+                <span><span class="cdk-visually-hidden">{{ 'file.col_visit' | translate }} </span>{{ formatFecha(exp.fecha_visita) }}</span>
+              </p>
+
+              @for (c of obrasTerminadasDe(exp); track c.id) {
+                <p class="mf-obra">
+                  <mat-icon aria-hidden="true">flag</mat-icon>
+                  <span><strong>{{ 'monitoring.obra_terminada_badge' | translate }}</strong>
+                    <span class="mf-obra__svc">{{ serviciosContrato(c) }}</span></span>
+                </p>
+              }
+
+              @if (exp.estado === 'en_oferta') {
+                <a class="mf-card__more" routerLink="/client/offers-received">
+                  {{ 'file.review_offers_received' | translate }}
+                  <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+                </a>
+              }
+            </div>
+          </li>
+        }
+    </ul>
+
+    <app-pagination
+      [total]="expedientesFiltrados().length"
+      [page]="paginaActual()"
+      [pageSize]="POR_PAGINA"
+      (pageChange)="paginaActual.set($event)" />
+  }
 
 </div>

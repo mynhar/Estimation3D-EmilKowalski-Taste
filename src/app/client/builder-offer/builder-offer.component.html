@@ -1,774 +1,257 @@
-<!-- ── Lightbox ──────────────────────────────────────────────────── -->
-@if (fotoAmpliada()) {
-  <div class="lightbox-overlay" role="dialog" aria-modal="true"
-       [attr.aria-label]="'file.photo_enlarged' | translate"
-       (click)="cerrarFoto()">
-    <div class="lightbox-container" (click)="$event.stopPropagation()">
-      <img [src]="fotoAmpliada()!" class="lightbox-img" alt="" />
-      <button class="lightbox-close" type="button" (click)="cerrarFoto()"
-              [title]="'common.close' | translate">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-             fill="none" stroke="currentColor" stroke-width="1.5"
-             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
-        </svg>
-      </button>
-    </div>
-  </div>
-}
+<div class="page-wrapper bo">
 
-<div class="page-wrapper">
-
-  <!-- ── Skeleton de carga ─────────────────────────────────────── -->
+  <!-- ── Cargando ────────────────────────────────────────────────────────── -->
   @if (cargando()) {
-
-    <div class="exp-header mb-4" aria-hidden="true">
-      <div class="skel skel--back-btn flex-shrink-0"></div>
-      <div class="exp-header__body">
-        <div class="skel skel--eyebrow mb-2"></div>
-        <div class="skel skel--title-lg mb-3"></div>
-        <div class="d-flex align-items-center gap-2">
-          <div class="skel skel--num-chip"></div>
-          <div class="skel skel--badge-sm"></div>
-          <div class="skel skel--pill d-none d-sm-block"></div>
-          <div class="skel skel--pill d-none d-sm-block"></div>
-        </div>
+    <div class="bo-skel" aria-hidden="true">
+      <span class="skel skel--title"></span>
+      <span class="skel skel--line"></span>
+      <div class="bo-skel__grid">
+        <span class="skel skel--card"></span>
+        <span class="skel skel--card"></span>
       </div>
     </div>
 
-    <div class="row g-4" aria-hidden="true">
-      <div class="col-lg-8">
-        <div class="skel-card mb-4">
-          <div class="skel-card__body">
-            <div class="row g-3 mb-4">
-              <div class="col-sm-6">
-                <div class="skel skel--label mb-2"></div>
-                <div class="skel skel--value"></div>
-              </div>
-              <div class="col-sm-6">
-                <div class="skel skel--label mb-2"></div>
-                <div class="skel skel--value"></div>
-              </div>
-            </div>
-            <div class="skel-divider mb-4"></div>
-            <div class="skel skel--label mb-2"></div>
-            <div class="skel skel--costo"></div>
-          </div>
-        </div>
-        <div class="d-flex align-items-center gap-2 mb-3">
-          <div class="skel skel--section-title"></div>
-          <div class="skel skel--badge-sm"></div>
-        </div>
-        <div class="offers-grid">
-          @for (_ of [1,2]; track $index) {
-            <div class="skel-card">
-              <div class="skel-card__body">
-                <div class="d-flex justify-content-between mb-3 gap-3">
-                  <div class="skel skel--price"></div>
-                  <div class="skel skel--badge-sm"></div>
-                </div>
-                <div class="row g-3">
-                  <div class="col-sm-6">
-                    <div class="skel skel--label mb-2"></div>
-                    <div class="skel skel--value"></div>
-                  </div>
-                  <div class="col-sm-3">
-                    <div class="skel skel--label mb-2"></div>
-                    <div class="skel skel--value"></div>
-                  </div>
-                  <div class="col-sm-3">
-                    <div class="skel skel--label mb-2"></div>
-                    <div class="skel skel--value"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          }
-        </div>
-      </div>
-      <div class="col-lg-4">
-        <div class="skel-card mb-3">
-          <div class="skel-card__body">
-            @for (_ of [1,2,3]; track $index) {
-              <div class="skel skel--label mb-1"></div>
-              <div class="skel skel--value mb-4"></div>
-            }
-          </div>
-        </div>
-        <div class="accept-card">
-          <div class="accept-hint">
-            <div class="skel skel--circle-lg mb-3"></div>
-            <div class="skel skel--label" style="width:55%"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  <!-- ── Error / no encontrado ──────────────────────────────────── -->
+  <!-- ── No encontrado ───────────────────────────────────────────────────── -->
   } @else if (!expediente()) {
-    <div class="page-error">
-      <div class="page-error__icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-             fill="none" stroke="currentColor" stroke-width="1.5"
-             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/>
-          <line x1="12" x2="12" y1="9" y2="13"/>
-          <line x1="12" x2="12.01" y1="17" y2="17"/>
-        </svg>
-      </div>
-      <p class="page-error__title">{{ 'file.not_found' | translate }}</p>
-      @if (errorMsg()) {
-        <p class="page-error__msg">{{ errorMsg() | translate }}</p>
-      }
-      <button class="btn-outline-sm" type="button" (click)="volver()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-             fill="none" stroke="currentColor" stroke-width="1.5"
-             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
-        </svg>
-        {{ 'common.back' | translate }}
-      </button>
-    </div>
+    <app-empty-state class="bo-missing"
+                     matIcon="folder_off"
+                     [titulo]="'file.not_found' | translate"
+                     [texto]="errorMsg() ? (errorMsg() | translate) : ''">
+      <a actions mat-stroked-button routerLink="/client/offers-received">
+        <mat-icon>arrow_back</mat-icon>
+        {{ 'my_offer.back_btn' | translate }}
+      </a>
+    </app-empty-state>
 
-  <!-- ── Contenido ──────────────────────────────────────────────── -->
   } @else {
+    @let exp = expediente()!;
+    @let nSel = ofertasSeleccionadas().length;
 
-    <!-- ── Encabezado editorial ────────────────────────────────── -->
-    <header class="exp-header mb-5">
-      <button class="btn-back flex-shrink-0" type="button" (click)="volver()"
-              [title]="'common.back' | translate">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-             fill="none" stroke="currentColor" stroke-width="1.5"
-             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
-        </svg>
-      </button>
-
-      <div class="exp-header__body">
-        <span class="eyebrow mb-1 d-block">{{ 'role.client' | translate }}</span>
-        <h1 class="exp-title">{{ servicioNombre() }}</h1>
-        <div class="d-flex align-items-center flex-wrap gap-2 mt-2">
-          <span class="exp-num">{{ expediente()!.numero }}</span>
-          <span class="badge rounded-pill px-3 py-1 {{ expedienteBadgeClass(expediente()!.estado) }}">
-            {{ ('state.' + expediente()!.estado) | translate }}
-          </span>
-          @if (ofertas().length > 0) {
-            <span class="kpi-pill kpi-pill--ofertas">
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
-                   fill="none" stroke="currentColor" stroke-width="1.5"
-                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-                <path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-              </svg>
-              {{ ofertas().length }} {{ 'common.offers_count' | translate }}
-            </span>
-          }
-          @if (estimacion()?.costo_estimado != null) {
-            <span class="kpi-pill kpi-pill--costo">
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
-                   fill="none" stroke="currentColor" stroke-width="1.5"
-                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <line x1="12" x2="12" y1="2" y2="22"/>
-                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-              </svg>
-              {{ formatCosto(estimacion()!.costo_estimado!) }}
-            </span>
-          }
-        </div>
+    <!-- ── Cabecera ──────────────────────────────────────────────────────── -->
+    <header class="bo-head">
+      <a mat-button class="bo-back" routerLink="/client/offers-received">
+        <mat-icon>arrow_back</mat-icon>
+        {{ 'my_offer.back_btn' | translate }}
+      </a>
+      <app-page-header [titulo]="servicioNombre()" [contexto]="('state_desc.' + exp.estado) | translate" />
+      <div class="bo-meta">
+        <span class="bo-fig">{{ exp.numero }}</span>
+        <app-status-chip [estado]="exp.estado" />
       </div>
     </header>
 
     <!-- Expediente archivado: las ofertas quedan archivadas y no se adjudican. -->
     @if (archivado()) {
-      <app-aviso-archivado class="mb-4" ambito="expediente" />
+      <app-aviso-archivado ambito="expediente" />
     }
 
-    <!-- ── Grid principal ──────────────────────────────────────── -->
-    <div class="row g-4 align-items-start">
+    <!-- Orden del DOM = orden en móvil: ofertas, decisión, informe, dossier.
+         En escritorio la decisión ocupa la columna lateral (fija al desplazar). -->
+    <div class="bo-layout" [class.has-aside]="ofertas().length > 0">
 
-      <!-- ══ LEFT: Informe del estimador + Ofertas ══════════════ -->
-      <div class="col-lg-8 d-flex flex-column gap-4">
-
-        <!-- Informe del estimador ──────────────────────────────── -->
-        @if (estimacion()) {
-          <div class="detail-card">
-            <div class="detail-card__head">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                   fill="none" stroke="currentColor" stroke-width="1.5"
-                   stroke-linecap="round" stroke-linejoin="round"
-                   class="icon-gold me-2" aria-hidden="true">
-                <rect width="8" height="4" x="8" y="2" rx="1" ry="1"/>
-                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
-                <path d="m9 14 2 2 4-4"/>
-              </svg>
-              <span class="detail-card__head-title">{{ 'file.estimator_report' | translate }}</span>
-            </div>
-            <div class="detail-card__body">
-
-              <div class="row g-3">
-                <div class="col-sm-6">
-                  <p class="info-label">{{ 'file.real_visit_date' | translate }}</p>
-                  <p class="info-value">{{ formatFecha(estimacion()!.fecha_visita_real) }}</p>
-                </div>
-                <div class="col-sm-6">
-                  <p class="info-label">{{ 'file.hour' | translate }}</p>
-                  <p class="info-value">{{ formatHora(estimacion()!.fecha_visita_real) }}</p>
-                </div>
-                @if (estimacion()!.descripcion_problemas) {
-                  <div class="col-12">
-                    <p class="info-label">{{ 'file.situation' | translate }}</p>
-                    <p class="descripcion-block">{{ estimacion()!.descripcion_problemas }}</p>
-                  </div>
-                }
-              </div>
-
-              @if (estimacion()!.costo_estimado !== null) {
-                <hr class="section-divider" />
-                <p class="info-label mb-2">{{ 'file.estimated_cost' | translate }}</p>
-                <div class="costo-range-card">
-                  <div class="d-flex align-items-center gap-3 flex-wrap">
-                    <div>
-                      <p class="costo-tag mb-0">{{ 'file.min' | translate }}</p>
-                      <p class="costo-valor mb-0">{{ formatCosto(estimacion()!.costo_estimado!) }}</p>
-                    </div>
-                    @if (estimacion()!.costo_estimado_max !== null) {
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                           fill="none" stroke="currentColor" stroke-width="1.5"
-                           stroke-linecap="round" stroke-linejoin="round"
-                           class="icon-muted" aria-hidden="true">
-                        <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
-                      </svg>
-                      <div>
-                        <p class="costo-tag mb-0">{{ 'file.max' | translate }}</p>
-                        <p class="costo-valor mb-0">{{ formatCosto(estimacion()!.costo_estimado_max!) }}</p>
-                      </div>
-                    }
-                  </div>
-                </div>
-              }
-
-              @if (urlsTour.length > 0) {
-                <hr class="section-divider" />
-                <p class="info-label mb-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                       fill="none" stroke="currentColor" stroke-width="1.5"
-                       stroke-linecap="round" stroke-linejoin="round"
-                       class="me-1" aria-hidden="true">
-                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
-                    <line x1="12" x2="12" y1="22.08" y2="12"/>
-                  </svg>
-                  {{ 'builder_offer.virtual_tour' | translate }}
-                </p>
-                <div class="tour-grid">
-                  @for (url of urlsTour; track $index) {
-                    <div class="tour-grid__item">
-                      @if (urlsTour.length > 1) {
-                        <p class="tour-video-label">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
-                               fill="none" stroke="currentColor" stroke-width="1.5"
-                               stroke-linecap="round" stroke-linejoin="round"
-                               class="me-1" aria-hidden="true">
-                            <path d="m22 8-6 4 6 4V8z"/>
-                            <rect width="14" height="12" x="2" y="6" rx="2" ry="2"/>
-                          </svg>
-                          {{ 'estimator_file.tour_video_n' | translate:{ n: $index + 1 } }}
-                        </p>
-                      }
-                      <div class="ratio ratio-16x9 rounded-3 overflow-hidden">
-                        <iframe [src]="getSafeUrl(url)"
-                                allowfullscreen allow="xr-spatial-tracking"
-                                title="Tour virtual Matterport"></iframe>
-                      </div>
-                    </div>
-                  }
-                </div>
-              }
-
-              <!-- Fotos del sitio: solo las que agregó el estimador; videos/docs NO. -->
-              @if (fotosEstimador().length > 0) {
-                <hr class="section-divider" />
-                <p class="info-label mb-2">{{ 'file.site_photos' | translate }}</p>
-                <div class="photos-grid">
-                  @for (f of fotosEstimador(); track f.id) {
-                    <button class="photo-thumb" type="button"
-                            (click)="abrirFotoVM(f)" [title]="f.nombre">
-                      <img [src]="f.url"
-                           class="photo-thumb__img" [alt]="f.nombre" />
-                      <div class="photo-thumb__overlay" aria-hidden="true">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-                             fill="none" stroke="currentColor" stroke-width="1.5"
-                             stroke-linecap="round" stroke-linejoin="round">
-                          <circle cx="11" cy="11" r="8"/>
-                          <line x1="21" x2="16.65" y1="21" y2="16.65"/>
-                          <line x1="11" x2="11" y1="8" y2="14"/>
-                          <line x1="8" x2="14" y1="11" y2="11"/>
-                        </svg>
-                      </div>
-                    </button>
-                  }
-                </div>
-              }
-
-              <!-- Documentos técnicos: solo los que agregó el estimador; videos/fotos NO. -->
-              @if (documentosEstimador().length > 0) {
-                <hr class="section-divider" />
-                <p class="info-label mb-2">{{ 'file.technical_docs' | translate }}</p>
-                <div class="file-list">
-                  @for (d of documentosEstimador(); track d.id) {
-                    <div class="file-row">
-                      <div class="file-row__icon file-row__icon--doc">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                             fill="none" stroke="currentColor" stroke-width="1.5"
-                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                          <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
-                          <path d="M14 2v4a2 2 0 0 0 2 2h4"/>
-                          <path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>
-                        </svg>
-                      </div>
-                      <div class="file-row__info">
-                        <p class="file-row__name">{{ d.nombre }}</p>
-                        <p class="file-row__meta">{{ formatTamano(d.tamanoBytes) }}</p>
-                      </div>
-                      <div class="file-row__actions">
-                        <button class="btn-icon-sm" type="button" (click)="verDocumentoVM(d)"
-                                [title]="'common.open' | translate">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                               fill="none" stroke="currentColor" stroke-width="1.5"
-                               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                            <polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/>
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  }
-                </div>
-              }
-
-            </div>
-          </div>
-        }
-
-        <!-- Video del estimador: sólo para ver ──────────────────── -->
-        @if (errorVideos()) {
-          <div class="status-msg status-msg--danger" role="alert">
-            <span class="flex-grow-1">{{ 'builder_offer.videos_error' | translate }}</span>
-            <button type="button" class="btn btn-sm btn-outline-secondary flex-shrink-0"
-                    (click)="cargarVideosPresentacion()">
-              {{ 'common.retry' | translate }}
-            </button>
-          </div>
-        } @else if (videosEstimador().length) {
-          <div class="detail-card">
-            <div class="detail-card__head">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                   fill="none" stroke="currentColor" stroke-width="1.5"
-                   stroke-linecap="round" stroke-linejoin="round"
-                   class="icon-gold me-2" aria-hidden="true">
-                <path d="m22 8-6 4 6 4V8z"/>
-                <rect width="14" height="12" x="2" y="6" rx="2" ry="2"/>
-              </svg>
-              <span class="detail-card__head-title">{{ 'builder_offer.estimator_video' | translate }}</span>
-            </div>
-            <div class="detail-card__body presentacion-body">
-              <p class="presentacion-hint">{{ 'builder_offer.estimator_video_hint' | translate }}</p>
-              @for (v of videosEstimador(); track v.id) {
-                <app-video-ficha [video]="v" [miniatura]="miniaturasPresentacion()[v.id]" />
-              }
-            </div>
-          </div>
-        }
-
-        <!-- ── Sección de ofertas ──────────────────────────────── -->
-        <div>
-          <div class="offers-section-header mb-3">
-            <div class="d-flex align-items-center gap-2">
-              <h2 class="offers-section-title mb-0">{{ 'builder_offer.title' | translate }}</h2>
-              <span class="offers-count-badge">{{ ofertas().length }}</span>
-            </div>
-            @if (ofertas().length > 0) {
-              <p class="offers-section-hint mb-0">{{ 'builder_offer.select_hint_multi' | translate }}</p>
-            }
-          </div>
-
-          @if (exitoMsg()) {
-            <div class="status-msg status-msg--success mb-3" role="status">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                   fill="none" stroke="currentColor" stroke-width="1.5"
-                   stroke-linecap="round" stroke-linejoin="round"
-                   class="flex-shrink-0" aria-hidden="true">
-                <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
-              </svg>
-              {{ exitoMsg() | translate }}
-            </div>
-          }
-          @if (errorMsg() && !cargando()) {
-            <div class="status-msg status-msg--danger mb-3" role="alert">
-              {{ errorMsg() | translate }}
-            </div>
-          }
-
-          @if (ofertas().length === 0) {
-            <div class="empty-panel empty-panel--sm">
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
-                   fill="none" stroke="currentColor" stroke-width="1.5"
-                   stroke-linecap="round" stroke-linejoin="round"
-                   class="icon-empty" aria-hidden="true">
-                <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
-                <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
-              </svg>
-              <p class="empty-panel__title">{{ 'builder_offer.no_offers' | translate }}</p>
-              <p class="empty-panel__text">{{ 'builder_offer.no_offers_text' | translate }}</p>
-            </div>
-
-          } @else {
-            <div class="offers-grid">
-              @for (oferta of ofertas(); track oferta.id; let i = $index) {
-                <!-- Conmutador: un clic marca o desmarca (selección múltiple). -->
-                <div class="offer-card"
-                     [class.offer-card--selected]="esSeleccionada(oferta.id)"
-                     [class.offer-card--aceptada]="oferta.estado === 'aceptada'"
-                     [class.offer-card--rechazada]="oferta.estado === 'rechazada'"
-                     [class.offer-card--locked]="bloqueado()"
-                     role="button" tabindex="0"
-                     [attr.aria-pressed]="esSeleccionada(oferta.id)"
-                     [attr.aria-disabled]="bloqueado() || null"
-                     (click)="seleccionar(oferta.id)"
-                     (keydown.enter)="seleccionar(oferta.id)"
-                     (keydown.space)="$event.preventDefault(); seleccionar(oferta.id)">
-                  <div class="offer-card__body">
-
-                    <!-- Top: orden + badge -->
-                    <div class="offer-card__top">
-                      <span class="offer-card__index">#{{ i + 1 }}</span>
-                      <div class="d-flex align-items-center gap-1">
-                        @if (esSeleccionada(oferta.id)) {
-                          <span class="selected-badge">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11"
-                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                 aria-hidden="true">
-                              <path d="M20 6 9 17l-5-5"/>
-                            </svg>
-                          </span>
-                        }
-                        <span class="badge rounded-pill px-2 py-1 {{ ofertaBadgeClass(oferta.estado) }}">
-                          {{ ofertaLabel(oferta.estado) | translate }}
-                        </span>
-                      </div>
-                    </div>
-
-                    <!-- Precio -->
-                    <div class="offer-card__price-block">
-                      <p class="offer-price mb-0">{{ formatCosto(oferta.precio) }}</p>
-                      <p class="offer-price-label mb-0">{{ 'builder_offer.total_price' | translate }}</p>
-                    </div>
-
-                    <!-- Servicios que cubre (solo si el expediente tiene varios) -->
-                    @if (multiServicio()) {
-                      <p class="offer-card__covers">
-                        <span class="offer-card__covers-label">{{ 'builder_offer.covers' | translate }}</span>
-                        {{ serviciosDeOfertaTexto(oferta) }}
-                      </p>
-                    }
-
-                    <!-- Constructor -->
-                    <div class="offer-card__section">
-                      <p class="offer-meta-label">{{ 'offers_received.builder' | translate }}</p>
-                      <p class="offer-builder-name mb-0">{{ oferta.constructor_nombre }}</p>
-                      @if (oferta.constructor_telefono) {
-                        <a href="tel:{{ oferta.constructor_telefono }}"
-                           class="offer-contact d-flex align-items-center gap-1 mt-1"
-                           (click)="$event.stopPropagation()">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
-                               viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                               stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
-                               aria-hidden="true">
-                            <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
-                          </svg>
-                          {{ oferta.constructor_telefono }}
-                        </a>
-                      }
-                    </div>
-
-                    <!-- Video de presentación del constructor: sólo para ver. El
-                         clic y las teclas no llegan a la tarjeta (no la marcan). -->
-                    @if (videoDePerfil().get(oferta.constructor_id); as video) {
-                      <div class="offer-card__presentacion"
-                           (click)="$event.stopPropagation()"
-                           (keydown.enter)="$event.stopPropagation()"
-                           (keydown.space)="$event.stopPropagation()">
-                        <app-video-ficha [video]="video"
-                                         [miniatura]="miniaturasPresentacion()[video.id]"
-                                         [compacta]="true"
-                                         etiqueta="builder_offer.presentation_video" />
-                      </div>
-                    }
-
-                    <!-- Plazos y fechas — 2 columnas -->
-                    <div class="offer-card__meta-grid">
-                      <div class="offer-meta-item">
-                        <span class="offer-meta-label">{{ 'offers_received.deadline' | translate }}</span>
-                        <span class="offer-meta-value">{{ formatPlazo(oferta.plazo_semanas_min, oferta.plazo_semanas_max) }}</span>
-                      </div>
-                      <div class="offer-meta-item">
-                        <span class="offer-meta-label">{{ 'offer.start_date' | translate }}</span>
-                        <span class="offer-meta-value">{{ formatFecha(oferta.fecha_inicio) }}</span>
-                      </div>
-                      @if (oferta.garantia_anos) {
-                        <div class="offer-meta-item">
-                          <span class="offer-meta-label">{{ 'offer.warranty' | translate }}</span>
-                          <span class="offer-meta-value">{{ oferta.garantia_anos }} {{ 'offer.years' | translate }}</span>
-                        </div>
-                      }
-                    </div>
-
-                    <!-- Descripción -->
-                    @if (oferta.descripcion) {
-                      <div class="offer-card__section">
-                        <p class="offer-meta-label">{{ 'builder_offer.approach' | translate }}</p>
-                        <p class="offer-desc mb-0">{{ oferta.descripcion }}</p>
-                      </div>
-                    }
-
-                    <!-- Video -->
-                    @if (oferta.videos.length > 0) {
-                      <div class="offer-card__section" (click)="$event.stopPropagation()">
-                        @for (v of oferta.videos; track v.id) {
-                          <button class="offer-video-btn w-100" type="button"
-                                  [class.offer-video-btn--active]="videoOfertaUrl(oferta.id) !== null"
-                                  (click)="toggleVideoOferta(oferta.id, v)">
-                            @if (videoOfertaUrl(oferta.id) !== null) {
-                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                                   fill="none" stroke="currentColor" stroke-width="1.5"
-                                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <circle cx="12" cy="12" r="10"/><rect width="6" height="6" x="9" y="9"/>
-                              </svg>
-                              {{ 'builder_offer.close_video' | translate }}
-                            } @else {
-                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                                   fill="none" stroke="currentColor" stroke-width="1.5"
-                                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="m22 8-6 4 6 4V8z"/>
-                                <rect width="14" height="12" x="2" y="6" rx="2" ry="2"/>
-                              </svg>
-                              {{ 'builder_offer.view_video' | translate }}
-                            }
-                          </button>
-                        }
-                        @if (videoOfertaUrl(oferta.id) !== null) {
-                          <video class="offer-video-el mt-2" controls autoplay
-                                 [src]="videoOfertaUrl(oferta.id)!">
-                            Tu navegador no soporta reproducción de video.
-                          </video>
-                        }
-                      </div>
-                    }
-
-                    <!-- Documentos -->
-                    @if (oferta.documentos.length > 0) {
-                      <div class="offer-docs" (click)="$event.stopPropagation()">
-                        @for (d of oferta.documentos; track d.id) {
-                          <button class="offer-doc-chip" type="button" (click)="verDocumento(d)">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13"
-                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                 stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
-                                 aria-hidden="true">
-                              <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
-                              <path d="M14 2v4a2 2 0 0 0 2 2h4"/>
-                              <path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>
-                            </svg>
-                            <span class="offer-doc-chip__name">{{ d.nombre_archivo }}</span>
-                            <span class="offer-doc-chip__size">{{ formatTamano(d.tamano_bytes) }}</span>
-                          </button>
-                        }
-                      </div>
-                    }
-
-                  </div>
-                </div>
-              }
-            </div>
+      <!-- ── Ofertas ─────────────────────────────────────────────────────── -->
+      <section class="bo-offers" aria-labelledby="bo-offers-title">
+        <div class="bo-offers__head">
+          <h2 id="bo-offers-title" class="bo-h2">
+            {{ 'builder_offer.title' | translate }}
+            <span class="bo-count">{{ ofertas().length }}</span>
+          </h2>
+          @if (ofertas().length > 0 && !bloqueado()) {
+            <p class="bo-muted">{{ 'builder_offer.select_hint_multi' | translate }}</p>
           }
         </div>
 
-      </div><!-- /col-lg-8 -->
+        <!-- Referencia para comparar: la horquilla del estimador. -->
+        @if (estimacion()?.costo_estimado != null) {
+          <p class="bo-reference">
+            <mat-icon aria-hidden="true">request_quote</mat-icon>
+            <span class="bo-reference__label">{{ 'file.estimated_cost' | translate }}</span>
+            <span class="bo-reference__value">{{ formatCosto(estimacion()!.costo_estimado!) }}@if (estimacion()!.costo_estimado_max != null) { – {{ formatCosto(estimacion()!.costo_estimado_max!) }}}</span>
+          </p>
+        }
 
-      <!-- ══ RIGHT: Sidebar ══════════════════════════════════════ -->
-      <div class="col-lg-4">
-        <div class="sidebar-sticky">
+        @if (ofertas().length === 0) {
+          <app-empty-state matIcon="inbox"
+                           [titulo]="'builder_offer.no_offers' | translate"
+                           [texto]="'builder_offer.no_offers_text' | translate" />
+        } @else {
+          <ul class="bo-grid">
+            @for (oferta of ofertas(); track oferta.id) {
+              @let sel = esSeleccionada(oferta.id);
+              <li class="bo-offer" [class.is-selected]="sel" [class.is-locked]="bloqueado()"
+                  (click)="alClicarOferta(oferta.id, $event)">
 
-          <!-- Datos del expediente -->
-          <div class="detail-card mb-3">
-            <div class="detail-card__head">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                   fill="none" stroke="currentColor" stroke-width="1.5"
-                   stroke-linecap="round" stroke-linejoin="round"
-                   class="icon-gold me-2" aria-hidden="true">
-                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-              </svg>
-              <span class="detail-card__head-title">{{ 'my_offer.section_file' | translate }}</span>
-            </div>
-            <div class="detail-card__body">
-              <div class="row g-3">
-                <div class="col-12">
-                  <p class="info-label">
-                    @if (servicios().length > 1) {
-                      {{ 'file.services' | translate }}
-                    } @else {
-                      {{ 'file.service' | translate }}
+                <div class="bo-offer__head">
+                  <span class="bo-avatar" aria-hidden="true"><mat-icon>engineering</mat-icon></span>
+                  <div class="bo-offer__who">
+                    <h3 class="bo-offer__name" [id]="'bo-o-' + oferta.id">{{ oferta.constructor_nombre }}</h3>
+                    @if (oferta.constructor_telefono) {
+                      <a class="bo-link" href="tel:{{ oferta.constructor_telefono }}">
+                        <mat-icon aria-hidden="true">call</mat-icon>{{ oferta.constructor_telefono }}
+                      </a>
                     }
+                  </div>
+                  <app-status-chip [estado]="oferta.estado" />
+                </div>
+
+                <div class="bo-offer__price">
+                  <span class="bo-label-sm">{{ 'builder_offer.total_price' | translate }}</span>
+                  <span class="bo-offer__amount">{{ formatCosto(oferta.precio) }}</span>
+                </div>
+
+                @if (multiServicio()) {
+                  <p class="bo-offer__covers">
+                    <span class="bo-label-sm">{{ 'builder_offer.covers' | translate }}</span>
+                    {{ serviciosDeOfertaTexto(oferta) }}
                   </p>
-                  <!-- Todos los servicios del expediente (principal primero), cada uno
-                       con su descripción. Sin lista, el principal como antes. -->
-                  @if (servicios().length > 0) {
-                    <ul class="servicios-list">
-                      @for (s of servicios(); track s.id) {
-                        <li class="servicios-list__item">
-                          <p class="info-value servicios-list__name">{{ nombreDe(s) }}</p>
-                          @if (descripcionDe(s)) {
-                            <p class="servicio-desc mb-0">{{ descripcionDe(s) }}</p>
-                          }
-                        </li>
-                      }
-                    </ul>
-                  } @else {
-                    <p class="info-value mb-0">{{ servicioNombre() }}</p>
-                    @if (servicioDescripcion()) {
-                      <p class="servicio-desc mb-0">{{ servicioDescripcion() }}</p>
-                    }
-                  }
-                </div>
-                <div class="col-12">
-                  <p class="info-label">{{ 'builder_offer.client_label' | translate }}</p>
-                  <p class="info-value">{{ expediente()!.cliente_nombre }}</p>
-                </div>
-                <div class="col-12">
-                  <p class="info-label">{{ 'common.address' | translate }}</p>
-                  <p class="info-value mb-0">{{ expediente()!.direccion }}</p>
-                  <p class="info-value mb-0">
-                    {{ expediente()!.canton }} {{ expediente()!.provincia }} {{ expediente()!.distrito }}
-                  </p>
-                  <span class="country-note">CANADA</span>
-                </div>
-                <div class="col-12">
-                  <p class="info-label">{{ 'file.visit_date' | translate }}</p>
-                  <p class="info-value mb-0">{{ formatFecha(expediente()!.fecha_visita) }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
+                }
 
-          <!-- Tarjeta de aceptación -->
-          <div class="accept-card">
-
-            @if (ofertasSeleccionadas().length === 0) {
-              <div class="accept-hint">
-                <div class="accept-hint__icon" aria-hidden="true">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24"
-                       fill="none" stroke="currentColor" stroke-width="1.5"
-                       stroke-linecap="round" stroke-linejoin="round">
-                    <path d="m9 9 5 12 1.774-5.226L21 14 9 9z"/>
-                    <path d="m16.071 16.071 4.243 4.243"/>
-                    <path d="m7.188 2.239.742 2.839 2.709-.569-2.251 1.988 1.132 2.591L7.558 7.552l-2.372 2.118.529-2.949-2.894-.462 2.373-2.118-.956-2.989z"/>
-                  </svg>
-                </div>
-                <p class="accept-hint__title">{{ 'builder_offer.select_hint_title_multi' | translate }}</p>
-                <p class="accept-hint__text">{{ 'builder_offer.select_hint_multi' | translate }}</p>
-              </div>
-
-              <!-- Selección vacía con ofertas ya aceptadas: se pueden rechazar todas. -->
-              @if (yaContratado() && !bloqueado()) {
-                <div class="mt-3">
-                  @if (!confirmandoRechazo()) {
-                    <button class="btn-reject-outline" type="button"
-                            [disabled]="aceptando() || rechazando()"
-                            (click)="confirmandoRechazo.set(true)">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                           fill="none" stroke="currentColor" stroke-width="1.5"
-                           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/>
-                      </svg>
-                      {{ 'builder_offer.reject_all_btn' | translate }}
-                    </button>
-                  } @else {
-                    <div class="reject-confirm-panel">
-                      <p class="reject-confirm-panel__title">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                             fill="none" stroke="currentColor" stroke-width="1.5"
-                             stroke-linecap="round" stroke-linejoin="round"
-                             class="me-1" aria-hidden="true">
-                          <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/>
-                          <line x1="12" x2="12" y1="9" y2="13"/>
-                          <line x1="12" x2="12.01" y1="17" y2="17"/>
-                        </svg>
-                        {{ 'builder_offer.reject_all_title' | translate }}
-                      </p>
-                      <p class="reject-confirm-panel__text">{{ 'builder_offer.reject_all_text' | translate }}</p>
-                      <div class="d-flex gap-2">
-                        <button class="btn-reject-confirm flex-grow-1" type="button"
-                                [disabled]="rechazando()"
-                                (click)="rechazarAceptadas()">
-                          @if (rechazando()) {
-                            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                          }
-                          {{ rechazando()
-                              ? ('builder_offer.rejecting' | translate)
-                              : ('builder_offer.reject_confirm' | translate) }}
-                        </button>
-                        <button class="btn-outline-sm" type="button"
-                                [disabled]="rechazando()"
-                                (click)="confirmandoRechazo.set(false)">
-                          {{ 'common.back' | translate }}
-                        </button>
-                      </div>
+                <dl class="bo-facts">
+                  <div class="bo-fact">
+                    <dt>{{ 'offers_received.deadline' | translate }}</dt>
+                    <dd class="bo-fig">{{ formatPlazo(oferta.plazo_semanas_min, oferta.plazo_semanas_max) }}</dd>
+                  </div>
+                  <div class="bo-fact">
+                    <dt>{{ 'offer.start_date' | translate }}</dt>
+                    <dd class="bo-fig">{{ formatFecha(oferta.fecha_inicio) }}</dd>
+                  </div>
+                  @if (oferta.garantia_anos) {
+                    <div class="bo-fact">
+                      <dt>{{ 'offer.warranty' | translate }}</dt>
+                      <dd class="bo-fig">{{ oferta.garantia_anos }} {{ 'offer.years' | translate }}</dd>
                     </div>
                   }
-                </div>
+                </dl>
+
+                @if (oferta.descripcion) {
+                  <div class="bo-block">
+                    <h4 class="bo-label">{{ 'builder_offer.approach' | translate }}</h4>
+                    <p class="bo-prose">{{ oferta.descripcion }}</p>
+                  </div>
+                }
+
+                <!-- Video de presentación del constructor: solo para ver. -->
+                @if (videoDePerfil().get(oferta.constructor_id); as video) {
+                  <app-video-ficha [video]="video"
+                                   [miniatura]="miniaturasPresentacion()[video.id]"
+                                   [compacta]="true"
+                                   etiqueta="builder_offer.presentation_video" />
+                }
+
+                @if (oferta.videos.length > 0 || oferta.documentos.length > 0) {
+                  <ul class="bo-files">
+                    @for (v of oferta.videos; track v.id) {
+                      <ng-container [ngTemplateOutlet]="fila" [ngTemplateOutletContext]="{
+                        nombre: v.nombre_archivo, tamano: v.tamano_bytes, url: publicUrl(v.url_storage), video: true }" />
+                    }
+                    @for (d of oferta.documentos; track d.id) {
+                      <ng-container [ngTemplateOutlet]="fila" [ngTemplateOutletContext]="{
+                        nombre: d.nombre_archivo, tamano: d.tamano_bytes, url: publicUrl(d.url_storage), video: false }" />
+                    }
+                  </ul>
+                }
+
+                <!-- Casilla: el control accesible de la selección (varias a la vez). -->
+                @if (!bloqueado()) {
+                  <label class="bo-pick">
+                    <input type="checkbox" class="cdk-visually-hidden"
+                           [checked]="sel" [disabled]="aceptando() || rechazando()"
+                           (change)="seleccionar(oferta.id)" />
+                    <span class="bo-pick__box" aria-hidden="true"><mat-icon>check</mat-icon></span>
+                    <span>
+                      {{ 'builder_offer.choose' | translate }}<span class="cdk-visually-hidden">, {{ oferta.constructor_nombre }}</span>
+                    </span>
+                  </label>
+                }
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      <!-- ── Decisión ───────────────────────────────────────────────────── -->
+      @if (ofertas().length > 0) {
+        <aside class="bo-aside" aria-labelledby="bo-decision-title">
+          <section class="bo-card bo-panel">
+
+            @if (nSel === 0) {
+              <h2 id="bo-decision-title" class="bo-h3">
+                <mat-icon class="bo-h3__icon" aria-hidden="true">checklist</mat-icon>
+                {{ 'builder_offer.select_hint_title_multi' | translate }}
+              </h2>
+
+              <!-- Selección vacía con ofertas ya aceptadas: se pueden refusar todas. -->
+              @if (yaContratado() && !bloqueado()) {
+                @if (!confirmandoRechazo()) {
+                  <button mat-stroked-button type="button" id="bo-reject-open" class="bo-danger-outline"
+                          [disabled]="aceptando() || rechazando()" (click)="pedirRechazo()">
+                    <mat-icon>block</mat-icon>
+                    {{ 'builder_offer.reject_all_btn' | translate }}
+                  </button>
+                } @else {
+                  <div class="bo-confirm" role="group" aria-labelledby="bo-confirm-title" aria-describedby="bo-confirm-text">
+                    <p id="bo-confirm-title" class="bo-confirm__title">
+                      <mat-icon aria-hidden="true">warning</mat-icon>
+                      {{ 'builder_offer.reject_all_title' | translate }}
+                    </p>
+                    <p id="bo-confirm-text" class="bo-confirm__text">{{ 'builder_offer.reject_all_text' | translate }}</p>
+                    <div class="bo-confirm__actions">
+                      <button mat-flat-button type="button" class="bo-danger"
+                              [disabled]="rechazando()" (click)="rechazarAceptadas()">
+                        @if (rechazando()) {
+                          <span class="bo-spinner" aria-hidden="true"></span>
+                        }
+                        {{ (rechazando() ? 'builder_offer.rejecting' : 'builder_offer.reject_confirm') | translate }}
+                      </button>
+                      <button mat-button type="button" id="bo-reject-cancel"
+                              [disabled]="rechazando()" (click)="cancelarRechazo()">
+                        {{ 'common.back' | translate }}
+                      </button>
+                    </div>
+                  </div>
+                }
               }
 
             } @else {
-              <p class="accept-section-label">
+              <h2 id="bo-decision-title" class="bo-h3">
                 {{ 'builder_offer.selected_title_n' | translate }}
-                <span class="sel-count">{{ ofertasSeleccionadas().length }}</span>
-              </p>
+                <span class="bo-count">{{ nSel }}</span>
+              </h2>
 
-              <!-- Ofertas seleccionadas: constructor, servicios que cubre y precio -->
-              <ul class="sel-list">
+              <!-- Ofertas seleccionadas: constructor, servicios que cubre y precio. -->
+              <ul class="bo-sel">
                 @for (o of ofertasSeleccionadas(); track o.id) {
-                  <li class="sel-item">
-                    <div class="sel-item__main">
-                      <p class="sel-item__name">{{ o.constructor_nombre }}</p>
+                  <li class="bo-sel__item">
+                    <span class="bo-sel__main">
+                      <span class="bo-sel__name">{{ o.constructor_nombre }}</span>
                       @if (multiServicio()) {
-                        <p class="sel-item__svc">{{ serviciosDeOfertaTexto(o) }}</p>
+                        <span class="bo-sel__svc">{{ serviciosDeOfertaTexto(o) }}</span>
                       }
-                    </div>
-                    <span class="sel-item__price">{{ formatCosto(o.precio) }}</span>
+                    </span>
+                    <span class="bo-sel__price">{{ formatCosto(o.precio) }}</span>
                     @if (!bloqueado()) {
-                      <button class="sel-item__remove" type="button"
+                      <button mat-icon-button type="button" class="bo-sel__remove"
                               [disabled]="aceptando()"
-                              [attr.aria-label]="('builder_offer.remove_offer' | translate) + ' · ' + o.constructor_nombre"
-                              [title]="'builder_offer.remove_offer' | translate"
+                              [attr.aria-label]="('builder_offer.remove_offer' | translate) + ', ' + o.constructor_nombre"
                               (click)="seleccionar(o.id)">
-                        <i class="bi bi-x-lg" aria-hidden="true"></i>
+                        <mat-icon>close</mat-icon>
                       </button>
                     }
                   </li>
                 }
               </ul>
 
-              <!-- Cobertura por servicio: sin oferta, una o varias (se admite más de una) -->
+              <!-- Cobertura por servicio: sin oferta, una o varias. -->
               @if (multiServicio()) {
-                <div class="coverage">
-                  <p class="coverage__title">{{ 'builder_offer.coverage_title' | translate }}</p>
-                  <ul class="coverage__list">
+                <div class="bo-coverage">
+                  <h3 class="bo-label">{{ 'builder_offer.coverage_title' | translate }}</h3>
+                  <ul class="bo-coverage__list">
                     @for (c of cobertura(); track c.servicio.id) {
-                      <li class="coverage__row" [class.coverage__row--none]="c.ofertas.length === 0">
-                        <span class="coverage__svc">{{ nombreDe(c.servicio) }}</span>
-                        <span class="coverage__who">
+                      <li class="bo-coverage__row" [class.is-none]="c.ofertas.length === 0">
+                        <span class="bo-coverage__svc">{{ nombreDe(c.servicio) }}</span>
+                        <span class="bo-coverage__who">
                           @if (c.ofertas.length === 0) {
-                            <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+                            <mat-icon aria-hidden="true">error</mat-icon>
                             {{ 'builder_offer.coverage_none' | translate }}
                           } @else if (c.ofertas.length === 1) {
                             {{ c.ofertas[0].constructor_nombre }}
@@ -782,66 +265,227 @@
                 </div>
               }
 
-              <!-- Suma de todas las ofertas seleccionadas -->
-              <div class="sel-total">
-                <span class="sel-total__label">{{ 'builder_offer.total_selected' | translate }}</span>
-                <span class="sel-total__value">{{ formatCosto(totalSeleccion()) }}</span>
+              <div class="bo-total">
+                <span class="bo-label-sm">{{ 'builder_offer.total_selected' | translate }}</span>
+                <span class="bo-total__value">{{ formatCosto(totalSeleccion()) }}</span>
               </div>
 
               @if (archivado()) {
-                <app-aviso-archivado class="mt-3" ambito="expediente" [compacto]="true" />
+                <app-aviso-archivado ambito="expediente" [compacto]="true" />
               } @else if (bloqueado()) {
-                <div class="status-msg status-msg--info mt-3">
-                  <i class="bi bi-lock" aria-hidden="true"></i>
+                <p class="bo-note">
+                  <mat-icon aria-hidden="true">lock</mat-icon>
                   {{ 'builder_offer.locked' | translate }}
-                </div>
+                </p>
               } @else if (yaContratado() && !seleccionCambiada()) {
-                <div class="status-msg status-msg--success mt-3">
-                  <i class="bi bi-check-circle" aria-hidden="true"></i>
-                  {{ (ofertasSeleccionadas().length === 1 ? 'builder_offer.already_accepted' : 'builder_offer.already_accepted_n') | translate }}
-                </div>
+                <p class="bo-ok">
+                  <mat-icon aria-hidden="true">check_circle</mat-icon>
+                  {{ (nSel === 1 ? 'builder_offer.already_accepted' : 'builder_offer.already_accepted_n') | translate }}
+                </p>
               } @else {
-                <button class="btn-accept mt-3" type="button"
-                        [disabled]="!puedeAceptar()"
-                        (click)="aceptarSeleccion()">
+                <!-- La siguiente etapa: el único botón tomate de la vista. -->
+                <button mat-flat-button type="button" class="ds-cta bo-accept"
+                        [disabled]="!puedeAceptar()" (click)="aceptarSeleccion()">
                   @if (aceptando()) {
-                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    {{ 'builder_offer.processing' | translate }}
-                  } @else {
-                    <i class="bi bi-check-circle" aria-hidden="true"></i>
-                    @if (yaContratado()) {
-                      {{ 'builder_offer.update_btn' | translate }}
-                    } @else if (ofertasSeleccionadas().length === 1) {
-                      {{ 'builder_offer.accept_btn' | translate }}
-                    } @else {
-                      {{ 'builder_offer.accept_n_btn' | translate: { n: ofertasSeleccionadas().length } }}
-                    }
+                    <span class="bo-spinner" aria-hidden="true"></span>
                   }
+                  {{ aceptando() ? ('builder_offer.processing' | translate)
+                     : yaContratado() ? ('builder_offer.update_btn' | translate)
+                     : nSel === 1 ? ('builder_offer.accept_btn' | translate)
+                     : ('builder_offer.accept_n_btn' | translate: { n: nSel }) }}
                 </button>
                 @if (yaContratado()) {
-                  <p class="accept-replace-warn">{{ 'builder_offer.replace_warning_n' | translate }}</p>
+                  <p class="bo-note">
+                    <mat-icon aria-hidden="true">info</mat-icon>
+                    {{ 'builder_offer.replace_warning_n' | translate }}
+                  </p>
                 }
               }
             }
 
+            <!-- Resultado de aceptar o refusar. La región existe siempre para que se anuncie. -->
+            <div class="bo-live" role="status">
+              @if (exitoMsg()) {
+                <p class="bo-ok">
+                  <mat-icon aria-hidden="true">check_circle</mat-icon>
+                  {{ exitoMsg() | translate }}
+                </p>
+              }
+            </div>
+            @if (errorMsg()) {
+              <p class="bo-error" role="alert">
+                <mat-icon aria-hidden="true">error</mat-icon>
+                {{ errorMsg() | translate }}
+              </p>
+            }
+          </section>
+        </aside>
+      }
+
+      <!-- ── Informe del estimador ───────────────────────────────────────── -->
+      @if (estimacion() || errorVideos() || videosEstimador().length) {
+        <section class="bo-card" aria-labelledby="bo-report-title">
+          <h2 id="bo-report-title" class="bo-h2">{{ 'file.estimator_report' | translate }}</h2>
+
+          @if (errorVideos()) {
+            <div class="bo-error bo-error--action" role="alert">
+              <mat-icon aria-hidden="true">error</mat-icon>
+              <span>{{ 'builder_offer.videos_error' | translate }}</span>
+              <button mat-button type="button" (click)="cargarVideosPresentacion()">
+                {{ 'common.retry' | translate }}
+              </button>
+            </div>
+          } @else if (videosEstimador().length) {
+            <div class="bo-block bo-block--first">
+              <h3 class="bo-label">{{ 'builder_offer.estimator_video' | translate }}</h3>
+              <p class="bo-muted">{{ 'builder_offer.estimator_video_hint' | translate }}</p>
+              @for (v of videosEstimador(); track v.id) {
+                <app-video-ficha [video]="v" [miniatura]="miniaturasPresentacion()[v.id]" />
+              }
+            </div>
+          }
+
+          @if (estimacion(); as est) {
+            <dl class="bo-facts">
+              <div class="bo-fact">
+                <dt>{{ 'file.real_visit_date' | translate }}</dt>
+                <dd class="bo-fig">{{ formatFecha(est.fecha_visita_real) }}</dd>
+              </div>
+              <div class="bo-fact">
+                <dt>{{ 'file.hour' | translate }}</dt>
+                <dd class="bo-fig">{{ formatHora(est.fecha_visita_real) }}</dd>
+              </div>
+            </dl>
+
+            @if (est.descripcion_problemas) {
+              <div class="bo-block">
+                <h3 class="bo-label">{{ 'file.situation' | translate }}</h3>
+                <p class="bo-prose">{{ est.descripcion_problemas }}</p>
+              </div>
+            }
+
+            @if (urlsTour.length > 0) {
+              <div class="bo-block">
+                <h3 class="bo-label">{{ 'builder_offer.virtual_tour' | translate }}</h3>
+                <div class="bo-tours">
+                  @for (url of urlsTour; track $index) {
+                    <app-tour-poster [url]="url" [titulo]="tituloTour($index)" />
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Fotos del sitio: solo las que agregó el estimador. -->
+            @if (fotosEstimador().length > 0) {
+              <div class="bo-block">
+                <h3 class="bo-label">{{ 'file.site_photos' | translate }} <span class="bo-count">{{ fotosEstimador().length }}</span></h3>
+                <ul class="bo-photos">
+                  @for (f of fotosEstimador(); track f.id) {
+                    <li>
+                      <button type="button" class="bo-photo" (click)="verFoto(f.url, f.nombre)"
+                              [attr.aria-label]="f.nombre">
+                        <img [src]="f.url" alt="" loading="lazy" />
+                      </button>
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
+
+            <!-- Documentos técnicos: solo los que agregó el estimador. -->
+            @if (documentosEstimador().length > 0) {
+              <div class="bo-block">
+                <h3 class="bo-label">{{ 'file.technical_docs' | translate }} <span class="bo-count">{{ documentosEstimador().length }}</span></h3>
+                <ul class="bo-files">
+                  @for (d of documentosEstimador(); track d.id) {
+                    <ng-container [ngTemplateOutlet]="fila" [ngTemplateOutletContext]="{
+                      nombre: d.nombre, tamano: d.tamanoBytes, url: d.url, video: false }" />
+                  }
+                </ul>
+              </div>
+            }
+          }
+        </section>
+      }
+
+      <!-- ── Dossier ────────────────────────────────────────────────────── -->
+      <section class="bo-card" aria-labelledby="bo-data-title">
+        <h2 id="bo-data-title" class="bo-h2">{{ 'my_offer.section_file' | translate }}</h2>
+        <dl class="bo-facts">
+          <div class="bo-fact bo-fact--wide">
+            <dt>{{ (servicios().length > 1 ? 'file.services' : 'file.service') | translate }}</dt>
+            <dd>
+              <!-- Todos los servicios (principal primero) con su descripción; sin lista, el principal. -->
+              @if (servicios().length > 0) {
+                <ul class="bo-svcs">
+                  @for (s of servicios(); track s.id) {
+                    <li class="bo-svcs__item">
+                      <span class="bo-svcs__name">{{ nombreDe(s) }}</span>
+                      @if (descripcionDe(s)) {
+                        <span class="bo-svcs__desc">{{ descripcionDe(s) }}</span>
+                      }
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <span class="bo-svcs__item">
+                  <span class="bo-svcs__name">{{ servicioNombre() }}</span>
+                  @if (servicioDescripcion()) {
+                    <span class="bo-svcs__desc">{{ servicioDescripcion() }}</span>
+                  }
+                </span>
+              }
+            </dd>
           </div>
-
-          <div class="mt-3">
-            <button class="btn-nav-back" type="button" (click)="volver()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                   fill="none" stroke="currentColor" stroke-width="1.5"
-                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
-              </svg>
-              {{ 'my_offer.back_btn' | translate }}
-            </button>
+          <div class="bo-fact">
+            <dt>{{ 'builder_offer.client_label' | translate }}</dt>
+            <dd>{{ exp.cliente_nombre }}</dd>
           </div>
-
-        </div>
-      </div><!-- /col-lg-4 -->
-
+          <div class="bo-fact">
+            <dt>{{ 'file.visit_date' | translate }}</dt>
+            <dd class="bo-fig">{{ formatFecha(exp.fecha_visita) }}</dd>
+          </div>
+          <div class="bo-fact bo-fact--wide">
+            <dt>{{ 'common.address' | translate }}</dt>
+            <dd>
+              <address class="bo-address">
+                {{ exp.direccion }}<br />
+                {{ exp.canton }} {{ exp.provincia }} {{ exp.distrito }}<br />
+                Canada
+              </address>
+            </dd>
+          </div>
+        </dl>
+      </section>
     </div>
-
   }
 
 </div>
+
+<!-- Fila de un archivo: icono, nombre y tamaño; el vídeo se abre en el visor, el documento en otra pestaña. -->
+<ng-template #fila let-nombre="nombre" let-tamano="tamano" let-url="url" let-video="video">
+  <li class="bo-file">
+    @if (video) {
+      <mat-icon class="bo-file__icon" aria-hidden="true">movie</mat-icon>
+    } @else {
+      <mat-icon class="bo-file__icon" aria-hidden="true">description</mat-icon>
+    }
+    <span class="bo-file__text">
+      <span class="bo-file__name">{{ nombre }}</span>
+      <span class="bo-file__size">{{ formatTamano(tamano) }}</span>
+    </span>
+    @if (video) {
+      <button mat-button type="button" class="bo-file__open" (click)="verVideo(url, nombre)"
+              [attr.aria-label]="('builder_offer.play' | translate) + ' ' + nombre">
+        <mat-icon>play_arrow</mat-icon>
+        <span class="bo-file__open-text">{{ 'builder_offer.play' | translate }}</span>
+      </button>
+    } @else {
+      <a mat-button class="bo-file__open" [href]="url" target="_blank" rel="noopener"
+         [attr.aria-label]="('common.open' | translate) + ' ' + nombre">
+        <mat-icon>open_in_new</mat-icon>
+        <span class="bo-file__open-text">{{ 'common.open' | translate }}</span>
+      </a>
+    }
+  </li>
+</ng-template>

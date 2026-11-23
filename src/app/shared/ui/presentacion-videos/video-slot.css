@@ -1,9 +1,9 @@
 /* Ranura de video de presentación, compartida
- * Miniatura 16:9 con duración, título en la fuente display, vacío · error · esqueleto.
+ * Miniatura 16:9 con duración, título en la fuente display; estados vacío, error y esqueleto.
  * La usan app-video-expediente (el propio, editable) y
  * app-videos-expediente-lectura (los de otros, sólo para ver).
  * contrast: textos en --ds-ink / --ds-ink-secondary / --ds-ink-muted sobre papel (AA);
- *           duración en crema sobre espresso; error en --ds-danger-ink sobre -soft
+ *           duración en vélin sobre abeto (cifra estrecha, sin monoespaciada); error en --ds-danger-ink sobre -soft
  */
 .ve {
   display: grid;
@@ -37,12 +37,11 @@
   align-items: center;
   gap: var(--ds-space-1);
   margin: 0 0 var(--ds-space-1);
-  font-size: var(--ds-text-2xs);
-  font-weight: var(--ds-weight-bold);
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  font-size: var(--ds-text-sm);
+  font-weight: var(--ds-weight-semibold);
   color: var(--ds-success-ink);
 }
+.ve-slot__eyebrow mat-icon { width: 18px; height: 18px; font-size: 18px; }
 .ve-slot__title {
   display: block;
   margin: 0;
@@ -51,8 +50,8 @@
   background: none;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-regular);
-  letter-spacing: var(--ds-tracking-tight);
+  font-weight: var(--ds-weight-bold);
+  font-stretch: var(--ds-stretch-heading);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
   text-align: left;
@@ -66,16 +65,19 @@
   text-underline-offset: 3px;
   transition: text-decoration-color var(--ds-duration-fast) var(--ds-ease-out);
 }
-.ve-slot__title--link:hover { text-decoration-color: var(--ds-gold); }
+.ve-slot__title--link:hover { text-decoration-color: var(--ds-action); }
 .ve-slot__title--link:focus { outline: none; }
 .ve-slot__title--link:focus-visible { border-radius: var(--ds-radius-sm); box-shadow: var(--ds-focus-ring); }
-.ve-slot__title--link:active { text-decoration-color: var(--ds-gold-ink); }
+.ve-slot__title--link:active { text-decoration-color: var(--ds-action-ink); }
+/* Origen y fecha separados por espacio, no por punto medio. */
 .ve-slot__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--ds-space-3);
   margin: var(--ds-space-1) 0 0;
-  font-size: var(--ds-text-xs);
+  font-size: var(--ds-text-sm);
   color: var(--ds-ink-muted);
 }
-.ve-sep { margin: 0 var(--ds-space-1); }
 
 /* ── Miniatura ────────────────────────────────────────────────────────────── */
 .ve-thumb {
@@ -101,7 +103,7 @@
   height: 100%;
   object-fit: cover;
 }
-.ve-thumb__fallback { font-size: 1.5rem; }
+.ve-thumb__fallback { width: 28px; height: 28px; font-size: 28px; }
 .ve-thumb__play {
   position: absolute;
   display: grid;
@@ -118,7 +120,7 @@
   transition: opacity var(--ds-duration-fast) var(--ds-ease-out),
               transform var(--ds-duration-base) var(--ds-ease-out);
 }
-.ve-thumb__play .bi { margin-left: 2px; }
+.ve-thumb__play mat-icon { width: 24px; height: 24px; font-size: 24px; }
 .ve-thumb__dur {
   position: absolute;
   right: var(--ds-space-1);
@@ -127,20 +129,22 @@
   border-radius: var(--ds-radius-sm);
   background: var(--ds-dark-surface);
   color: var(--ds-ink-inverse);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-2xs);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-sm);
+  font-weight: var(--ds-weight-bold);
+  font-stretch: var(--ds-stretch-figure);
   font-variant-numeric: tabular-nums;
   line-height: 1.5;
 }
 .ve-thumb:hover { border-color: var(--ds-border-strong); box-shadow: var(--ds-shadow-md); }
 .ve-thumb:hover .ve-thumb__play,
 .ve-thumb:focus-visible .ve-thumb__play { opacity: 1; transform: scale(1); }
-.ve-thumb:focus-visible { outline: none; border-color: var(--ds-gold); box-shadow: var(--ds-focus-ring); }
+.ve-thumb:focus-visible { outline: none; border-color: var(--ds-action); box-shadow: var(--ds-focus-ring); }
 .ve-thumb:active .ve-thumb__play { transform: scale(0.96); }
-.ve-thumb--busy { cursor: default; color: var(--ds-gold-ink); }
+.ve-thumb--busy { cursor: default; color: var(--ds-action-ink); }
 .ve-thumb--busy:hover { border-color: var(--ds-border); box-shadow: none; }
 
-/* ── Vacío · error · esqueleto ────────────────────────────────────────────── */
+/* ── Vacío, error y esqueleto ─────────────────────────────────────────────── */
 .ve-empty {
   display: flex;
   align-items: center;
@@ -152,7 +156,7 @@
   color: var(--ds-ink-muted);
   font-size: var(--ds-text-sm);
 }
-.ve-empty > .bi { font-size: 1.5rem; color: var(--ds-ink-faint); }
+.ve-empty > mat-icon { flex-shrink: 0; width: 28px; height: 28px; font-size: 28px; color: var(--ds-ink-muted); }
 .ve-empty p { margin: 0; }
 
 .ve-error {
@@ -167,6 +171,7 @@
   color: var(--ds-danger-ink);
   font-size: var(--ds-text-sm);
 }
+.ve-error > mat-icon { flex-shrink: 0; }
 .ve-error p { margin: 0; flex: 1 1 12rem; }
 
 @keyframes ve-pulse {
@@ -180,8 +185,23 @@
 .ve-thumb.ve-skel { border-color: transparent; cursor: default; }
 .ve-skel--line { height: 12px; margin-bottom: var(--ds-space-2); border-radius: var(--ds-radius-sm); }
 .ve-skel--short { width: 55%; }
+/* Spinner propio (subiendo, quitando, guardando): toma el color del texto. */
+.ve-spinner {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border: 2px solid color-mix(in srgb, currentColor 30%, transparent);
+  border-top-color: currentColor;
+  border-radius: var(--ds-radius-circle);
+  animation: ve-spin 0.8s linear infinite;
+}
+.ve-thumb--busy .ve-spinner { width: 28px; height: 28px; border-width: 3px; }
+@keyframes ve-spin { to { transform: rotate(360deg); } }
+
 @media (prefers-reduced-motion: reduce) {
   .ve-skel { animation: none; }
+  .ve-spinner { animation-duration: 2.4s; }
 }
 
 /* ── Columna estrecha ──────────────────────────────────────────────────────── */

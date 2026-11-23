@@ -1,4 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, model, output, signal } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe } from '@ngx-translate/core';
 import { OfertaService } from '../../../services/oferta.service';
 import { OfertaConConstructor } from '../../../models';
@@ -26,7 +29,7 @@ export type AccionReparto = 'rechazar' | 'reactivar';
 @Component({
   selector: 'app-oferta-reparto',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, MatButtonModule, MatCheckboxModule, MatIconModule],
   templateUrl: './oferta-reparto.component.html',
   styleUrl: './oferta-reparto.component.css',
 })

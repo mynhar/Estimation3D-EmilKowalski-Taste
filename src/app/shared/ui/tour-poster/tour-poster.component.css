@@ -1,6 +1,7 @@
 /* component: tour poster
  * states: default · hover · focus-visible · active · sin miniatura
- * contrast: etiquetas ink / on-action sobre fondos sólidos (≥ 6.5:1), nunca texto sobre la foto
+ * contrast: etiqueta ink sobre vélin (13.6:1), acción vélin sobre abeto (9.7:1); nunca texto sobre la foto
+ *           la acción va en abeto, no en tomate: abrir el tour no hace avanzar el dossier
  */
 :host { display: block; }
 
@@ -13,7 +14,7 @@
   overflow: hidden;
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
-  background: var(--ds-stone);
+  background: var(--ds-band);
   color: var(--ds-ink);
   font: inherit;
   text-align: left;

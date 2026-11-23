@@ -1,4 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, input, signal } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe } from '@ngx-translate/core';
 import { PerfilVideoService } from '../../../services/perfil-video.service';
 import { DbPerfilVideo } from '../../../types/supabase';
@@ -16,7 +18,7 @@ import { VideoFichaComponent } from './video-ficha.component';
 @Component({
   selector: 'app-videos-expediente-lectura',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, VideoFichaComponent],
+  imports: [TranslatePipe, MatButtonModule, MatIconModule, VideoFichaComponent],
   templateUrl: './videos-expediente-lectura.component.html',
   styleUrls: ['./video-slot.css', './videos-expediente-lectura.component.css'],
 })

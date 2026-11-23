@@ -1,18 +1,28 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ToastService } from '../../../services/toast.service';
 import { FichaNormativaRepository } from '../../../data';
 import { parseKeywords } from '../keywords.util';
 import { CAMPOS_FALTANTES } from '../../../shared/ui/campos-faltantes/campos-faltantes.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
 
 @Component({
   selector: 'app-admin-fichas-create',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, TranslatePipe, ...CAMPOS_FALTANTES],
+  imports: [
+    ReactiveFormsModule, TranslatePipe,
+    MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSlideToggleModule,
+    PageHeaderComponent, ...CAMPOS_FALTANTES,
+  ],
   templateUrl: './create.component.html',
-  styleUrls: ['../../_shared/crud-form.css'],
+  styleUrls: ['../../../shared/ui/alta/alta.css', '../../_shared/catalogo-form.css'],
 })
 export class AdminFichasCreateComponent {
   private fb        = inject(FormBuilder);
@@ -25,11 +35,7 @@ export class AdminFichasCreateComponent {
   /** Intentos de envío con campos sin completar: cada uno trae el resumen de lo que falta. */
   intentos  = signal(0);
 
-  readonly langs = [
-    { c: 'fr', b: 'FR' },
-    { c: 'en', b: 'EN' },
-    { c: 'es', b: 'ES' },
-  ];
+  readonly idiomas = ['fr', 'en', 'es'] as const;
 
   form = this.fb.group({
     codigo:     ['', [Validators.required, Validators.pattern(/^[A-Z0-9_]+$/)]],
@@ -45,8 +51,6 @@ export class AdminFichasCreateComponent {
   });
 
   get f() { return this.form.controls; }
-  /** Acceso a un control por nombre dinámico (evita el índice tipado en plantilla). */
-  ctrl(name: string) { return this.form.get(name); }
 
   async onSubmit() {
     if (this.form.invalid) { this.form.markAllAsTouched(); this.intentos.update(n => n + 1); return; }

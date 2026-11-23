@@ -2,6 +2,12 @@ import {
   ChangeDetectionStrategy, Component, DestroyRef, ElementRef, NgZone, afterNextRender,
   computed, inject, output, signal, viewChild,
 } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ToastService } from '../../../services/toast.service';
 import {
@@ -92,7 +98,10 @@ function copiarEstilos(origen: Document, destino: Document): void {
 @Component({
   selector: 'app-grabador-video',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe],
+  imports: [
+    TranslatePipe, MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatIconModule,
+    MatInputModule, MatSlideToggleModule,
+  ],
   templateUrl: './grabador-video.component.html',
   styleUrl: './grabador-video.component.css',
   host: {
@@ -119,10 +128,10 @@ export class GrabadorVideoComponent {
   readonly maxTexto = formatoDuracion(DURACION_MAX_MS);
   readonly pantallaDisponible = puedeGrabarPantalla();
 
-  readonly modos: { valor: ModoGrabacion; clave: string; icono: string }[] = [
-    { valor: 'pantalla_camara', clave: 'presentation_videos.mode.pantalla_camara', icono: 'bi-person-video3' },
-    { valor: 'pantalla',        clave: 'presentation_videos.mode.pantalla',        icono: 'bi-display' },
-    { valor: 'camara',          clave: 'presentation_videos.mode.camara',          icono: 'bi-camera-video' },
+  readonly modos: { valor: ModoGrabacion; clave: string; matIcon: string }[] = [
+    { valor: 'pantalla_camara', clave: 'presentation_videos.mode.pantalla_camara', matIcon: 'co_present' },
+    { valor: 'pantalla',        clave: 'presentation_videos.mode.pantalla',        matIcon: 'desktop_windows' },
+    { valor: 'camara',          clave: 'presentation_videos.mode.camara',          matIcon: 'videocam' },
   ];
 
   // ── Preferencias (sólo comodidad de este navegador) ──────────────────────

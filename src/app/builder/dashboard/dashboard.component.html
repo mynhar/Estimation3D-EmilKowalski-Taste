@@ -1,438 +1,174 @@
-<div class="bld-root page-wrapper">
+<div class="page-wrapper bd">
 
-  <!-- ══════════════════════════════════════════════════════════
-       HEADER EDITORIAL
-       ══════════════════════════════════════════════════════════ -->
-  <header class="bld-header">
-    <div class="bld-header__accent" aria-hidden="true"></div>
+  <app-page-header
+    [titulo]="nombre() ? ('dashboard_client.welcome' | translate) + ', ' + nombre() : ('dashboard_builder.title' | translate)"
+    [contexto]="'dashboard_builder.subtitle' | translate">
+    @if (!cargando() && (total() > 0 || obras().length > 0)) {
+      <a actions mat-flat-button class="bd-cta ds-cta" routerLink="/builder/available-files">
+        <mat-icon>search</mat-icon>
+        {{ 'common.see_available' | translate }}
+      </a>
+    }
+  </app-page-header>
 
-    <div class="bld-header__body">
-      <div class="bld-header__info">
-        <p class="page-eyebrow">
-          <i class="bi bi-building" aria-hidden="true"></i>
-          {{ 'role.constructeur' | translate }}
-        </p>
-        <h1 class="bld-header__title">
-          @if (bienvenida) {
-            {{ 'dashboard_client.welcome' | translate }},&nbsp;<em class="bld-header__name">{{ bienvenida }}</em>
-          } @else {
-            <em class="bld-header__name">{{ 'dashboard_builder.title' | translate }}</em>
-          }
-        </h1>
-        <p class="bld-header__sub">{{ 'dashboard_builder.subtitle' | translate }}</p>
-      </div>
-
-      <div class="bld-header__actions">
-        <a routerLink="/builder/my-offers" class="btn btn-secondary btn-sm">
-          <i class="bi bi-list-ul" aria-hidden="true"></i>
-          {{ 'nav.mes_offres' | translate }}
-        </a>
-        <a routerLink="/builder/available-files" class="btn btn-primary btn-sm">
-          <i class="bi bi-search" aria-hidden="true"></i>
-          {{ 'common.see_available' | translate }}
-        </a>
-      </div>
-    </div>
-  </header>
-
-  <!-- ══════════════════════════════════════════════════════════
-       CARGANDO
-       ══════════════════════════════════════════════════════════ -->
+  <!-- ── Cargando ────────────────────────────────────────────────────────── -->
   @if (cargando()) {
-    <div class="bld-loading" role="status">
-      <span class="bld-spinner" aria-hidden="true"></span>
-      <span class="text-ink-muted">{{ 'common.loading' | translate }}</span>
+    <div class="bd-skel" role="status">
+      <span class="cdk-visually-hidden">{{ 'common.loading' | translate }}</span>
+      <span class="skel skel--works" aria-hidden="true"></span>
+      <span class="skel skel--list" aria-hidden="true"></span>
     </div>
+
+  <!-- ── Sin ofertas ni obras: una sola acción ───────────────────────────── -->
+  } @else if (total() === 0 && obras().length === 0) {
+    <app-empty-state class="bd-empty"
+                     matIcon="search"
+                     [titulo]="'dashboard_builder.no_offers' | translate"
+                     [texto]="'dashboard_builder.no_offers_text' | translate">
+      <a actions mat-flat-button class="bd-cta ds-cta" routerLink="/builder/available-files">
+        <mat-icon>search</mat-icon>
+        {{ 'common.see_available' | translate }}
+      </a>
+    </app-empty-state>
 
   } @else {
 
-    <!-- ══════════════════════════════════════════════════════════
-         SEGUIMIENTO DE OBRA — avance de los trabajos en curso
-         ══════════════════════════════════════════════════════════ -->
+    <!-- ── Suivi de chantier: obras firmadas o en curso ──────────────────── -->
     @if (obras().length > 0) {
-      <section class="bld-works-section" aria-labelledby="works-title">
-        <div class="bld-section-head">
-          <div class="bld-section-head__left">
-            <div class="bld-card__header-icon" aria-hidden="true"><i class="bi bi-hammer"></i></div>
-            <div>
-              <h2 class="bld-card__title" id="works-title">{{ 'dashboard_builder.works_title' | translate }}</h2>
-              <p class="bld-card__subtitle">
-                {{ obrasActivas() }} {{ 'dashboard_builder.active_works' | translate }}
-                &nbsp;·&nbsp; {{ 'dashboard_builder.avg_progress' | translate }} {{ avanceMedio() }}%
-              </p>
-            </div>
-          </div>
-          <a routerLink="/builder/construction-monitoring/list" class="bld-btn-link">
-            {{ 'dashboard_builder.view_all' | translate }}
-            <i class="bi bi-arrow-right" aria-hidden="true"></i>
-          </a>
+      <section class="bd-works" aria-labelledby="bd-works-title">
+        <div class="bd-head">
+          <h2 id="bd-works-title" class="bd-h2">{{ 'dashboard_builder.works_title' | translate }}</h2>
+          <span class="bd-count">{{ obras().length }}</span>
+          <a class="bd-link" routerLink="/builder/construction-monitoring/list"
+             aria-describedby="bd-works-title">{{ 'dashboard_builder.view_all' | translate }}</a>
         </div>
 
-        <div class="bld-works" role="list">
+        <p class="bd-works__summary">
+          <span><strong class="bd-fig">{{ obrasActivas() }}</strong> {{ 'dashboard_builder.active_works' | translate }}</span>
+          <span class="bd-cap">{{ 'dashboard_builder.avg_progress' | translate }} <strong class="bd-fig">{{ avanceMedio() }} %</strong></span>
+        </p>
+
+        <ul class="bd-works__list">
           @for (o of obras(); track o.contratoId) {
-            <a [routerLink]="['/builder/construction-monitoring/monitoring', o.contratoId]"
-               [class]="'bld-work ' + obraEstadoCls(o.estado)" role="listitem">
-              <div class="bld-work__top">
-                <span class="bld-work__num">{{ o.expedienteNumero }}</span>
-                <span class="bld-work__badge">
-                  {{ ('construction_monitoring.estado_' + o.estado) | translate }}
+            <li>
+              <a class="bd-work" [routerLink]="['/builder/construction-monitoring/monitoring', o.contratoId]">
+                <span class="bd-work__top">
+                  <span class="bd-work__service">{{ servicioObra(o) }}</span>
+                  <app-status-chip [estado]="o.estado" prefijo="construction_monitoring.estado_" />
                 </span>
-              </div>
-              <p class="bld-work__service">{{ servicioObra(o) }}</p>
-              <div class="bld-work__avance">
-                <strong class="bld-work__pct">{{ o.avance }}<span>%</span></strong>
-                <div class="bld-work__track" role="progressbar"
-                     [attr.aria-valuenow]="o.avance" aria-valuemin="0" aria-valuemax="100">
-                  <span class="bld-work__fill" [style.width.%]="o.avance"></span>
-                </div>
-              </div>
-              <div class="bld-work__foot">
-                <span class="bld-work__when">
-                  <i class="bi bi-clock-history" aria-hidden="true"></i>
-                  {{ formatFechaCorta(o.actualizadoEn) }}
+                <span class="bd-work__num">{{ 'file.exp_abbr' | translate }} {{ o.expedienteNumero }}</span>
+
+                <span class="bd-work__avance">
+                  <span class="bd-work__pct">{{ o.avance }} %</span>
+                  <span class="bd-bar" aria-hidden="true">
+                    <span class="bd-bar__fill" [style.width.%]="o.avance"></span>
+                  </span>
                 </span>
-                <span class="bld-work__cta">
-                  {{ 'dashboard_builder.view_monitoring' | translate }}
-                  <i class="bi bi-arrow-right" aria-hidden="true"></i>
+
+                <span class="bd-work__foot">
+                  <span class="bd-cap">{{ 'dashboard_client.obra_actualizada' | translate: { date: formatActualizacion(o.actualizadoEn) } }}</span>
+                  <span class="bd-work__go">{{ 'dashboard_builder.view_monitoring' | translate }}</span>
                 </span>
-              </div>
-            </a>
+              </a>
+            </li>
           }
-        </div>
+        </ul>
       </section>
     }
 
-    <!-- ══════════════════════════════════════════════════════════
-         OFERTAS
-         ══════════════════════════════════════════════════════════ -->
+    <!-- ── Ofertas: las más recientes y el resumen ─────────────────────────── -->
     @if (total() > 0) {
+      <div class="bd-grid">
 
-      <!-- KPI strip unificado -->
-      <div class="bld-kpis" role="region" aria-label="Métricas">
-
-        <div class="bld-kpi">
-          <div class="bld-kpi__icon-wrap bld-kpi__icon-wrap--neutral" aria-hidden="true">
-            <i class="bi bi-file-earmark-text"></i>
-          </div>
-          <div class="bld-kpi__content">
-            <p class="bld-kpi__val">{{ total() }}</p>
-            <p class="bld-kpi__label">{{ 'dashboard_builder.total_offers' | translate }}</p>
-          </div>
-          <div class="bld-kpi__bar bld-kpi__bar--neutral"></div>
-        </div>
-
-        <div class="bld-kpi" [class.bld-kpi--pulse]="pendientes() > 0">
-          <div class="bld-kpi__icon-wrap bld-kpi__icon-wrap--warning" aria-hidden="true">
-            <i class="bi bi-hourglass-split"></i>
-          </div>
-          <div class="bld-kpi__content">
-            <p class="bld-kpi__val bld-kpi__val--warning">{{ pendientes() }}</p>
-            <p class="bld-kpi__label">{{ 'dashboard_builder.pending' | translate }}</p>
-          </div>
-          <div class="bld-kpi__bar bld-kpi__bar--warning"></div>
-        </div>
-
-        <div class="bld-kpi">
-          <div class="bld-kpi__icon-wrap bld-kpi__icon-wrap--success" aria-hidden="true">
-            <i class="bi bi-check-circle"></i>
-          </div>
-          <div class="bld-kpi__content">
-            <p class="bld-kpi__val bld-kpi__val--success">{{ aceptadas() }}</p>
-            <p class="bld-kpi__label">{{ 'dashboard_builder.accepted' | translate }}</p>
-          </div>
-          <div class="bld-kpi__bar bld-kpi__bar--success"></div>
-        </div>
-
-        <div class="bld-kpi">
-          <div class="bld-kpi__icon-wrap bld-kpi__icon-wrap--danger" aria-hidden="true">
-            <i class="bi bi-x-circle"></i>
-          </div>
-          <div class="bld-kpi__content">
-            <p class="bld-kpi__val bld-kpi__val--danger">{{ rechazadas() }}</p>
-            <p class="bld-kpi__label">{{ 'dashboard_builder.rejected' | translate }}</p>
-          </div>
-          <div class="bld-kpi__bar bld-kpi__bar--danger"></div>
-        </div>
-
-        <div class="bld-kpi">
-          <div class="bld-kpi__icon-wrap bld-kpi__icon-wrap--gold" aria-hidden="true">
-            <i class="bi bi-coin"></i>
-          </div>
-          <div class="bld-kpi__content">
-            <p class="bld-kpi__val bld-kpi__val--gold bld-kpi__val--sm">
-              {{ formatPrecio(montoAdjudicado()) }}
-            </p>
-            <p class="bld-kpi__label">{{ 'dashboard_builder.awarded_amount' | translate }}</p>
-          </div>
-          <div class="bld-kpi__bar bld-kpi__bar--gold"></div>
-        </div>
-
-        <div class="bld-kpi">
-          <div class="bld-kpi__icon-wrap bld-kpi__icon-wrap--neutral" aria-hidden="true">
-            <i class="bi bi-bar-chart"></i>
-          </div>
-          <div class="bld-kpi__content bld-kpi__content--rate">
-            <div class="bld-rate-top">
-              <p class="bld-kpi__label mb-0">{{ 'dashboard_builder.success_rate' | translate }}</p>
-              <p class="bld-kpi__val bld-kpi__val--success mb-0">{{ tasaExito() }}%</p>
-            </div>
-            <div class="bld-rate-bar" role="progressbar"
-                 [attr.aria-valuenow]="tasaExito()"
-                 aria-valuemin="0" aria-valuemax="100">
-              <div class="bld-rate-fill" [style.width.%]="tasaExito()"></div>
-            </div>
-          </div>
-          <div class="bld-kpi__bar bld-kpi__bar--success"></div>
-        </div>
-
-      </div>
-
-      <!-- Layout principal -->
-      <div class="bld-main">
-
-        <!-- ── Columna principal: lista de ofertas ──────────────── -->
-        <section class="bld-card" aria-labelledby="ofertas-title">
-
-          <div class="bld-card__header">
-            <div class="bld-card__header-left">
-              <div class="bld-card__header-icon" aria-hidden="true">
-                <i class="bi bi-list-check"></i>
-              </div>
-              <div>
-                <h2 class="bld-card__title" id="ofertas-title">
-                  {{ 'dashboard_builder.my_offers_progress' | translate }}
-                </h2>
-                <p class="bld-card__subtitle">
-                  {{ total() }} {{ 'common.offers_count' | translate }}
-                </p>
-              </div>
-            </div>
-            <a routerLink="/builder/my-offers" class="bld-btn-link">
-              {{ 'dashboard_builder.view_all' | translate }}
-              <i class="bi bi-arrow-right" aria-hidden="true"></i>
-            </a>
+        <section class="bd-card bd-offers" aria-labelledby="bd-offers-title">
+          <div class="bd-head">
+            <h2 id="bd-offers-title" class="bd-h2">{{ 'nav.mes_offres' | translate }}</h2>
+            <span class="bd-count">{{ total() }}</span>
+            <a class="bd-link" routerLink="/builder/my-offers"
+               aria-describedby="bd-offers-title">{{ 'dashboard_builder.view_all' | translate }}</a>
           </div>
 
-          <div class="bld-offers-list" role="list">
-            @for (oferta of ofertas(); track oferta.id) {
-              <a [routerLink]="['/builder/my-offer', oferta.id]"
-                 [class]="'bld-offer bld-offer--' + oferta.estado"
-                 role="listitem">
+          <ul class="bd-offers__list">
+            @for (oferta of ofertasRecientes(); track oferta.id) {
+              <li>
+                <a class="bd-offer" [routerLink]="['/builder/my-offer', oferta.id]">
+                  <span class="bd-offer__main">
+                    @if (sinDossier(oferta)) {
+                      <span class="bd-offer__title is-hidden-file">{{ 'state_desc.archivado' | translate }}</span>
+                    } @else {
+                      <span class="bd-offer__title">{{ servicioNombre(oferta) }}</span>
+                    }
 
-                <!-- Acento lateral semántico -->
-                <span class="bld-offer__accent" aria-hidden="true"></span>
-
-                <!-- Contenido principal -->
-                <div class="bld-offer__body">
-
-                  <!-- Fila 1: número + servicio + estado -->
-                  <div class="bld-offer__head">
-                    <span class="bld-offer__num">{{ oferta.expediente_numero }}</span>
-                    <span class="bld-offer__service">{{ servicioNombre(oferta) }}</span>
-                    <span class="bld-offer__badge">
-                      <i class="bi {{ ofertaIcon(oferta.estado) }}" aria-hidden="true"></i>
-                      {{ ('state.' + oferta.estado) | translate }}
-                    </span>
-                  </div>
-
-                  <!-- Fila 2: ubicación + precio -->
-                  <div class="bld-offer__meta">
-                    <span class="bld-offer__loc">
-                      <i class="bi bi-geo-alt" aria-hidden="true"></i>
-                      {{ oferta.provincia }}, {{ oferta.canton }}
-                    </span>
-                    <span class="bld-offer__price">{{ formatPrecio(oferta.precio) }}</span>
-                  </div>
-
-                  <!-- Fila 3: fechas y plazo (condicional) -->
-                  @if (oferta.fecha_inicio || oferta.plazo_semanas_min) {
-                    <div class="bld-offer__footer">
+                    <span class="bd-offer__meta">
+                      @if (!sinDossier(oferta)) {
+                        <span>{{ 'file.exp_abbr' | translate }} {{ oferta.expediente_numero }}</span>
+                      }
+                      @if (oferta.canton !== SIN_DATO) {
+                        <span><mat-icon aria-hidden="true">location_on</mat-icon>{{ oferta.canton }}, {{ oferta.provincia }}</span>
+                      }
                       @if (oferta.fecha_inicio) {
-                        <span>
-                          <i class="bi bi-calendar3" aria-hidden="true"></i>
-                          {{ 'dashboard_builder.start_label' | translate }}: {{ formatFecha(oferta.fecha_inicio) }}
-                        </span>
+                        <span><mat-icon aria-hidden="true">event</mat-icon>{{ 'dashboard_builder.start_label' | translate }} {{ formatFecha(oferta.fecha_inicio) }}</span>
                       }
-                      @if (oferta.plazo_semanas_min || oferta.plazo_semanas_max) {
-                        <span>
-                          <i class="bi bi-clock" aria-hidden="true"></i>
-                          {{ oferta.plazo_semanas_min }}–{{ oferta.plazo_semanas_max }} {{ 'offer.weeks' | translate }}
-                        </span>
+                      @if (plazo(oferta)) {
+                        <span><mat-icon aria-hidden="true">schedule</mat-icon>{{ plazo(oferta) }} {{ 'offer.weeks' | translate }}</span>
                       }
-                    </div>
-                  }
+                    </span>
 
-                  <!-- Nota de rechazo -->
-                  @if (oferta.estado === 'rechazada') {
-                    <p class="bld-offer__reject-note">
-                      <i class="bi bi-info-circle" aria-hidden="true"></i>
-                      {{ 'offer.not_selected' | translate }}
-                    </p>
-                  }
+                    @if (oferta.estado === 'rechazada') {
+                      <span class="bd-offer__note">
+                        <mat-icon aria-hidden="true">info</mat-icon>
+                        {{ 'offer.not_selected' | translate }}
+                      </span>
+                    }
+                  </span>
 
-                </div>
-
-                <!-- Ring de progreso -->
-                <div class="bld-ring-wrap" aria-hidden="true">
-                  <svg class="bld-ring" viewBox="0 0 56 56">
-                    <circle class="bld-ring__track" cx="28" cy="28" r="23"/>
-                    <circle class="bld-ring__fill" cx="28" cy="28" r="23"
-                            [attr.stroke-dasharray]="RING_CIRC"
-                            [attr.stroke-dashoffset]="ringOffset(oferta)"
-                            transform="rotate(-90 28 28)"/>
-                    <text x="28" y="28" text-anchor="middle"
-                          dominant-baseline="central" class="bld-ring__pct">
-                      {{ progress(oferta) }}%
-                    </text>
-                  </svg>
-                </div>
-
-              </a>
+                  <span class="bd-offer__side">
+                    <span class="bd-offer__price">{{ formatPrecio(oferta.precio) }}</span>
+                    <app-status-chip [estado]="oferta.estado" />
+                  </span>
+                </a>
+              </li>
             }
-          </div>
-
+          </ul>
         </section>
 
-        <!-- ── Sidebar ─────────────────────────────────────────── -->
-        <aside class="bld-sidebar">
+        <!-- Resumen: lo adjudicado arriba, los recuentos debajo -->
+        <section class="bd-sum" aria-labelledby="bd-sum-title">
+          <h2 id="bd-sum-title" class="bd-h2">{{ 'dashboard_builder.distribution' | translate }}</h2>
 
-          <!-- Acciones rápidas (siempre primero) -->
-          <div class="bld-card">
-            <div class="bld-card__header">
-              <div class="bld-card__header-left">
-                <div class="bld-card__header-icon" aria-hidden="true">
-                  <i class="bi bi-lightning"></i>
-                </div>
-                <h2 class="bld-card__title">{{ 'dashboard_builder.quick_actions' | translate }}</h2>
-              </div>
+          <dl class="bd-sum__lead">
+            <dt>{{ 'dashboard_builder.awarded_amount' | translate }}</dt>
+            <dd class="bd-sum__amount">{{ formatPrecio(montoAdjudicado()) }}</dd>
+          </dl>
+
+          <dl class="bd-sum__counts">
+            <div>
+              <dt>{{ 'dashboard_builder.pending' | translate }}</dt>
+              <dd class="bd-fig">{{ pendientes() }}</dd>
             </div>
-            <nav class="bld-card__body bld-actions" aria-label="Acciones rápidas">
-              <a routerLink="/builder/available-files" class="bld-action bld-action--primary">
-                <div class="bld-action__icon" aria-hidden="true">
-                  <i class="bi bi-search"></i>
-                </div>
-                <div class="bld-action__text">
-                  <span class="bld-action__label">{{ 'common.see_available' | translate }}</span>
-                  <span class="bld-action__hint">{{ 'dashboard_builder.find_projects' | translate }}</span>
-                </div>
-                <i class="bi bi-arrow-right bld-action__arrow" aria-hidden="true"></i>
-              </a>
-              <a routerLink="/builder/my-offers" class="bld-action">
-                <div class="bld-action__icon bld-action__icon--neutral" aria-hidden="true">
-                  <i class="bi bi-list-ul"></i>
-                </div>
-                <div class="bld-action__text">
-                  <span class="bld-action__label">{{ 'nav.mes_offres' | translate }}</span>
-                  <span class="bld-action__hint">{{ total() }} {{ 'common.offers_count' | translate }}</span>
-                </div>
-                @if (pendientes() > 0) {
-                  <span class="bld-action__badge" [attr.aria-label]="pendientes() + ' pendientes'">
-                    {{ pendientes() }}
-                  </span>
-                }
-              </a>
-            </nav>
+            <div>
+              <dt>{{ 'dashboard_builder.accepted' | translate }}</dt>
+              <dd class="bd-fig">{{ aceptadas() }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'dashboard_builder.rejected' | translate }}</dt>
+              <dd class="bd-fig">{{ rechazadas() }}</dd>
+            </div>
+          </dl>
+
+          <div class="bd-sum__rate">
+            <div class="bd-sum__rate-head">
+              <span id="bd-rate-label">{{ 'dashboard_builder.success_rate' | translate }}</span>
+              <strong class="bd-fig">{{ tasaExito() }} %</strong>
+            </div>
+            <span class="bd-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+                  [attr.aria-valuenow]="tasaExito()" aria-labelledby="bd-rate-label">
+              <span class="bd-bar__fill" [style.width.%]="tasaExito()"></span>
+            </span>
           </div>
+        </section>
 
-          <!-- Distribución de ofertas -->
-          <div class="bld-card">
-            <div class="bld-card__header">
-              <div class="bld-card__header-left">
-                <div class="bld-card__header-icon" aria-hidden="true">
-                  <i class="bi bi-pie-chart"></i>
-                </div>
-                <h2 class="bld-card__title">{{ 'dashboard_builder.distribution' | translate }}</h2>
-              </div>
-              @if (tasaExito() > 0) {
-                <span class="bld-success-chip">
-                  <i class="bi bi-trophy" aria-hidden="true"></i>
-                  {{ tasaExito() }}%
-                </span>
-              }
-            </div>
-
-            <div class="bld-card__body">
-
-              <!-- Donut + leyenda -->
-              <div class="bld-dist-layout">
-
-                <div class="bld-donut-wrap" aria-hidden="true">
-                  <svg width="110" height="110" viewBox="0 0 140 140">
-                    <circle cx="70" cy="70" r="54" fill="none"
-                            stroke="var(--ds-border)" stroke-width="18"/>
-                    @for (seg of donutSegments(); track seg.cls) {
-                      <circle class="bld-donut-seg {{ seg.cls }}" cx="70" cy="70" [attr.r]="R" fill="none"
-                              stroke-width="18"
-                              [attr.stroke-dasharray]="seg.dasharray"
-                              [attr.stroke-dashoffset]="seg.dashoffset"
-                              transform="rotate(-90 70 70)"/>
-                    }
-                    <text x="70" y="65" text-anchor="middle" class="bld-donut__num">{{ total() }}</text>
-                    <text x="70" y="81" text-anchor="middle" class="bld-donut__sub">
-                      {{ 'common.offers_count' | translate }}
-                    </text>
-                  </svg>
-                </div>
-
-                <div class="bld-legend" role="list">
-                  @for (e of estadoBreakdown(); track e.key) {
-                    <div class="bld-legend-item" role="listitem">
-                      <div class="bld-legend-item__left">
-                        <span class="bld-legend-dot {{ e.cls }}" aria-hidden="true"></span>
-                        <span class="bld-legend-label">{{ ('state.' + e.key) | translate }}</span>
-                      </div>
-                      <div class="bld-legend-item__right">
-                        <div class="bld-legend-bar" aria-hidden="true">
-                          <div class="bld-legend-bar__fill {{ e.cls }}" [style.width.%]="e.pct"></div>
-                        </div>
-                        <span class="bld-legend-count">{{ e.count }}</span>
-                      </div>
-                    </div>
-                  }
-                </div>
-
-              </div>
-
-              <!-- Referencia de progreso (integrada, más compacta) -->
-              <div class="bld-progress-ref">
-                <p class="bld-progress-ref__title">
-                  <i class="bi bi-info-circle" aria-hidden="true"></i>
-                  {{ 'dashboard_builder.progress_meaning' | translate }}
-                </p>
-                @for (ref of progressRefs; track ref.pct) {
-                  <div class="bld-progress-ref__row">
-                    <div class="bld-progress-ref__bar-wrap" aria-hidden="true">
-                      <div class="bld-progress-ref__bar {{ ref.cls }}" [style.width.%]="ref.pct"></div>
-                    </div>
-                    <span class="bld-progress-ref__pct">{{ ref.pct }}%</span>
-                    <span class="bld-progress-ref__label">{{ ref.label | translate }}</span>
-                  </div>
-                }
-              </div>
-
-            </div>
-          </div>
-
-        </aside>
-      </div>
-
-    <!-- ══════════════════════════════════════════════════════════
-         SIN DATOS (ni obras ni ofertas)
-         ══════════════════════════════════════════════════════════ -->
-    } @else if (obras().length === 0) {
-      <div class="empty-state">
-        <div class="empty-state__icon">
-          <i class="bi bi-clipboard2-x" aria-hidden="true"></i>
-        </div>
-        <p class="empty-state__title">{{ 'dashboard_builder.no_offers' | translate }}</p>
-        <p class="empty-state__desc">{{ 'dashboard_builder.no_offers_text' | translate }}</p>
-        <a routerLink="/builder/available-files" class="btn btn-primary btn-sm mt-2">
-          <i class="bi bi-search" aria-hidden="true"></i>
-          {{ 'common.see_available' | translate }}
-        </a>
       </div>
     }
-
   }
-
 </div>

@@ -1,0 +1,13 @@
+<div class="tst">
+  @for (t of toast.toasts(); track t.id) {
+    <div class="tst-item" [class]="'is-' + t.type" animate.enter="tst-enter" animate.leave="tst-leave"
+         [attr.role]="t.type === 'danger' || t.type === 'warning' ? 'alert' : 'status'">
+      <mat-icon class="tst-icon" aria-hidden="true">{{ ICONO[t.type].matIcon }}</mat-icon>
+      <p class="tst-text">{{ t.message }}</p>
+      <button mat-icon-button type="button" class="tst-close"
+              [attr.aria-label]="'common.close' | translate" (click)="toast.dismiss(t.id)">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  }
+</div>

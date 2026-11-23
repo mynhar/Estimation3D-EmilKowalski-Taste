@@ -8,11 +8,19 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatDialog } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSliderModule } from '@angular/material/slider';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ContratoService } from '../../../services/contrato.service';
 import { SeguimientoService } from '../../../services/seguimiento.service';
@@ -22,6 +30,9 @@ import { ContratoAdminDetalle, ContratoPdfData, nombreServicio, serviciosParaCon
 import { AvisoArchivadoComponent } from '../../../shared/ui/aviso-archivado/aviso-archivado.component';
 import { ArchivarExpedienteComponent } from '../../../shared/ui/archivar-expediente/archivar-expediente.component';
 import { BotonArchivarComponent } from '../../../shared/ui/archivar-expediente/boton-archivar.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
+import { StatusChipComponent } from '../../../shared/ui/status-chip/status-chip.component';
+import { abrirVisor } from '../../../shared/ui/media-viewer/media-viewer.component';
 import {
   ActividadServicio,
   FaseServicio,
@@ -38,15 +49,21 @@ interface CalDia { num: number; tipo: 'vacio' | 'normal' | 'trabajado' | 'hoy' |
 @Component({
   selector: 'app-construction-monitoring',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, AvisoArchivadoComponent, ArchivarExpedienteComponent, BotonArchivarComponent],
+  imports: [
+    RouterLink, TranslatePipe,
+    MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatIconModule, MatInputModule,
+    MatSliderModule, MatTooltipModule,
+    PageHeaderComponent, StatusChipComponent,
+    AvisoArchivadoComponent, ArchivarExpedienteComponent, BotonArchivarComponent,
+  ],
   templateUrl: './monitoring.component.html',
   styleUrl: './monitoring.component.css',
-  host: { '(document:keydown.escape)': 'cerrarViewer()' },
 })
 export class ConstructionMonitoringComponent implements OnInit, OnDestroy {
   private route               = inject(ActivatedRoute);
   private router              = inject(Router);
   private sanitizer           = inject(DomSanitizer);
+  private dialog              = inject(MatDialog);
   private translate           = inject(TranslateService);
   private contratoService     = inject(ContratoService);
   private seguimientoService  = inject(SeguimientoService);
@@ -141,7 +158,6 @@ export class ConstructionMonitoringComponent implements OnInit, OnDestroy {
   subiendoVid  = signal(false);
   subiendoDoc  = signal(false);
   errorMedia          = signal<string | null>(null);
-  mediaViewer         = signal<{ tipo: 'foto' | 'video'; url: string; nombre: string } | null>(null);
   eliminandoReporteId = signal<string | null>(null);
 
   // ── Agenda inline form ────────────────────────────────────────────────────
@@ -177,18 +193,24 @@ export class ConstructionMonitoringComponent implements OnInit, OnDestroy {
   // (/admin/construction-monitoring/monitoring/:id). El admin no está acotado a
   // sus propios contratos y opera sobre el constructor real de la obra.
   esAdmin = false;
-  private listaRuta(): string {
+  listaRuta(): string {
     if (!this.esAdmin) return '/builder/construction-monitoring/list';
     // Las obras archivadas ya no salen en el listado de seguimiento.
     return this.archivado() ? '/admin/archived' : '/admin/construction-monitoring/list';
   }
 
   readonly PASOS = [
-    { key: 'firmado',      icon: 'bi-pen'           },
-    { key: 'en_ejecucion', icon: 'bi-tools'         },
-    { key: 'completado',   icon: 'bi-check2-circle' },
+    { key: 'firmado',      matIcon: 'draw'         },
+    { key: 'en_ejecucion', matIcon: 'construction' },
+    { key: 'completado',   matIcon: 'check_circle' },
   ];
-  readonly CAL_HEADERS = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+
+  /** Iniciales de lunes a domingo en el idioma activo (L M M J V S D en francés). */
+  calHeaders = computed(() => {
+    const fmt = new Intl.DateTimeFormat(this.langLocale(), { weekday: 'narrow' });
+    // 1 de enero de 2024 fue lunes.
+    return Array.from({ length: 7 }, (_, i) => ({ id: i, letra: fmt.format(new Date(2024, 0, 1 + i)) }));
+  });
 
   // ── Computados ────────────────────────────────────────────────────────────
 
@@ -291,6 +313,12 @@ export class ConstructionMonitoringComponent implements OnInit, OnDestroy {
     const c = this.contrato();
     return this.esAdmin && !!c && c.estado !== 'archivado' && c.expediente_estado !== 'archivado';
   });
+
+  /**
+   * El botón tomate de la vista: para el administrador, completar el contrato
+   * cuando la obra llegó al 100 %; si no, guardar el parte del día.
+   */
+  ctaCompletar = computed(() => this.esAdmin && this.obraTerminada());
 
   /** Tras archivar: cierra la confirmación de completar y relee contrato y avance. */
   recargarTrasArchivar = async (): Promise<void> => {
@@ -861,20 +889,11 @@ export class ConstructionMonitoringComponent implements OnInit, OnDestroy {
   servicioNombre(c: ContratoAdminDetalle): string {
     const lang = this.currentLang();
     if (c.servicios?.length) {
-      return c.servicios.map(s => nombreServicio(s, lang)).join(' · ');
+      return c.servicios.map(s => nombreServicio(s, lang)).join(', ');
     }
     if (lang === 'en') return c.servicio_nombre_en || c.servicio_nombre;
     if (lang === 'fr') return c.servicio_nombre_fr || c.servicio_nombre;
     return c.servicio_nombre;
-  }
-
-  badgeExpediente(estado: string): string {
-    return ({
-      en_ejecucion: 'badge-exp-ejecucion',
-      completado:   'badge-exp-completado',
-      adjudicado:   'badge-exp-adjudicado',
-      contratado:   'badge-exp-contratado',
-    } as Record<string, string>)[estado] ?? '';
   }
 
   inspDia(fecha: string): string {
@@ -886,7 +905,6 @@ export class ConstructionMonitoringComponent implements OnInit, OnDestroy {
     const raw = fecha.includes('T') ? fecha.split('T')[0] : fecha;
     return new Intl.DateTimeFormat(this.langLocale(), { month: 'short' })
       .format(new Date(`${raw}T00:00:00`))
-      .toUpperCase()
       .replace('.', '');
   }
 
@@ -1017,18 +1035,17 @@ export class ConstructionMonitoringComponent implements OnInit, OnDestroy {
     }
   }
 
+  /** Fotos y vídeos en el visor a pantalla completa; los documentos, en otra pestaña. */
   abrirMedia(archivo: ReporteArchivoRow): void {
     const url = this.publicUrl(archivo.url_storage);
     if (archivo.tipo === 'reporte_foto') {
-      this.mediaViewer.set({ tipo: 'foto', url, nombre: archivo.nombre_archivo });
+      abrirVisor(this.dialog, { tipo: 'foto', url, titulo: archivo.nombre_archivo });
     } else if (archivo.tipo === 'reporte_video') {
-      this.mediaViewer.set({ tipo: 'video', url, nombre: archivo.nombre_archivo });
+      abrirVisor(this.dialog, { tipo: 'video', url, titulo: archivo.nombre_archivo });
     } else {
       window.open(url, '_blank');
     }
   }
-
-  cerrarViewer(): void { this.mediaViewer.set(null); }
 
   private async cargarMedia(reporteId: string): Promise<void> {
     const { fotos, videos, documentos } = await this.archivoService.cargarPorReporte(reporteId);
@@ -1078,22 +1095,12 @@ export class ConstructionMonitoringComponent implements OnInit, OnDestroy {
     return this.archivoService.publicUrl(storagePath);
   }
 
-  badgeContrato(estado: string): string {
-    return ({
-      firmado:      'badge-firmado',
-      en_ejecucion: 'badge-en-ejecucion',
-      completado:   'badge-completado',
-      cancelado:    'badge-cancelado',
-      archivado:    'badge-archivado',
-    } as Record<string, string>)[estado] ?? '';
-  }
-
   formatFecha(valor: string | null): string {
     if (!valor) return '—';
     const raw = valor.includes('T') ? valor.split('T')[0] : valor;
     const d   = new Date(`${raw}T00:00:00`);
     if (isNaN(d.getTime())) return '—';
-    return new Intl.DateTimeFormat(this.langLocale(), { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d);
+    return new Intl.DateTimeFormat(this.langLocale(), { day: 'numeric', month: 'short', year: 'numeric' }).format(d);
   }
 
   formatPrecio(precio: number | null): string {
@@ -1103,8 +1110,9 @@ export class ConstructionMonitoringComponent implements OnInit, OnDestroy {
 
   formatPlazo(min: number | null, max: number | null): string {
     if (!min && !max) return '—';
-    if (min === max) return `${min} sem.`;
-    return `${min ?? '?'} – ${max ?? '?'} sem.`;
+    const w = this.translate.instant('offer.weeks');
+    if (min === max) return `${min} ${w}`;
+    return `${min ?? '?'}–${max ?? '?'} ${w}`;
   }
 
   private langLocale(): string {

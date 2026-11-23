@@ -1,9 +1,18 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, effect, inject, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../../services/auth-supabase.service';
 import { DbPerfil, ProveedorAuth, RolUsuario } from '../../../types/supabase';
 import { PaginationComponent } from '../../../shared/pagination/pagination.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
 
 type FiltroActivo = 'todos' | 'activo' | 'inactivo';
 
@@ -13,9 +22,13 @@ type RolExterno = Extract<RolUsuario, 'cliente' | 'constructor'>;
 @Component({
   selector: 'app-estimator-client-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, TranslatePipe, PaginationComponent],
+  imports: [
+    NgTemplateOutlet, RouterLink, TranslatePipe,
+    MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTooltipModule,
+    PageHeaderComponent, EmptyStateComponent, PaginationComponent,
+  ],
   templateUrl: './list.component.html',
-  styleUrl: './list.component.css',
+  styleUrls: ['../../../shared/ui/lista/lista.css', './list.component.css'],
 })
 export class EstimatorClientListComponent implements OnInit {
   private auth      = inject(AuthSupabaseService);
@@ -117,12 +130,6 @@ export class EstimatorClientListComponent implements OnInit {
     return rol === 'constructor'
       ? 'admin_users.edit_builder_title'
       : 'admin_users.edit_client_title';
-  }
-
-  rolBadgeClass(rol: RolUsuario): string {
-    return rol === 'constructor'
-      ? 'role-badge role-badge--constructor'
-      : 'role-badge role-badge--cliente';
   }
 
   /** Navega a la edición del usuario (fila/tarjeta completa clicable). */

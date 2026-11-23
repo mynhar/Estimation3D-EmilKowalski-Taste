@@ -1,30 +1,19 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ExpedienteService } from '../../../services/expediente.service';
 import { ExpedienteArchivadoAdmin } from '../../../models';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
+import { StatusChipComponent } from '../../../shared/ui/status-chip/status-chip.component';
 
 type VistaArchivados = 'tabla' | 'tarjetas';
-
-/** Insignia del estado que tenía el expediente al archivarse. */
-/** Estado del contrato al archivarse → clase de su insignia. */
-const BADGE_CONTRATO: Record<string, string> = {
-  generado:     'badge-ct-generado',
-  firmado:      'badge-ct-firmado',
-  en_ejecucion: 'badge-ct-en_ejecucion',
-  completado:   'badge-ct-completado',
-  cancelado:    'badge-ct-cancelado',
-};
-
-const BADGE_ESTADO: Record<string, string> = {
-  nuevo:         'badge-nuevo',
-  en_estimacion: 'badge-en_estimacion',
-  estimado:      'badge-estimado',
-  en_oferta:     'badge-en_oferta',
-  adjudicado:    'badge-adjudicado',
-  contratado:    'badge-contratado',
-  cancelado:     'badge-cancelado',
-};
 
 /** Minúsculas y sin acentos, para que «Montreal» encuentre «Montréal». */
 function normalizar(texto: string): string {
@@ -38,15 +27,19 @@ function normalizar(texto: string): string {
  * Seguimiento de obra: esta es la única lista donde aparecen, y solo la ve el
  * administrador, el único que puede modificarlos. Cada fila abre
  * admin/file/edit. Son pocos, así que se cargan todos y se filtran aquí.
- * Vista de tarjetas por defecto; en escritorio se puede pasar a tabla (en
- * móvil siempre tarjetas), como en admin/file.
+ * Vista de tarjetas por defecto; desde 1200px se puede pasar a tabla (por
+ * debajo, siempre tarjetas), como en admin/contract.
  */
 @Component({
   selector: 'app-admin-archived-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, TranslatePipe],
+  imports: [
+    RouterLink, TranslatePipe,
+    PageHeaderComponent, EmptyStateComponent, StatusChipComponent,
+    MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTooltipModule,
+  ],
   templateUrl: './list.component.html',
-  styleUrl: './list.component.css',
+  styleUrls: ['../../../shared/ui/lista/lista.css', './list.component.css'],
 })
 export class AdminArchivedListComponent implements OnInit {
   private expedienteService = inject(ExpedienteService);
@@ -127,15 +120,7 @@ export class AdminArchivedListComponent implements OnInit {
 
   /** Ciudad y código postal (`canton` y `distrito` en la tabla). */
   lugar(e: ExpedienteArchivadoAdmin): string {
-    return [e.canton, e.distrito].filter(Boolean).join(' · ');
-  }
-
-  badgeEstado(estado: string | null): string {
-    return BADGE_ESTADO[estado ?? ''] ?? 'badge-cancelado';
-  }
-
-  badgeContrato(estado: string): string {
-    return BADGE_CONTRATO[estado] ?? 'badge-cancelado';
+    return [e.canton, e.distrito].filter(Boolean).join(' ');
   }
 
   /** `archivado_en` es un instante: se muestra en la fecha local. */

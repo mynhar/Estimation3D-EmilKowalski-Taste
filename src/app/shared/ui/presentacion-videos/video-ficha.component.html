@@ -41,7 +41,8 @@
       }
       <button type="button" class="ve-slot__title ve-slot__title--link" (click)="abrir()">{{ video().titulo }}</button>
       <p class="ve-slot__meta">
-        {{ origen() | translate }}<span class="ve-sep" aria-hidden="true">·</span>{{ relativo() }}
+        <span>{{ origen() | translate }}</span>
+        <span>{{ relativo() }}</span>
       </p>
     </div>
   </div>

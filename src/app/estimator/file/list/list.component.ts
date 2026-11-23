@@ -1,5 +1,11 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -7,6 +13,9 @@ import { AuthSupabaseService } from '../../../services/auth-supabase.service';
 import { ExpedienteService } from '../../../services/expediente.service';
 import { ExpedienteRow } from '../../../models';
 import { coincideBusqueda, direccionLinea1, direccionLinea2, direccionCompleta } from '../../../shared/util/busqueda';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
+import { StatusChipComponent } from '../../../shared/ui/status-chip/status-chip.component';
 
 type Vista = 'tabla' | 'tarjetas';
 type Grupo = 'todos' | 'creados' | 'en_estimacion' | 'estimados';
@@ -14,9 +23,13 @@ type Grupo = 'todos' | 'creados' | 'en_estimacion' | 'estimados';
 @Component({
   selector: 'app-estimator-file-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, RouterLink, TranslatePipe],
+  imports: [
+    FormsModule, RouterLink, TranslatePipe,
+    MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTooltipModule,
+    PageHeaderComponent, EmptyStateComponent, StatusChipComponent,
+  ],
   templateUrl: './list.component.html',
-  styleUrl:    './list.component.css',
+  styleUrls:   ['../../../shared/ui/lista/lista.css', './list.component.css'],
 })
 export class EstimatorFileListComponent implements OnInit {
   private auth              = inject(AuthSupabaseService);
@@ -42,11 +55,11 @@ export class EstimatorFileListComponent implements OnInit {
   // La lista trae los expedientes del estimador por sus tres vínculos (creados,
   // asignados, estimados) y los chips filtran dentro de ese conjunto. No son
   // grupos excluyentes: un expediente que creó y ya estimó cuenta en los dos.
-  readonly GRUPOS: { key: Grupo; label: string; icon: string }[] = [
-    { key: 'todos',         label: 'estimator_file_list.group_all',        icon: 'bi-collection'    },
-    { key: 'creados',       label: 'estimator_file_list.group_created',    icon: 'bi-folder-plus'   },
-    { key: 'en_estimacion', label: 'estimator_file_list.group_in_progress', icon: 'bi-pencil-square' },
-    { key: 'estimados',     label: 'estimator_file_list.group_estimated',  icon: 'bi-check2-circle' },
+  readonly GRUPOS: { key: Grupo; label: string }[] = [
+    { key: 'todos',         label: 'estimator_file_list.group_all' },
+    { key: 'creados',       label: 'estimator_file_list.group_created' },
+    { key: 'en_estimacion', label: 'estimator_file_list.group_in_progress' },
+    { key: 'estimados',     label: 'estimator_file_list.group_estimated' },
   ];
 
   private readonly ESTADOS_ESTIMADOS = ['estimado', 'en_oferta', 'adjudicado', 'contratado'];
@@ -128,20 +141,6 @@ export class EstimatorFileListComponent implements OnInit {
     if (lang === 'en') return exp.servicio_nombre_en || exp.servicio_nombre;
     if (lang === 'fr') return exp.servicio_nombre_fr || exp.servicio_nombre;
     return exp.servicio_nombre;
-  }
-
-  estadoLabel(estado: string | undefined): string {
-    return estado ? `state.${estado}` : 'common.none';
-  }
-
-  /** Modificador de color del distintivo de estado. */
-  estadoTono(estado: string | undefined): string {
-    switch (estado) {
-      case 'nuevo':         return 'nuevo';
-      case 'en_estimacion': return 'proceso';
-      case 'cancelado':     return 'cancelado';
-      default:              return 'listo';
-    }
   }
 
   formatFecha(valor: string): string {

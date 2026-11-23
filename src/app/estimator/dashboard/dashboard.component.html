@@ -1,745 +1,322 @@
-﻿<div class="estd-root page-wrapper">
+﻿<div class="page-wrapper ed">
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       HEADER â€” eyebrow + bienvenida + pills de estado
-       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  <header class="estd-header">
-    <div class="estd-header__accent" aria-hidden="true"></div>
-
-    <div class="estd-header__body">
-      <div class="estd-header__info">
-        <p class="page-eyebrow">
-          <i class="bi bi-clipboard2-pulse" aria-hidden="true"></i>
-          {{ 'role.estimateur' | translate }}
-        </p>
-        <h1 class="estd-header__title">
-          {{ bienvenida
-            ? (('dashboard_client.welcome' | translate) + ', ' + bienvenida)
-            : ('dashboard_estimator.title' | translate) }}
-        </h1>
-        <p class="estd-header__sub">{{ 'dashboard_estimator.subtitle' | translate }}</p>
-      </div>
-
-      @if (!cargando()) {
-        <div class="estd-header__stats" aria-label="Estado actual">
-          @if (activos().length > 0) {
-            <a class="estd-hstat estd-hstat--activo" routerLink="/estimator/files-under-estimation">
-              <span class="estd-hstat__n">{{ activos().length }}</span>
-              <span class="estd-hstat__l">{{ 'dashboard_estimator.in_progress' | translate }}</span>
-            </a>
-          }
-          @if (disponibles() > 0) {
-            <a class="estd-hstat estd-hstat--disponible" routerLink="/estimator/files-to-be-estimated">
-              <span class="estd-hstat__n">{{ disponibles() }}</span>
-              <span class="estd-hstat__l">{{ 'common.available' | translate }}</span>
-            </a>
-          }
-          @if (contratados().length > 0) {
-            <a class="estd-hstat estd-hstat--contratado" routerLink="/estimator/estimated-files">
-              <span class="estd-hstat__n">{{ contratados().length }}</span>
-              <span class="estd-hstat__l">{{ 'dashboard_estimator.contracted' | translate }}</span>
-            </a>
-          }
-          @if (montoTotal() > 0) {
-            <div class="estd-hstat estd-hstat--monto">
-              <span class="estd-hstat__n estd-hstat__n--sm">{{ formatPrecio(montoTotal()) }}</span>
-              <span class="estd-hstat__l">{{ 'dashboard_estimator.estimated_value' | translate }}</span>
-            </div>
-          }
-        </div>
+  <app-page-header
+    [titulo]="bienvenida ? ('dashboard_client.welcome' | translate) + ', ' + bienvenida : ('dashboard_estimator.title' | translate)"
+    [contexto]="'dashboard_estimator.subtitle' | translate">
+    <!-- Sin estimación en curso, la siguiente etapa es tomar un dossier: tomate.
+         Con estimaciones en curso, el tomate es «Continuer» de la primera. -->
+    @if (!cargando() && disponibles() > 0) {
+      @if (activos().length === 0) {
+        <a actions mat-flat-button class="ed-cta ds-cta" routerLink="/estimator/files-to-be-estimated">
+          <mat-icon>inbox</mat-icon>
+          {{ 'dashboard_estimator.see_available_btn' | translate }}
+          <span class="ed-btn-count">{{ disponibles() }}</span>
+        </a>
+      } @else {
+        <a actions mat-stroked-button class="ed-cta" routerLink="/estimator/files-to-be-estimated">
+          <mat-icon>inbox</mat-icon>
+          {{ 'nav.a_estimer' | translate }}
+          <span class="ed-btn-count">{{ disponibles() }}</span>
+        </a>
       }
-    </div>
-  </header>
+    }
+  </app-page-header>
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       CARGANDO
-       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ── Cargando ────────────────────────────────────────────────────────── -->
   @if (cargando()) {
-    <div class="estd-loading" role="status" [attr.aria-label]="'common.loading' | translate">
-      <span class="estd-spinner" aria-hidden="true"></span>
-      {{ 'common.loading' | translate }}
+    <div class="ed-skel" role="status">
+      <span class="cdk-visually-hidden">{{ 'common.loading' | translate }}</span>
+      <span class="skel skel--main" aria-hidden="true"></span>
+      <span class="skel skel--list" aria-hidden="true"></span>
     </div>
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       SIN DATOS
-       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ── Sin dossiers ni disponibles ─────────────────────────────────────── -->
   } @else if (expedientes().length === 0 && disponibles() === 0) {
-    <div class="estd-empty empty-state">
-      <div class="empty-state__icon">
-        <i class="bi bi-clipboard2-x" aria-hidden="true"></i>
-      </div>
-      <p class="empty-state__title">{{ 'dashboard_estimator.no_files' | translate }}</p>
-      <p class="empty-state__desc">{{ 'dashboard_estimator.no_files_text' | translate }}</p>
-      <a routerLink="/estimator/files-to-be-estimated" class="btn btn-primary btn-sm mt-2">
-        <i class="bi bi-inbox" aria-hidden="true"></i>
+    <app-empty-state class="ed-empty"
+                     matIcon="assignment"
+                     [titulo]="'dashboard_estimator.no_files' | translate"
+                     [texto]="'dashboard_estimator.no_files_text' | translate">
+      <a actions mat-stroked-button routerLink="/estimator/files-to-be-estimated">
+        <mat-icon>inbox</mat-icon>
         {{ 'nav.a_estimer' | translate }}
       </a>
-    </div>
+    </app-empty-state>
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       CONTENIDO PRINCIPAL
-       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
   } @else {
 
-    <!-- KPI strip compacto -->
-    <div class="estd-kpis" role="region" aria-label="KPIs">
+    <div class="ed-grid">
 
-      <a class="estd-kpi estd-kpi--activo" [class.estd-kpi--pulse]="activos().length > 0"
-         routerLink="/estimator/files-under-estimation">
-        <div class="estd-kpi__icon-wrap estd-kpi__icon-wrap--activo" aria-hidden="true">
-          <i class="bi bi-pencil-square"></i>
-        </div>
-        <div class="estd-kpi__content">
-          <p class="estd-kpi__val">
-            {{ activos().length }}
-          </p>
-          <p class="estd-kpi__label">{{ 'state.en_estimacion' | translate }}</p>
-        </div>
-        <div class="estd-kpi__indicator estd-kpi__indicator--activo"></div>
-      </a>
-
-      <a class="estd-kpi estd-kpi--disponible" routerLink="/estimator/files-to-be-estimated">
-        <div class="estd-kpi__icon-wrap estd-kpi__icon-wrap--disponible" aria-hidden="true">
-          <i class="bi bi-inbox"></i>
-        </div>
-        <div class="estd-kpi__content">
-          <p class="estd-kpi__val">{{ disponibles() }}</p>
-          <p class="estd-kpi__label">{{ 'common.available' | translate }}</p>
-        </div>
-        <div class="estd-kpi__indicator estd-kpi__indicator--disponible"></div>
-      </a>
-
-      <a class="estd-kpi estd-kpi--mercado" routerLink="/estimator/estimated-files">
-        <div class="estd-kpi__icon-wrap estd-kpi__icon-wrap--mercado" aria-hidden="true">
-          <i class="bi bi-people"></i>
-        </div>
-        <div class="estd-kpi__content">
-          <p class="estd-kpi__val">{{ enMercado().length }}</p>
-          <p class="estd-kpi__label">{{ 'dashboard_estimator.on_market' | translate }}</p>
-        </div>
-        <div class="estd-kpi__indicator estd-kpi__indicator--mercado"></div>
-      </a>
-
-      <a class="estd-kpi estd-kpi--contratado" routerLink="/estimator/estimated-files">
-        <div class="estd-kpi__icon-wrap estd-kpi__icon-wrap--contratado" aria-hidden="true">
-          <i class="bi bi-check-circle"></i>
-        </div>
-        <div class="estd-kpi__content">
-          <p class="estd-kpi__val">{{ contratados().length }}</p>
-          <p class="estd-kpi__label">{{ 'dashboard_estimator.contracted' | translate }}</p>
-        </div>
-        <div class="estd-kpi__indicator estd-kpi__indicator--contratado"></div>
-      </a>
-
-      @if (obras().length > 0) {
-        <button type="button" class="estd-kpi estd-kpi--obra" (click)="scrollAObras()">
-          <div class="estd-kpi__icon-wrap estd-kpi__icon-wrap--obra" aria-hidden="true">
-            <i class="bi bi-hammer"></i>
-          </div>
-          <div class="estd-kpi__content">
-            <p class="estd-kpi__val">{{ obrasEnCurso() }}</p>
-            <p class="estd-kpi__label">{{ 'dashboard_estimator.works_active' | translate }}</p>
-          </div>
-          <div class="estd-kpi__indicator estd-kpi__indicator--obra"></div>
-        </button>
-      }
-
-    </div>
-
-    <!-- â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-         LAYOUT: columna principal + sidebar
-         â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-    <div class="estd-main">
-
-      <!-- â”€â”€ Estimaciones activas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-      <section class="estd-card" aria-labelledby="activas-title">
-
-        <div class="estd-card__header">
-          <div class="estd-card__header-left">
-            <div class="estd-card__header-icon" aria-hidden="true">
-              <i class="bi bi-pencil-square"></i>
-            </div>
-            <div>
-              <h2 class="estd-card__title" id="activas-title">
-                {{ 'dashboard_estimator.active_estimations' | translate }}
-              </h2>
-              @if (activos().length > 0) {
-                <p class="estd-card__subtitle">
-                  {{ activos().length }}
-                  {{ activos().length === 1 ? ('dashboard_estimator.in_progress' | translate) : ('dashboard_estimator.in_progress' | translate) }}
-                </p>
-              }
-            </div>
-          </div>
-          <a routerLink="/estimator/files-under-estimation" class="estd-btn-link" [attr.aria-label]="'common.view_all' | translate">
-            {{ 'common.view_all' | translate }}
-            <i class="bi bi-arrow-right" aria-hidden="true"></i>
-          </a>
-        </div>
-
-        <div class="estd-card__body">
-
-          @if (activos().length === 0) {
-            <!-- Estado vacÃ­o inline -->
-            <div class="estd-inline-empty">
-              <div class="estd-inline-empty__icon" aria-hidden="true">
-                <i class="bi bi-check-circle"></i>
-              </div>
-              <div class="estd-inline-empty__text">
-                <p class="estd-inline-empty__title">{{ 'dashboard_estimator.no_pending' | translate }}</p>
-                <p class="estd-inline-empty__desc">{{ 'dashboard_estimator.take_available_hint' | translate }}</p>
-              </div>
-              <a routerLink="/estimator/files-to-be-estimated" class="btn btn-primary btn-sm">
-                <i class="bi bi-inbox" aria-hidden="true"></i>
-                {{ 'dashboard_estimator.see_available_btn' | translate }}
-                @if (disponibles() > 0) {
-                  <span class="estd-btn-count" [attr.aria-label]="disponibles() + ' disponibles'">
-                    {{ disponibles() }}
-                  </span>
-                }
-              </a>
-            </div>
-
-          } @else {
-
-            <!-- Grid de cards de trabajo activo -->
-            <div class="estd-work-grid">
-              @for (exp of activos(); track exp.id) {
-                <article [class]="'estd-work-card ' + cfg(exp.estado ?? '').cls"
-                         [attr.aria-label]="exp.numero + ' — ' + servicioNombre(exp)">
-
-                  <!-- Top: nÃºmero + urgencia -->
-                  <div class="estd-work-card__top">
-                    <span class="estd-work-num">
-                      {{ exp.numero }}
-                    </span>
-                    <div class="estd-work-badges" aria-live="polite">
-                      @if (urgencia(exp.fecha_visita) === 'vencida') {
-                        <span class="status-badge status-badge--cancelado" role="status">
-                          <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
-                          {{ 'common.urgency_expired' | translate }}
-                        </span>
-                      } @else if (urgencia(exp.fecha_visita) === 'hoy') {
-                        <span class="status-badge status-badge--en_estimacion" role="status">
-                          <i class="bi bi-clock" aria-hidden="true"></i>
-                          {{ 'common.urgency_today' | translate }}
-                        </span>
-                      } @else if (urgencia(exp.fecha_visita) === 'proxima') {
-                        <span class="status-badge status-badge--nuevo" role="status">
-                          <i class="bi bi-calendar-event" aria-hidden="true"></i>
-                          {{ 'common.urgency_upcoming' | translate }}
-                        </span>
-                      }
-                    </div>
-                  </div>
-
-                  <!-- Servicio -->
-                  <p class="estd-work-service">{{ servicioNombre(exp) }}</p>
-
-                  <!-- Meta: cliente + ubicaciÃ³n -->
-                  <div class="estd-work-meta">
-                    <span>
-                      <i class="bi bi-person" aria-hidden="true"></i>
-                      {{ exp.cliente_nombre }}
-                    </span>
-                    <span>
-                      <i class="bi bi-geo-alt" aria-hidden="true"></i>
-                      {{ exp.provincia }}, {{ exp.canton }}
-                    </span>
-                  </div>
-
-                  <!-- Barra de progreso -->
-                  <div class="estd-progress-wrap" role="progressbar"
-                       [attr.aria-valuenow]="cfg(exp.estado ?? '').pct"
-                       aria-valuemin="0" aria-valuemax="100">
-                    <div class="estd-progress-track">
-                      <div class="estd-progress-fill"
-                           [style.width.%]="cfg(exp.estado ?? '').pct"></div>
-                    </div>
-                    <span class="estd-progress-pct">{{ cfg(exp.estado ?? '').pct }}%</span>
-                  </div>
-
-                  <!-- Footer: fecha + CTA -->
-                  <div class="estd-work-card__footer">
-                    <span class="estd-work-fecha"
-                          [class.estd-work-fecha--vencida]="urgencia(exp.fecha_visita) === 'vencida'"
-                          [class.estd-work-fecha--hoy]="urgencia(exp.fecha_visita) === 'hoy'">
-                      <i class="bi bi-calendar3" aria-hidden="true"></i>
-                      <time [dateTime]="exp.fecha_visita">{{ formatFecha(exp.fecha_visita) }}</time>
-                    </span>
-                    <button class="estd-btn-continue" (click)="irAEstimar(exp.id)"
-                            [attr.aria-label]="'common.continue' | translate">
-                      <i class="bi bi-pencil-square" aria-hidden="true"></i>
-                      {{ 'common.continue' | translate }}
-                    </button>
-                  </div>
-
-                </article>
-              }
-            </div>
-
+      <!-- ── Estimaciones en curso ───────────────────────────────────────── -->
+      <section class="ed-active" aria-labelledby="ed-active-title">
+        <div class="ed-head">
+          <h2 id="ed-active-title" class="ed-h2">{{ 'dashboard_estimator.active_estimations' | translate }}</h2>
+          @if (activos().length > 0) {
+            <span class="ed-count">{{ activos().length }}</span>
           }
-        </div>
-      </section>
-
-      <!-- â”€â”€ Sidebar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-      <aside class="estd-sidebar">
-
-        <!-- Acciones rÃ¡pidas (siempre visible) -->
-        <div class="estd-card estd-card--actions">
-          <div class="estd-card__header">
-            <div class="estd-card__header-left">
-              <div class="estd-card__header-icon" aria-hidden="true">
-                <i class="bi bi-lightning"></i>
-              </div>
-              <h2 class="estd-card__title">{{ 'dashboard_builder.quick_actions' | translate }}</h2>
-            </div>
-          </div>
-          <nav class="estd-card__body estd-actions"
-               [attr.aria-label]="'dashboard_builder.quick_actions' | translate">
-            <!-- Alta de cliente. Es la unica accion de creacion de la tarjeta:
-                 va primera y con el borde punteado del sistema, para no robarle
-                 el relleno dorado a la accion primaria (la bandeja, que es la
-                 que trae contador). -->
-            <a routerLink="/estimator/client/create" class="estd-action estd-action--create">
-              <div class="estd-action__icon" aria-hidden="true">
-                <i class="bi bi-person-plus"></i>
-              </div>
-              <div class="estd-action__text">
-                <span class="estd-action__label">{{ 'admin_users.create_client_btn' | translate }}</span>
-              </div>
-            </a>
-            <a routerLink="/estimator/files-to-be-estimated" class="estd-action estd-action--primary">
-              <div class="estd-action__icon" aria-hidden="true">
-                <i class="bi bi-inbox"></i>
-              </div>
-              <div class="estd-action__text">
-                <span class="estd-action__label">{{ 'nav.a_estimer' | translate }}</span>
-                @if (disponibles() > 0) {
-                  <span class="estd-action__hint">{{ disponibles() }} {{ 'common.available' | translate }}</span>
-                }
-              </div>
-              @if (disponibles() > 0) {
-                <span class="estd-action__badge estd-action__badge--primary" aria-hidden="true">
-                  {{ disponibles() }}
-                </span>
-              }
-            </a>
-            <a routerLink="/estimator/files-under-estimation" class="estd-action">
-              <div class="estd-action__icon" aria-hidden="true">
-                <i class="bi bi-pencil-square"></i>
-              </div>
-              <div class="estd-action__text">
-                <span class="estd-action__label">{{ 'dashboard_estimator.active_estimations_link' | translate }}</span>
-                @if (activos().length > 0) {
-                  <span class="estd-action__hint">{{ activos().length }} {{ 'dashboard_estimator.in_progress' | translate }}</span>
-                }
-              </div>
-              @if (activos().length > 0) {
-                <span class="estd-action__badge" aria-hidden="true">{{ activos().length }}</span>
-              }
-            </a>
-            <a routerLink="/estimator/estimated-files" class="estd-action">
-              <div class="estd-action__icon" aria-hidden="true">
-                <i class="bi bi-clipboard-check"></i>
-              </div>
-              <div class="estd-action__text">
-                <span class="estd-action__label">{{ 'nav.completes' | translate }}</span>
-                @if (totalCompletados() > 0) {
-                  <span class="estd-action__hint">{{ totalCompletados() }} {{ 'common.total' | translate }}</span>
-                }
-              </div>
-              @if (totalCompletados() > 0) {
-                <span class="estd-action__badge" aria-hidden="true">{{ totalCompletados() }}</span>
-              }
-            </a>
-          </nav>
+          <a class="ed-link" routerLink="/estimator/files-under-estimation"
+             aria-describedby="ed-active-title">{{ 'common.view_all' | translate }}</a>
         </div>
 
-        <!-- DistribuciÃ³n + tasa de Ã©xito -->
-        @if (expedientes().length > 0) {
-          <div class="estd-card">
-            <div class="estd-card__header">
-              <div class="estd-card__header-left">
-                <div class="estd-card__header-icon" aria-hidden="true">
-                  <i class="bi bi-pie-chart"></i>
-                </div>
-                <h2 class="estd-card__title">{{ 'dashboard_builder.distribution' | translate }}</h2>
-              </div>
-              @if (totalCompletados() > 0) {
-                <div class="estd-success-chip">
-                  <i class="bi bi-trophy" aria-hidden="true"></i>
-                  {{ tasaExito() }}%
-                </div>
-              }
-            </div>
-
-            <div class="estd-card__body">
-
-              <!-- Donut + leyenda lado a lado -->
-              <div class="estd-dist-layout">
-
-                <div class="estd-donut-wrap" aria-hidden="true">
-                  <svg width="112" height="112" viewBox="0 0 140 140">
-                    <circle cx="70" cy="70" r="54" fill="none"
-                            stroke="var(--ds-border)" stroke-width="18"/>
-                    @for (seg of donutSegments(); track seg.cls) {
-                      <circle class="estd-donut-seg {{ seg.cls }}" cx="70" cy="70" [attr.r]="R" fill="none"
-                              stroke-width="18"
-                              [attr.stroke-dasharray]="seg.dasharray"
-                              [attr.stroke-dashoffset]="seg.dashoffset"
-                              transform="rotate(-90 70 70)"/>
+        @if (activos().length === 0) {
+          <p class="ed-uptodate">
+            <mat-icon aria-hidden="true">task_alt</mat-icon>
+            <span>
+              <strong>{{ 'dashboard_estimator.no_pending' | translate }}</strong>
+              {{ 'dashboard_estimator.take_available_hint' | translate }}
+            </span>
+          </p>
+        } @else {
+          <ul class="ed-work-list">
+            @for (exp of activos(); track exp.id) {
+              <li class="ed-work">
+                <div class="ed-work__top">
+                  <span class="ed-work__num">{{ exp.numero }}</span>
+                  @switch (urgencia(exp.fecha_visita)) {
+                    @case ('vencida') {
+                      <span class="ed-urg is-late">
+                        <mat-icon aria-hidden="true">error</mat-icon>
+                        {{ 'common.urgency_expired' | translate }}
+                      </span>
                     }
-                    <text x="70" y="65" text-anchor="middle"
-                          class="estd-donut__num">{{ expedientes().length }}</text>
-                    <text x="70" y="81" text-anchor="middle"
-                          class="estd-donut__sub">{{ 'common.total' | translate }}</text>
-                  </svg>
-                </div>
-
-                <div class="estd-legend" role="list">
-                  @for (e of estadoBreakdown(); track e.key) {
-                    <div class="estd-legend-item" role="listitem">
-                      <div class="estd-legend-item__left">
-                        <span class="estd-legend-dot {{ e.cls }}" aria-hidden="true"></span>
-                        <span class="estd-legend-label">{{ ('state.' + e.key) | translate }}</span>
-                      </div>
-                      <div class="estd-legend-item__right">
-                        <div class="estd-legend-bar" aria-hidden="true">
-                          <div class="estd-legend-bar__fill {{ e.cls }}"
-                               [style.width.%]="e.pct"></div>
-                        </div>
-                        <span class="estd-legend-count" [attr.aria-label]="e.count + ' expedientes'">
-                          {{ e.count }}
-                        </span>
-                      </div>
-                    </div>
+                    @case ('hoy') {
+                      <span class="ed-urg is-today">
+                        <mat-icon aria-hidden="true">schedule</mat-icon>
+                        {{ 'common.urgency_today' | translate }}
+                      </span>
+                    }
+                    @case ('proxima') {
+                      <span class="ed-urg is-soon">
+                        <mat-icon aria-hidden="true">event</mat-icon>
+                        {{ 'common.urgency_upcoming' | translate }}
+                      </span>
+                    }
                   }
                 </div>
 
-              </div>
+                <h3 class="ed-work__service">{{ servicioNombre(exp) }}</h3>
 
-              <!-- Tasa de Ã©xito integrada (cuando hay contratados) -->
-              @if (totalCompletados() > 0) {
-                <div class="estd-rate-strip">
-                  <div class="estd-rate-strip__bar-wrap" aria-hidden="true">
-                    <div class="estd-rate-strip__bar">
-                      <div class="estd-rate-strip__fill"
-                           [style.width.%]="tasaExito()"></div>
-                    </div>
-                    <span class="estd-rate-strip__pct">{{ tasaExito() }}%</span>
-                  </div>
-                  <p class="estd-rate-strip__label">
-                    <i class="bi bi-trophy" aria-hidden="true"></i>
-                    {{ contratados().length }} {{ 'dashboard_estimator.contracted' | translate }}
-                    {{ 'common.of' | translate }} {{ totalCompletados() }}
-                    {{ 'dashboard_estimator.estimated_lc' | translate }}
-                  </p>
+                <p class="ed-meta">
+                  <span><mat-icon aria-hidden="true">person</mat-icon>{{ exp.cliente_nombre }}</span>
+                  <span><mat-icon aria-hidden="true">location_on</mat-icon>{{ exp.canton }}, {{ exp.provincia }}</span>
+                  @if (exp.fecha_visita) {
+                    <span [class.is-late]="urgencia(exp.fecha_visita) === 'vencida'">
+                      <mat-icon aria-hidden="true">calendar_month</mat-icon>
+                      <time class="ed-fig" [dateTime]="exp.fecha_visita">{{ formatFecha(exp.fecha_visita) }}</time>
+                    </span>
+                  }
+                </p>
+
+                <div class="ed-work__foot">
+                  @if (exp.id === primeraActiva()) {
+                    <a mat-flat-button class="ds-cta" [routerLink]="['/estimator/file-under-estimation', exp.id]">
+                      <mat-icon>edit_note</mat-icon>
+                      {{ 'common.continue' | translate }}
+                    </a>
+                  } @else {
+                    <a mat-flat-button [routerLink]="['/estimator/file-under-estimation', exp.id]">
+                      <mat-icon>edit_note</mat-icon>
+                      {{ 'common.continue' | translate }}
+                    </a>
+                  }
                 </div>
-              }
+              </li>
+            }
+          </ul>
+        }
+      </section>
 
+      <!-- ── Resumen: valor estimado arriba, recuentos debajo ────────────── -->
+      <section class="ed-sum" aria-labelledby="ed-sum-title">
+        <h2 id="ed-sum-title" class="ed-h2">{{ 'dashboard_builder.distribution' | translate }}</h2>
+
+        <dl class="ed-sum__lead">
+          <dt>{{ 'dashboard_estimator.estimated_value' | translate }}</dt>
+          <dd class="ed-sum__amount">{{ formatPrecio(montoTotal()) }}</dd>
+        </dl>
+
+        <dl class="ed-sum__counts">
+          <div>
+            <dt>{{ 'nav.a_estimer' | translate }}</dt>
+            <dd class="ed-fig">{{ disponibles() }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'state.en_estimacion' | translate }}</dt>
+            <dd class="ed-fig">{{ activos().length }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'dashboard_estimator.on_market' | translate }}</dt>
+            <dd class="ed-fig">{{ enMercado().length }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'dashboard_estimator.contracted' | translate }}</dt>
+            <dd class="ed-fig">{{ contratados().length }}</dd>
+          </div>
+        </dl>
+
+        @if (totalCompletados() > 0) {
+          <div class="ed-sum__rate">
+            <div class="ed-sum__rate-head">
+              <span id="ed-rate-label">{{ 'dashboard_builder.success_rate' | translate }}</span>
+              <strong class="ed-fig">{{ tasaExito() }} %</strong>
             </div>
+            <span class="ed-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+                  [attr.aria-valuenow]="tasaExito()" aria-labelledby="ed-rate-label">
+              <span class="ed-bar__fill" [style.width.%]="tasaExito()"></span>
+            </span>
+            <!-- Angular quita los espacios entre etiquetas: el texto va seguido. -->
+            <p class="ed-sum__note">{{ contratados().length }} <span class="ed-lc">{{ 'dashboard_estimator.contracted' | translate }}</span> {{ 'common.of' | translate }} {{ totalCompletados() }} {{ 'dashboard_estimator.estimated_lc' | translate }}</p>
+          </div>
+        }
+      </section>
+    </div>
+
+    <!-- ── Suivi post-estimation ─────────────────────────────────────────── -->
+    @if (postEstimacion().length > 0) {
+      <section class="ed-pipe" aria-labelledby="ed-pipe-title">
+        <div class="ed-head">
+          <div class="ed-head__text">
+            <h2 id="ed-pipe-title" class="ed-h2">
+              {{ 'dashboard_estimator.post_tracking' | translate }}
+              <span class="ed-count">{{ postEstimacion().length }}</span>
+            </h2>
+            <p class="ed-sub">{{ 'dashboard_estimator.post_tracking_text' | translate }}</p>
+          </div>
+
+          <mat-button-toggle-group class="ed-toggle ed-view" hideSingleSelectionIndicator
+                                   [value]="vista()" (change)="setVista($event.value)">
+            <mat-button-toggle value="tarjetas" [aria-label]="'estimated_files.view_cards' | translate"
+                               [matTooltip]="'estimated_files.view_cards' | translate">
+              <mat-icon>grid_view</mat-icon>
+            </mat-button-toggle>
+            <mat-button-toggle value="tabla" [aria-label]="'estimated_files.view_table' | translate"
+                               [matTooltip]="'estimated_files.view_table' | translate">
+              <mat-icon>table_rows</mat-icon>
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+
+        <!-- Tabla (escritorio, si se elige) -->
+        @if (vista() === 'tabla') {
+          <div class="ed-table-wrap">
+            <table class="ed-table">
+              <thead>
+                <tr>
+                  <th scope="col">{{ 'estimated_files.col_number' | translate }}</th>
+                  <th scope="col">{{ 'estimated_files.col_service' | translate }}</th>
+                  <th scope="col">{{ 'estimated_files.col_client' | translate }}</th>
+                  <th scope="col">{{ 'estimated_files.col_location' | translate }}</th>
+                  <th scope="col">{{ 'estimated_files.col_status' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (exp of postEstimacion(); track exp.id) {
+                  <!-- La fila entera abre el dossier; el foco de teclado va al enlace del número. -->
+                  <tr class="ed-table__row" (click)="irAVer(exp.id)">
+                    <td>
+                      <div class="ed-table__who">
+                        <span class="ed-thumb">
+                          @if (fotoExpediente(exp); as foto) {
+                            <img [src]="foto" loading="lazy" alt="" (error)="onFotoError(exp.id)" />
+                          } @else {
+                            <mat-icon aria-hidden="true">view_in_ar</mat-icon>
+                          }
+                        </span>
+                        <a class="ed-table__link ed-fig" [routerLink]="['/estimator/estimated-file', exp.id]"
+                           (click)="$event.stopPropagation()">{{ exp.numero }}</a>
+                      </div>
+                    </td>
+                    <td class="ed-table__svc">{{ servicioNombre(exp) }}</td>
+                    <td>{{ exp.cliente_nombre }}</td>
+                    <td class="ed-nowrap">{{ exp.canton }}, {{ exp.provincia }}</td>
+                    <td>
+                      <div class="ed-stage">
+                        @if (paso(exp.estado) > 0) {
+                          <app-stage-line class="ed-stage__line" [actual]="paso(exp.estado)" [etapas]="etapas" [compact]="true" />
+                        }
+                        <app-status-chip [estado]="exp.estado ?? ''" />
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
           </div>
         }
 
-      </aside>
-    </div>
-
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-         PIPELINE POST-ESTIMACIÃ“N
-         â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-    @if (postEstimacion().length > 0) {
-      <section class="estd-card" aria-labelledby="pipeline-title">
-
-        <div class="estd-card__header estd-card__header--pipeline">
-          <div class="estd-card__header-left">
-            <div class="estd-card__header-icon" aria-hidden="true">
-              <i class="bi bi-diagram-3"></i>
-            </div>
-            <div>
-              <h2 class="estd-card__title" id="pipeline-title">
-                {{ 'dashboard_estimator.post_tracking' | translate }}
-              </h2>
-              <p class="estd-card__subtitle">
-                {{ 'dashboard_estimator.post_tracking_text' | translate }}
-              </p>
-            </div>
-          </div>
-          <div class="estd-pipe-head-tools">
-            <div class="estd-pipeline-pills">
-              @if (enMercado().length > 0) {
-                <span class="kpi-pill">
-                  <i class="bi bi-people" aria-hidden="true"></i>
-                  {{ enMercado().length }} {{ 'dashboard_estimator.on_market' | translate }}
-                </span>
-              }
-              @if (contratados().length > 0) {
-                <span class="kpi-pill" style="background:var(--ds-success-soft);border-color:var(--ds-success)">
-                  <i class="bi bi-trophy" aria-hidden="true"></i>
-                  {{ contratados().length }} {{ 'dashboard_estimator.contracted' | translate }}
-                </span>
-              }
-            </div>
-
-            <!-- Vista tabla / tarjetas (en móvil siempre tarjetas) -->
-            <div class="estd-view-toggle d-none d-md-inline-flex" role="group"
-                 [attr.aria-label]="'estimated_files.view_cards' | translate">
-              <button type="button" class="estd-view-toggle__btn"
-                      [class.estd-view-toggle__btn--active]="vista() === 'tabla'"
-                      [attr.aria-pressed]="vista() === 'tabla'"
-                      (click)="setVista('tabla')"
-                      [title]="'estimated_files.view_table' | translate">
-                <i class="bi bi-table" aria-hidden="true"></i>
-              </button>
-              <button type="button" class="estd-view-toggle__btn"
-                      [class.estd-view-toggle__btn--active]="vista() === 'tarjetas'"
-                      [attr.aria-pressed]="vista() === 'tarjetas'"
-                      (click)="setVista('tarjetas')"
-                      [title]="'estimated_files.view_cards' | translate">
-                <i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Leyenda del pipeline -->
-        <div class="estd-pipe-legend" aria-hidden="true">
-          @for (step of pipelineSteps; track step; let last = $last) {
-            <div class="estd-pipe-legend__step">
-              <span class="estd-pipe-legend__dot {{ cfg(step).cls }}"></span>
-              <span class="estd-pipe-legend__label">
-                {{ ('state.' + step) | translate }}
-              </span>
-            </div>
-            @if (!last) {
-              <i class="bi bi-chevron-right estd-pipe-legend__arrow" aria-hidden="true"></i>
-            }
-          }
-        </div>
-
-        <!-- Vista tabla (escritorio) -->
-        <div class="estd-pipe-table-wrap d-none" [class.d-md-block]="vista() === 'tabla'">
-          <table class="estd-pipe-table">
-            <thead>
-              <tr>
-                <th class="estd-pipe-table__col-photo" aria-hidden="true"></th>
-                <th class="estd-pipe-table__col-num">{{ 'estimated_files.col_number' | translate }}</th>
-                <th>{{ 'estimated_files.col_service' | translate }}</th>
-                <th>{{ 'estimated_files.col_client' | translate }}</th>
-                <th>{{ 'estimated_files.col_location' | translate }}</th>
-                <th>{{ 'estimated_files.col_status' | translate }}</th>
-                <th class="estd-pipe-table__col-action"></th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (exp of postEstimacion(); track exp.id) {
-                <tr class="estd-pipe-table__row"
-                    (click)="irAVer(exp.id)"
-                    [class.estd-pipe-table__row--contratado]="exp.estado === 'contratado'"
-                    [class.estd-pipe-table__row--cancelado]="exp.estado === 'cancelado'">
-
-                  <!-- Foto del expediente (miniatura del tour 3D) -->
-                  <td class="estd-pipe-table__col-photo">
-                    <div class="estd-thumb">
-                      @if (fotoExpediente(exp); as foto) {
-                        <img [src]="foto" loading="lazy" [alt]="exp.numero"
-                             (error)="onFotoError(exp.id)" />
-                      } @else {
-                        <i class="bi bi-badge-3d" aria-hidden="true"
-                           [title]="'estimated_files.photo_none' | translate"></i>
-                      }
-                    </div>
-                  </td>
-
-                  <td class="estd-pipe-table__col-num">
-                    <span class="estd-pipe-num">{{ exp.numero }}</span>
-                    @if (exp.estado === 'contratado') {
-                      <i class="bi bi-trophy estd-pipe-trophy" aria-label="Contratado" title="Contratado"></i>
-                    }
-                  </td>
-
-                  <td><span class="estd-pipe-service">{{ servicioNombre(exp) }}</span></td>
-
-                  <td>{{ exp.cliente_nombre }}</td>
-
-                  <td>{{ exp.provincia }}, {{ exp.canton }}</td>
-
-                  <td>
-                    <div class="estd-pipe-track estd-pipe-track--cell">
-                      @if (exp.estado !== 'cancelado') {
-                        <div class="estd-p-dots" role="progressbar"
-                             [attr.aria-label]="('state.' + exp.estado) | translate">
-                          @for (step of pipelineSteps; track step; let last = $last) {
-                            <span [class]="pDotClass(exp.estado ?? '', step)"
-                                  [title]="('state.' + step) | translate">
-                            </span>
-                            @if (!last) {
-                              <span class="estd-p-line"
-                                    [class.estd-p-line--done]="stepDone(exp.estado ?? '', step)">
-                              </span>
-                            }
-                          }
-                        </div>
-                        <span [class]="'estd-pipe-badge ' + cfg(exp.estado ?? '').cls">
-                          <i class="bi {{ cfg(exp.estado ?? '').icon }}" aria-hidden="true"></i>
-                          {{ ('state.' + (exp.estado ?? '')) | translate }}
-                        </span>
-                      } @else {
-                        <span class="estd-pipe-badge estd-pipe-badge--cancelado">
-                          {{ 'state.cancelado' | translate }}
-                        </span>
-                      }
-                    </div>
-                  </td>
-
-                  <td class="estd-pipe-table__col-action" (click)="$event.stopPropagation()">
-                    <button class="estd-btn-eye"
-                            (click)="irAVer(exp.id)"
-                            [attr.aria-label]="('common.view' | translate) + ' ' + exp.numero">
-                      <i class="bi bi-eye" aria-hidden="true"></i>
-                    </button>
-                  </td>
-
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Vista tarjetas (móvil siempre · escritorio según toggle) -->
-        <div class="estd-pipe-cards" [class.d-md-none]="vista() === 'tabla'" role="list">
+        <!-- Tarjetas (en móvil siempre; en escritorio, salvo vista tabla) -->
+        <ul class="ed-cards" [class.is-mobile-only]="vista() === 'tabla'">
           @for (exp of postEstimacion(); track exp.id) {
-            <article class="estd-pipe-card" role="listitem" tabindex="0"
-                     (click)="irAVer(exp.id)"
-                     (keydown.enter)="irAVer(exp.id)"
-                     (keydown.space)="$event.preventDefault(); irAVer(exp.id)"
-                     [class.estd-pipe-card--contratado]="exp.estado === 'contratado'"
-                     [class.estd-pipe-card--cancelado]="exp.estado === 'cancelado'"
-                     [attr.aria-label]="exp.numero + ' — ' + servicioNombre(exp)">
-
-              <!-- Foto del expediente (miniatura del tour 3D) -->
-              <div class="estd-pipe-card__photo">
+            <li class="ed-card" [class.is-out]="paso(exp.estado) === 0">
+              <span class="ed-card__photo">
                 @if (fotoExpediente(exp); as foto) {
-                  <img class="estd-pipe-card__photo-img" [src]="foto" loading="lazy"
-                       [alt]="exp.numero" (error)="onFotoError(exp.id)" />
+                  <img [src]="foto" loading="lazy" alt="" (error)="onFotoError(exp.id)" />
                 } @else {
-                  <div class="estd-pipe-card__photo-empty"
-                       [title]="'estimated_files.photo_none' | translate">
-                    <i class="bi bi-badge-3d" aria-hidden="true"></i>
-                  </div>
-                }
-              </div>
-
-              <div class="estd-pipe-card__body">
-
-                <!-- Cabecera: número + trofeo + badge de estado -->
-                <div class="estd-pipe-card__head">
-                  <div class="estd-pipe-card__head-left">
-                    <span class="estd-pipe-num">{{ exp.numero }}</span>
-                    @if (exp.estado === 'contratado') {
-                      <i class="bi bi-trophy estd-pipe-trophy" aria-label="Contratado" title="Contratado"></i>
-                    }
-                  </div>
-                  @if (exp.estado !== 'cancelado') {
-                    <span [class]="'estd-pipe-badge ' + cfg(exp.estado ?? '').cls">
-                      <i class="bi {{ cfg(exp.estado ?? '').icon }}" aria-hidden="true"></i>
-                      {{ ('state.' + (exp.estado ?? '')) | translate }}
-                    </span>
-                  } @else {
-                    <span class="estd-pipe-badge estd-pipe-badge--cancelado">
-                      {{ 'state.cancelado' | translate }}
-                    </span>
-                  }
-                </div>
-
-                <p class="estd-pipe-service">{{ servicioNombre(exp) }}</p>
-
-                <p class="estd-pipe-meta">
-                  <i class="bi bi-person" aria-hidden="true"></i>
-                  {{ exp.cliente_nombre }}
-                  <span class="estd-pipe-sep" aria-hidden="true">·</span>
-                  <i class="bi bi-geo-alt" aria-hidden="true"></i>
-                  {{ exp.provincia }}, {{ exp.canton }}
-                </p>
-
-                <!-- Track de progreso -->
-                @if (exp.estado !== 'cancelado') {
-                  <div class="estd-p-dots estd-pipe-card__dots" role="progressbar"
-                       [attr.aria-label]="('state.' + exp.estado) | translate">
-                    @for (step of pipelineSteps; track step; let last = $last) {
-                      <span [class]="pDotClass(exp.estado ?? '', step)"
-                            [title]="('state.' + step) | translate">
-                      </span>
-                      @if (!last) {
-                        <span class="estd-p-line"
-                              [class.estd-p-line--done]="stepDone(exp.estado ?? '', step)">
-                        </span>
-                      }
-                    }
-                  </div>
-                }
-
-              </div>
-            </article>
-          }
-        </div>
-
-      </section>
-    }
-
-    <!-- ══════════════════════════════════════════════════════
-         SEGUIMIENTO DE OBRA — avance de los trabajos
-         ══════════════════════════════════════════════════════ -->
-    @if (obras().length > 0) {
-      <section id="estd-obra-section" class="estd-card" aria-labelledby="obra-title">
-        <div class="estd-card__header">
-          <div class="estd-card__header-left">
-            <div class="estd-card__header-icon" aria-hidden="true">
-              <i class="bi bi-hammer"></i>
-            </div>
-            <div>
-              <h2 class="estd-card__title" id="obra-title">{{ 'dashboard_estimator.works_title' | translate }}</h2>
-              <p class="estd-card__subtitle">
-                {{ obrasEnCurso() }} {{ 'dashboard_estimator.works_active' | translate }}
-                &nbsp;·&nbsp; {{ 'dashboard_estimator.works_avg' | translate }} {{ avanceMedio() }}%
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="estd-card__body">
-          <div class="estd-works-grid" role="list">
-            @for (o of obras(); track o.expedienteId) {
-              <button class="estd-work-obra" type="button"
-                      (click)="irAVer(o.expedienteId)"
-                      role="listitem"
-                      [attr.aria-label]="o.numero + ' — ' + servicioObra(o)">
-                <div class="estd-work-obra__top">
-                  <span class="estd-work-num">{{ o.numero }}</span>
-                  <span [class]="'estd-obra-badge ' + obraEstadoCls(o.estado)">
-                    {{ obraEstadoLabel(o.estado) | translate }}
+                  <span class="ed-card__nophoto">
+                    <mat-icon aria-hidden="true">view_in_ar</mat-icon>
+                    {{ 'estimated_files.photo_none' | translate }}
                   </span>
-                </div>
-                <p class="estd-work-service">{{ servicioObra(o) }}</p>
-                <p class="estd-work-meta-single">
-                  <i class="bi bi-person" aria-hidden="true"></i>
-                  {{ o.clienteNombre }}
+                }
+              </span>
+
+              <div class="ed-card__body">
+                <app-status-chip [estado]="exp.estado ?? ''" />
+                <!-- El enlace del título cubre la tarjeta entera (::after). -->
+                <h3 class="ed-card__title">
+                  <a class="ed-card__link" [routerLink]="['/estimator/estimated-file', exp.id]">{{ servicioNombre(exp) }}</a>
+                </h3>
+                <p class="ed-card__num ed-fig">{{ exp.numero }}</p>
+                <p class="ed-meta">
+                  <span><mat-icon aria-hidden="true">person</mat-icon>{{ exp.cliente_nombre }}</span>
+                  <span><mat-icon aria-hidden="true">location_on</mat-icon>{{ exp.canton }}, {{ exp.provincia }}</span>
                 </p>
-                <div class="estd-obra-avance">
-                  <strong class="estd-obra-pct">{{ o.avance }}<span>%</span></strong>
-                  <div class="estd-obra-track" role="progressbar"
-                       [attr.aria-valuenow]="o.avance" aria-valuemin="0" aria-valuemax="100">
-                    <span class="estd-obra-fill" [style.width.%]="o.avance"></span>
-                  </div>
-                </div>
-              </button>
-            }
-          </div>
-        </div>
+                @if (paso(exp.estado) > 0) {
+                  <app-stage-line class="ed-card__stage" [actual]="paso(exp.estado)" [etapas]="etapas" [compact]="true" />
+                }
+              </div>
+            </li>
+          }
+        </ul>
       </section>
     }
 
+    <!-- ── Suivi de chantier ──────────────────────────────────────────────── -->
+    @if (obras().length > 0) {
+      <section class="ed-works" aria-labelledby="ed-works-title">
+        <div class="ed-head">
+          <h2 id="ed-works-title" class="ed-h2">{{ 'dashboard_estimator.works_title' | translate }}</h2>
+          <span class="ed-count">{{ obras().length }}</span>
+          <a class="ed-link" routerLink="/estimator/construction-monitoring/list"
+             aria-describedby="ed-works-title">{{ 'common.view_all' | translate }}</a>
+        </div>
+
+        <p class="ed-works__summary">
+          <span><strong class="ed-fig">{{ obrasEnCurso() }}</strong> {{ 'dashboard_estimator.works_active' | translate }}</span>
+          <span class="ed-cap">{{ 'dashboard_estimator.works_avg' | translate }} <strong class="ed-fig">{{ avanceMedio() }} %</strong></span>
+        </p>
+
+        <ul class="ed-works__list">
+          @for (o of obras(); track o.expedienteId) {
+            <li>
+              <a class="ed-obra" [routerLink]="['/estimator/estimated-file', o.expedienteId]">
+                <span class="ed-obra__top">
+                  <span class="ed-obra__service">{{ servicioObra(o) }}</span>
+                  <app-status-chip [estado]="o.estado" prefijo="seguimiento_estado." />
+                </span>
+                <span class="ed-obra__num">
+                  <span class="ed-fig">{{ o.numero }}</span>
+                  <span>{{ o.clienteNombre }}</span>
+                </span>
+                <span class="ed-obra__avance">
+                  <span class="ed-obra__pct">{{ o.avance }} %</span>
+                  <span class="ed-bar" aria-hidden="true">
+                    <span class="ed-bar__fill" [style.width.%]="o.avance"></span>
+                  </span>
+                </span>
+              </a>
+            </li>
+          }
+        </ul>
+      </section>
+    }
   }
-
 </div>
-

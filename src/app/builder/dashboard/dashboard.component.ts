@@ -1,37 +1,23 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../services/auth-supabase.service';
 import { OfertaService } from '../../services/oferta.service';
 import { ContratoService } from '../../services/contrato.service';
 import { SeguimientoService } from '../../services/seguimiento.service';
 import { OfertaDashboard } from '../../models';
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../shared/ui/empty-state/empty-state.component';
+import { StatusChipComponent } from '../../shared/ui/status-chip/status-chip.component';
 
-// Icono y clase semántica (token) por estado de oferta. Los colores viven en
-// el CSS como clases is-warning / is-success / is-danger — nunca hex inline.
-const OFERTA_META: Record<string, { icon: string; cls: string }> = {
-  pendiente: { icon: 'bi-hourglass-split', cls: 'is-warning' },
-  aceptada:  { icon: 'bi-check-circle',    cls: 'is-success' },
-  rechazada: { icon: 'bi-x-circle',        cls: 'is-danger'  },
-  archivado: { icon: 'bi-archive',         cls: 'is-muted'   },
-};
+/** Ofertas que se muestran en el tablero; el resto, en «Mes offres». */
+const OFERTAS_EN_TABLERO = 5;
 
-// Donut (sidebar)
-const R             = 54;
-const CIRCUMFERENCE = 2 * Math.PI * R;
-
-// Ring de progreso por oferta (viewBox 56×56, r=23)
-const RING_R    = 23;
-const RING_CIRC = 2 * Math.PI * RING_R;
-
-function calcProgress(ofertaEstado: string, expEstado: string): number {
-  if (ofertaEstado === 'rechazada' || ofertaEstado === 'archivado') return 0;
-  if (ofertaEstado === 'pendiente') return 35;
-  if (expEstado    === 'contratado') return 100;
-  if (expEstado    === 'adjudicado') return 80;
-  return 60;
-}
+/** El servicio rellena con «—» lo que el constructor ya no puede ver (dossier archivado). */
+const SIN_DATO = '—';
 
 // Resumen de una obra (contrato activo) para el seguimiento del dashboard.
 interface ObraResumen {
@@ -48,7 +34,10 @@ interface ObraResumen {
 @Component({
   selector: 'app-builder-dashboard',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, TranslatePipe],
+  imports: [
+    RouterLink, TranslatePipe, MatButtonModule, MatIconModule,
+    PageHeaderComponent, EmptyStateComponent, StatusChipComponent,
+  ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })
@@ -65,11 +54,16 @@ export class BuilderDashboardComponent implements OnInit {
   obras    = signal<ObraResumen[]>([]);
   cargando = signal(true);
 
-  // ── KPIs ofertas ───────────────────────────────────────────────────────────
+  readonly SIN_DATO = SIN_DATO;
+
+  // ── Ofertas ────────────────────────────────────────────────────────────────
   total      = computed(() => this.ofertas().length);
   pendientes = computed(() => this.ofertas().filter(o => o.estado === 'pendiente').length);
   aceptadas  = computed(() => this.ofertas().filter(o => o.estado === 'aceptada').length);
   rechazadas = computed(() => this.ofertas().filter(o => o.estado === 'rechazada').length);
+
+  /** Las más recientes (el servicio ya las ordena por fecha de creación). */
+  ofertasRecientes = computed(() => this.ofertas().slice(0, OFERTAS_EN_TABLERO));
 
   montoAdjudicado = computed(() =>
     this.ofertas().filter(o => o.estado === 'aceptada').reduce((s, o) => s + o.precio, 0)
@@ -80,67 +74,21 @@ export class BuilderDashboardComponent implements OnInit {
     return t === 0 ? 0 : Math.round((this.aceptadas() / t) * 100);
   });
 
-  // ── KPIs obra ────────────────────────────────────────────────────────────────
-  totalObras   = computed(() => this.obras().length);
+  // ── Obras ──────────────────────────────────────────────────────────────────
   obrasActivas = computed(() => this.obras().filter(o => o.estado === 'en_ejecucion').length);
   avanceMedio  = computed(() => {
     const o = this.obras();
     return o.length === 0 ? 0 : Math.round(o.reduce((s, x) => s + x.avance, 0) / o.length);
   });
 
-  // ── Donut SVG ─────────────────────────────────────────────────────────────
-  readonly R             = R;
-  readonly CIRCUMFERENCE = CIRCUMFERENCE;
-
-  donutSegments = computed(() => {
-    const total = this.total();
-    if (total === 0) return [];
-    let offset = 0;
-    const segs: { cls: string; dasharray: string; dashoffset: number }[] = [];
-    for (const key of ['pendiente', 'aceptada', 'rechazada']) {
-      const count = this.ofertas().filter(o => o.estado === key).length;
-      if (count === 0) continue;
-      const portion = (count / total) * CIRCUMFERENCE;
-      segs.push({
-        cls: OFERTA_META[key].cls,
-        dasharray: `${portion} ${CIRCUMFERENCE}`,
-        dashoffset: -offset,
-      });
-      offset += portion;
-    }
-    return segs;
+  nombre = computed(() => {
+    const p = this.perfil();
+    if (p?.nombre) return [p.nombre, p.apellido].filter(Boolean).join(' ');
+    const u = this.user();
+    return u?.user_metadata?.['full_name'] ?? u?.email?.split('@')[0] ?? '';
   });
 
-  estadoBreakdown = computed(() =>
-    ['pendiente', 'aceptada', 'rechazada'].map(key => ({
-      key, icon: OFERTA_META[key].icon, cls: OFERTA_META[key].cls,
-      count: this.ofertas().filter(o => o.estado === key).length,
-      pct:   this.total() > 0
-        ? Math.round((this.ofertas().filter(o => o.estado === key).length / this.total()) * 100)
-        : 0,
-    })).filter(e => e.count > 0)
-  );
-
-  // ── Ring de progreso ──────────────────────────────────────────────────────
-  readonly RING_R    = RING_R;
-  readonly RING_CIRC = RING_CIRC;
-
-  ringOffset(oferta: OfertaDashboard): string {
-    return (RING_CIRC * (1 - this.progress(oferta) / 100)).toFixed(2);
-  }
-
-  // ── Referencia de progreso ────────────────────────────────────────────────
-  readonly progressRefs = [
-    { pct: 35,  cls: 'is-warning', label: 'dashboard_builder.ref_35'  },
-    { pct: 60,  cls: 'is-success', label: 'dashboard_builder.ref_60'  },
-    { pct: 80,  cls: 'is-success', label: 'dashboard_builder.ref_80'  },
-    { pct: 100, cls: 'is-success', label: 'dashboard_builder.ref_100' },
-  ];
-
-  // ── Helpers ───────────────────────────────────────────────────────────────
-  ofertaIcon(estado: string): string { return (OFERTA_META[estado] ?? OFERTA_META['pendiente']).icon; }
-  ofertaCls(estado: string):  string { return (OFERTA_META[estado] ?? OFERTA_META['pendiente']).cls; }
-
+  // ── Helpers ────────────────────────────────────────────────────────────────
   servicioNombre(oferta: OfertaDashboard): string {
     const lang = this.translate.currentLang;
     if (lang === 'en') return oferta.servicio_nombre_en || oferta.servicio_nombre;
@@ -155,53 +103,43 @@ export class BuilderDashboardComponent implements OnInit {
     return o.servicioNombre;
   }
 
-  obraEstadoCls(estado: string): string {
-    return estado === 'completado' ? 'is-success'
-         : estado === 'en_ejecucion' ? 'is-gold'
-         : 'is-info';
+  /** Dossier oculto para el constructor (archivado): sin número ni servicio. */
+  sinDossier(oferta: OfertaDashboard): boolean {
+    return oferta.expediente_numero === SIN_DATO && oferta.servicio_nombre === SIN_DATO;
   }
 
-  progress(oferta: OfertaDashboard): number {
-    return calcProgress(oferta.estado, oferta.expediente_estado);
+  plazo(oferta: OfertaDashboard): string {
+    const { plazo_semanas_min: min, plazo_semanas_max: max } = oferta;
+    if (min && max && min !== max) return `${min}–${max}`;
+    return String(min || max || '');
   }
 
   formatPrecio(v: number): string {
     return new Intl.NumberFormat('fr-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(v);
   }
 
+  private get locale(): string {
+    const localeMap: Record<string, string> = { es: 'es-CA', en: 'en-US', fr: 'fr-CA' };
+    return localeMap[this.translate.currentLang] ?? 'fr-CA';
+  }
+
   formatFecha(valor: string): string {
-    if (!valor) return '—';
+    if (!valor) return SIN_DATO;
     const d = new Date(valor.includes('T') ? valor : `${valor}T00:00:00`);
-    if (isNaN(d.getTime())) return '—';
-    const localeMap: Record<string, string> = { es: 'es-CA', en: 'en-US', fr: 'fr-CA' };
-    const locale = localeMap[this.translate.currentLang] ?? 'fr-CA';
-    const parts  = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' }).formatToParts(d);
-    const p: Record<string, string> = {};
-    for (const part of parts) p[part.type] = part.value;
-    return this.translate.currentLang === 'en'
-      ? `${p['month']} ${p['day']}, ${p['year']}`
-      : `${p['day']} ${p['month']} ${p['year']}`;
+    if (isNaN(d.getTime())) return SIN_DATO;
+    return new Intl.DateTimeFormat(this.locale, { day: 'numeric', month: 'long', year: 'numeric' }).format(d);
   }
 
-  formatFechaCorta(valor: string): string {
-    if (!valor) return '—';
+  /** Fecha y hora de la última actualización de una obra: «11 nov., 17 h 06». */
+  formatActualizacion(valor: string): string {
     const d = new Date(valor);
-    if (isNaN(d.getTime())) return this.formatFecha(valor);
-    const localeMap: Record<string, string> = { es: 'es-CA', en: 'en-US', fr: 'fr-CA' };
-    const locale = localeMap[this.translate.currentLang] ?? 'fr-CA';
-    return new Intl.DateTimeFormat(locale, { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(d);
+    if (!valor || isNaN(d.getTime())) return SIN_DATO;
+    return new Intl.DateTimeFormat(this.locale, {
+      day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
+    }).format(d);
   }
 
-  get bienvenida(): string {
-    const p = this.perfil();
-    if (p?.nombre) {
-      return [p.nombre, p.apellido].filter(Boolean).join(' ');
-    }
-    const u = this.user();
-    return u?.user_metadata?.['full_name'] ?? u?.email?.split('@')[0] ?? '';
-  }
-
-  // ── Ciclo de vida ─────────────────────────────────────────────────────────
+  // ── Ciclo de vida ──────────────────────────────────────────────────────────
   async ngOnInit() {
     const userId = this.user()?.id;
     if (!userId) { this.cargando.set(false); return; }

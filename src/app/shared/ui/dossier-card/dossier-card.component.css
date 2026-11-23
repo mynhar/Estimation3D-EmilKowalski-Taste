@@ -1,6 +1,6 @@
 /* component: dossier card
  * states: default · selected (lo pinta el padre con su hover/focus)
- * contrast: servicio ink (13.9:1), número ink-muted (6.1:1)
+ * contrast: servicio ink (13.6:1 sobre vélin), número ink-muted (7.0:1)
  */
 :host {
   display: grid;
@@ -15,6 +15,7 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-bold);
+  font-stretch: var(--ds-stretch-heading);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
   -webkit-line-clamp: 2;

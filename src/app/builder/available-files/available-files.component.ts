@@ -1,7 +1,13 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, effect, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../services/auth-supabase.service';
 import { ExpedienteService } from '../../services/expediente.service';
@@ -9,13 +15,21 @@ import { OfertaService } from '../../services/oferta.service';
 import { InvitacionService } from '../../services/invitacion.service';
 import { ExpedienteDisponible } from '../../models';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../shared/ui/empty-state/empty-state.component';
 
 type VistaExpedientes = 'tabla' | 'tarjetas';
+
+/** Plazas de oferta por dossier. */
+const MAX_OFERTAS = 5;
 
 @Component({
   selector: 'app-available-files',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, TranslatePipe, PaginationComponent],
+  imports: [
+    FormsModule, RouterLink, TranslatePipe, PaginationComponent, PageHeaderComponent, EmptyStateComponent,
+    MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTooltipModule,
+  ],
   templateUrl: './available-files.component.html',
   styleUrl: './available-files.component.css',
 })
@@ -97,6 +111,14 @@ export class AvailableFilesComponent implements OnInit {
     return this.expedientesFiltrados().slice(desde, desde + this.POR_PAGINA);
   });
 
+  /**
+   * La siguiente etapa del constructor es ofertar: solo la primera tarjeta de la página
+   * en la que aún puede hacerlo lleva el botón tomate; las demás, abeto.
+   */
+  ctaId = computed(() =>
+    this.expedientesPaginados().find(e => this.puedeOfertar(e))?.id ?? null
+  );
+
   totalUrgentes = computed(() =>
     this.expedientes().filter(e => this.esUrgente(e.id)).length
   );
@@ -172,23 +194,19 @@ export class AvailableFilesComponent implements OnInit {
     return (Date.now() - d.getTime()) < 7 * 24 * 60 * 60 * 1000;
   }
 
+  /** Sin oferta propia y con plazas libres. */
+  puedeOfertar(exp: ExpedienteDisponible): boolean {
+    return !this.tieneOferta(exp.id) && exp.total_ofertas < MAX_OFERTAS;
+  }
+
+  completo(exp: ExpedienteDisponible): boolean {
+    return exp.total_ofertas >= MAX_OFERTAS;
+  }
+
   competenciaLabel(n: number): string {
     if (n <= 1) return 'competition.low';
     if (n <= 3) return 'competition.mid';
     return 'competition.high';
-  }
-
-  // Devuelve hex que coincide exactamente con los tokens DS semánticos
-  competenciaColor(n: number): string {
-    if (n <= 1) return '#5B7A4F'; // --ds-success
-    if (n <= 3) return '#B8862E'; // --ds-warning
-    return '#A14545';              // --ds-danger
-  }
-
-  competenciaClass(n: number): string {
-    if (n <= 1) return 'cbadge--low';
-    if (n <= 3) return 'cbadge--mid';
-    return 'cbadge--high';
   }
 
   servicioNombre(exp: ExpedienteDisponible): string {
@@ -217,5 +235,6 @@ export class AvailableFilesComponent implements OnInit {
     this.router.navigate(['/builder/make-offer', id]);
   }
 
-  readonly slots = [1, 2, 3, 4, 5];
+  readonly slots = Array.from({ length: MAX_OFERTAS }, (_, i) => i + 1);
+  readonly MAX_OFERTAS = MAX_OFERTAS;
 }

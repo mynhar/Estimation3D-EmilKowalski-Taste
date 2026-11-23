@@ -1,16 +1,14 @@
 import {
-  ChangeDetectionStrategy, Component, ElementRef, NgZone, OnDestroy, OnInit,
+  ChangeDetectionStrategy, Component, ElementRef, Injector, NgZone, OnDestroy, OnInit,
   afterNextRender, computed, inject, signal, viewChild,
 } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
-import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 
-import { LangToggleComponent } from '../components/lang-toggle/lang-toggle.component';
+import { SiteFooterComponent } from '../public-site/chrome/site-footer.component';
+import { SiteHeaderComponent } from '../public-site/chrome/site-header.component';
 import { PROVINCIAS_CANADA, SERVICIOS_FALLBACK, Servicio } from '../models';
 import { AuthSupabaseService } from '../services/auth-supabase.service';
 import { EdgeErrorService } from '../services/edge-error.service';
@@ -25,25 +23,44 @@ import {
 /** Código postal canadiense: A1A 1A1 (con espacio, guion o nada). */
 const CA_POSTAL_RE = /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/;
 
+/** Anchos de teléfono: el formulario va en tres pasos. */
+const PASOS_MQ = '(max-width: 767.98px)';
+
+type Paso = 1 | 2 | 3;
+
+/** Controles de cada paso del formulario, en el orden en que se ven. */
+const CONTROLES_PASO = {
+  1: ['prenom', 'nom', 'telephone', 'courriel'],
+  2: ['typePropriete', 'adresse'],
+  3: ['servicioId', 'description'],
+} as const;
+
 /**
- * Landing pública, dirección Clarté: una sola superficie clara, seis secciones
+ * Landing pública, dirección Trait rouge: una sola superficie clara, seis secciones
  * (escaneo, problema frente a solución, pasos, especialidades, tour 3D y
  * formulario) y un único momento de movimiento, el barrido del escáner del hero.
  *
  * Sin Material salvo botón de icono, iconos y el menú de idioma, que el armazón
  * de la aplicación ya carga: los campos y botones son CSS propio para que la
  * primera visita en 4G no cargue el resto de la librería.
+ *
+ * «Créer mon dossier» es la siguiente etapa y va en tomate, pero solo un botón
+ * tomate a la vista: el del hero, después el de la barra fija (móvil) o el de la
+ * cabecera (escritorio), y al llegar al formulario el de enviar.
  */
 @Component({
   selector: 'app-landing-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    RouterLink, TranslatePipe, ReactiveFormsModule, NgOptimizedImage,
-    MatButtonModule, MatIconModule, MatMenuModule,
-    LangToggleComponent, ...CAMPOS_FALTANTES,
+    TranslatePipe, ReactiveFormsModule, NgOptimizedImage,
+    MatIconModule,
+    SiteHeaderComponent, SiteFooterComponent, ...CAMPOS_FALTANTES,
   ],
   templateUrl: './landing-page.component.html',
-  styleUrl: './landing-page.component.css',
+  styleUrls: [
+    '../public-site/styles/site-base.css', '../public-site/styles/site-blocks.css',
+    './landing-page.component.css',
+  ],
 })
 export class LandingPageComponent implements OnInit, OnDestroy {
   private zone = inject(NgZone);
@@ -52,6 +69,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   private auth = inject(AuthSupabaseService);
   private solicitudes = inject(SolicitudLandingService);
   private edgeErrors = inject(EdgeErrorService);
+  private injector = inject(Injector);
 
   readonly lang = inject(LangService);
   readonly year = new Date().getFullYear();
@@ -68,8 +86,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   readonly media = MEDIA;
 
   // ── Estado de interfaz ────────────────────────────────────────────────────
-  /** La página bajó lo bastante como para que la cabecera lleve filete. */
-  readonly scrolled = signal(false);
   /** El escaneo del hero cargó: arranca el barrido (antes pasaría sobre una caja vacía). */
   readonly scanReady = signal(false);
   /** Botón fijo de móvil: entre el final del hero y el principio del formulario. */
@@ -81,9 +97,15 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   /** Clave i18n del último fallo del envío; vacía mientras no haya error. */
   readonly sendError = signal('');
 
-  private menu = viewChild.required<ElementRef<HTMLDialogElement>>('menu');
-  // En un `mat-icon-button` la referencia apunta al componente: se pide el elemento.
-  private menuButton = viewChild.required('menuButton', { read: ElementRef<HTMLButtonElement> });
+  // ── Formulario en tres pasos (solo en anchos de teléfono) ─────────────────
+  private readonly pasosMq = typeof matchMedia === 'function' ? matchMedia(PASOS_MQ) : null;
+  /** true en teléfono: un paso cada vez. En tableta y escritorio, todo a la vez. */
+  readonly pasos = signal(this.pasosMq?.matches ?? false);
+  readonly paso = signal<Paso>(1);
+  readonly pasoLista: readonly Paso[] = [1, 2, 3];
+  /** Sentido del último cambio de paso: el contenido nuevo entra desde ese lado. */
+  readonly sentido = signal<'next' | 'back' | null>(null);
+  private fm = viewChild.required<ElementRef<HTMLFormElement>>('fm');
 
   // ── Servicios activos (bloque "type de service") ──────────────────────────
   // La lista sale de la tabla `servicio`, no de una constante: lo que la landing
@@ -132,8 +154,8 @@ export class LandingPageComponent implements OnInit, OnDestroy {
 
   constructor() {
     afterNextRender(() => this.zone.runOutsideAngular(() => {
-      this.bindScroll();
       this.bindCtaBar();
+      this.bindPasos();
     }));
   }
 
@@ -158,18 +180,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     this.loadingServices.set(false);
   }
 
-  // ── Cabecera y botón fijo ─────────────────────────────────────────────────
-  /** Filete de la cabecera. Fuera de la zona: sólo se entra al cambiar de estado. */
-  private bindScroll(): void {
-    const onScroll = () => {
-      const isScrolled = window.scrollY > 8;
-      if (isScrolled !== this.scrolled()) this.zone.run(() => this.scrolled.set(isScrolled));
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    this.teardown.push(() => window.removeEventListener('scroll', onScroll));
-    onScroll();
-  }
-
+  // ── Botón fijo ────────────────────────────────────────────────────────────
   /**
    * El botón fijo aparece cuando el CTA del hero ya no se ve y desaparece al
    * llegar al formulario (allí sobra) y en adelante (taparía el pie).
@@ -194,39 +205,19 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     this.teardown.push(() => io.disconnect());
   }
 
-  // ── Menú móvil (<dialog> nativo: foco atrapado, Escape y fondo inerte) ────
-  openMenu(): void {
-    this.menu().nativeElement.showModal();
-  }
-
-  /**
-   * `returnFocus = false` cuando se cierra para navegar: el evento `close` llega
-   * después y, si no, devolvería el foco al botón en vez de dejarlo en el destino.
-   */
-  closeMenu(returnFocus = true): void {
-    const dialog = this.menu().nativeElement;
-    if (!dialog.open) return;
-    this.returnFocus = returnFocus;
-    dialog.close();
-  }
-  private returnFocus = true;
-
-  /** Un clic en el telón (fuera de la hoja) cierra el menú. */
-  onMenuClick(event: MouseEvent): void {
-    if (event.target === this.menu().nativeElement) this.closeMenu();
-  }
-
-  /** Al cerrarse, el foco vuelve al botón que lo abrió (salvo al navegar). */
-  onMenuClosed(): void {
-    if (this.returnFocus) this.menuButton().nativeElement.focus({ preventScroll: true });
-    this.returnFocus = true;
+  /** Al girar el teléfono o redimensionar, el formulario cambia de modo sin perder lo escrito. */
+  private bindPasos(): void {
+    const mq = this.pasosMq;
+    if (!mq) return;
+    const onChange = (e: MediaQueryListEvent) => this.zone.run(() => this.pasos.set(e.matches));
+    mq.addEventListener('change', onChange);
+    this.teardown.push(() => mq.removeEventListener('change', onChange));
   }
 
   // ── Navegación interna ────────────────────────────────────────────────────
   /** Desplazamiento a una sección de la propia landing; deja el foco en ella. */
   goTo(id: string, event?: Event): void {
     event?.preventDefault();
-    this.closeMenu(false);
     const el = this.host.querySelector<HTMLElement>('#' + id);
     if (!el) return;
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -240,9 +231,63 @@ export class LandingPageComponent implements OnInit, OnDestroy {
    */
   goTop(event?: Event): void {
     event?.preventDefault();
-    this.closeMenu(false);
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+  }
+
+  // ── Pasos del formulario ──────────────────────────────────────────────────
+  private pasoValido(n: Paso): boolean {
+    return CONTROLES_PASO[n].every(k => this.form.controls[k].valid);
+  }
+
+  /** «Continuer»: si el paso está completo, al siguiente; si no, sus errores y el foco en el primero. */
+  avanzar(): void {
+    const n = this.paso();
+    if (!this.pasoValido(n)) {
+      for (const k of CONTROLES_PASO[n]) this.form.controls[k].markAllAsTouched();
+      this.enfocarError(n);
+      return;
+    }
+    if (n < 3) this.irAPaso((n + 1) as Paso, 'next');
+  }
+
+  retroceder(): void {
+    const n = this.paso();
+    if (n > 1) this.irAPaso((n - 1) as Paso, 'back');
+  }
+
+  /**
+   * Cambia de paso y lleva el foco a su título (el lector de pantalla anuncia
+   * «Étape n sur 3» y el nombre). Si el formulario quedó por encima de la
+   * pantalla, sube de golpe hasta su borde: el movimiento lo pone la entrada
+   * del paso, no el scroll. Con `conError`, el foco va al primer campo mal.
+   */
+  private irAPaso(n: Paso, sentido: 'next' | 'back', conError = false): void {
+    this.sentido.set(sentido);
+    this.paso.set(n);
+    if (conError) {
+      this.enfocarError(n);
+      return;
+    }
+    afterNextRender(() => {
+      const form = this.fm().nativeElement;
+      form.querySelector<HTMLElement>(`#fm-s${n}`)?.focus({ preventScroll: true });
+      const top = form.getBoundingClientRect().top;
+      const hd = this.host.querySelector<HTMLElement>('.hd')?.offsetHeight ?? 0;
+      if (top < hd) form.scrollIntoView({ block: 'start' });
+    }, { injector: this.injector });
+  }
+
+  /** Foco en el primer campo con error del paso, centrado en pantalla. */
+  private enfocarError(n: Paso): void {
+    afterNextRender(() => {
+      const paso = this.fm().nativeElement.querySelector<HTMLElement>(`[data-paso="${n}"]`);
+      const campo = paso?.querySelector<HTMLElement>(
+        '[aria-invalid="true"], .chips.is-invalid input:not([disabled])');
+      if (!campo) return;
+      campo.focus({ preventScroll: true });
+      campo.scrollIntoView({ block: 'center', behavior: movimiento() });
+    }, { injector: this.injector });
   }
 
   // ── Formulario ────────────────────────────────────────────────────────────
@@ -265,9 +310,20 @@ export class LandingPageComponent implements OnInit, OnDestroy {
    * formulario y se refleja el resultado.
    */
   async submit(): Promise<void> {
+    // En pasos, Intro o «Continuer» antes del último paso solo avanzan.
+    if (this.pasos() && this.paso() < 3) {
+      this.avanzar();
+      return;
+    }
     this.submitted.set(true);
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      // En pasos, si lo que falta está en un paso anterior (se borró al volver), se vuelve a él.
+      const primero = this.pasoLista.find(n => !this.pasoValido(n));
+      if (this.pasos() && primero && primero !== this.paso()) {
+        this.irAPaso(primero, 'back', true);
+        return;
+      }
       // El resumen junto al botón dice qué falta y lleva a cada campo.
       this.intentos.update(n => n + 1);
       return;
@@ -300,7 +356,10 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.closeMenu(false);
     for (const fn of this.teardown) fn();
   }
+}
+
+function movimiento(): ScrollBehavior {
+  return matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
 }

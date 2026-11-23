@@ -1,5 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -12,19 +17,25 @@ import { EdgeErrorService } from '../../services/edge-error.service';
 import { MatterportModelo } from '../../models/matterport.model';
 import { MatterportInfoComponent } from '../../shared/ui/matterport-info/matterport-info.component';
 import { VideoExpedienteComponent } from '../../shared/ui/presentacion-videos/video-expediente.component';
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../shared/ui/empty-state/empty-state.component';
+import { StatusChipComponent } from '../../shared/ui/status-chip/status-chip.component';
 import {
   ExpedienteDetalle,
   EstimacionDetalle,
   ArchivoRow,
-  ESTADO_BADGE_ESTIMADOR,
 } from '../../models';
 
 @Component({
   selector: 'app-estimated-file',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, TranslatePipe, MatterportInfoComponent, VideoExpedienteComponent],
+  imports: [
+    FormsModule, TranslatePipe,
+    MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTooltipModule,
+    PageHeaderComponent, EmptyStateComponent, StatusChipComponent, MatterportInfoComponent, VideoExpedienteComponent,
+  ],
   templateUrl: './estimated-file.component.html',
-  styleUrl:    './estimated-file.component.css',
+  styleUrls:   ['../../shared/ui/ficha/ficha.css', './estimated-file.component.css'],
 })
 export class EstimatedFileComponent implements OnInit {
   private auth              = inject(AuthSupabaseService);
@@ -329,10 +340,6 @@ export class EstimatedFileComponent implements OnInit {
     return d.servicio_nombre;
   }
 
-  badgeClass(estado: string | undefined): string {
-    return ESTADO_BADGE_ESTIMADOR[estado ?? ''] ?? 'bg-light text-dark';
-  }
-
   publicUrl(storagePath: string): string {
     return this.archivoService.publicUrl(storagePath);
   }
@@ -392,13 +399,6 @@ export class EstimatedFileComponent implements OnInit {
       return time ?? '—';
     }
     return '—';
-  }
-
-  private formatDireccionCA(d: ExpedienteDetalle): string {
-    const country = this.translate.instant('footer.country').toUpperCase();
-    return `<p class="fw-semibold mb-0">${d.direccion}</p>`
-         + `<p class="fw-semibold mb-0">${d.canton} ${d.provincia} ${d.distrito}</p>`
-         + `<p class="fw-bold text-uppercase mb-0 small">${country}</p>`;
   }
 
   imprimir() {
@@ -469,7 +469,7 @@ export class EstimatedFileComponent implements OnInit {
   <title>${t('file.exp_abbr')} ${d.numero} — Estimation3D</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,500;0,700;1,400&family=Sofia+Sans+Semi+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,300..700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     @page { size: A4; margin: 2cm; }
@@ -477,17 +477,17 @@ export class EstimatedFileComponent implements OnInit {
        var(--ds-*) de la app. El hex aquí es intencional; los valores se
        mantienen alineados a la paleta canónica de src/styles/tokens.css. */
     :root {
-      --gold:        #1E6A55;  /* --ds-action */
-      --gold-faint:  #E3F6F0;  /* --ds-scan-soft */
-      --gold-soft:   #CFE8DF;  /* --ds-action-soft */
-      --ink:         #1D2B30;  /* --ds-ink */
-      --ink-2:       #34444A;  /* --ds-ink-secondary */
-      --ink-3:       #56646A;  /* --ds-ink-muted */
-      --surface:     #FFFFFF;  /* --ds-surface */
-      --border:      #D3D7D2;  /* --ds-border */
-      --bg:          #FAFAF7;  /* --ds-bg */
-      --ff-display:  'Sofia Sans Semi Condensed', 'Arial Narrow', sans-serif;
-      --ff-body:     'Atkinson Hyperlegible Next', system-ui, sans-serif;
+      --gold:        #1B4532;  /* --ds-action */
+      --gold-faint:  #DDE5D6;  /* --ds-action-faint */
+      --gold-soft:   #C5D3C0;  /* --ds-action-soft */
+      --ink:         #142A20;  /* --ds-ink */
+      --ink-2:       #2E3F35;  /* --ds-ink-secondary */
+      --ink-3:       #4A5547;  /* --ds-ink-muted */
+      --surface:     #FFFFFF;  /* papel: en impresión no se rellena con vélin */
+      --border:      #D9CBAE;  /* --ds-border */
+      --bg:          #F1E8D6;  /* --ds-bg-alt (insignias) */
+      --ff-display:  'Archivo', 'Helvetica Neue', Arial, sans-serif;
+      --ff-body:     'Archivo', 'Helvetica Neue', Arial, sans-serif;
     }
     body {
       font-family: var(--ff-body);

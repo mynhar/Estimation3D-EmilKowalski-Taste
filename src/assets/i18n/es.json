@@ -160,13 +160,13 @@
   "ai_assistant": {
     "eyebrow": "Área del cliente",
     "title": "Asistente IA",
-    "tagline": "Haz cualquier pregunta sobre tu expediente · respuestas en segundos.",
+    "tagline": "Haz cualquier pregunta sobre tu expediente y obtén una respuesta en segundos.",
     "expediente": "Expediente",
     "dossier": "Expediente",
     "no_files_title": "Aún no tienes expedientes",
     "no_files_hint": "Crea un expediente para que el asistente pueda ayudarte con tus ofertas y tu obra.",
     "intro_title": "Asistente Estimation3D",
-    "intro_lead": "Impulsado por tu expediente · respuestas contextuales. Pregúntame sobre tus ofertas, plazos, garantías o riesgos de la obra.",
+    "intro_lead": "Respondo con los datos de tu expediente. Pregúntame sobre tus ofertas, plazos, garantías o riesgos de la obra.",
     "cap_analiza_title": "Analiza el expediente",
     "cap_analiza_desc": "Revisa ofertas, plazos, costos y datos del expediente.",
     "cap_jargon_title": "Explica el jargón",
@@ -175,11 +175,11 @@
     "cap_riesgos_desc": "Identifica puntos de vigilancia.",
     "cap_decide_title": "Prepara los próximos pasos",
     "cap_decide_desc": "Resume lo que está en juego en cada etapa.",
-    "tagline_cliente": "Haz cualquier pregunta sobre tu expediente · respuestas en segundos.",
+    "tagline_cliente": "Haz cualquier pregunta sobre tu expediente y obtén una respuesta en segundos.",
     "tagline_estimador": "Apoyo técnico para diagnosticar y estimar este expediente.",
     "tagline_constructor": "Apoyo para entender el alcance y preparar tu oferta.",
     "tagline_administrador": "Apoyo operativo para supervisar el expediente.",
-    "intro_lead_cliente": "Impulsado por tu expediente · respuestas contextuales. Pregúntame sobre tus ofertas, plazos, garantías o riesgos de la obra.",
+    "intro_lead_cliente": "Respondo con los datos de tu expediente. Pregúntame sobre tus ofertas, plazos, garantías o riesgos de la obra.",
     "intro_lead_estimador": "Impulsado por los datos del expediente. Pregúntame por el diagnóstico, las partidas a considerar, los riesgos técnicos o cómo dimensionar la estimación.",
     "intro_lead_constructor": "Impulsado por los datos del expediente. Pregúntame por el alcance del trabajo, cómo preparar tu oferta, plazos razonables o riesgos a prever.",
     "intro_lead_administrador": "Impulsado por los datos del expediente. Pregúntame por el estado, la comparación de ofertas, los cuellos de botella o un resumen ejecutivo.",
@@ -212,7 +212,10 @@
     "refusal": "Lo siento, no puedo ayudar con esa solicitud.",
     "empty_reply": "No tengo una respuesta para eso ahora mismo.",
     "error": "No se pudo obtener respuesta. Inténtalo de nuevo en un momento.",
-    "clear": "Limpiar conversación"
+    "clear": "Limpiar conversación",
+    "you": "Tú",
+    "assistant": "Asistente",
+    "typing": "El asistente está redactando una respuesta…"
   },
   "history": {
     "eyebrow": "Área del cliente",
@@ -309,6 +312,7 @@
     "administrador": "Administrador"
   },
   "common": {
+    "chars": "caracteres",
     "loading": "Cargando…",
     "retry": "Reintentar",
     "save": "Guardar",
@@ -862,7 +866,8 @@
     "presentation_video": "Video de presentación",
     "estimator_video": "Video del estimador",
     "estimator_video_hint": "El estimador que preparó tu estimación se presenta en este video.",
-    "videos_error": "No se pudieron cargar los videos de presentación."
+    "videos_error": "No se pudieron cargar los videos de presentación.",
+    "choose": "Elegir esta oferta"
   },
   "make_offer": {
     "editing_badge": "Modificación de oferta",
@@ -1117,7 +1122,8 @@
     "street_name_placeholder": "Rue Saint-Denis",
     "ca_city": "Ciudad",
     "province_territory": "Provincia / Territorio",
-    "postal_code": "Código Postal",
+    "postal_code": "Código postal",
+    "postal_hint": "Formato: A1A 1A1",
     "postal_placeholder": "A1A 1A1",
     "postal_invalid": "Formato inválido. Ej: A1A 1A1"
   },
@@ -1137,6 +1143,7 @@
     "status_filter": "Estado",
     "col_name": "Nombre",
     "col_lastname": "Apellido",
+    "col_fullname": "Nombre y apellido",
     "col_phone": "Teléfono",
     "col_email": "Correo",
     "col_role": "Rol",
@@ -1317,7 +1324,7 @@
     "photo": "Foto de perfil",
     "change_photo": "Cambiar foto",
     "uploading": "Subiendo…",
-    "photo_hint": "JPG, PNG o WebP · Máx. 2 MB",
+    "photo_hint": "JPG, PNG o WebP, 2 MB como máximo.",
     "save_changes": "Guardar cambios",
     "no_changes": "Sin cambios pendientes",
     "pending_changes": "Cambios pendientes",
@@ -1434,14 +1441,13 @@
       "title_a": "Cree su expediente.",
       "title_b": "A una visita de distancia.",
       "sub": "Cuéntenos sobre su propiedad. Le responderemos en 24 horas para agendar la única visita de documentación.",
+      "step_contact": "Sus datos",
+      "step_property": "La propiedad",
+      "step_need": "Su solicitud",
       "firstname": "Nombre",
-      "firstname_ph": "Camille",
       "lastname": "Apellido",
-      "lastname_ph": "Tremblay",
       "phone": "Teléfono",
-      "phone_ph": "514 555 0123",
       "email": "Correo electrónico",
-      "email_ph": "usted@ejemplo.ca",
       "type": "Tipo de propiedad",
       "type_choose": "Elegir…",
       "type_house": "Casa",
@@ -1453,15 +1459,12 @@
       "optional": "opcional",
       "required": "Campo requerido",
       "addr_unit": "Número de unidad",
-      "addr_unit_ph": "5",
       "addr_street": "Número y nombre de calle",
-      "addr_street_ph": "1660 av. Ducharme",
       "addr_city": "Ciudad",
-      "addr_city_ph": "Outremont",
       "addr_prov": "Provincia / Territorio",
       "addr_prov_choose": "Elegir…",
       "addr_postal": "Código postal",
-      "addr_postal_ph": "A1A 1A1",
+      "addr_postal_hint": "Formato: A1A 1A1",
       "addr_postal_invalid": "Formato inválido. Ej.: A1A 1A1",
       "service_type": "Tipo de servicio",
       "services_loading": "Cargando servicios…",
@@ -1480,12 +1483,6 @@
       "explore": "Explorar",
       "apply": "Postular",
       "contact": "Contacto"
-    },
-    "controls": {
-      "language": "Idioma",
-      "theme": "Ambiente visual",
-      "dark": "Oscuro",
-      "light": "Claro"
     }
   },
   "auth": {
@@ -1533,7 +1530,7 @@
     "select": "Idioma"
   },
   "admin_file_create": {
-    "title": "Nuevo Expediente",
+    "title": "Nuevo expediente",
     "subtitle": "Crear un expediente en nombre de un cliente",
     "step2_name": "Cliente",
     "step2_title": "Selección de cliente",
@@ -1572,7 +1569,7 @@
     "uncovered": "Sin cubrir por las marcadas: {{lista}}"
   },
   "admin_file_edit": {
-    "title": "Editar Expediente",
+    "title": "Editar expediente",
     "subtitle": "Actualizar los datos del expediente",
     "submit_btn": "Guardar cambios",
     "sending": "Guardando…",
@@ -1618,7 +1615,7 @@
     "address_scope": "Esta dirección pertenece al expediente. Editarla nunca modifica la ficha del cliente."
   },
   "to_estimate": {
-    "title": "A Estimar",
+    "title": "A estimar",
     "subtitle": "Expedientes en estado nuevo, en estimación o estimado",
     "count": "expediente(s)",
     "search_placeholder": "Buscar por número, cliente, servicio, estimador, dirección…",
@@ -1929,7 +1926,8 @@
   "pagination": {
     "of": "de",
     "prev": "Página anterior",
-    "next": "Página siguiente"
+    "next": "Página siguiente",
+    "label": "Paginación"
   },
   "validation": {
     "password_hint": "Mín. 8 caracteres, mayúscula, número y símbolo",
@@ -2179,29 +2177,29 @@
     "reporte_title": "Reporte del día",
     "hora_inicio": "Hora de inicio",
     "horas_trabajadas": "Horas trabajadas",
-    "horas_hint": "(normal: 8h)",
+    "horas_hint": "Normal: 8 h",
     "avance_dia": "% de avance de hoy",
-    "avance_dia_hint": "— mueve el slider",
+    "avance_dia_hint": "Mueve el control.",
     "avance_acumulado": "Acumulado tras hoy",
     "avance_restante": "Restante disponible",
-    "avance_dia_servicio_hint": "— de {{servicio}}",
+    "avance_dia_servicio_hint": "De {{servicio}}.",
     "avance_acumulado_servicio": "{{servicio}} tras hoy",
     "avance_global_tras_hoy": "Avance global de la obra tras hoy",
     "avance_por_servicio": "Avance por servicio",
     "servicio_label": "Servicio",
-    "servicio_hint": "— en cuál se trabajó este día",
+    "servicio_hint": "En el que se trabajó este día.",
     "servicio_requerido": "Elige el servicio en el que se trabajó este día.",
     "servicio_con_parte": "ya tiene parte este día",
     "servicio_parte_hint": "Cada servicio trabajado este día tiene su propio parte.",
     "fase_label": "Fase / etapa actual",
-    "fase_hint": "— específica del servicio",
+    "fase_hint": "Específica del servicio.",
     "fase_1": "Preparación y protección del sitio",
     "fase_2": "Trabajos en zona principal",
     "fase_3": "Trabajos en zona secundaria",
     "fase_4": "Limpieza y restauración",
     "fase_5": "Inspección y recepción final",
     "actividades_label": "Actividades realizadas hoy",
-    "actividades_hint": "— selecciona del checklist",
+    "actividades_hint": "Selecciona de la lista.",
     "act_1": "Llegada al sitio",
     "act_2": "Material descargado",
     "act_3": "Zona A terminada",
@@ -2220,8 +2218,8 @@
     "media_videos": "Videos",
     "media_docs": "Documentos",
     "guardar_btn": "Guardar reporte del día",
-    "guardado_msg": "Reporte guardado · contrato en estado «en_ejecución»",
-    "nota_inicio": "Al guardar el primer reporte, el contrato pasa automáticamente a en_ejecución y se fija la fecha de inicio real.",
+    "guardado_msg": "Reporte guardado. El contrato está ahora «En curso».",
+    "nota_inicio": "Al guardar el primer reporte, el contrato pasa automáticamente a «En curso» y se fija la fecha de inicio real.",
     "kpi_title": "Resumen",
     "kpi_dias": "días trabajados",
     "kpi_horas": "horas",
@@ -2369,14 +2367,14 @@
     "codigo_required": "El código es obligatorio.",
     "codigo_note": "Identificador estable, ej. IICRC_S520.",
     "section_titles": "Títulos",
-    "titulo_fr": "Título",
-    "titulo_en": "Título",
-    "titulo_es": "Título",
+    "titulo_fr": "Título en francés",
+    "titulo_en": "Título en inglés",
+    "titulo_es": "Título en español",
     "field_required": "Este campo es obligatorio.",
     "section_summaries": "Resúmenes",
-    "resumen_fr": "Resumen",
-    "resumen_en": "Resumen",
-    "resumen_es": "Resumen",
+    "resumen_fr": "Resumen en francés",
+    "resumen_en": "Resumen en inglés",
+    "resumen_es": "Resumen en español",
     "keywords_label": "Palabras clave",
     "keywords_note": "Separadas por comas. Ayudan al asistente a detectar la relevancia.",
     "orden_label": "Orden",
@@ -2425,6 +2423,15 @@
     "field_profile": "Perfil",
     "section_protocol": "Protocolo",
     "field_protocol": "Protocolo",
+    "titulo_fr": "Título en francés",
+    "titulo_en": "Título en inglés",
+    "titulo_es": "Título en español",
+    "perfil_fr": "Perfil en francés",
+    "perfil_en": "Perfil en inglés",
+    "perfil_es": "Perfil en español",
+    "protocolo_fr": "Protocolo en francés",
+    "protocolo_en": "Protocolo en inglés",
+    "protocolo_es": "Protocolo en español",
     "ficha_label": "Ficha normativa vinculada",
     "ficha_none": "Ninguna",
     "ficha_note": "Norma de referencia asociada a este imprevisto.",
@@ -2450,12 +2457,12 @@
   "journal": {
     "crumbs": {
       "home": "Inicio",
-      "current": "El Diario"
+      "current": "El Diario",
+      "aria": "Ruta de navegación"
     },
     "hero": {
-      "title_gold": "Entender",
-      "title_rest": " lo que pasa en su casa.",
-      "lede": "Artículos, guías e historias para decidir mejor cuando un problema afecta su propiedad."
+      "lede": "Artículos, guías e historias para decidir mejor cuando un problema afecta su propiedad.",
+      "title": "Entender lo que pasa en su casa."
     },
     "filter": {
       "aria": "Filtrar por categoría"
@@ -2473,59 +2480,56 @@
       "moisissure-danger": {
         "title": "Cómo saber si el moho en su casa es peligroso",
         "sum": "Manchas, olores, especies: qué mirar, qué hacer y qué no hacer nunca.",
-        "meta": "12 feb. 2026 · 6 min"
+        "meta": "12 feb. 2026, 6 min"
       },
       "degat-eau-48h": {
         "title": "Daño por agua: las primeras 48 horas que lo cambian todo",
         "sum": "Por qué los dos primeros días determinan la magnitud del daño — y la factura final.",
-        "meta": "5 feb. 2026 · 5 min"
+        "meta": "5 feb. 2026, 5 min"
       },
       "comparer-soum": {
         "title": "Comparar tres presupuestos: lo que de verdad importa más allá del precio",
         "sum": "Una guía de lectura simple para no caer en la trampa del precio más bajo.",
-        "meta": "29 ene. 2026 · 7 min"
+        "meta": "29 ene. 2026, 7 min"
       },
       "avant-1980": {
         "title": "Casas construidas antes de 1980: lo que todo propietario debe saber",
         "sum": "Dónde se esconde el amianto, cómo detectarlo y por qué nunca debe tocarlo usted mismo.",
-        "meta": "22 ene. 2026 · 8 min"
+        "meta": "22 ene. 2026, 8 min"
       },
       "cave-rosemont": {
         "title": "Un sótano húmedo en Rosemont: del diagnóstico a la solución",
         "sum": "El caso de una propietaria que creía tener un simple problema de humedad.",
-        "meta": "15 ene. 2026 · 6 min"
+        "meta": "15 ene. 2026, 6 min"
       },
       "fissures-fond": {
         "title": "Fisuras en los cimientos: ¿estructurales o cosméticas?",
         "sum": "Las señales que lo cambian todo, y las que pueden esperar.",
-        "meta": "8 ene. 2026 · 6 min"
+        "meta": "8 ene. 2026, 6 min"
       },
       "une-visite": {
         "title": "Por qué una sola visita basta (y por qué tres son demasiadas)",
         "sum": "El cálculo económico y humano detrás de la documentación en una sola visita.",
-        "meta": "18 dic. 2025 · 5 min"
+        "meta": "18 dic. 2025, 5 min"
       },
       "vermiculite": {
         "title": "Vermiculita en el ático: por qué es tan delicada",
         "sum": "Un aislante frecuente en las casas antiguas de Quebec — y una trampa que manejar con cuidado.",
-        "meta": "11 dic. 2025 · 7 min"
+        "meta": "11 dic. 2025, 7 min"
       },
       "assechement": {
         "title": "El secado tras un daño por agua: cuánto tiempo, y por qué",
         "sum": "Por qué un muro parece seco en la superficie pero no lo está.",
-        "meta": "4 dic. 2025 · 5 min"
+        "meta": "4 dic. 2025, 5 min"
       }
     },
     "featured": {
       "label": "Destacado",
-      "sub": "lectura del mes",
+      "sub": "Lectura del mes",
       "title": "Entender su expediente: lo que cada sección le dice de verdad.",
       "text": "Mediciones, clasificaciones, planos, garantías: un expediente Estimation3D se lee como un cuaderno de bitácora. Así se lee — y qué mirar primero.",
-      "meta": "19 mar. 2026 · 9 min",
+      "meta": "19 mar. 2026, 9 min",
       "img_alt": "Plano 3D documentado de una propiedad"
-    },
-    "footer": {
-      "sign": "JOURNAL"
     }
   },
   "entrepreneurs": {
@@ -2534,7 +2538,7 @@
       "current": "Contratistas"
     },
     "hero": {
-      "kicker": "Fase piloto — 15 contratistas socios seleccionados en 2026",
+      "kicker": "Fase piloto: 15 contratistas socios seleccionados en 2026",
       "title_1": "Reciba expedientes completos.",
       "title_2": "Presupueste sin visitar.",
       "lede": "Estimation3D le envía proyectos pre-documentados por todo Montréal. Usted analiza el expediente, presupuesta. Sin desplazarse a estimar. Sin carrera al precio más bajo.",
@@ -2718,28 +2722,20 @@
       "title": "Cuéntenos sobre su empresa.",
       "sub": "Unos pocos datos bastan para iniciar la conversación.",
       "company": "Nombre de la empresa",
-      "company_ph": "Atelier Boréal Construction inc.",
-      "contact": "Persona de contacto",
-      "contact_ph": "Marie-Claude Lavoie",
       "phone": "Teléfono",
-      "phone_ph": "514 555 0123",
       "email": "Correo electrónico",
-      "email_ph": "contact@exemple.ca",
       "rbq": "Número de licencia RBQ",
-      "rbq_ph": "0000-0000-00",
+      "rbq_hint": "Diez dígitos, con el formato 0000-0000-00.",
       "specialties": "Especialidades",
       "years": "Años de experiencia",
       "area": "Zona de servicio",
-      "area_ph": "Montréal y la corona norte",
       "message": "Mensaje (opcional)",
       "message_ph": "Unas palabras sobre su enfoque, sus obras recientes o sus preguntas.",
       "note": "Revisamos cada candidatura individualmente. Respuesta en 5 días hábiles.",
       "submit": "Enviar mi candidatura",
       "success": "Candidatura recibida",
       "contact_first": "Nombre de la persona de contacto",
-      "contact_first_ph": "Marie-Claude",
       "contact_last": "Apellido de la persona de contacto",
-      "contact_last_ph": "Lavoie",
       "specialties_all": "Todos los servicios",
       "err_required": "Campo obligatorio.",
       "err_email": "Correo electrónico no válido.",
@@ -2753,9 +2749,6 @@
       "manifesto_1": "La construcción merece algo mejor que estimaciones gratis",
       "manifesto_2": "en serie.",
       "lede": "Únase a los contratistas que eligen la claridad."
-    },
-    "footer": {
-      "sign": "CONTRATISTAS"
     }
   },
   "archivo": {
@@ -2773,7 +2766,7 @@
     "desarchivando": "Desarchivando…",
     "titulo_expediente": "Expediente archivado",
     "titulo_contrato": "Expediente y contrato archivados",
-    "titulo_obra": "Expediente y contrato archivados · obra en pausa",
+    "titulo_obra": "Expediente y contrato archivados, obra en pausa",
     "texto_expediente": "Los trabajos de este expediente no se realizarán. Solo un administrador puede modificarlo.",
     "texto_oferta": "Tu oferta queda archivada: los trabajos de este expediente no se realizarán. Solo un administrador puede modificarla.",
     "texto_contrato": "Los trabajos de este contrato no se realizarán. Solo un administrador puede modificarlo.",

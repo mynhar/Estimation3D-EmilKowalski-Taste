@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
+import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatterportHabitacion, MatterportModelo, MatterportPiso } from '../../../models/matterport.model';
 import { matterportThumb } from '../../util/matterport';
@@ -30,7 +31,7 @@ interface ModeloVM {
 @Component({
   selector: 'app-matterport-info',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe],
+  imports: [MatIconModule, TranslatePipe],
   templateUrl: './matterport-info.component.html',
   styleUrl:    './matterport-info.component.css',
 })

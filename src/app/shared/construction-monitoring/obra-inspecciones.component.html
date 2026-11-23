@@ -1,39 +1,41 @@
 <div class="oi-head">
-  <span class="oi-head__title">
-    <i class="bi bi-calendar-week"></i>
+  <h4 class="oi-title">
+    <mat-icon aria-hidden="true">event</mat-icon>
     {{ 'client_monitoring.inspecciones_title' | translate }}
-  </span>
-  <button class="oi-btn oi-btn--ghost" type="button" (click)="calVisible.set(!calVisible())">
-    <i class="bi bi-calendar3"></i>
+  </h4>
+  <button mat-button type="button" class="oi-agenda-toggle"
+          [attr.aria-expanded]="calVisible()" (click)="calVisible.set(!calVisible())">
+    <mat-icon>calendar_month</mat-icon>
     {{ 'monitoring.ver_agenda' | translate }}
   </button>
 </div>
 
-<!-- Lista de próximas inspecciones -->
+<!-- Próximas inspecciones -->
 @if (proximas().length > 0) {
   <ul class="oi-list">
     @for (insp of proximas(); track insp.id) {
       <li class="oi-item">
-        <span class="oi-item__when">
+        <span class="oi-when" aria-hidden="true">
           <strong>{{ diaNum(insp.fecha) }}</strong>
           <small>{{ mesCorto(insp.fecha) }}</small>
         </span>
-        <span class="oi-item__info">
-          <span class="oi-item__tipo">
+        <span class="oi-info">
+          <span class="oi-info__tipo">
             {{ ('monitoring.tipo_visitante_' + insp.tipo_visitante) | translate }}
-            &nbsp;·&nbsp; {{ horaCorta(insp.hora) }}
+            <span class="cdk-visually-hidden">, {{ diaNum(insp.fecha) }} {{ mesCorto(insp.fecha) }}</span>
+            <span class="oi-fig">{{ horaCorta(insp.hora) }}</span>
           </span>
           @if (insp.motivo) {
-            <span class="oi-item__motivo">{{ insp.motivo }}</span>
+            <span class="oi-info__motivo">{{ insp.motivo }}</span>
           }
         </span>
-        <button class="oi-item__del" type="button"
-                [disabled]="eliminandoId() !== null"
-                (click)="eliminarInspeccion(insp)">
+        <button mat-icon-button type="button" class="oi-del"
+                [disabled]="eliminandoId() !== null" (click)="eliminarInspeccion(insp)"
+                [attr.aria-label]="('common.delete' | translate) + ', ' + (('monitoring.tipo_visitante_' + insp.tipo_visitante) | translate) + ' ' + diaNum(insp.fecha) + ' ' + mesCorto(insp.fecha)">
           @if (eliminandoId() === insp.id) {
-            <span class="oi-spinner oi-spinner--sm"></span>
+            <span class="oi-spinner" aria-hidden="true"></span>
           } @else {
-            <i class="bi bi-trash3"></i>
+            <mat-icon>delete</mat-icon>
           }
         </button>
       </li>
@@ -41,111 +43,98 @@
   </ul>
 } @else {
   <p class="oi-empty">
-    <i class="bi bi-calendar-x"></i>
+    <mat-icon aria-hidden="true">event_busy</mat-icon>
     {{ 'monitoring.insp_none' | translate }}
   </p>
 }
 
 <!-- Agendar visita -->
-<button class="oi-btn oi-btn--agenda" type="button" (click)="toggleAgenda()">
-  <i class="bi" [class]="agendaVisible() ? 'bi-x-lg' : 'bi-plus-lg'"></i>
+<button mat-stroked-button type="button" class="oi-schedule"
+        [attr.aria-expanded]="agendaVisible()" (click)="toggleAgenda()">
+  @if (agendaVisible()) {
+    <mat-icon>close</mat-icon>
+  } @else {
+    <mat-icon>add</mat-icon>
+  }
   {{ 'monitoring.agendar_visita' | translate }}
 </button>
 
 @if (agendaVisible()) {
   <div class="oi-form">
     <div class="oi-field">
-      <label class="oi-label">{{ 'monitoring.tipo_visitante_label' | translate }}</label>
-      <div class="oi-tipo-row">
+      <span class="oi-label" id="oi-tipo-{{ seguimientoId() }}">{{ 'monitoring.tipo_visitante_label' | translate }}</span>
+      <mat-button-toggle-group class="oi-tipo" hideSingleSelectionIndicator
+                               [attr.aria-labelledby]="'oi-tipo-' + seguimientoId()"
+                               [value]="nuevaTipo()" (change)="setTipo($event.value)">
         @if (esEstimador()) {
-          <button class="oi-tipo-btn" type="button"
-                  [class.is-active]="nuevaTipo() === 'estimador'"
-                  (click)="setTipo('estimador')">
-            <i class="bi bi-clipboard-check"></i>
-            {{ 'monitoring.tipo_visitante_estimador' | translate }}
-          </button>
+          <mat-button-toggle value="estimador">{{ 'monitoring.tipo_visitante_estimador' | translate }}</mat-button-toggle>
         }
-        <button class="oi-tipo-btn" type="button"
-                [class.is-active]="nuevaTipo() === 'inspector'"
-                (click)="setTipo('inspector')">
-          <i class="bi bi-person-badge"></i>
-          {{ 'monitoring.tipo_visitante_inspector' | translate }}
-        </button>
-        <button class="oi-tipo-btn" type="button"
-                [class.is-active]="nuevaTipo() === 'dueno'"
-                (click)="setTipo('dueno')">
-          <i class="bi bi-house-door"></i>
-          {{ 'monitoring.tipo_visitante_dueno' | translate }}
-        </button>
-      </div>
+        <mat-button-toggle value="inspector">{{ 'monitoring.tipo_visitante_inspector' | translate }}</mat-button-toggle>
+        <mat-button-toggle value="dueno">{{ 'monitoring.tipo_visitante_dueno' | translate }}</mat-button-toggle>
+      </mat-button-toggle-group>
     </div>
-    <div class="oi-form-row">
-      <div class="oi-field">
-        <label class="oi-label">{{ 'monitoring.visita_fecha' | translate }}</label>
-        <input class="oi-input" type="date"
-               [value]="nuevaFecha()" [min]="fechaHoy"
-               (change)="setFecha($event)">
-      </div>
-      <div class="oi-field">
-        <label class="oi-label">{{ 'monitoring.visita_hora' | translate }}</label>
-        <input class="oi-input" type="time"
-               [value]="nuevaHora()" (change)="setHora($event)">
-      </div>
+
+    <div class="oi-row">
+      <mat-form-field appearance="outline" hideRequiredMarker>
+        <mat-label>{{ 'monitoring.visita_fecha' | translate }}</mat-label>
+        <input matInput type="date" required [value]="nuevaFecha()" [min]="fechaHoy" (change)="setFecha($event)" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" hideRequiredMarker>
+        <mat-label>{{ 'monitoring.visita_hora' | translate }}</mat-label>
+        <input matInput type="time" required [value]="nuevaHora()" (change)="setHora($event)" />
+      </mat-form-field>
     </div>
-    <div class="oi-field">
-      <label class="oi-label">{{ 'monitoring.visita_motivo' | translate }}</label>
-      <input class="oi-input" type="text"
-             [placeholder]="'monitoring.visita_motivo_placeholder' | translate"
-             [value]="nuevaMotivo()" (input)="setMotivo($event)">
-    </div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'monitoring.visita_motivo' | translate }}</mat-label>
+      <input matInput type="text" [value]="nuevaMotivo()" (input)="setMotivo($event)" />
+    </mat-form-field>
+
     @if (errorInsp()) {
-      <div class="oi-alert">
-        <i class="bi bi-exclamation-triangle"></i>
+      <p class="oi-error" role="alert">
+        <mat-icon aria-hidden="true">error</mat-icon>
         {{ errorInsp()! | translate }}
-      </div>
+      </p>
     }
-    <div class="oi-form-actions">
-      <button class="oi-btn oi-btn--primary" type="button"
-              (click)="guardarInspeccion()" [disabled]="guardando()">
-        @if (guardando()) { <span class="oi-spinner oi-spinner--sm"></span> }
+
+    <div class="oi-actions">
+      <button mat-flat-button type="button" [disabled]="guardando()" (click)="guardarInspeccion()">
+        @if (guardando()) {
+          <span class="oi-spinner" aria-hidden="true"></span>
+        }
         {{ 'monitoring.visita_guardar_btn' | translate }}
       </button>
-      <button class="oi-btn oi-btn--outline" type="button" (click)="cancelarAgenda()">
+      <button mat-button type="button" (click)="cancelarAgenda()">
         {{ 'monitoring.visita_cancelar' | translate }}
       </button>
     </div>
   </div>
 }
 
-<!-- Calendario -->
+<!-- Calendario del mes: resumen visual; las inspecciones también van en la lista de arriba. -->
 @if (calVisible()) {
   <div class="oi-cal">
     <p class="oi-cal__month">{{ mesLabel() }}</p>
-    <div class="oi-cal__grid">
-      @for (h of CAL_HEADERS; track h) {
-        <div class="oi-cal__hdr">{{ h }}</div>
+    <div class="oi-cal__grid" aria-hidden="true">
+      @for (h of calCabeceras(); track $index) {
+        <span class="oi-cal__hdr">{{ h }}</span>
       }
       @for (dia of calDias(); track $index) {
-        <div class="oi-cal__day"
-             [class.is-empty]="dia.tipo === 'vacio'"
-             [class.is-worked]="dia.tipo === 'trabajado'"
-             [class.is-today]="dia.tipo === 'hoy'"
-             [class.is-insp]="dia.tipo === 'inspeccion'">
+        <span class="oi-cal__day"
+              [class.is-empty]="dia.tipo === 'vacio'"
+              [class.is-worked]="dia.tipo === 'trabajado'"
+              [class.is-today]="dia.tipo === 'hoy'"
+              [class.is-insp]="dia.tipo === 'inspeccion'">
           @if (dia.tipo !== 'vacio') { {{ dia.num }} }
-        </div>
+        </span>
       }
     </div>
-    <div class="oi-cal__legend">
-      <span class="oi-cal__dot oi-cal__dot--worked"></span>
-      {{ 'monitoring.dias_trabajados' | translate }}
-      &nbsp;·&nbsp;
-      <span class="oi-cal__dot oi-cal__dot--today"></span>
-      {{ 'monitoring.hoy' | translate }}
+    <ul class="oi-cal__legend">
+      <li><span class="oi-cal__key oi-cal__key--worked" aria-hidden="true"></span>{{ 'monitoring.dias_trabajados' | translate }}</li>
+      <li><span class="oi-cal__key oi-cal__key--today" aria-hidden="true"></span>{{ 'monitoring.hoy' | translate }}</li>
       @if (fechasInspeccionMes().size > 0) {
-        &nbsp;·&nbsp;
-        <span class="oi-cal__dot oi-cal__dot--insp"></span>
-        {{ 'monitoring.cal_inspeccion' | translate }}
+        <li><span class="oi-cal__key oi-cal__key--insp" aria-hidden="true"></span>{{ 'monitoring.cal_inspeccion' | translate }}</li>
       }
-    </div>
+    </ul>
   </div>
 }

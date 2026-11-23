@@ -1,5 +1,11 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, effect, inject, signal } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { DatePipe, LowerCasePipe, NgTemplateOutlet } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -13,6 +19,7 @@ import { ToastService } from '../../../services/toast.service';
 import { DbPerfil, RolUsuario } from '../../../types/supabase';
 import { especialidadesRequeridas } from '../../../shared/validators/especialidades.validator';
 import { CAMPOS_FALTANTES } from '../../../shared/ui/campos-faltantes/campos-faltantes.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
 
 function passwordOpcionalValidator(ctrl: AbstractControl): ValidationErrors | null {
   const v = ctrl.value as string;
@@ -23,9 +30,13 @@ function passwordOpcionalValidator(ctrl: AbstractControl): ValidationErrors | nu
 @Component({
   selector: 'app-estimator-client-edit',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DatePipe, ReactiveFormsModule, TranslatePipe, ...CAMPOS_FALTANTES],
+  imports: [
+    DatePipe, LowerCasePipe, NgTemplateOutlet, ReactiveFormsModule, TranslatePipe,
+    MatButtonModule, MatCheckboxModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSelectModule,
+    PageHeaderComponent, ...CAMPOS_FALTANTES,
+  ],
   templateUrl: './edit.component.html',
-  styleUrl: './edit.component.css',
+  styleUrls: ['../../../shared/ui/alta/alta.css', './edit.component.css'],
 })
 export class EstimatorClientEditComponent implements OnInit {
   private fb        = inject(FormBuilder);

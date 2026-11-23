@@ -160,13 +160,13 @@
   "ai_assistant": {
     "eyebrow": "Client area",
     "title": "AI Assistant",
-    "tagline": "Ask anything about your file · answers in seconds.",
+    "tagline": "Ask anything about your file and get an answer in seconds.",
     "expediente": "File",
     "dossier": "File",
     "no_files_title": "You don't have any files yet",
     "no_files_hint": "Create a file so the assistant can help you with your offers and your project.",
     "intro_title": "Estimation3D Assistant",
-    "intro_lead": "Powered by your file · contextual answers. Ask me about your offers, timelines, warranties or project risks.",
+    "intro_lead": "I answer from the details of your file. Ask me about your offers, timelines, warranties or project risks.",
     "cap_analiza_title": "Analyze the file",
     "cap_analiza_desc": "Review offers, timelines, costs and file data.",
     "cap_jargon_title": "Explain the jargon",
@@ -175,11 +175,11 @@
     "cap_riesgos_desc": "Identify points to watch.",
     "cap_decide_title": "Prepare next steps",
     "cap_decide_desc": "Summarize what's at stake at each stage.",
-    "tagline_cliente": "Ask anything about your file · answers in seconds.",
+    "tagline_cliente": "Ask anything about your file and get an answer in seconds.",
     "tagline_estimador": "Technical support to diagnose and estimate this file.",
     "tagline_constructor": "Support to understand the scope and prepare your offer.",
     "tagline_administrador": "Operational support to oversee the file.",
-    "intro_lead_cliente": "Powered by your file · contextual answers. Ask me about your offers, timelines, warranties or project risks.",
+    "intro_lead_cliente": "I answer from the details of your file. Ask me about your offers, timelines, warranties or project risks.",
     "intro_lead_estimador": "Powered by the file data. Ask me about the diagnosis, line items to consider, technical risks or how to size the estimate.",
     "intro_lead_constructor": "Powered by the file data. Ask me about the scope of work, how to prepare your offer, reasonable timelines or risks to anticipate.",
     "intro_lead_administrador": "Powered by the file data. Ask me about the status, offer comparison, bottlenecks or an executive summary.",
@@ -212,7 +212,10 @@
     "refusal": "Sorry, I can't help with that request.",
     "empty_reply": "I don't have an answer for that right now.",
     "error": "Couldn't get a response. Please try again in a moment.",
-    "clear": "Clear conversation"
+    "clear": "Clear conversation",
+    "you": "You",
+    "assistant": "Assistant",
+    "typing": "The assistant is writing a reply…"
   },
   "history": {
     "eyebrow": "Client area",
@@ -309,6 +312,7 @@
     "administrador": "Administrator"
   },
   "common": {
+    "chars": "characters",
     "loading": "Loading…",
     "retry": "Retry",
     "save": "Save",
@@ -862,7 +866,8 @@
     "presentation_video": "Introduction video",
     "estimator_video": "Estimator's video",
     "estimator_video_hint": "The estimator who prepared your estimate introduces themselves in this video.",
-    "videos_error": "Couldn't load the introduction videos."
+    "videos_error": "Couldn't load the introduction videos.",
+    "choose": "Choose this offer"
   },
   "make_offer": {
     "editing_badge": "Editing offer",
@@ -1117,7 +1122,8 @@
     "street_name_placeholder": "Main Street",
     "ca_city": "City",
     "province_territory": "Province / Territory",
-    "postal_code": "Postal Code",
+    "postal_code": "Postal code",
+    "postal_hint": "Format: A1A 1A1",
     "postal_placeholder": "A1A 1A1",
     "postal_invalid": "Invalid format. Example: A1A 1A1"
   },
@@ -1137,6 +1143,7 @@
     "status_filter": "Status",
     "col_name": "Name",
     "col_lastname": "Last name",
+    "col_fullname": "Name",
     "col_phone": "Phone",
     "col_email": "Email",
     "col_role": "Role",
@@ -1317,7 +1324,7 @@
     "photo": "Profile photo",
     "change_photo": "Change photo",
     "uploading": "Uploading…",
-    "photo_hint": "JPG, PNG or WebP · Max. 2 MB",
+    "photo_hint": "JPG, PNG or WebP, 2 MB maximum.",
     "save_changes": "Save changes",
     "no_changes": "No pending changes",
     "pending_changes": "Pending changes",
@@ -1434,14 +1441,13 @@
       "title_a": "Create your file.",
       "title_b": "One visit away.",
       "sub": "Tell us about your property. We'll get back within 24 hours to schedule the single documentation visit.",
+      "step_contact": "Your details",
+      "step_property": "The property",
+      "step_need": "Your request",
       "firstname": "First name",
-      "firstname_ph": "Camille",
       "lastname": "Last name",
-      "lastname_ph": "Tremblay",
       "phone": "Phone",
-      "phone_ph": "514 555 0123",
       "email": "Email",
-      "email_ph": "you@example.ca",
       "type": "Property type",
       "type_choose": "Choose…",
       "type_house": "House",
@@ -1453,15 +1459,12 @@
       "optional": "optional",
       "required": "Required field",
       "addr_unit": "Unit number",
-      "addr_unit_ph": "5",
       "addr_street": "Street number and name",
-      "addr_street_ph": "1660 Ducharme Ave",
       "addr_city": "City",
-      "addr_city_ph": "Outremont",
       "addr_prov": "Province / Territory",
       "addr_prov_choose": "Choose…",
       "addr_postal": "Postal code",
-      "addr_postal_ph": "A1A 1A1",
+      "addr_postal_hint": "Format: A1A 1A1",
       "addr_postal_invalid": "Invalid format. E.g. A1A 1A1",
       "service_type": "Type of service",
       "services_loading": "Loading services…",
@@ -1480,12 +1483,6 @@
       "explore": "Explore",
       "apply": "Apply",
       "contact": "Contact"
-    },
-    "controls": {
-      "language": "Language",
-      "theme": "Visual mood",
-      "dark": "Dark",
-      "light": "Light"
     }
   },
   "auth": {
@@ -1533,7 +1530,7 @@
     "select": "Language"
   },
   "admin_file_create": {
-    "title": "New File",
+    "title": "New file",
     "subtitle": "Create a file on behalf of a client",
     "step2_name": "Client",
     "step2_title": "Client selection",
@@ -1572,7 +1569,7 @@
     "uncovered": "Not covered by the selected offers: {{lista}}"
   },
   "admin_file_edit": {
-    "title": "Edit File",
+    "title": "Edit file",
     "subtitle": "Update the file information",
     "submit_btn": "Save changes",
     "sending": "Saving…",
@@ -1618,7 +1615,7 @@
     "address_scope": "This address belongs to the file. Editing it never changes the client's profile."
   },
   "to_estimate": {
-    "title": "To Estimate",
+    "title": "To estimate",
     "subtitle": "Files in new, under estimation, or estimated status",
     "count": "file(s)",
     "search_placeholder": "Search by number, client, service, estimator, address…",
@@ -1929,7 +1926,8 @@
   "pagination": {
     "of": "of",
     "prev": "Previous page",
-    "next": "Next page"
+    "next": "Next page",
+    "label": "Pagination"
   },
   "validation": {
     "password_hint": "Min. 8 chars, uppercase, number and symbol",
@@ -2179,29 +2177,29 @@
     "reporte_title": "Today's report",
     "hora_inicio": "Start time",
     "horas_trabajadas": "Hours worked",
-    "horas_hint": "(standard: 8h)",
+    "horas_hint": "Standard: 8h",
     "avance_dia": "Today's progress %",
-    "avance_dia_hint": "— move the slider",
+    "avance_dia_hint": "Move the slider.",
     "avance_acumulado": "Cumulative after today",
     "avance_restante": "Remaining budget",
-    "avance_dia_servicio_hint": "— for {{servicio}}",
+    "avance_dia_servicio_hint": "For {{servicio}}.",
     "avance_acumulado_servicio": "{{servicio}} after today",
     "avance_global_tras_hoy": "Overall project progress after today",
     "avance_por_servicio": "Progress by service",
     "servicio_label": "Service",
-    "servicio_hint": "— which one was worked on this day",
+    "servicio_hint": "The one worked on this day.",
     "servicio_requerido": "Choose the service that was worked on this day.",
     "servicio_con_parte": "already has a report this day",
     "servicio_parte_hint": "Each service worked on this day has its own report.",
     "fase_label": "Current phase / stage",
-    "fase_hint": "— specific to the service",
+    "fase_hint": "Specific to the service.",
     "fase_1": "Site preparation and protection",
     "fase_2": "Main zone work",
     "fase_3": "Secondary zone work",
     "fase_4": "Cleaning and restoration",
     "fase_5": "Final inspection and acceptance",
     "actividades_label": "Activities completed today",
-    "actividades_hint": "— select from the list",
+    "actividades_hint": "Select from the list.",
     "act_1": "Site arrival",
     "act_2": "Materials unloaded",
     "act_3": "Zone A completed",
@@ -2220,8 +2218,8 @@
     "media_videos": "Videos",
     "media_docs": "Documents",
     "guardar_btn": "Save today's report",
-    "guardado_msg": "Report saved · contract status set to «in progress»",
-    "nota_inicio": "Saving the first report automatically moves the contract to in_progress and sets the actual start date.",
+    "guardado_msg": "Report saved. The contract is now “In progress”.",
+    "nota_inicio": "Saving the first report automatically moves the contract to “In progress” and sets the actual start date.",
     "kpi_title": "Summary",
     "kpi_dias": "days worked",
     "kpi_horas": "hours",
@@ -2369,14 +2367,14 @@
     "codigo_required": "Code is required.",
     "codigo_note": "Stable identifier, e.g. IICRC_S520.",
     "section_titles": "Titles",
-    "titulo_fr": "Title",
-    "titulo_en": "Title",
-    "titulo_es": "Title",
+    "titulo_fr": "Title in French",
+    "titulo_en": "Title in English",
+    "titulo_es": "Title in Spanish",
     "field_required": "This field is required.",
     "section_summaries": "Summaries",
-    "resumen_fr": "Summary",
-    "resumen_en": "Summary",
-    "resumen_es": "Summary",
+    "resumen_fr": "Summary in French",
+    "resumen_en": "Summary in English",
+    "resumen_es": "Summary in Spanish",
     "keywords_label": "Keywords",
     "keywords_note": "Comma-separated. Help the assistant spot relevance.",
     "orden_label": "Order",
@@ -2425,6 +2423,15 @@
     "field_profile": "Profile",
     "section_protocol": "Protocol",
     "field_protocol": "Protocol",
+    "titulo_fr": "Title in French",
+    "titulo_en": "Title in English",
+    "titulo_es": "Title in Spanish",
+    "perfil_fr": "Profile in French",
+    "perfil_en": "Profile in English",
+    "perfil_es": "Profile in Spanish",
+    "protocolo_fr": "Protocol in French",
+    "protocolo_en": "Protocol in English",
+    "protocolo_es": "Protocol in Spanish",
     "ficha_label": "Linked regulatory sheet",
     "ficha_none": "None",
     "ficha_note": "Reference standard tied to this contingency.",
@@ -2450,12 +2457,12 @@
   "journal": {
     "crumbs": {
       "home": "Home",
-      "current": "The Journal"
+      "current": "The Journal",
+      "aria": "Breadcrumb"
     },
     "hero": {
-      "title_gold": "Understand",
-      "title_rest": " what happens at home.",
-      "lede": "Articles, guides and stories to decide better when a problem touches your property."
+      "lede": "Articles, guides and stories to decide better when a problem touches your property.",
+      "title": "Understand what happens at home."
     },
     "filter": {
       "aria": "Filter by category"
@@ -2473,59 +2480,56 @@
       "moisissure-danger": {
         "title": "How to tell if the mould in your home is dangerous",
         "sum": "Stains, smells, species: what to look at, what to do, and what never to do.",
-        "meta": "12 Feb 2026 · 6 min"
+        "meta": "12 Feb 2026, 6 min"
       },
       "degat-eau-48h": {
         "title": "Water damage: the first 48 hours that change everything",
         "sum": "Why the first two days determine the extent of the damage — and the final bill.",
-        "meta": "5 Feb 2026 · 5 min"
+        "meta": "5 Feb 2026, 5 min"
       },
       "comparer-soum": {
         "title": "Comparing three bids: what really matters beyond price",
         "sum": "A simple reading grid so you're not caught out by the lowest number.",
-        "meta": "29 Jan 2026 · 7 min"
+        "meta": "29 Jan 2026, 7 min"
       },
       "avant-1980": {
         "title": "Homes built before 1980: what every owner should know",
         "sum": "Where asbestos hides, how to spot it, and why you should never disturb it yourself.",
-        "meta": "22 Jan 2026 · 8 min"
+        "meta": "22 Jan 2026, 8 min"
       },
       "cave-rosemont": {
         "title": "A damp basement in Rosemont: from diagnosis to solution",
         "sum": "The case of an owner who thought she had a simple humidity problem.",
-        "meta": "15 Jan 2026 · 6 min"
+        "meta": "15 Jan 2026, 6 min"
       },
       "fissures-fond": {
         "title": "Foundation cracks: structural or cosmetic?",
         "sum": "The signs that change everything, and the ones that can wait.",
-        "meta": "8 Jan 2026 · 6 min"
+        "meta": "8 Jan 2026, 6 min"
       },
       "une-visite": {
         "title": "Why one visit is enough (and why three is too many)",
         "sum": "The economic and human math behind single-visit documentation.",
-        "meta": "18 Dec 2025 · 5 min"
+        "meta": "18 Dec 2025, 5 min"
       },
       "vermiculite": {
         "title": "Vermiculite in the attic: why it's so delicate",
         "sum": "A common insulant in old Québec homes — and a trap to handle with care.",
-        "meta": "11 Dec 2025 · 7 min"
+        "meta": "11 Dec 2025, 7 min"
       },
       "assechement": {
         "title": "Drying after water damage: how long, and why",
         "sum": "Why a wall looks dry on the surface but really isn't.",
-        "meta": "4 Dec 2025 · 5 min"
+        "meta": "4 Dec 2025, 5 min"
       }
     },
     "featured": {
       "label": "Featured",
-      "sub": "read of the month",
+      "sub": "Read of the month",
       "title": "Understanding your file: what each section really tells you.",
       "text": "Measurements, classifications, plans, warranties: an Estimation3D file reads like a logbook. Here's how to read it — and what to look at first.",
-      "meta": "19 Mar 2026 · 9 min",
+      "meta": "19 Mar 2026, 9 min",
       "img_alt": "Documented 3D plan of a property"
-    },
-    "footer": {
-      "sign": "JOURNAL"
     }
   },
   "entrepreneurs": {
@@ -2534,7 +2538,7 @@
       "current": "Contractors"
     },
     "hero": {
-      "kicker": "Pilot phase — 15 partner contractors selected in 2026",
+      "kicker": "Pilot phase: 15 partner contractors selected in 2026",
       "title_1": "Receive complete files.",
       "title_2": "Bid without visiting.",
       "lede": "Estimation3D sends you pre-documented projects across Montréal. You analyze the file, you bid. No travel to estimate. No race to the lowest number.",
@@ -2718,28 +2722,20 @@
       "title": "Tell us about your company.",
       "sub": "A few details are enough to start the conversation.",
       "company": "Company name",
-      "company_ph": "Atelier Boréal Construction inc.",
-      "contact": "Contact person",
-      "contact_ph": "Marie-Claude Lavoie",
       "phone": "Phone",
-      "phone_ph": "514 555 0123",
       "email": "Email",
-      "email_ph": "contact@exemple.ca",
       "rbq": "RBQ licence number",
-      "rbq_ph": "0000-0000-00",
+      "rbq_hint": "Ten digits, formatted 0000-0000-00.",
       "specialties": "Specialties",
       "years": "Years of experience",
       "area": "Service area",
-      "area_ph": "Montréal and north ring",
       "message": "Message (optional)",
       "message_ph": "A few words on your approach, recent job sites, or your questions.",
       "note": "We review each application individually. Response within 5 business days.",
       "submit": "Submit my application",
       "success": "Application received",
       "contact_first": "Contact first name",
-      "contact_first_ph": "Marie-Claude",
       "contact_last": "Contact last name",
-      "contact_last_ph": "Lavoie",
       "specialties_all": "All services",
       "err_required": "Required field.",
       "err_email": "Invalid email address.",
@@ -2753,9 +2749,6 @@
       "manifesto_1": "Construction deserves better than free estimates",
       "manifesto_2": "on repeat.",
       "lede": "Join the contractors who choose clarity."
-    },
-    "footer": {
-      "sign": "CONTRACTORS"
     }
   },
   "archivo": {
@@ -2773,7 +2766,7 @@
     "desarchivando": "Unarchiving…",
     "titulo_expediente": "File archived",
     "titulo_contrato": "File and contract archived",
-    "titulo_obra": "File and contract archived · work paused",
+    "titulo_obra": "File and contract archived, work paused",
     "texto_expediente": "The work for this file will not be carried out. Only an administrator can modify it.",
     "texto_oferta": "Your offer has been archived: the work for this file will not be carried out. Only an administrator can modify it.",
     "texto_contrato": "The work under this contract will not be carried out. Only an administrator can modify it.",

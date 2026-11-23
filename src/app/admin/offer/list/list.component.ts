@@ -8,10 +8,19 @@ import {
   signal,
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ExpedienteService } from '../../../services/expediente.service';
 import { ExpedienteConOfertaAdmin } from '../../../models';
 import { PaginationComponent } from '../../../shared/pagination/pagination.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
+import { StatusChipComponent } from '../../../shared/ui/status-chip/status-chip.component';
 import {
   coincideBusqueda, direccionLinea1, direccionLinea2, direccionCompleta,
 } from '../../../shared/util/busqueda';
@@ -19,9 +28,13 @@ import {
 @Component({
   selector: 'app-admin-offer-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, TranslatePipe, PaginationComponent],
+  imports: [
+    RouterLink, TranslatePipe,
+    MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTooltipModule,
+    PaginationComponent, PageHeaderComponent, EmptyStateComponent, StatusChipComponent,
+  ],
   templateUrl: './list.component.html',
-  styleUrl: './list.component.css',
+  styleUrls: ['../../../shared/ui/lista/lista.css', './list.component.css'],
 })
 export class AdminOfferListComponent implements OnInit {
   private expedienteService = inject(ExpedienteService);
@@ -130,26 +143,6 @@ export class AdminOfferListComponent implements OnInit {
   direccionLinea1   = direccionLinea1;
   direccionLinea2   = direccionLinea2;
   direccionCompleta = direccionCompleta;
-
-  estadoBadgeExp(estado: string): string {
-    const map: Record<string, string> = {
-      estimado:   'badge-estimado',
-      en_oferta:  'badge-en_oferta',
-      adjudicado: 'badge-adjudicado',
-    };
-    return map[estado] ?? 'badge-estimado';
-  }
-
-  estadoBadgeOferta(estado: string | null): string {
-    if (!estado) return '';
-    const map: Record<string, string> = {
-      pendiente: 'badge-oferta-pendiente',
-      aceptada:  'badge-oferta-aceptada',
-      rechazada: 'badge-oferta-rechazada',
-      archivado: 'badge-archivado',
-    };
-    return map[estado] ?? '';
-  }
 
   formatFecha(valor: string | null): string {
     if (!valor) return '—';

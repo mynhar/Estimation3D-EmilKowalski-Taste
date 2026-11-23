@@ -2,38 +2,25 @@
  * states: default · hover · focus · active · disabled (mientras guarda) · loading (esqueleto,
  *         subiendo) · error (carga) · success (video en el expediente) · empty (sin video)
  * contrast: textos en --ds-ink / --ds-ink-secondary / --ds-ink-muted sobre papel (AA);
- *           duración en crema sobre espresso; error en --ds-danger-ink sobre -soft
+ *           duración en vélin sobre abeto; error en --ds-danger-ink sobre -soft
  *
  * La ranura, la miniatura y los estados vacío · error · esqueleto están en
  * video-slot.css (compartida con app-videos-expediente-lectura).
  *
  * Misma familia que la biblioteca de videos del perfil (miniatura 16:9 con
- * duración, punto rojo de grabar), en formato de una sola ranura: aquí sólo
+ * duración, icono de grabar en ladrillo), en formato de una sola ranura: aquí sólo
  * hay un video por expediente.
  */
 :host { display: block; }
 
-/* Quitar: acción secundaria en texto, roja sólo al pasar. */
+/* Quitar: acción secundaria en texto (mat-button), en tinta secundaria;
+   no borra el video de la biblioteca, sólo lo desvincula del expediente. */
 .ve-remove {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-space-1);
-  margin-top: var(--ds-space-3);
-  padding: 2px var(--ds-space-1);
-  border: 0;
-  border-radius: var(--ds-radius-sm);
-  background: none;
-  font-size: var(--ds-text-xs);
-  font-weight: var(--ds-weight-semibold);
-  color: var(--ds-ink-secondary);
-  cursor: pointer;
-  transition: var(--ds-transition-color);
+  --mat-button-text-label-text-color: var(--ds-ink-secondary);
+  --mat-button-text-state-layer-color: var(--ds-ink);
+  margin-top: var(--ds-space-2);
+  margin-left: calc(-1 * var(--ds-space-3));
 }
-.ve-remove:hover { color: var(--ds-danger-ink); background: var(--ds-danger-soft); }
-.ve-remove:focus { outline: none; }
-.ve-remove:focus-visible { box-shadow: var(--ds-focus-ring); }
-.ve-remove:active { color: var(--ds-danger-ink); }
-.ve-remove:disabled { opacity: 0.6; cursor: not-allowed; background: none; color: var(--ds-ink-secondary); }
 
 /* ── Acciones ─────────────────────────────────────────────────────────────── */
 .ve-actions {
@@ -41,31 +28,26 @@
   flex-wrap: wrap;
   gap: var(--ds-space-2);
 }
-.ve-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-  white-space: nowrap;
-}
-.ve-btn:focus-visible { box-shadow: var(--ds-focus-ring); }
-.ve-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: var(--ds-radius-circle);
-  background: var(--ds-danger);
-}
+.ve-btn { white-space: nowrap; }
+/* El icono de grabar conserva el ladrillo de siempre: es el signo universal
+   de grabación, no un error ni la acción de la siguiente etapa. */
+.ve-rec { color: var(--ds-danger); }
+.ve-btn:disabled .ve-rec { color: inherit; }
 .ve-count {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 20px;
-  height: 20px;
+  min-width: 24px;
+  height: 22px;
+  margin-left: var(--ds-space-2);
   padding: 0 6px;
   border-radius: var(--ds-radius-pill);
-  background: var(--ds-gold-faint);
-  color: var(--ds-gold-ink);
-  font-size: var(--ds-text-2xs);
-  font-weight: var(--ds-weight-bold);
+  background: var(--ds-band);
+  color: var(--ds-ink);
+  font-size: var(--ds-text-sm);
+  font-stretch: var(--ds-stretch-figure);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--ds-weight-semibold);
 }
 
 /* ── Diálogo: elegir de mis videos ────────────────────────────────────────── */
@@ -84,8 +66,8 @@
   margin: 0 0 var(--ds-space-2);
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-regular);
-  letter-spacing: var(--ds-tracking-tight);
+  font-stretch: var(--ds-stretch-heading);
+  font-weight: var(--ds-weight-bold);
   color: var(--ds-ink);
 }
 .ve-dialog__text {
@@ -104,7 +86,6 @@
   background: var(--ds-surface);
   border-radius: 0 0 var(--ds-radius-xl) var(--ds-radius-xl);
 }
-.ve-dialog__foot .btn { white-space: nowrap; }
 
 .ve-pick {
   display: grid;
@@ -133,7 +114,7 @@
 }
 .ve-opt:hover { border-color: var(--ds-border-strong); background: var(--ds-surface); }
 .ve-opt:active { background: var(--ds-bg-alt); }
-.ve-opt.is-selected { border-color: var(--ds-gold); background: var(--ds-gold-faint); }
+.ve-opt.is-selected { border-color: var(--ds-action); background: var(--ds-action-faint); }
 .ve-opt:has(.ve-opt__radio:focus-visible) { box-shadow: var(--ds-focus-ring); }
 .ve-pick:disabled .ve-opt { cursor: not-allowed; }
 
@@ -141,7 +122,7 @@
   width: 1rem;
   height: 1rem;
   margin: 0;
-  accent-color: var(--ds-gold-ink);
+  accent-color: var(--ds-action);
 }
 .ve-opt__radio:focus { outline: none; }
 .ve-opt__thumb {
@@ -173,16 +154,23 @@
   color: var(--ds-ink);
   overflow-wrap: anywhere;
 }
-.ve-opt__meta { font-size: var(--ds-text-xs); color: var(--ds-ink-muted); }
+.ve-opt__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--ds-space-3);
+  font-size: var(--ds-text-sm);
+  color: var(--ds-ink-muted);
+}
+.ve-opt__thumb > mat-icon { width: 28px; height: 28px; font-size: 28px; }
 
 /* ── Columna estrecha · móvil ─────────────────────────────────────────────── */
 @container (max-width: 30rem) {
-  .ve-actions .btn { flex: 1 1 auto; justify-content: center; }
+  .ve-actions .ve-btn { flex: 1 1 auto; }
 }
 @media (max-width: 575.98px) {
   .ve-opt { grid-template-columns: auto 5rem minmax(0, 1fr); gap: var(--ds-space-2); }
   .ve-pick { padding-inline: var(--ds-space-4); }
   .ve-dialog__head { padding-inline: var(--ds-space-4); }
   .ve-dialog__foot { padding-inline: var(--ds-space-4); }
-  .ve-dialog__foot .btn { flex: 1 1 auto; }
+  .ve-dialog__foot button { flex: 1 1 auto; }
 }

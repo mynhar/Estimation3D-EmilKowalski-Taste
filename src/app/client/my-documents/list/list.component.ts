@@ -1,13 +1,20 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  Injector,
   OnInit,
+  afterNextRender,
   computed,
   inject,
   signal,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NgTemplateOutlet } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../../services/auth-supabase.service';
 import { ArchivoService } from '../../../services/archivo.service';
@@ -22,13 +29,38 @@ import {
 } from '../../../services/documentos-cliente.service';
 import { DbPerfilVideo } from '../../../types/supabase';
 import { ReproductorVideoComponent } from '../../../shared/ui/presentacion-videos/reproductor-video.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
+import { ExpedientePanelComponent } from '../../../shared/ui/expediente-panel/expediente-panel.component';
+import { abrirVisor } from '../../../shared/ui/media-viewer/media-viewer.component';
 
 type FiltroTipo = 'todos' | TipoArchivo;
+
+/** Icono de cada tipo de archivo; el tour 3D del estimador lleva el suyo. */
+const ICONO_TIPO: Record<TipoArchivo | 'tour', { matIcon: string }> = {
+  foto:      { matIcon: 'image' },
+  video:     { matIcon: 'videocam' },
+  documento: { matIcon: 'description' },
+  tour:      { matIcon: 'view_in_ar' },
+};
+
+/** Icono de quien subió el archivo (cabecera de cada grupo). */
+const ICONO_ROL: Record<RolSubida, { matIcon: string }> = {
+  cliente:       { matIcon: 'person' },
+  estimador:     { matIcon: 'assignment_turned_in' },
+  constructor:   { matIcon: 'construction' },
+  administrador: { matIcon: 'shield_person' },
+  desconocido:   { matIcon: 'help' },
+};
 
 @Component({
   selector: 'app-client-my-documents-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, NgTemplateOutlet, ReproductorVideoComponent],
+  imports: [
+    TranslatePipe, NgTemplateOutlet, MatButtonModule, MatButtonToggleModule, MatIconModule,
+    MatTooltipModule, ReproductorVideoComponent, PageHeaderComponent, EmptyStateComponent,
+    ExpedientePanelComponent,
+  ],
   templateUrl: './list.component.html',
   styleUrl: './list.component.css',
 })
@@ -38,6 +70,8 @@ export class MyDocumentsListComponent implements OnInit {
   private archivoSvc  = inject(ArchivoService);
   private toast       = inject(ToastService);
   private translate   = inject(TranslateService);
+  private dialog      = inject(MatDialog);
+  private injector    = inject(Injector);
 
   private user = toSignal(this.auth.user$);
 
@@ -54,13 +88,12 @@ export class MyDocumentsListComponent implements OnInit {
   dragId            = signal<string | null>(null);    // expediente con drag encima
   eliminandoId      = signal<string | null>(null);
   confirmEliminarId = signal<string | null>(null);
-  fotoAmpliada      = signal<string | null>(null);
   /** Video de presentación abierto en el reproductor (sólo para ver). */
   presentacionAbierta = signal<DbPerfilVideo | null>(null);
 
   private pendingExpId: string | null = null;
 
-  // Conteo global por tipo, para las pills de filtro y la franja de resumen.
+  // Conteo global por tipo, para el filtro.
   conteoGlobal = computed(() => {
     const exps = this.expedientes();
     const all  = exps.flatMap(e => e.grupos.flatMap(g => g.archivos));
@@ -195,10 +228,22 @@ export class MyDocumentsListComponent implements OnInit {
 
   // ── Eliminar (solo propios; RLS bloquea el resto) ───────────────────────────
 
-  pedirEliminar(id: string): void { this.confirmEliminarId.set(id); }
-  cancelarEliminar(): void { this.confirmEliminarId.set(null); }
+  // El foco sigue a la pregunta: «Non» al abrirla, la papelera al cerrarla y,
+  // si el archivo ya no está, la zona de subida de su dossier.
+  pedirEliminar(id: string): void {
+    this.confirmEliminarId.set(id);
+    this.enfocar(`md-del-keep-${id}`);
+  }
+  cancelarEliminar(id: string): void {
+    this.confirmEliminarId.set(null);
+    this.enfocar(`md-del-open-${id}`);
+  }
 
-  async eliminar(a: ArchivoVM): Promise<void> {
+  private enfocar(id: string): void {
+    afterNextRender(() => document.getElementById(id)?.focus(), { injector: this.injector });
+  }
+
+  async eliminar(a: ArchivoVM, expId: string): Promise<void> {
     if (this.eliminandoId()) return;
     this.eliminandoId.set(a.id);
     try {
@@ -212,6 +257,7 @@ export class MyDocumentsListComponent implements OnInit {
       });
       this.confirmEliminarId.set(null);
       await this.cargar(false);
+      this.enfocar(`md-up-${expId}`);
       this.toast.show(this.translate.instant('my_documents.success_delete'), 'success');
     } catch {
       this.toast.show(this.translate.instant('my_documents.err_delete'), 'danger');
@@ -227,13 +273,16 @@ export class MyDocumentsListComponent implements OnInit {
       if (a.presentacion) this.presentacionAbierta.set(a.presentacion);
       return;
     }
-    if (a.tipo === 'foto' && !a.esExterno) {
-      this.fotoAmpliada.set(a.url);
+    // Tour 3D, foto y video propios: en el visor a pantalla completa, como en
+    // el resto de la app. Documentos y contratos (PDF): en una pestaña nueva.
+    if (a.fuente === 'estimacion') {
+      abrirVisor(this.dialog, { tipo: 'tour', url: a.url, titulo: a.nombre });
+    } else if ((a.tipo === 'foto' || a.tipo === 'video') && !a.esExterno) {
+      abrirVisor(this.dialog, { tipo: a.tipo, url: a.url, titulo: a.nombre });
     } else {
       window.open(a.url, '_blank', 'noopener');
     }
   }
-  cerrarFoto(): void { this.fotoAmpliada.set(null); }
 
   descargar(a: ArchivoVM): void {
     const el = document.createElement('a');
@@ -248,20 +297,14 @@ export class MyDocumentsListComponent implements OnInit {
 
   // ── Helpers de presentación ─────────────────────────────────────────────────
 
-  iconoTipo(tipo: TipoArchivo): string {
-    if (tipo === 'foto')  return 'bi-image';
-    if (tipo === 'video') return 'bi-camera-video';
-    return 'bi-file-earmark-text';
+  iconoArchivo(a: ArchivoVM): { matIcon: string } {
+    return ICONO_TIPO[a.fuente === 'estimacion' ? 'tour' : a.tipo];
   }
 
   labelRol(rol: RolSubida): string { return `my_documents.role_${rol}`; }
 
-  iconoRol(rol: RolSubida): string {
-    if (rol === 'cliente')       return 'bi-person';
-    if (rol === 'estimador')     return 'bi-clipboard-check';
-    if (rol === 'constructor')   return 'bi-tools';
-    if (rol === 'administrador') return 'bi-shield-check';
-    return 'bi-question-circle';
+  iconoRol(rol: RolSubida): { matIcon: string } {
+    return ICONO_ROL[rol] ?? ICONO_ROL.desconocido;
   }
 
   formatTamano(bytes: number): string {

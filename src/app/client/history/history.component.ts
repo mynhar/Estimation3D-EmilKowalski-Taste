@@ -6,6 +6,8 @@ import {
   signal,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../services/auth-supabase.service';
 import {
@@ -14,19 +16,41 @@ import {
   EventoHistorialVM,
   CategoriaEvento,
 } from '../../services/historial-cliente.service';
+import { etapaDossier } from '../../shared/util/etapas';
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../shared/ui/empty-state/empty-state.component';
+import { ExpedientePanelComponent } from '../../shared/ui/expediente-panel/expediente-panel.component';
+import { StageLineComponent } from '../../shared/ui/stage-line/stage-line.component';
+import { AvisoArchivadoComponent } from '../../shared/ui/aviso-archivado/aviso-archivado.component';
 
 interface GrupoFecha {
   label:   string;
   eventos: EventoHistorialVM[];
 }
 
-// Fases del recorrido del expediente para la barra de progreso.
-const FASES = ['creado', 'estimado', 'adjudicado', 'contratado', 'obra', 'completado'] as const;
+/** Icono de cada tipo de evento (clave i18n del título). */
+const ICONO_EVENTO: Record<string, { matIcon: string }> = {
+  'history.exp_creado':         { matIcon: 'create_new_folder' },
+  'history.visita_programada':  { matIcon: 'event' },
+  'history.visita_realizada':   { matIcon: 'assignment_turned_in' },
+  'history.exp_cancelado':      { matIcon: 'cancel' },
+  'history.oferta_recibida':    { matIcon: 'request_quote' },
+  'history.contrato_generado':  { matIcon: 'description' },
+  'history.contrato_firmado':   { matIcon: 'draw' },
+  'history.contrato_cancelado': { matIcon: 'cancel' },
+  'history.obra_iniciada':      { matIcon: 'construction' },
+  'history.parte_obra':         { matIcon: 'summarize' },
+  'history.obra_finalizada':    { matIcon: 'flag' },
+};
+const ICONO_EVENTO_POR_DEFECTO = { matIcon: 'event_note' };
 
 @Component({
   selector: 'app-client-history',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe],
+  imports: [
+    TranslatePipe, MatButtonModule, MatIconModule, PageHeaderComponent, EmptyStateComponent,
+    ExpedientePanelComponent, StageLineComponent, AvisoArchivadoComponent,
+  ],
   templateUrl: './history.component.html',
   styleUrl: './history.component.css',
 })
@@ -42,8 +66,6 @@ export class HistoryComponent implements OnInit {
   error       = signal<string | null>(null);
   expandidos  = signal<Set<string>>(new Set());
   partesAbiertos = signal<Set<string>>(new Set());
-
-  readonly fases = FASES;
 
   async ngOnInit(): Promise<void> {
     const userId = this.user()?.id;
@@ -120,29 +142,31 @@ export class HistoryComponent implements OnInit {
     return out.map(b => b.grupo);
   }
 
-  // ── Barra de fases ──────────────────────────────────────────────────────────
+  // ── Línea de etapas (la misma del panel y del dossier) ───────────────────
   esCancelado(exp: ExpedienteHistorialVM): boolean { return exp.estado === 'cancelado'; }
+  esArchivado(exp: ExpedienteHistorialVM): boolean { return exp.estado === 'archivado'; }
 
-  faseActual(exp: ExpedienteHistorialVM): number {
-    if (exp.eventos.some(e => e.titulo === 'history.obra_finalizada')) return 5;
-    if (exp.eventos.some(e => e.titulo === 'history.obra_iniciada'))   return 4;
-    switch (exp.estado) {
-      case 'contratado':            return 3;
-      case 'adjudicado':            return 2;
-      case 'estimado':
-      case 'en_oferta':             return 1;
-      default:                      return 0; // nuevo, en_estimacion
-    }
-  }
-  estadoFase(exp: ExpedienteHistorialVM, i: number): 'done' | 'current' | 'pending' {
-    const actual = this.faseActual(exp);
-    if (i < actual)  return 'done';
-    if (i === actual) return 'current';
-    return 'pending';
+  /**
+   * Etapa 1–6 de `app-stage-line`: la del estado del dossier, adelantada por lo
+   * que ya consta en el historial (contrato firmado → 5, obra empezada → 6),
+   * igual que `etapaDossier` hace con los contratos. 0 = fuera del flujo.
+   */
+  etapa(exp: ExpedienteHistorialVM): number {
+    let n = etapaDossier(exp.estado);
+    if (n === 0) return 0;
+    const hechos = new Set(exp.eventos.map(e => e.titulo));
+    const contratoVivo = !hechos.has('history.contrato_cancelado');
+    if (contratoVivo && hechos.has('history.contrato_firmado')) n = Math.max(n, 5);
+    if (contratoVivo && hechos.has('history.obra_iniciada')) n = 6;
+    return n;
   }
 
   // ── Presentación ────────────────────────────────────────────────────────────
   labelCategoria(cat: CategoriaEvento): string { return `history.cat_${cat}`; }
+
+  iconoEvento(ev: EventoHistorialVM): { matIcon: string } {
+    return ICONO_EVENTO[ev.titulo] ?? ICONO_EVENTO_POR_DEFECTO;
+  }
 
   private localeActual(): string {
     const map: Record<string, string> = { es: 'es-CA', en: 'en-US', fr: 'fr-CA' };
@@ -156,15 +180,6 @@ export class HistoryComponent implements OnInit {
     const d   = new Date(`${raw}T00:00:00`);
     if (isNaN(d.getTime())) return '—';
     return new Intl.DateTimeFormat(this.localeActual(), { day: 'numeric', month: 'short' }).format(d);
-  }
-
-  // Fecha completa para aria-label / accesibilidad.
-  formatLargo(valor: string): string {
-    if (!valor) return '';
-    const raw = valor.includes('T') ? valor.split('T')[0] : valor;
-    const d   = new Date(`${raw}T00:00:00`);
-    if (isNaN(d.getTime())) return '';
-    return new Intl.DateTimeFormat(this.localeActual(), { day: 'numeric', month: 'long', year: 'numeric' }).format(d);
   }
 
   formatHora(valor: string): string {

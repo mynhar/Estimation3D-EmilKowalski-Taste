@@ -7,21 +7,38 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ContratoService } from '../../../services/contrato.service';
 import { ContratoConstructorListItem, nombreServicio } from '../../../models';
 import { PaginationComponent } from '../../../shared/pagination/pagination.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
+import { StatusChipComponent } from '../../../shared/ui/status-chip/status-chip.component';
 import {
   coincideBusqueda, direccionLinea1, direccionLinea2, direccionCompleta,
 } from '../../../shared/util/busqueda';
 
+type VistaContratos = 'tabla' | 'tarjetas';
+
+const SIN_DATO = '—';
+
 @Component({
   selector: 'app-admin-construction-monitoring-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, PaginationComponent],
+  imports: [
+    RouterLink, TranslatePipe, PaginationComponent,
+    PageHeaderComponent, EmptyStateComponent, StatusChipComponent,
+    MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTooltipModule,
+  ],
   templateUrl: './list.component.html',
-  styleUrl: './list.component.css',
+  styleUrls: ['../../../shared/construction-monitoring/obras-lista.css', './list.component.css'],
 })
 export class AdminConstructionMonitoringListComponent implements OnInit {
   private contratoService = inject(ContratoService);
@@ -35,7 +52,10 @@ export class AdminConstructionMonitoringListComponent implements OnInit {
 
   busqueda     = signal('');
   filtroEstado = signal('todos');
-  vista        = signal<'tabla' | 'tarjetas'>('tarjetas');   // por defecto: tarjetas
+  vista        = signal<VistaContratos>('tarjetas');   // por defecto: tarjetas
+
+  /** Ids cuya miniatura 3D falló al cargar → se muestra el marcador de posición. */
+  private fotosFallidas = signal<Set<string>>(new Set<string>());
 
   readonly estados    = ['todos', 'firmado', 'en_ejecucion', 'completado', 'cancelado'];
   readonly POR_PAGINA = 15;
@@ -53,6 +73,8 @@ export class AdminConstructionMonitoringListComponent implements OnInit {
           c.cliente_nombre,
           this.serviciosTexto(c),
           c.constructor_nombre,
+          c.constructor_email,
+          c.constructor_telefono,
           c.estado,
           // Dirección: en Canadá `direccion` lleva unidad + nº y calle,
           // `canton` la ciudad y `distrito` el código postal.
@@ -139,33 +161,16 @@ export class AdminConstructionMonitoringListComponent implements OnInit {
   serviciosTexto(c: ContratoConstructorListItem): string {
     const lang = this.translate.currentLang;
     if (c.servicios?.length) {
-      return c.servicios.map(s => nombreServicio(s, lang)).join(' · ');
+      return c.servicios.map(s => nombreServicio(s, lang)).join(', ');
     }
     if (lang === 'en') return c.servicio_nombre_en || c.servicio_nombre;
     if (lang === 'fr') return c.servicio_nombre_fr || c.servicio_nombre;
     return c.servicio_nombre;
   }
 
-  badgeContrato(estado: string): string {
-    const map: Record<string, string> = {
-      firmado:      'badge-firmado',
-      en_ejecucion: 'badge-en-ejecucion',
-      completado:   'badge-completado',
-      cancelado:    'badge-cancelado',
-      archivado:    'badge-archivado',
-    };
-    return map[estado] ?? '';
-  }
-
-  iconoEstado(estado: string): string {
-    const map: Record<string, string> = {
-      firmado:      'bi-pen',
-      en_ejecucion: 'bi-tools',
-      completado:   'bi-check2-circle',
-      cancelado:    'bi-x-circle',
-      archivado:    'bi-archive',
-    };
-    return map[estado] ?? 'bi-circle';
+  /** El dato existe y no es el «—» de relleno de la vista. */
+  hay(valor: string | null | undefined): boolean {
+    return !!valor && valor.trim() !== '' && valor !== SIN_DATO;
   }
 
   formatFecha(valor: string | null): string {
@@ -185,13 +190,31 @@ export class AdminConstructionMonitoringListComponent implements OnInit {
     }).format(precio);
   }
 
+  setVista(v: VistaContratos): void {
+    this.vista.set(v);
+  }
+
+  /**
+   * Miniatura del expediente extraída del tour 3D Matterport.
+   * Null si el expediente no tiene tour o si la imagen ya falló al cargar.
+   */
+  fotoContrato(c: ContratoConstructorListItem): string | null {
+    return this.fotosFallidas().has(c.id) ? null : c.foto;
+  }
+
+  onFotoError(id: string): void {
+    this.fotosFallidas.update(set => new Set(set).add(id));
+  }
+
+  // Abre el seguimiento del contrato seleccionado.
   irAMonitoreo(id: string): void {
     this.router.navigate(['/admin/construction-monitoring/monitoring', id]);
   }
 
-  plazoLabel(c: ContratoConstructorListItem): string {
-    if (c.plazo_semanas_min == null && c.plazo_semanas_max == null) return '—';
-    if (c.plazo_semanas_min === c.plazo_semanas_max) return `${c.plazo_semanas_min} sem`;
-    return `${c.plazo_semanas_min ?? '?'}–${c.plazo_semanas_max ?? '?'} sem`;
+  /** Plazo en semanas («4» o «4–6»); vacío si no se fijó. La unidad la pone la plantilla. */
+  plazo(c: ContratoConstructorListItem): string {
+    if (c.plazo_semanas_min == null && c.plazo_semanas_max == null) return '';
+    if (c.plazo_semanas_min === c.plazo_semanas_max) return `${c.plazo_semanas_min}`;
+    return `${c.plazo_semanas_min ?? '?'}–${c.plazo_semanas_max ?? '?'}`;
   }
 }

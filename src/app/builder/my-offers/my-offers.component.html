@@ -1,444 +1,240 @@
-﻿<div class="page-wrapper">
+﻿<div class="page-wrapper ofs">
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       HEADER EDITORIAL
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  <header class="card card-premium mb-4 fade-up">
-    <div class="card-body px-4 px-lg-5 py-4 d-flex align-items-start justify-content-between gap-4 flex-wrap">
-      <div>
-        <span class="eyebrow">
-          <i class="bi bi-list-check me-1"></i>{{ 'role.constructeur' | translate }}
-        </span>
-        <h1 class="page-title title-editorial mb-1">
-          {{ 'nav.mes_offres' | translate }}
-        </h1>
-        <p class="text-ink-muted page-subtitle mb-0">
-          {{ 'my_offers.subtitle' | translate }}
-        </p>
-      </div>
+  <app-page-header [titulo]="'nav.mes_offres' | translate"
+                   [contexto]="'my_offers.subtitle' | translate">
+    @if (!cargando() && ofertas().length > 0) {
+      <a actions mat-stroked-button class="ofs-find" routerLink="/builder/available-files">
+        <mat-icon>search</mat-icon>
+        {{ 'common.see_available' | translate }}
+      </a>
+    }
+  </app-page-header>
 
-      @if (!cargando() && ofertas().length > 0) {
-        <div class="d-flex gap-2 flex-wrap align-items-center pt-1">
-          <span class="stat-pill stat-pill--neutral">
-            <i class="bi bi-send me-1"></i>
-            {{ ofertas().length }} {{ 'my_offers.total_sent' | translate }}
-          </span>
-          @if (totalPendientes() > 0) {
-            <span class="stat-pill stat-pill--pending">
-              <i class="bi bi-hourglass me-1"></i>
-              {{ totalPendientes() }} {{ 'state.pendiente' | translate }}
-            </span>
-          }
-          @if (totalAceptadas() > 0) {
-            <span class="stat-pill stat-pill--accepted">
-              <i class="bi bi-check-circle me-1"></i>
-              {{ totalAceptadas() }} {{ 'state.aceptada' | translate }}
-            </span>
-          }
-          @if (totalRechazadas() > 0) {
-            <span class="stat-pill stat-pill--rejected">
-              <i class="bi bi-x-circle me-1"></i>
-              {{ totalRechazadas() }} {{ 'state.rechazada' | translate }}
-            </span>
-          }
-        </div>
+  <!-- ── Cargando ────────────────────────────────────────────────────────── -->
+  @if (cargando()) {
+    <div class="ofs-grid" role="status">
+      <span class="cdk-visually-hidden">{{ 'common.loading' | translate }}</span>
+      @for (_ of [1, 2, 3, 4, 5, 6]; track $index) {
+        <span class="skel" aria-hidden="true"></span>
       }
     </div>
-  </header>
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       ESTADO: CARGANDO
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  @if (cargando()) {
-    <div class="page-loading">
-      <div class="spinner-border spinner-border-sm me-2" style="color:var(--ds-gold)" role="status">
-        <span class="visually-hidden">Cargandoâ€¦</span>
-      </div>
-      <span class="text-ink-muted">{{ 'common.loading' | translate }}</span>
-    </div>
-
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       ESTADO: SIN OFERTAS
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ── Sin ofertas: una sola acción ────────────────────────────────────── -->
   } @else if (ofertas().length === 0) {
-    <div class="empty-wrap fade-up">
-      <div class="card card-premium text-center px-4 px-lg-5 py-5">
-        <div class="empty-icon mx-auto mb-4">
-          <i class="bi bi-clipboard2-x"></i>
-        </div>
-        <h2 class="empty-title mb-2">{{ 'dashboard_builder.no_offers' | translate }}</h2>
-        <p class="text-ink-muted mb-4">{{ 'dashboard_builder.no_offers_text' | translate }}</p>
-        <div>
-          <a routerLink="/builder/available-files" class="btn btn-primary fw-semibold">
-            <i class="bi bi-search me-1"></i>{{ 'common.see_available' | translate }}
-          </a>
-        </div>
-      </div>
-    </div>
+    <app-empty-state class="ofs-empty"
+                     matIcon="request_quote"
+                     [titulo]="'dashboard_builder.no_offers' | translate"
+                     [texto]="'dashboard_builder.no_offers_text' | translate">
+      <a actions mat-flat-button class="ds-cta" routerLink="/builder/available-files">
+        <mat-icon>search</mat-icon>
+        {{ 'common.see_available' | translate }}
+      </a>
+    </app-empty-state>
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       CON DATOS
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
   } @else {
 
-    <!-- â”€â”€ KPI Strip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-    <div class="row g-3 mb-4 fade-up" style="--delay:40ms">
+    <!-- ── Búsqueda, filtro por estado (hace también de recuento) y vista ── -->
+    <div class="ofs-tools">
+      <mat-form-field class="ofs-search" appearance="outline" subscriptSizing="dynamic">
+        <mat-label>{{ 'common.search' | translate }}</mat-label>
+        <mat-icon matPrefix aria-hidden="true">search</mat-icon>
+        <input matInput type="search" autocomplete="off"
+               [placeholder]="'my_offers.search_placeholder' | translate"
+               [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)" />
+      </mat-form-field>
 
-      <div class="col-6 col-xl-3">
-        <div class="kpi-card kpi-card--neutral h-100">
-          <div class="kpi-icon-wrap kpi-icon-wrap--neutral">
-            <i class="bi bi-send"></i>
-          </div>
-          <div class="kpi-body">
-            <span class="kpi-label">{{ 'my_offers.total_sent' | translate }}</span>
-            <span class="kpi-value">{{ ofertas().length }}</span>
-          </div>
-        </div>
+      <div class="ofs-filter">
+        <span class="ofs-filter__label" id="ofs-state-label">{{ 'common.status' | translate }}</span>
+        <mat-button-toggle-group class="ofs-toggle" hideSingleSelectionIndicator
+                                 aria-labelledby="ofs-state-label"
+                                 [value]="filtroEstado()" (change)="filtroEstado.set($event.value)">
+          <mat-button-toggle value="todos">
+            {{ 'common.all' | translate }} <span class="ofs-count">{{ ofertas().length }}</span>
+          </mat-button-toggle>
+          <mat-button-toggle value="pendiente">
+            {{ 'state.pendiente' | translate }} <span class="ofs-count">{{ totalPendientes() }}</span>
+          </mat-button-toggle>
+          <mat-button-toggle value="aceptada">
+            {{ 'state.aceptada' | translate }} <span class="ofs-count">{{ totalAceptadas() }}</span>
+          </mat-button-toggle>
+          <mat-button-toggle value="rechazada">
+            {{ 'state.rechazada' | translate }} <span class="ofs-count">{{ totalRechazadas() }}</span>
+          </mat-button-toggle>
+        </mat-button-toggle-group>
       </div>
 
-      <div class="col-6 col-xl-3">
-        <div class="kpi-card kpi-card--warning h-100" [class.kpi-card--pulse]="totalPendientes() > 0">
-          <div class="kpi-icon-wrap kpi-icon-wrap--warning">
-            <i class="bi bi-hourglass"></i>
-          </div>
-          <div class="kpi-body">
-            <span class="kpi-label">{{ 'dashboard_builder.pending' | translate }}</span>
-            <span class="kpi-value" style="color:var(--ds-warning)">{{ totalPendientes() }}</span>
-          </div>
-        </div>
-      </div>
+      <dl class="ofs-awarded">
+        <dt>{{ 'dashboard_builder.awarded_amount' | translate }}</dt>
+        <dd class="ofs-fig">{{ formatCosto(montoAdjudicado()) }}</dd>
+      </dl>
 
-      <div class="col-6 col-xl-3">
-        <div class="kpi-card kpi-card--success h-100">
-          <div class="kpi-icon-wrap kpi-icon-wrap--success">
-            <i class="bi bi-check-circle"></i>
-          </div>
-          <div class="kpi-body">
-            <span class="kpi-label">{{ 'dashboard_builder.accepted' | translate }}</span>
-            <span class="kpi-value" style="color:var(--ds-success)">{{ totalAceptadas() }}</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-6 col-xl-3">
-        <div class="kpi-card kpi-card--gold h-100">
-          <div class="kpi-icon-wrap kpi-icon-wrap--gold">
-            <i class="bi bi-coin"></i>
-          </div>
-          <div class="kpi-body">
-            <span class="kpi-label">{{ 'dashboard_builder.awarded_amount' | translate }}</span>
-            <span class="kpi-value kpi-value--sm">{{ formatCosto(montoAdjudicado()) }}</span>
-          </div>
-        </div>
-      </div>
-
+      <mat-button-toggle-group class="ofs-toggle ofs-view" hideSingleSelectionIndicator
+                               [value]="vista()" (change)="setVista($event.value)">
+        <mat-button-toggle value="tarjetas" [aria-label]="'my_offers.view_cards' | translate"
+                           [matTooltip]="'my_offers.view_cards' | translate">
+          <mat-icon>grid_view</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="tabla" [aria-label]="'my_offers.view_table' | translate"
+                           [matTooltip]="'my_offers.view_table' | translate">
+          <mat-icon>table_rows</mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
     </div>
 
-    <!-- â”€â”€ Barra de filtros â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-    <div class="filter-bar mb-3 fade-up" style="--delay:80ms">
-
-      <div class="filter-search">
-        <i class="bi bi-search filter-search__icon"></i>
-        <input
-          type="search"
-          class="filter-input"
-          [ngModel]="busqueda()"
-          (ngModelChange)="busqueda.set($event)"
-          [placeholder]="'my_offers.search_placeholder' | translate"
-          autocomplete="off"
-        />
-      </div>
-
-      <div class="filter-section">
-        <span class="filter-label">{{ 'common.status' | translate }}</span>
-        <div class="seg-group">
-          <button type="button" class="seg-btn"
-                  [class.active]="filtroEstado() === 'todos'"
-                  (click)="filtroEstado.set('todos')">
-            {{ 'common.all' | translate }}
-          </button>
-          <button type="button" class="seg-btn seg-btn--warning"
-                  [class.active]="filtroEstado() === 'pendiente'"
-                  (click)="filtroEstado.set('pendiente')">
-            {{ 'state.pendiente' | translate }}
-          </button>
-          <button type="button" class="seg-btn seg-btn--success"
-                  [class.active]="filtroEstado() === 'aceptada'"
-                  (click)="filtroEstado.set('aceptada')">
-            {{ 'state.aceptada' | translate }}
-          </button>
-          <button type="button" class="seg-btn seg-btn--danger"
-                  [class.active]="filtroEstado() === 'rechazada'"
-                  (click)="filtroEstado.set('rechazada')">
-            {{ 'state.rechazada' | translate }}
-          </button>
-        </div>
-      </div>
-
-      @if (hayFiltros()) {
-        <button type="button" class="filter-clear" (click)="limpiarFiltros()">
-          <i class="bi bi-x-circle me-1"></i>{{ 'common.clear' | translate }}
-        </button>
-      }
-
-      <!-- Alternar vista tabla / tarjetas (solo escritorio) -->
-      <div class="view-toggle d-none d-md-inline-flex ms-md-auto" role="group"
-           [attr.aria-label]="'my_offers.view_cards' | translate">
-        <button type="button" class="view-toggle__btn"
-                [class.view-toggle__btn--active]="vista() === 'tabla'"
-                [attr.aria-pressed]="vista() === 'tabla'"
-                (click)="setVista('tabla')"
-                [title]="'my_offers.view_table' | translate">
-          <i class="bi bi-table" aria-hidden="true"></i>
-        </button>
-        <button type="button" class="view-toggle__btn"
-                [class.view-toggle__btn--active]="vista() === 'tarjetas'"
-                [attr.aria-pressed]="vista() === 'tarjetas'"
-                (click)="setVista('tarjetas')"
-                [title]="'my_offers.view_cards' | translate">
-          <i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>
-        </button>
-      </div>
-
-    </div>
-
-    <!-- â”€â”€ Conteo de resultados â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
     @if (hayFiltros()) {
-      <p class="results-count mb-3 fade-up">
-        <i class="bi bi-funnel me-1"></i>
-        {{ 'common.showing' | translate }}
-        <strong>{{ ofertasFiltradas().length }}</strong>
-        {{ 'common.of' | translate }} {{ ofertas().length }}
-        {{ 'common.offers_count' | translate }}
-      </p>
+      <div class="ofs-status">
+        <p class="ofs-showing" role="status">
+          {{ 'common.showing' | translate }} {{ ofertasFiltradas().length }}
+          {{ 'common.of' | translate }} {{ ofertas().length }} {{ 'common.offers_count' | translate }}
+        </p>
+        <button mat-button type="button" class="ofs-clear" (click)="limpiarFiltros()">
+          <mat-icon>close</mat-icon>
+          {{ 'common.clear' | translate }}
+        </button>
+      </div>
     }
 
-    <!-- â”€â”€ Sin resultados tras filtro â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+    <!-- ── Filtros sin resultados ─────────────────────────────────────────── -->
     @if (ofertasFiltradas().length === 0) {
-      <div class="empty-wrap fade-up">
-        <div class="card card-premium text-center px-4 px-lg-5 py-5">
-          <div class="empty-icon mx-auto mb-4">
-            <i class="bi bi-funnel"></i>
-          </div>
-          <h2 class="empty-title mb-2">{{ 'common.no_results' | translate }}</h2>
-          <p class="text-ink-muted mb-4">{{ 'my_offers.no_match' | translate }}</p>
-          <div>
-            <button class="btn btn-outline-secondary" (click)="limpiarFiltros()">
-              <i class="bi bi-x-circle me-1"></i>{{ 'common.clear_filters' | translate }}
-            </button>
-          </div>
-        </div>
-      </div>
+      <app-empty-state class="ofs-empty"
+                       matIcon="filter_alt_off"
+                       [titulo]="'common.no_results' | translate"
+                       [texto]="'my_offers.no_match' | translate">
+        <button actions mat-stroked-button type="button" (click)="limpiarFiltros()">
+          {{ 'common.clear_filters' | translate }}
+        </button>
+      </app-empty-state>
 
-    <!-- â”€â”€ CuadrÃ­cula de ofertas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
     } @else {
 
-      <!-- ── Vista tabla (solo escritorio) ──────────────────────────────────── -->
-      <div class="table-card d-none" [class.d-md-block]="vista() === 'tabla'">
-        <table class="offers-table">
-          <thead>
-            <tr>
-              <th class="offers-table__col-photo" aria-hidden="true"></th>
-              <th class="offers-table__col-num">{{ 'my_offers.col_number' | translate }}</th>
-              <th>{{ 'my_offers.col_service' | translate }}</th>
-              <th>{{ 'my_offers.col_location' | translate }}</th>
-              <th class="offers-table__col-price">{{ 'my_offers.col_price' | translate }}</th>
-              <th class="offers-table__col-status">{{ 'common.status' | translate }}</th>
-              <th class="offers-table__col-date">{{ 'my_offers.col_date' | translate }}</th>
-              <th class="offers-table__col-action"></th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (oferta of ofertasPaginadas(); track oferta.id) {
-              <tr class="offers-table__row offers-table__row--select"
-                  role="button" tabindex="0"
-                  [attr.aria-label]="oferta.expediente_numero + ' · ' + servicioNombre(oferta)"
-                  (click)="ver(oferta.id)"
-                  (keydown.enter)="ver(oferta.id)"
-                  (keydown.space)="$event.preventDefault(); ver(oferta.id)"
-                  [class.offers-table__row--accepted]="oferta.estado === 'aceptada'"
-                  [class.offers-table__row--rejected]="oferta.estado === 'rechazada'">
-
-                <td class="offers-table__col-photo">
-                  <div class="offers-thumb">
-                    @if (fotoExpediente(oferta); as foto) {
-                      <img [src]="foto" loading="lazy" [alt]="oferta.expediente_numero"
-                           (error)="onFotoError(oferta.id)" />
-                    } @else {
-                      <i class="bi bi-badge-3d" aria-hidden="true"
-                         [title]="'my_offers.photo_none' | translate"></i>
-                    }
-                  </div>
-                </td>
-
-                <td class="offers-table__col-num">
-                  <span class="offer-num">{{ oferta.expediente_numero }}</span>
-                </td>
-
-                <td><span class="offers-table__service">{{ servicioNombre(oferta) }}</span></td>
-
-                <td class="offers-table__muted">{{ oferta.provincia }}, {{ oferta.canton }}</td>
-
-                <td class="offers-table__col-price">
-                  <span class="offers-table__price">{{ formatCosto(oferta.precio) }}</span>
-                </td>
-
-                <td class="offers-table__col-status">
-                  <span class="offer-badge"
-                        [class.offer-badge--pending]="oferta.estado === 'pendiente'"
-                        [class.offer-badge--accepted]="oferta.estado === 'aceptada'"
-                        [class.offer-badge--rejected]="oferta.estado === 'rechazada'"
-                        [class.badge-archivado]="oferta.estado === 'archivado'">
-                    <i class="bi {{ estadoIcon(oferta.estado) }} me-1"></i>
-                    {{ ('state.' + oferta.estado) | translate }}
-                  </span>
-                </td>
-
-                <td class="offers-table__col-date offers-table__muted">
-                  {{ formatFechaCorta(oferta.creado_en) }}
-                </td>
-
-                <td class="offers-table__col-action">
-                  <button class="btn btn-outline-secondary btn-sm fw-semibold
-                                 d-flex align-items-center justify-content-center gap-2"
-                          type="button"
-                          (click)="$event.stopPropagation(); ver(oferta.id)">
-                    <i class="bi bi-eye"></i>{{ 'offer.my_offer' | translate }}
-                  </button>
-                </td>
+      <!-- ── Tabla (escritorio, si se elige) ──────────────────────────────── -->
+      @if (vista() === 'tabla') {
+        <div class="ofs-table-wrap">
+          <table class="ofs-table">
+            <thead>
+              <tr>
+                <th scope="col">{{ 'my_offers.col_service' | translate }}</th>
+                <th scope="col">{{ 'my_offers.col_number' | translate }}</th>
+                <th scope="col">{{ 'my_offers.col_location' | translate }}</th>
+                <th scope="col" class="is-num">{{ 'my_offers.col_price' | translate }}</th>
+                <th scope="col">{{ 'common.status' | translate }}</th>
+                <th scope="col">{{ 'my_offers.col_date' | translate }}</th>
               </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-
-      <!-- ── Vista tarjetas (móvil siempre · escritorio por defecto) ─────────── -->
-      <div class="cards-grid fade-up" style="--delay:120ms"
-           [class.d-md-none]="vista() === 'tabla'">
-
-        @for (oferta of ofertasPaginadas(); track oferta.id) {
-            <div class="offer-card offer-card--select"
-                 role="button" tabindex="0"
-                 [attr.aria-label]="oferta.expediente_numero + ' · ' + servicioNombre(oferta)"
-                 (click)="ver(oferta.id)"
-                 (keydown.enter)="ver(oferta.id)"
-                 (keydown.space)="$event.preventDefault(); ver(oferta.id)"
-                 [class.offer-card--pending]="oferta.estado === 'pendiente'"
-                 [class.offer-card--accepted]="oferta.estado === 'aceptada'"
-                 [class.offer-card--rejected]="oferta.estado === 'rechazada'">
-
-              <!-- Foto del expediente (miniatura del tour 3D Matterport) -->
-              <div class="offer-photo">
-                @if (fotoExpediente(oferta); as foto) {
-                  <img class="offer-photo__img" [src]="foto" loading="lazy"
-                       [alt]="oferta.expediente_numero" (error)="onFotoError(oferta.id)" />
-                } @else {
-                  <div class="offer-photo__empty"
-                       [title]="'my_offers.photo_none' | translate">
-                    <i class="bi bi-badge-3d" aria-hidden="true"></i>
-                  </div>
-                }
-              </div>
-
-              <div class="offer-card__body d-flex flex-column">
-
-                <!-- â”€â”€ Fila 1: nÃºmero + estado + fecha â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-                <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
-                  <span class="offer-num">{{ oferta.expediente_numero }}</span>
-                  <span class="offer-badge"
-                        [class.offer-badge--pending]="oferta.estado === 'pendiente'"
-                        [class.offer-badge--accepted]="oferta.estado === 'aceptada'"
-                        [class.offer-badge--rejected]="oferta.estado === 'rechazada'"
-                        [class.badge-archivado]="oferta.estado === 'archivado'">
-                    <i class="bi {{ estadoIcon(oferta.estado) }} me-1"></i>
-                    {{ ('state.' + oferta.estado) | translate }}
-                  </span>
-                  <span class="offer-date ms-auto">
-                    <i class="bi bi-calendar3 me-1"></i>{{ formatFechaCorta(oferta.creado_en) }}
-                  </span>
-                </div>
-
-                <!-- â”€â”€ Servicio â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-                <h3 class="offer-servicio mb-2">{{ servicioNombre(oferta) }}</h3>
-
-                <!-- â”€â”€ UbicaciÃ³n â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-                <div class="offer-location">
-                  <div class="d-flex align-items-start gap-2 mb-1">
-                    <i class="bi bi-geo-alt offer-location__icon"></i>
-                    <span class="offer-location__main">{{ oferta.provincia }}, {{ oferta.canton }}</span>
-                  </div>
-                  <div class="d-flex align-items-start gap-2">
-                    <i class="bi bi-signpost offer-location__icon"></i>
-                    <span class="offer-location__detail">
-                      {{ oferta.distrito }} Â· {{ oferta.direccion }}
-                    </span>
-                  </div>
-                </div>
-
-                <!-- â”€â”€ Nota de estado â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-                @if (oferta.estado === 'aceptada') {
-                  <div class="offer-status-note offer-status-note--accepted mt-2">
-                    <i class="bi bi-check-circle me-1"></i>{{ 'offer.accepted_note' | translate }}
-                  </div>
-                } @else if (oferta.estado === 'rechazada') {
-                  <div class="offer-status-note offer-status-note--rejected mt-2">
-                    <i class="bi bi-info-circle me-1"></i>{{ 'offer.rejected_note' | translate }}
-                  </div>
-                }
-
-                <hr class="offer-divider my-2">
-
-                <!-- â”€â”€ Precio + Plazos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-                <div class="d-flex align-items-start justify-content-between gap-2 mb-3 flex-wrap">
-                  <div>
-                    <p class="offer-detail-label mb-0">{{ 'my_offers.my_price' | translate }}</p>
-                    <p class="offer-price mb-0">{{ formatCosto(oferta.precio) }}</p>
-                  </div>
-                  @if (oferta.fecha_inicio) {
-                    <div class="text-end">
-                      <p class="offer-detail-label mb-0">{{ 'my_offers.start_deadline' | translate }}</p>
-                      <p class="offer-detail-value mb-0">
-                        {{ formatFecha(oferta.fecha_inicio) }}
-                        @if (oferta.plazo_semanas_min || oferta.plazo_semanas_max) {
-                          <br><span class="text-ink-muted" style="font-size:var(--ds-text-2xs)">{{ formatPlazo(oferta.plazo_semanas_min, oferta.plazo_semanas_max) }}</span>
+            </thead>
+            <tbody>
+              @for (oferta of ofertasPaginadas(); track oferta.id) {
+                <!-- La fila entera abre la oferta; el foco de teclado va al enlace del servicio. -->
+                <tr class="ofs-table__row" (click)="ver(oferta.id)">
+                  <td>
+                    <div class="ofs-table__svc">
+                      <span class="ofs-thumb">
+                        @if (fotoExpediente(oferta); as foto) {
+                          <img [src]="foto" loading="lazy" alt="" (error)="onFotoError(oferta.id)" />
+                        } @else {
+                          <mat-icon aria-hidden="true">view_in_ar</mat-icon>
                         }
-                      </p>
+                      </span>
+                      <a class="ofs-table__link" [class.is-hidden-file]="sinDossier(oferta)"
+                         [routerLink]="['/builder/my-offer', oferta.id]"
+                         (click)="$event.stopPropagation()">
+                        {{ sinDossier(oferta) ? ('state_desc.archivado' | translate) : servicioNombre(oferta) }}
+                      </a>
                     </div>
-                  }
+                  </td>
+                  <td class="ofs-fig ofs-nowrap">{{ sinDossier(oferta) ? '' : oferta.expediente_numero }}</td>
+                  <td>{{ oferta.canton !== SIN_DATO ? oferta.canton + ', ' + oferta.provincia : '' }}</td>
+                  <td class="ofs-fig ofs-nowrap is-num ofs-table__price">{{ formatCosto(oferta.precio) }}</td>
+                  <td><app-status-chip [estado]="oferta.estado" /></td>
+                  <td class="ofs-fig ofs-nowrap">{{ formatFechaCorta(oferta.creado_en) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <!-- ── Tarjetas (en móvil siempre; en escritorio, salvo vista tabla) ── -->
+      <ul class="ofs-grid" [class.is-mobile-only]="vista() === 'tabla'">
+        @for (oferta of ofertasPaginadas(); track oferta.id) {
+          <li class="ofs-card" [class.is-out]="oferta.estado === 'rechazada' || oferta.estado === 'archivado'">
+            <span class="ofs-card__photo">
+              @if (fotoExpediente(oferta); as foto) {
+                <img [src]="foto" loading="lazy" alt="" (error)="onFotoError(oferta.id)" />
+              } @else {
+                <mat-icon aria-hidden="true">view_in_ar</mat-icon>
+              }
+            </span>
+
+            <div class="ofs-card__body">
+              <app-status-chip [estado]="oferta.estado" />
+
+              <!-- El enlace del título cubre la tarjeta entera (::after). -->
+              <h2 class="ofs-card__title" [class.is-hidden-file]="sinDossier(oferta)">
+                <a class="ofs-card__link" [routerLink]="['/builder/my-offer', oferta.id]">
+                  {{ sinDossier(oferta) ? ('state_desc.archivado' | translate) : servicioNombre(oferta) }}
+                </a>
+              </h2>
+              @if (!sinDossier(oferta)) {
+                <p class="ofs-card__num">{{ oferta.expediente_numero }}</p>
+              }
+
+              @if (oferta.canton !== SIN_DATO) {
+                <p class="ofs-card__place">
+                  <mat-icon aria-hidden="true">location_on</mat-icon>
+                  <span>
+                    {{ oferta.canton }}, {{ oferta.provincia }}
+                    @if (oferta.direccion && oferta.direccion !== SIN_DATO) {
+                      <span class="ofs-card__addr">{{ oferta.direccion }}{{ oferta.distrito && oferta.distrito !== SIN_DATO ? ', ' + oferta.distrito : '' }}</span>
+                    }
+                  </span>
+                </p>
+              }
+
+              @if (oferta.estado === 'aceptada') {
+                <p class="ofs-note is-ok">
+                  <mat-icon aria-hidden="true">check_circle</mat-icon>
+                  {{ 'offer.accepted_note' | translate }}
+                </p>
+              } @else if (oferta.estado === 'rechazada') {
+                <p class="ofs-note">
+                  <mat-icon aria-hidden="true">info</mat-icon>
+                  {{ 'offer.rejected_note' | translate }}
+                </p>
+              }
+
+              <dl class="ofs-card__facts">
+                <div>
+                  <dt>{{ 'my_offers.my_price' | translate }}</dt>
+                  <dd class="ofs-card__price">{{ formatCosto(oferta.precio) }}</dd>
                 </div>
+                @if (oferta.fecha_inicio) {
+                  <div>
+                    <dt>{{ 'my_offers.start_deadline' | translate }}</dt>
+                    <dd class="ofs-fig">
+                      {{ formatFecha(oferta.fecha_inicio) }}
+                      @if (formatPlazo(oferta.plazo_semanas_min, oferta.plazo_semanas_max)) {
+                        <span class="ofs-card__sub">{{ formatPlazo(oferta.plazo_semanas_min, oferta.plazo_semanas_max) }} {{ 'offer.weeks' | translate }}</span>
+                      }
+                    </dd>
+                  </div>
+                }
+              </dl>
 
-                <!-- â”€â”€ CTA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-                <button class="offer-cta mt-1"
-                        [class.offer-cta--pending]="oferta.estado === 'pendiente'"
-                        [class.offer-cta--accepted]="oferta.estado === 'aceptada'"
-                        [class.offer-cta--rejected]="oferta.estado === 'rechazada'"
-                        type="button" (click)="$event.stopPropagation(); ver(oferta.id)">
-                  <i class="bi bi-eye me-1"></i>{{ 'offer.my_offer' | translate }}
-                </button>
-
-              </div>
+              <p class="ofs-card__date">
+                <mat-icon aria-hidden="true">send</mat-icon>
+                <span><span class="cdk-visually-hidden">{{ 'my_offers.col_date' | translate }} </span>{{ formatFechaCorta(oferta.creado_en) }}</span>
+              </p>
             </div>
+          </li>
         }
-
-      </div>
+      </ul>
 
       <app-pagination
         [total]="ofertasFiltradas().length"
         [page]="paginaActual()"
         [pageSize]="POR_PAGINA"
-        (pageChange)="paginaActual.set($event)">
-      </app-pagination>
-
-      <div class="mt-4 text-center">
-        <a routerLink="/builder/available-files" class="btn btn-outline-secondary">
-          <i class="bi bi-search me-1"></i>{{ 'common.see_available' | translate }}
-        </a>
-      </div>
-
+        (pageChange)="paginaActual.set($event)" />
     }
-
   }
 
 </div>
-
-

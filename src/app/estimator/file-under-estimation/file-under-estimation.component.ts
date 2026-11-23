@@ -1,5 +1,11 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -16,15 +22,21 @@ import { EdgeErrorService } from '../../services/edge-error.service';
 import { MatterportService } from '../../services/matterport.service';
 import { MatterportModelo } from '../../models/matterport.model';
 import { MatterportInfoComponent } from '../../shared/ui/matterport-info/matterport-info.component';
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../shared/ui/empty-state/empty-state.component';
 import { CampoExtra, CamposFaltantesComponent, listaEstable } from '../../shared/ui/campos-faltantes/campos-faltantes.component';
 import { VideoExpedienteComponent } from '../../shared/ui/presentacion-videos/video-expediente.component';
 
 @Component({
   selector: 'app-file-under-estimation',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, TranslatePipe, MatterportInfoComponent, CamposFaltantesComponent, VideoExpedienteComponent],
+  imports: [
+    FormsModule, TranslatePipe,
+    MatButtonModule, MatCheckboxModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTooltipModule,
+    PageHeaderComponent, EmptyStateComponent, MatterportInfoComponent, CamposFaltantesComponent, VideoExpedienteComponent,
+  ],
   templateUrl: './file-under-estimation.component.html',
-  styleUrl:    './file-under-estimation.component.css',
+  styleUrls:   ['../../shared/ui/ficha/ficha.css', './file-under-estimation.component.css'],
 })
 export class FileUnderEstimationComponent implements OnInit {
   private auth              = inject(AuthSupabaseService);
@@ -134,6 +146,17 @@ export class FileUnderEstimationComponent implements OnInit {
       this.horaVisita &&
       this.descripcionProblema.trim()
     );
+  }
+
+  /** Lista de comprobación bajo el informe (lo que falta se ve sin intentar enviar). */
+  get checklist(): { label: string; ok: boolean; opcional?: boolean }[] {
+    return [
+      { label: 'estimator_file.check_visit_date',  ok: !!this.fechaVisita },
+      { label: 'estimator_file.check_visit_time',  ok: !!this.horaVisita },
+      { label: 'estimator_file.problems_observed', ok: !!this.descripcionProblema.trim() },
+      { label: 'estimator_file.approx_cost',
+        ok: this.costoMin !== null && this.costoMax !== null && this.costoValido, opcional: true },
+    ];
   }
 
   get costoValido(): boolean {

@@ -1,0 +1,166 @@
+/* component: cabecera pública con menú móvil (Trait rouge; sale de la landing)
+ * states: enlaces default · hover (solo puntero fino) · focus-visible · página actual (aria-current)
+ *         cabecera arriba / con scroll (filete) ; menú abierto / cerrado
+ * contrast: enlaces ink-secondary sobre crema (9.1:1) · página actual ink con subrayado abeto
+ *           tomate: «Créer mon dossier» solo con ctaTomate; si no, de contorno
+ */
+/* contents: la cabecera es sticky respecto a la página, no a esta etiqueta. */
+:host { display: contents; }
+
+/* ── Cabecera ───────────────────────────────────────────────────────────── */
+.hd {
+  position: sticky;
+  top: 0;
+  z-index: var(--ds-z-sticky);
+  background: var(--ds-bg);
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--ds-duration-base) var(--ds-ease-out);
+}
+.hd.is-scrolled { border-bottom-color: var(--ds-border); }
+
+.hd__in {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-5);
+  min-height: var(--hd-h);
+}
+.hd__nav { display: none; }
+.hd__end {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  margin-left: auto;
+}
+
+.hd__link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  min-height: 44px;
+  padding: 0 var(--ds-space-3);
+  border-radius: var(--ds-radius-md);
+  color: var(--ds-ink-secondary);
+  font-weight: var(--ds-weight-medium);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: var(--ds-transition-color);
+}
+.hd__link:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
+.hd__link mat-icon { width: 20px; height: 20px; font-size: 20px; }
+.hd__login { color: var(--ds-ink); font-weight: var(--ds-weight-bold); }
+@media (hover: hover) and (pointer: fine) {
+  .hd__link:hover { color: var(--ds-ink); background: var(--ds-bg-alt); }
+}
+
+.hd__tel,
+.hd__lang,
+.hd__login,
+.hd__cta { display: none; }
+
+.hd__langmenu {
+  --mat-button-text-label-text-color: var(--ds-ink-secondary);
+  --mat-button-text-horizontal-padding: var(--ds-space-3);
+  min-height: 44px;
+}
+.hd__menu { --mat-icon-button-icon-color: var(--ds-ink); }
+.is-blank { visibility: hidden; }
+
+@media (min-width: 1200px) {
+  .hd__nav { display: flex; gap: var(--ds-space-1); }
+  .hd__lang,
+  .hd__login { display: inline-flex; }
+  /* De contorno mientras el CTA del hero se ve; tomate cuando él solo queda a la vista. */
+  .hd__cta { display: inline-flex; flex-shrink: 0; margin-left: var(--ds-space-2); white-space: nowrap; }
+  .hd__langmenu,
+  .hd__menu { display: none; }
+}
+/* El teléfono entra cuando cabe sin apretar el botón (a 1440 px no cabe). */
+@media (min-width: 1560px) {
+  .hd__tel { display: inline-flex; }
+}
+
+.hd__link[aria-current='page'] {
+  color: var(--ds-ink);
+  font-weight: var(--ds-weight-bold);
+  text-decoration: underline;
+  text-decoration-color: var(--ds-action);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 8px;
+}
+
+/* ── Menú móvil: hoja que baja desde arriba (<dialog> nativo) ───────────── */
+.mm {
+  inset: 0 0 auto;
+  width: 100%;
+  max-width: 100%;
+  max-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 0;
+  border-radius: 0 0 var(--ds-radius-xl) var(--ds-radius-xl);
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+  box-shadow: var(--ds-shadow-xl);
+}
+.mm::backdrop { background: color-mix(in srgb, var(--ds-ink) 45%, transparent); }
+.mm__sheet {
+  display: grid;
+  gap: var(--ds-space-5);
+  padding: 0 var(--ds-space-4) max(var(--ds-space-5), env(safe-area-inset-bottom));
+}
+@media (min-width: 768px) {
+  .mm__sheet { padding-inline: var(--ds-space-5); }
+}
+.mm__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--hd-h);
+}
+.mm__close { --mat-icon-button-icon-color: var(--ds-ink); }
+.mm__nav { display: grid; }
+.mm__nav a {
+  display: flex;
+  align-items: center;
+  min-height: 56px;
+  border-bottom: 1px solid var(--ds-border-subtle);
+  border-radius: var(--ds-radius-sm);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-2xl);
+  font-weight: var(--ds-weight-bold);
+  font-stretch: var(--ds-stretch-heading);
+  text-decoration: none;
+}
+.mm__nav a:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
+.mm__foot { display: grid; gap: var(--ds-space-3); }
+.mm__tel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  justify-self: start;
+  min-height: 44px;
+  border-radius: var(--ds-radius-sm);
+  color: var(--ds-ink-secondary);
+  font-weight: var(--ds-weight-medium);
+  text-decoration: none;
+}
+.mm__tel:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .mm,
+  .mm::backdrop {
+    transition: opacity 240ms var(--ds-ease-out), transform 240ms var(--ds-ease-out),
+                overlay 240ms allow-discrete, display 240ms allow-discrete;
+  }
+  .mm:not([open]) { opacity: 0; transform: translateY(-12px); transition-duration: 160ms; }
+  .mm:not([open])::backdrop { opacity: 0; transition-duration: 160ms; }
+  @starting-style {
+    .mm[open] { opacity: 0; transform: translateY(-12px); }
+    .mm[open]::backdrop { opacity: 0; }
+  }
+}
+
+.mm__nav a[aria-current='page'] { color: var(--ds-action); }

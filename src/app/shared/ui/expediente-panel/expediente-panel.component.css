@@ -1,93 +1,107 @@
-/* component: expediente-panel (acordeón por expediente)
- * Misma cabecera que /client/my-documents/list (.md-exp): carpeta dorada, número
- * en la fuente display, cifras a la derecha y chevron. Prefijo propio `xp-`.
+/* component: expediente-panel (acordeón por expediente, Trait rouge)
  * states: default · hover · focus-visible · active · abierto/cerrado
- * contrast: texto en --ds-ink / --ds-ink-secondary (AA) · tokens: --ds-* only
+ * contrast: número ink (13.6:1 sobre vélin) · cifras ink-secondary (9.6:1) · chevron ink-secondary
+ * type: «Dossier» al 112 %, el número al 75 % con tabular-nums
  */
 
 :host { display: block; }
 
 .xp {
-  background: var(--ds-surface);
+  overflow: hidden;
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
-  box-shadow: var(--ds-shadow-xs);
-  overflow: hidden;
+  background: var(--ds-surface);
 }
 
+.xp__h { margin: 0; font: inherit; }
+
 .xp__head {
-  width: 100%;
   display: flex;
   align-items: center;
   gap: var(--ds-space-4);
-  padding: var(--ds-space-4) var(--ds-space-5);
+  width: 100%;
+  min-height: 64px;
+  padding: var(--ds-space-3) var(--ds-space-5);
+  border: 0;
   background: transparent;
-  border: none;
-  cursor: pointer;
-  text-align: left;
   color: var(--ds-ink);
   font-family: var(--ds-font-body);
-  transition: background var(--ds-duration-fast) var(--ds-ease-out);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--ds-duration-fast) var(--ds-ease-out);
+  -webkit-tap-highlight-color: transparent;
 }
-.xp__head:hover { background: var(--ds-bg-alt); }
+@media (hover: hover) and (pointer: fine) {
+  .xp__head:hover { background: var(--ds-bg-alt); }
+}
 .xp__head:active { background: var(--ds-border-subtle); }
-.xp__head:focus-visible { outline: 2px solid var(--ds-gold-active); outline-offset: -2px; }
+/* Dentro del panel (overflow hidden): contorno hacia dentro. */
+.xp__head:focus-visible { outline: var(--ds-focus-outline); outline-offset: -4px; }
 
-.xp__title {
-  flex: 1 1 auto;
-  min-width: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-space-3);
-}
 .xp__tile {
-  flex: 0 0 auto;
   display: grid;
+  flex-shrink: 0;
   place-items: center;
   width: 40px;
   height: 40px;
-  font-size: var(--ds-text-lg);
-  color: var(--ds-gold-ink);
-  background: var(--ds-gold-soft);
   border-radius: var(--ds-radius-md);
-}
-.xp__num {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-medium);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  background: var(--ds-band);
+  color: var(--ds-ink-secondary);
 }
 
-/* Cifras de la cabecera (las pone quien usa el panel) */
+.xp__num {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-lg);
+  font-weight: var(--ds-weight-bold);
+  font-stretch: var(--ds-stretch-heading);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.xp__fig {
+  font-stretch: var(--ds-stretch-figure);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Cifras de la cabecera (las pone quien usa el panel). */
 .xp__meta {
   display: inline-flex;
-  align-items: center;
-  gap: var(--ds-space-3);
-  color: var(--ds-ink-secondary);
-  font-size: var(--ds-text-xs);
   flex-wrap: wrap;
+  align-items: center;
   justify-content: flex-end;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  font-size: var(--ds-text-sm);
+  color: var(--ds-ink-secondary);
 }
 .xp__meta:empty { display: none; }
 
-.xp__chev { color: var(--ds-ink-secondary); font-size: var(--ds-text-base); flex-shrink: 0; }
+.xp__chev {
+  flex-shrink: 0;
+  color: var(--ds-ink-secondary);
+  transition: transform var(--ds-duration-base) var(--ds-ease-out);
+}
+.xp__chev.is-open { transform: rotate(180deg); }
 
 .xp__body {
-  padding: var(--ds-space-4) var(--ds-space-5) var(--ds-space-5);
-  border-top: 1px solid var(--ds-border);
   display: flex;
   flex-direction: column;
   gap: var(--ds-space-4);
+  padding: var(--ds-space-4) var(--ds-space-5) var(--ds-space-5);
+  border-top: 1px solid var(--ds-border);
 }
-/* Con tarjetas dentro: fondo alterno, para no apilar tarjeta sobre tarjeta. */
-.xp__body--bandeja { background: var(--ds-bg-alt); }
+/* Con tarjetas dentro: fondo crema, para no apilar vélin sobre vélin. */
+.xp__body--bandeja { background: var(--ds-bg); }
 
 @media (max-width: 640px) {
-  .xp__head { padding: var(--ds-space-3) var(--ds-space-4); gap: var(--ds-space-3); }
+  .xp__head { gap: var(--ds-space-3); padding: var(--ds-space-3) var(--ds-space-4); }
   .xp__body { padding: var(--ds-space-3) var(--ds-space-3) var(--ds-space-4); }
   .xp__meta { display: none; }
   /* El número identifica la tarjeta: en estrecho se parte, no se corta. */
-  .xp__num { white-space: normal; overflow-wrap: anywhere; font-size: var(--ds-text-base); }
+  .xp__num { font-size: var(--ds-text-base); white-space: normal; overflow-wrap: anywhere; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp__chev { transition: none; }
 }

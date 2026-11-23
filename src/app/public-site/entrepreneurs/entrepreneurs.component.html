@@ -1,195 +1,168 @@
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     Estimation3D — Entrepreneurs (página pública)
-     Portado de "Estimation3D - Entrepreneurs.html". El texto vive en i18n bajo
-     `entrepreneurs.*`; la cabecera y el pie comparten las claves `landing.*`.
-     ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- Entrepreneurs, dirección Trait rouge. El texto vive en i18n bajo `entrepreneurs.*`;
+     cabecera y pie son los compartidos (claves `landing.*`). -->
+<a class="skip" href="#contenu" (click)="goTo('contenu', $event)">{{ 'nav.skip' | translate }}</a>
 
-<!-- ─────────── HEADER ─────────── -->
-<header class="hdr" [class.scrolled]="scrolled()">
-  <div class="in">
-    <a routerLink="/" class="brand" [attr.aria-label]="'landing.nav.home_aria' | translate">
-      <span class="reticle"><i></i></span>
-      <span class="e3">Estimation<b>3D</b></span>
-    </a>
+<!-- Aquí la siguiente etapa es postular: «Créer mon dossier» de la cabecera va de contorno. -->
+<app-site-header pagina="entrepreneurs" [ctaTomate]="false" />
 
-    <nav class="nav-links">
-      <a routerLink="/" fragment="processus">{{ 'landing.nav.process' | translate }}</a>
-      <a routerLink="/" fragment="services">{{ 'landing.nav.specialties' | translate }}</a>
-      <a routerLink="/journal">{{ 'landing.nav.journal' | translate }}</a>
-      <a routerLink="/entrepreneurs" class="gold-txt" aria-current="page">{{ 'landing.nav.contractors' | translate }}</a>
-      <a class="tel" href="tel:+15145108819" [attr.aria-label]="'landing.nav.phone_aria' | translate">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.2 2.2 6.6 5 5.3 6.4a8.6 8.6 0 0 0 4.3 4.3L11 9.4l2.8 1.4v2.4a1 1 0 0 1-1.1 1A11.5 11.5 0 0 1 2.2 3.3a1 1 0 0 1 1-1.1h2Z"/></svg>
-        514&nbsp;510-8819
-      </a>
-    </nav>
+<main id="contenu" tabindex="-1">
 
-    <div class="hdr-actions">
-      <a href="#form" class="e3-btn cta" (click)="goTo('form', $event)">
-        {{ 'landing.footer.apply' | translate }}
-        <svg class="ar" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M1 6h13M10 1l5 5-5 5"/></svg>
-      </a>
-      <a routerLink="/login" class="login">{{ 'landing.nav.login' | translate }}</a>
-    </div>
+  <!-- ── El dossier que recibe el entrepreneur ─────────────────────────────── -->
+  <section class="en-hero" aria-labelledby="en-title">
+    <div class="wrap">
+      <nav class="crumbs" [attr.aria-label]="'journal.crumbs.aria' | translate">
+        <ol>
+          <li><a routerLink="/">{{ 'entrepreneurs.crumbs.home' | translate }}</a></li>
+          <li aria-current="page">{{ 'entrepreneurs.crumbs.current' | translate }}</li>
+        </ol>
+      </nav>
 
-    <button class="burger" type="button" (click)="toggleMenu()"
-            [attr.aria-label]="'landing.nav.menu' | translate"
-            [attr.aria-expanded]="menuOpen()">
-      <span></span><span></span><span></span>
-    </button>
-  </div>
-</header>
-
-<nav class="mobile-nav" [class.open]="menuOpen()">
-  <a routerLink="/" fragment="processus" (click)="closeMenu()"><span class="num">01</span><span>{{ 'landing.nav.process' | translate }}</span></a>
-  <a routerLink="/" fragment="services" (click)="closeMenu()"><span class="num">02</span><span>{{ 'landing.nav.specialties' | translate }}</span></a>
-  <a routerLink="/journal" (click)="closeMenu()"><span class="num">03</span><span>{{ 'landing.nav.journal' | translate }}</span></a>
-  <a routerLink="/entrepreneurs" (click)="closeMenu()"><span class="num">04</span><span>{{ 'landing.nav.contractors' | translate }}</span></a>
-  <a href="tel:+15145108819" (click)="closeMenu()" [attr.aria-label]="'landing.nav.phone_aria' | translate"><span class="num">05</span><span>514&nbsp;510-8819</span></a>
-  <a href="#form" (click)="goTo('form', $event)"><span class="num">06</span><span>{{ 'landing.footer.apply' | translate }}</span></a>
-  <a routerLink="/login" (click)="closeMenu()"><span class="num">07</span><span>{{ 'landing.nav.login' | translate }}</span></a>
-</nav>
-
-<main>
-
-  <!-- ─────────── SUB-HERO ─────────── -->
-  <section class="subhero">
-    <div class="glow" aria-hidden="true"></div>
-    <div class="e3-container">
-      <div class="scan-feature">
-        <div>
-          <div class="crumbs" e3Reveal>
-            <a routerLink="/">{{ 'entrepreneurs.crumbs.home' | translate }}</a>
-            <span class="sep">/</span>
-            <span>{{ 'entrepreneurs.crumbs.current' | translate }}</span>
-          </div>
-          <span class="kicker mt-18" e3Reveal="1">{{ 'entrepreneurs.hero.kicker' | translate }}</span>
-          <h1 class="mt-18" e3Reveal="1">
-            {{ 'entrepreneurs.hero.title_1' | translate }}<br />
-            <span class="gold-txt">{{ 'entrepreneurs.hero.title_2' | translate }}</span>
+      <div class="en-hero__in">
+        <div class="en-hero__copy">
+          <h1 class="en-hero__title" id="en-title">
+            <span>{{ 'entrepreneurs.hero.title_1' | translate }}</span>
+            <span>{{ 'entrepreneurs.hero.title_2' | translate }}</span>
           </h1>
-          <p class="lede" e3Reveal="2">{{ 'entrepreneurs.hero.lede' | translate }}</p>
-          <div class="hero-cta" e3Reveal="2">
-            <a href="#form" class="e3-btn" (click)="goTo('form', $event)">
-              {{ 'entrepreneurs.hero.cta' | translate }}
-              <svg class="ar" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M1 6h13M10 1l5 5-5 5"/></svg>
-            </a>
-            <a href="#how" class="e3-btn ghost" (click)="goTo('how', $event)">{{ 'entrepreneurs.hero.cta_how' | translate }}</a>
+          <p class="en-hero__lede">{{ 'entrepreneurs.hero.lede' | translate }}</p>
+          <div class="en-hero__actions">
+            <a class="button button--lg button--cta" href="#form" (click)="goTo('form', $event)">{{ 'entrepreneurs.hero.cta' | translate }}</a>
+            <a class="link" href="#how" (click)="goTo('how', $event)">{{ 'entrepreneurs.hero.cta_how' | translate }}</a>
           </div>
+          <!-- Como el precio bajo el botón de la landing: un dato, no una etiqueta sobre el título. -->
+          <p class="en-hero__pilot">
+            <mat-icon aria-hidden="true">handshake</mat-icon>
+            {{ 'entrepreneurs.hero.kicker' | translate }}
+          </p>
         </div>
 
-        <div class="dossier-card" e3Reveal="2" e3Sweep>
-          <span class="corner tl"></span><span class="corner tr"></span>
-          <span class="corner bl"></span><span class="corner br"></span>
-          <div class="imgwrap">
-            <img src="assets/landing/scan-plan-jolicoeur.jpg"
+        <!-- Ficha del dossier: el plano real y lo que ya trae. Sin animación: el
+             momento de barrido es de la landing. -->
+        <figure class="doc">
+          <div class="doc__ph">
+            <img class="doc__img" ngSrc="assets/landing/scan-plan-jolicoeur.jpg" width="850" height="920" priority
                  [alt]="'entrepreneurs.hero.img_alt' | translate" />
-            <div class="sweep" aria-hidden="true"></div>
           </div>
-          <div class="bar">
-            <span class="data live"><span class="dot"></span><span>{{ 'entrepreneurs.hero.badge_ready' | translate }}</span></span>
-            <span class="data">786 ft² · <span class="v">{{ 'entrepreneurs.hero.badge_bids' | translate }}</span></span>
-          </div>
-        </div>
+          <ul class="doc__bar">
+            <li class="doc__ready"><mat-icon aria-hidden="true">check_circle</mat-icon>{{ 'entrepreneurs.hero.badge_ready' | translate }}</li>
+            <li class="doc__fig"><mat-icon aria-hidden="true">square_foot</mat-icon><span class="doc__n">786&nbsp;ft²</span></li>
+            <li class="doc__fig"><mat-icon aria-hidden="true">request_quote</mat-icon><span class="doc__n">{{ 'entrepreneurs.hero.badge_bids' | translate }}</span></li>
+          </ul>
+        </figure>
       </div>
     </div>
   </section>
 
-  <!-- ─────────── [01] LE PROBLÈME ─────────── -->
-  <section class="alt">
-    <div class="e3-container">
-      <div class="sec-head">
-        <span class="idx" e3Reveal>[ 01 ]</span>
-        <h2 e3Reveal>
-          {{ 'entrepreneurs.problem.title_1' | translate }}
-          <span class="display-dim">{{ 'entrepreneurs.problem.title_2' | translate }}</span>
+  <!-- ── El problema ───────────────────────────────────────────────────────── -->
+  <section class="sec sec--band" aria-labelledby="en-prob-title">
+    <div class="wrap">
+      <header class="sec__head">
+        <h2 class="sec__title" id="en-prob-title">
+          {{ 'entrepreneurs.problem.title_1' | translate }} {{ 'entrepreneurs.problem.title_2' | translate }}
         </h2>
-        <p class="sub" e3Reveal="1">{{ 'entrepreneurs.problem.sub' | translate }}</p>
-      </div>
+        <p class="sec__lead">{{ 'entrepreneurs.problem.sub' | translate }}</p>
+      </header>
 
-      <div class="prob-grid">
-        @for (c of problemCells; track c.id; let i = $index) {
-          <div class="cell" [e3Reveal]="i">
-            <span class="n">{{ c.n }}</span>
-            <h3>{{ 'entrepreneurs.problem.cells.' + c.id + '.title' | translate }}</h3>
-            <p>{{ 'entrepreneurs.problem.cells.' + c.id + '.text' | translate }}</p>
-          </div>
+      <ul class="en-prob">
+        @for (c of problemCells; track c.id) {
+          <li class="en-prob__item">
+            <mat-icon aria-hidden="true">{{ c.matIcon }}</mat-icon>
+            <h3 class="en-item__title">{{ 'entrepreneurs.problem.cells.' + c.id + '.title' | translate }}</h3>
+            <p class="en-item__text">{{ 'entrepreneurs.problem.cells.' + c.id + '.text' | translate }}</p>
+          </li>
         }
-      </div>
+      </ul>
     </div>
   </section>
 
-  <!-- ─────────── [02] LE PROCESSUS ─────────── -->
-  <section id="how">
-    <div class="e3-container">
-      <div class="sec-head">
-        <span class="idx" e3Reveal>[ 02 ]</span>
-        <h2 e3Reveal>
-          {{ 'entrepreneurs.how.title_1' | translate }}
-          <span class="display-dim">{{ 'entrepreneurs.how.title_2' | translate }}</span>
+  <!-- ── El proceso ────────────────────────────────────────────────────────── -->
+  <section class="sec" id="how" tabindex="-1" aria-labelledby="en-how-title">
+    <div class="wrap">
+      <header class="sec__head">
+        <h2 class="sec__title" id="en-how-title">
+          {{ 'entrepreneurs.how.title_1' | translate }} {{ 'entrepreneurs.how.title_2' | translate }}
         </h2>
-        <p class="sub" e3Reveal="1">{{ 'entrepreneurs.how.sub' | translate }}</p>
-      </div>
+        <p class="sec__lead">{{ 'entrepreneurs.how.sub' | translate }}</p>
+      </header>
 
-      <ol class="steps" e3Reveal>
-        @for (s of steps; track s.id) {
+      <ol class="en-steps">
+        @for (s of steps; track s; let i = $index) {
           <li class="step">
-            <span class="num">{{ s.n }}</span>
-            <h4>{{ 'entrepreneurs.how.steps.' + s.id + '.title' | translate }}</h4>
-            <p>{{ 'entrepreneurs.how.steps.' + s.id + '.text' | translate }}</p>
+            <span class="step__n" aria-hidden="true">{{ i + 1 }}</span>
+            <h3 class="step__title">{{ 'entrepreneurs.how.steps.' + s + '.title' | translate }}</h3>
+            <p class="step__text">{{ 'entrepreneurs.how.steps.' + s + '.text' | translate }}</p>
           </li>
         }
       </ol>
     </div>
   </section>
 
-  <div class="dimline">
-    <span class="seg"></span>
-    <span class="lbl"><b>{{ 'entrepreneurs.benefits.label' | translate }}</b></span>
-    <span class="seg"></span>
-  </div>
+  <!-- ── Lo que obtiene ────────────────────────────────────────────────────── -->
+  <section class="sec sec--rule" aria-labelledby="en-ben-title">
+    <div class="wrap">
+      <header class="sec__head">
+        <h2 class="sec__title" id="en-ben-title">{{ 'entrepreneurs.benefits.label' | translate }}</h2>
+        <p class="sec__lead">
+          {{ 'entrepreneurs.benefits.title_1' | translate }} {{ 'entrepreneurs.benefits.title_2' | translate }}
+        </p>
+      </header>
 
-  <!-- ─────────── [03] CE QUE VOUS OBTENEZ ─────────── -->
-  <section class="pt-30">
-    <div class="e3-container">
-      <div class="sec-head">
-        <span class="idx" e3Reveal>[ 03 ]</span>
-        <h2 e3Reveal>
-          {{ 'entrepreneurs.benefits.title_1' | translate }}
-          <span class="display-dim">{{ 'entrepreneurs.benefits.title_2' | translate }}</span>
-        </h2>
-      </div>
-
-      <div class="benefits" e3Reveal>
+      <ul class="en-ben__grid">
         @for (b of benefits; track b.id) {
-          <div class="b">
-            <span class="num">{{ b.n }}</span>
-            <h4>{{ 'entrepreneurs.benefits.items.' + b.id + '.title' | translate }}</h4>
-            <p>{{ 'entrepreneurs.benefits.items.' + b.id + '.text' | translate }}</p>
-          </div>
+          <li class="en-ben__item">
+            <mat-icon aria-hidden="true">{{ b.matIcon }}</mat-icon>
+            <h3 class="en-item__title">{{ 'entrepreneurs.benefits.items.' + b.id + '.title' | translate }}</h3>
+            <p class="en-item__text">{{ 'entrepreneurs.benefits.items.' + b.id + '.text' | translate }}</p>
+          </li>
         }
-      </div>
+      </ul>
     </div>
   </section>
 
-  <!-- ─────────── [04] EXIGENCES ─────────── -->
-  <section class="alt">
-    <div class="e3-container">
-      <div class="sec-head">
-        <span class="idx" e3Reveal>[ 04 ]</span>
-        <h2 e3Reveal>
-          {{ 'entrepreneurs.req.title_1' | translate }}
-          <span class="display-dim">{{ 'entrepreneurs.req.title_2' | translate }}</span>
+  <!-- ── Exigencias ────────────────────────────────────────────────────────── -->
+  <section class="sec sec--band" aria-labelledby="en-req-title">
+    <div class="wrap en-split">
+      <header class="sec__head en-split__head">
+        <h2 class="sec__title" id="en-req-title">
+          {{ 'entrepreneurs.req.title_1' | translate }} {{ 'entrepreneurs.req.title_2' | translate }}
         </h2>
-        <p class="sub" e3Reveal="1">{{ 'entrepreneurs.req.sub' | translate }}</p>
-      </div>
+        <p class="sec__lead">{{ 'entrepreneurs.req.sub' | translate }}</p>
+      </header>
 
-      <ul class="req-list" e3Reveal>
+      <ul class="en-req">
         @for (r of requirements; track r) {
           <li>
-            <svg class="ic" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M3 9l4 4 8-9"/></svg>
-            <div>
+            <mat-icon aria-hidden="true">check_circle</mat-icon>
+            <p>
               <strong>{{ 'entrepreneurs.req.items.' + r + '.strong' | translate }}</strong>
-              <span>{{ 'entrepreneurs.req.items.' + r + '.rest' | translate }}</span>
+              {{ 'entrepreneurs.req.items.' + r + '.rest' | translate }}
+            </p>
+          </li>
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── Dominios y plazas del piloto ──────────────────────────────────────── -->
+  <section class="sec" aria-labelledby="en-specs-title">
+    <div class="wrap">
+      <header class="sec__head">
+        <h2 class="sec__title" id="en-specs-title">
+          {{ 'entrepreneurs.specs.title_1' | translate }} {{ 'entrepreneurs.specs.title_2' | translate }}
+        </h2>
+        <p class="sec__lead">{{ 'entrepreneurs.specs.sub' | translate }}</p>
+      </header>
+
+      <ul class="svc">
+        @for (s of specialtySlots; track s.id) {
+          <li class="svc__item">
+            <div class="svc__ph"><img [ngSrc]="s.img" fill alt="" /></div>
+            <div class="svc__body">
+              <h3 class="svc__title">{{ 'entrepreneurs.specs.items.' + s.id + '.title' | translate }}</h3>
+              <p class="svc__text">{{ 'entrepreneurs.specs.items.' + s.id + '.text' | translate }}</p>
+              <p class="en-avail" [class.is-full]="s.avail === 'full'">
+                <mat-icon aria-hidden="true">{{ (s.avail === 'full' ? availIcon.full : availIcon.open).matIcon }}</mat-icon>
+                {{ 'entrepreneurs.specs.avail.' + s.avail | translate }}
+              </p>
             </div>
           </li>
         }
@@ -197,54 +170,28 @@
     </div>
   </section>
 
-  <!-- ─────────── [05] DOMAINES ─────────── -->
-  <section>
-    <div class="e3-container">
-      <div class="sec-head">
-        <span class="idx" e3Reveal>[ 05 ]</span>
-        <h2 e3Reveal>
-          {{ 'entrepreneurs.specs.title_1' | translate }}
-          <span class="display-dim">{{ 'entrepreneurs.specs.title_2' | translate }}</span>
-        </h2>
-        <p class="sub" e3Reveal="1">{{ 'entrepreneurs.specs.sub' | translate }}</p>
-      </div>
+  <!-- ── Preguntas frecuentes ──────────────────────────────────────────────── -->
+  <section class="sec sec--band" aria-labelledby="en-faq-title">
+    <div class="wrap en-split">
+      <header class="sec__head en-split__head">
+        <h2 class="sec__title" id="en-faq-title">{{ 'entrepreneurs.faq.title' | translate }}</h2>
+      </header>
 
-      <div class="spec-grid" e3Reveal>
-        @for (s of specialtySlots; track s.id) {
-          <article class="spec">
-            <span class="num">{{ s.n }}</span>
-            <h4>{{ 'entrepreneurs.specs.items.' + s.id + '.title' | translate }}</h4>
-            <p>{{ 'entrepreneurs.specs.items.' + s.id + '.text' | translate }}</p>
-            <span class="avail" [class.full]="s.avail === 'full'">
-              {{ 'entrepreneurs.specs.avail.' + s.avail | translate }}
-            </span>
-          </article>
-        }
-      </div>
-    </div>
-  </section>
-
-  <!-- ─────────── [06] FAQ ─────────── -->
-  <section class="alt">
-    <div class="e3-container">
-      <div class="sec-head">
-        <span class="idx" e3Reveal>[ 06 ]</span>
-        <h2 e3Reveal>{{ 'entrepreneurs.faq.title' | translate }}</h2>
-      </div>
-
-      <div class="faq-list" e3Reveal>
+      <div class="faq">
         @for (f of faqIds; track f) {
-          <div class="faq-item" [class.open]="openFaq() === f">
-            <button class="faq-q" type="button" (click)="toggleFaq(f)"
-                    [attr.aria-expanded]="openFaq() === f" [attr.aria-controls]="'faq-' + f">
-              <span>{{ 'entrepreneurs.faq.items.' + f + '.q' | translate }}</span>
-              <span class="plus" aria-hidden="true">+</span>
-            </button>
-            <!-- La animación es CSS pura (grid-template-rows 0fr → 1fr): no hay
-                 que medir scrollHeight como hacía el script original. -->
-            <div class="faq-a" [id]="'faq-' + f" role="region">
-              <div class="inner-wrap">
-                <p class="inner">{{ 'entrepreneurs.faq.items.' + f + '.a' | translate }}</p>
+          <div class="faq__item" [class.is-open]="openFaq() === f">
+            <h3 class="faq__h">
+              <button class="faq__q" type="button" [id]="'faq-q-' + f" (click)="toggleFaq(f)"
+                      [attr.aria-expanded]="openFaq() === f" [attr.aria-controls]="'faq-' + f">
+                <span>{{ 'entrepreneurs.faq.items.' + f + '.q' | translate }}</span>
+                <mat-icon aria-hidden="true">add</mat-icon>
+              </button>
+            </h3>
+            <!-- grid-template-rows 0fr → 1fr: el navegador interpola la altura real. -->
+            <div class="faq__a" [id]="'faq-' + f" role="region" [attr.aria-labelledby]="'faq-q-' + f"
+                 [inert]="openFaq() !== f">
+              <div class="faq__clip">
+                <p class="faq__text">{{ 'entrepreneurs.faq.items.' + f + '.a' | translate }}</p>
               </div>
             </div>
           </div>
@@ -253,85 +200,60 @@
     </div>
   </section>
 
-  <!-- ─────────── [07] CANDIDATURE ─────────── -->
-  <section id="form">
-    <div class="e3-container">
-      <div class="sec-head">
-        <span class="idx" e3Reveal>[ 07 ]</span>
-        <h2 e3Reveal>{{ 'entrepreneurs.form.title' | translate }}</h2>
-        <p class="sub" e3Reveal="1">{{ 'entrepreneurs.form.sub' | translate }}</p>
-      </div>
+  <!-- ── Candidatura ───────────────────────────────────────────────────────── -->
+  <section class="sec" id="form" tabindex="-1" aria-labelledby="en-form-title">
+    <div class="wrap en-split">
+      <header class="sec__head en-split__head">
+        <h2 class="sec__title" id="en-form-title">{{ 'entrepreneurs.form.title' | translate }}</h2>
+        <p class="sec__lead">{{ 'entrepreneurs.form.sub' | translate }}</p>
+      </header>
 
-      <form class="form-wrap" e3Reveal [formGroup]="form" (ngSubmit)="submit()" novalidate>
-        <div class="form-grid">
-          <div class="field full">
-            <label for="e-entreprise">
-              {{ 'entrepreneurs.form.company' | translate }}<span class="req" aria-hidden="true">*</span>
-            </label>
-            <input id="e-entreprise" type="text" formControlName="entreprise" aria-required="true"
-                   [class.is-invalid]="invalid('entreprise')"
-                   [attr.aria-invalid]="invalid('entreprise') || null"
-                   [attr.aria-describedby]="invalid('entreprise') ? 'e-entreprise-err' : null"
-                   [placeholder]="'entrepreneurs.form.company_ph' | translate" />
+      <form class="fm" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="fm__grid">
+          <div class="fld fld--full">
+            <label class="fld__label" for="e-entreprise">{{ 'entrepreneurs.form.company' | translate }}</label>
+            <input class="fld__input" id="e-entreprise" type="text" formControlName="entreprise" autocomplete="organization"
+                   [attr.aria-invalid]="invalid('entreprise')" [attr.aria-describedby]="invalid('entreprise') ? 'e-entreprise-err' : null" />
             @if (invalid('entreprise')) {
-              <p class="field-err" id="e-entreprise-err">{{ 'entrepreneurs.form.err_required' | translate }}</p>
+              <p class="fld__error" id="e-entreprise-err"><mat-icon aria-hidden="true">error</mat-icon>{{ 'entrepreneurs.form.err_required' | translate }}</p>
             }
           </div>
 
-          <div class="field">
-            <label for="e-prenom">
-              {{ 'entrepreneurs.form.contact_first' | translate }}<span class="req" aria-hidden="true">*</span>
-            </label>
-            <input id="e-prenom" type="text" formControlName="prenom" autocomplete="given-name" aria-required="true"
-                   [class.is-invalid]="invalid('prenom')"
-                   [attr.aria-invalid]="invalid('prenom') || null"
-                   [attr.aria-describedby]="invalid('prenom') ? 'e-prenom-err' : null"
-                   [placeholder]="'entrepreneurs.form.contact_first_ph' | translate" />
+          <div class="fld">
+            <label class="fld__label" for="e-prenom">{{ 'entrepreneurs.form.contact_first' | translate }}</label>
+            <input class="fld__input" id="e-prenom" type="text" formControlName="prenom" autocomplete="given-name"
+                   [attr.aria-invalid]="invalid('prenom')" [attr.aria-describedby]="invalid('prenom') ? 'e-prenom-err' : null" />
             @if (invalid('prenom')) {
-              <p class="field-err" id="e-prenom-err">{{ 'entrepreneurs.form.err_required' | translate }}</p>
+              <p class="fld__error" id="e-prenom-err"><mat-icon aria-hidden="true">error</mat-icon>{{ 'entrepreneurs.form.err_required' | translate }}</p>
             }
           </div>
 
-          <div class="field">
-            <label for="e-nom">
-              {{ 'entrepreneurs.form.contact_last' | translate }}<span class="req" aria-hidden="true">*</span>
-            </label>
-            <input id="e-nom" type="text" formControlName="nom" autocomplete="family-name" aria-required="true"
-                   [class.is-invalid]="invalid('nom')"
-                   [attr.aria-invalid]="invalid('nom') || null"
-                   [attr.aria-describedby]="invalid('nom') ? 'e-nom-err' : null"
-                   [placeholder]="'entrepreneurs.form.contact_last_ph' | translate" />
+          <div class="fld">
+            <label class="fld__label" for="e-nom">{{ 'entrepreneurs.form.contact_last' | translate }}</label>
+            <input class="fld__input" id="e-nom" type="text" formControlName="nom" autocomplete="family-name"
+                   [attr.aria-invalid]="invalid('nom')" [attr.aria-describedby]="invalid('nom') ? 'e-nom-err' : null" />
             @if (invalid('nom')) {
-              <p class="field-err" id="e-nom-err">{{ 'entrepreneurs.form.err_required' | translate }}</p>
+              <p class="fld__error" id="e-nom-err"><mat-icon aria-hidden="true">error</mat-icon>{{ 'entrepreneurs.form.err_required' | translate }}</p>
             }
           </div>
 
-          <div class="field">
-            <label for="e-tel">
-              {{ 'entrepreneurs.form.phone' | translate }}<span class="req" aria-hidden="true">*</span>
-            </label>
-            <input id="e-tel" type="tel" formControlName="telephone" autocomplete="tel" aria-required="true"
-                   [class.is-invalid]="invalid('telephone')"
-                   [attr.aria-invalid]="invalid('telephone') || null"
-                   [attr.aria-describedby]="invalid('telephone') ? 'e-tel-err' : null"
-                   [placeholder]="'entrepreneurs.form.phone_ph' | translate" />
+          <div class="fld">
+            <label class="fld__label" for="e-tel">{{ 'entrepreneurs.form.phone' | translate }}</label>
+            <input class="fld__input" id="e-tel" type="tel" formControlName="telephone" autocomplete="tel" inputmode="tel"
+                   [attr.aria-invalid]="invalid('telephone')" [attr.aria-describedby]="invalid('telephone') ? 'e-tel-err' : null" />
             @if (invalid('telephone')) {
-              <p class="field-err" id="e-tel-err">{{ 'entrepreneurs.form.err_required' | translate }}</p>
+              <p class="fld__error" id="e-tel-err"><mat-icon aria-hidden="true">error</mat-icon>{{ 'entrepreneurs.form.err_required' | translate }}</p>
             }
           </div>
 
-          <div class="field">
-            <label for="e-mail">
-              {{ 'entrepreneurs.form.email' | translate }}<span class="req" aria-hidden="true">*</span>
-            </label>
-            <input id="e-mail" type="email" formControlName="courriel" autocomplete="email" aria-required="true"
-                   [class.is-invalid]="invalid('courriel')"
-                   [attr.aria-invalid]="invalid('courriel') || null"
-                   [attr.aria-describedby]="invalid('courriel') ? 'e-mail-err' : null"
-                   [placeholder]="'entrepreneurs.form.email_ph' | translate" />
+          <div class="fld">
+            <label class="fld__label" for="e-mail">{{ 'entrepreneurs.form.email' | translate }}</label>
+            <input class="fld__input" id="e-mail" type="email" formControlName="courriel" autocomplete="email" inputmode="email"
+                   [attr.aria-invalid]="invalid('courriel')" [attr.aria-describedby]="invalid('courriel') ? 'e-mail-err' : null" />
             @if (invalid('courriel')) {
-              <p class="field-err" id="e-mail-err">
-                @if (form.controls.courriel.errors?.['required']) {
+              <p class="fld__error" id="e-mail-err">
+                <mat-icon aria-hidden="true">error</mat-icon>
+                @if (form.controls.courriel.hasError('required')) {
                   {{ 'entrepreneurs.form.err_required' | translate }}
                 } @else {
                   {{ 'entrepreneurs.form.err_email' | translate }}
@@ -340,39 +262,35 @@
             }
           </div>
 
-          <div class="field">
-            <label for="e-rbq">
-              {{ 'entrepreneurs.form.rbq' | translate }}<span class="req" aria-hidden="true">*</span>
-            </label>
-            <input id="e-rbq" type="text" formControlName="rbq" inputmode="numeric" maxlength="12"
-                   aria-required="true" (input)="formatRbq($event)"
-                   [class.is-invalid]="invalid('rbq')"
-                   [attr.aria-invalid]="invalid('rbq') || null"
-                   [attr.aria-describedby]="invalid('rbq') ? 'e-rbq-err' : null"
-                   [placeholder]="'entrepreneurs.form.rbq_ph' | translate" />
+          <div class="fld">
+            <label class="fld__label" for="e-rbq">{{ 'entrepreneurs.form.rbq' | translate }}</label>
+            <input class="fld__input fld__input--fig" id="e-rbq" type="text" formControlName="rbq" inputmode="numeric" maxlength="12"
+                   (input)="formatRbq($event)"
+                   [attr.aria-invalid]="invalid('rbq')" [attr.aria-describedby]="invalid('rbq') ? 'e-rbq-err' : 'e-rbq-hint'" />
             @if (invalid('rbq')) {
-              <p class="field-err" id="e-rbq-err">
-                @if (form.controls.rbq.errors?.['required']) {
+              <p class="fld__error" id="e-rbq-err">
+                <mat-icon aria-hidden="true">error</mat-icon>
+                @if (form.controls.rbq.hasError('required')) {
                   {{ 'entrepreneurs.form.err_required' | translate }}
                 } @else {
                   {{ 'entrepreneurs.form.err_rbq' | translate }}
                 }
               </p>
+            } @else {
+              <!-- El formato va en una ayuda, no en un placeholder que parezca un valor ya escrito. -->
+              <p class="fld__hint" id="e-rbq-hint">{{ 'entrepreneurs.form.rbq_hint' | translate }}</p>
             }
           </div>
 
-          <div class="field">
-            <label for="e-annees">
-              {{ 'entrepreneurs.form.years' | translate }}<span class="req" aria-hidden="true">*</span>
-            </label>
-            <input id="e-annees" type="number" min="0" max="80" step="1" formControlName="annees"
-                   aria-required="true" placeholder="12"
-                   [class.is-invalid]="invalid('annees')"
-                   [attr.aria-invalid]="invalid('annees') || null"
-                   [attr.aria-describedby]="invalid('annees') ? 'e-annees-err' : null" />
+          <div class="fld">
+            <label class="fld__label" for="e-annees">{{ 'entrepreneurs.form.years' | translate }}</label>
+            <input class="fld__input fld__input--fig" id="e-annees" type="number" min="0" max="80" step="1" inputmode="numeric"
+                   formControlName="annees"
+                   [attr.aria-invalid]="invalid('annees')" [attr.aria-describedby]="invalid('annees') ? 'e-annees-err' : null" />
             @if (invalid('annees')) {
-              <p class="field-err" id="e-annees-err">
-                @if (form.controls.annees.errors?.['required']) {
+              <p class="fld__error" id="e-annees-err">
+                <mat-icon aria-hidden="true">error</mat-icon>
+                @if (form.controls.annees.hasError('required')) {
                   {{ 'entrepreneurs.form.err_required' | translate }}
                 } @else {
                   {{ 'entrepreneurs.form.err_years' | translate }}
@@ -381,154 +299,104 @@
             }
           </div>
 
-          <div class="field">
-            <label for="e-zone">
-              {{ 'entrepreneurs.form.area' | translate }}<span class="req" aria-hidden="true">*</span>
-            </label>
-            <input id="e-zone" type="text" formControlName="zone" aria-required="true"
-                   [class.is-invalid]="invalid('zone')"
-                   [attr.aria-invalid]="invalid('zone') || null"
-                   [attr.aria-describedby]="invalid('zone') ? 'e-zone-err' : null"
-                   [placeholder]="'entrepreneurs.form.area_ph' | translate" />
+          <div class="fld fld--full">
+            <label class="fld__label" for="e-zone">{{ 'entrepreneurs.form.area' | translate }}</label>
+            <input class="fld__input" id="e-zone" type="text" formControlName="zone"
+                   [attr.aria-invalid]="invalid('zone')" [attr.aria-describedby]="invalid('zone') ? 'e-zone-err' : null" />
             @if (invalid('zone')) {
-              <p class="field-err" id="e-zone-err">{{ 'entrepreneurs.form.err_required' | translate }}</p>
+              <p class="fld__error" id="e-zone-err"><mat-icon aria-hidden="true">error</mat-icon>{{ 'entrepreneurs.form.err_required' | translate }}</p>
             }
           </div>
 
-          <fieldset class="field full" data-campo="specialites">
-            <legend>
-              {{ 'entrepreneurs.form.specialties' | translate }}<span class="req" aria-hidden="true">*</span>
-            </legend>
+          <fieldset class="fld fld--full" data-campo="specialites"
+                    [attr.aria-describedby]="invalid('specialites') ? 'e-specs-err' : null">
+            <legend class="fld__label">{{ 'entrepreneurs.form.specialties' | translate }}</legend>
             @if (loadingServices()) {
-              <p class="checks-note">{{ 'common.loading' | translate }}</p>
+              <p class="fld__note">{{ 'common.loading' | translate }}</p>
             } @else {
-              <div class="checks">
-                <!-- «Todos los servicios» y las casillas sueltas se excluyen: al
-                     marcarlo, las de abajo quedan inertes en vez de desaparecer,
-                     para que se siga viendo qué cubre esa respuesta. -->
-                <label class="check check--all">
-                  <input type="checkbox" [checked]="todosLosServicios()"
+              <!-- «Tous les services» y las casillas sueltas se excluyen: al marcarlo,
+                   las de abajo quedan inertes en vez de desaparecer, para que se siga
+                   viendo qué cubre esa respuesta. -->
+              <div class="chips" [class.is-invalid]="invalid('specialites')">
+                <label class="chip">
+                  <input class="chip__input" type="checkbox" [checked]="todosLosServicios()"
                          (change)="toggleAllSpecialties($any($event.target).checked)" />
-                  <span>{{ 'entrepreneurs.form.specialties_all' | translate }}</span>
+                  <span class="chip__box">
+                    <mat-icon class="chip__check" aria-hidden="true">check</mat-icon>
+                    {{ 'entrepreneurs.form.specialties_all' | translate }}
+                  </span>
                 </label>
+              </div>
+              <div class="chips" [class.is-invalid]="invalid('specialites')">
                 @for (s of services(); track s.id) {
-                  <label class="check">
-                    <input type="checkbox" [checked]="hasSpecialty(s.id)"
+                  <label class="chip">
+                    <input class="chip__input" type="checkbox" [checked]="hasSpecialty(s.id)"
                            [disabled]="todosLosServicios()"
                            (change)="toggleSpecialty(s.id, $any($event.target).checked)" />
-                    <span>{{ s.nombre }}</span>
+                    <span class="chip__box">
+                      <mat-icon class="chip__check" aria-hidden="true">check</mat-icon>
+                      {{ s.nombre }}
+                    </span>
                   </label>
                 }
               </div>
             }
             @if (invalid('specialites')) {
-              <p class="field-err">{{ 'entrepreneurs.form.err_specialties' | translate }}</p>
+              <p class="fld__error" id="e-specs-err"><mat-icon aria-hidden="true">error</mat-icon>{{ 'entrepreneurs.form.err_specialties' | translate }}</p>
             }
           </fieldset>
 
-          <div class="field full">
-            <label for="e-msg">{{ 'entrepreneurs.form.message' | translate }}</label>
-            <textarea id="e-msg" formControlName="message"
+          <div class="fld fld--full">
+            <label class="fld__label" for="e-msg">{{ 'entrepreneurs.form.message' | translate }}</label>
+            <textarea class="fld__input fld__input--area" id="e-msg" formControlName="message" rows="4"
                       [placeholder]="'entrepreneurs.form.message_ph' | translate"></textarea>
           </div>
         </div>
 
-        <div class="form-foot">
-          <p class="form-note">{{ 'entrepreneurs.form.note' | translate }}</p>
-
+        <div class="fm__foot">
           @if (sent()) {
-            <p class="form-success" role="status">
-              ✓ {{ 'entrepreneurs.form.success' | translate }}
-              <span class="form-success-detail">{{ 'entrepreneurs.form.success_mail' | translate }}</span>
+            <p class="fm__success" role="status">
+              <mat-icon aria-hidden="true">check_circle</mat-icon>
+              <span>
+                {{ 'entrepreneurs.form.success' | translate }}
+                <span class="fm__success-detail">{{ 'entrepreneurs.form.success_mail' | translate }}</span>
+              </span>
             </p>
           } @else {
-            @if (errorKey(); as clave) {
-              <p class="form-error" role="alert">{{ clave | translate }}</p>
-            }
-            <button type="submit" class="e3-btn" [disabled]="sending()">
-              {{ (sending() ? 'entrepreneurs.form.sending' : 'entrepreneurs.form.submit') | translate }}
-              <svg class="ar" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M1 6h13M10 1l5 5-5 5"/></svg>
-            </button>
+            <div class="fm__actions">
+              <!-- Activo aunque falten datos: al pulsarlo, el resumen dice qué falta. -->
+              <button type="submit" class="button button--lg button--cta fm__submit" [disabled]="sending()">
+                @if (sending()) { <span class="spinner" aria-hidden="true"></span> }
+                {{ (sending() ? 'entrepreneurs.form.sending' : 'entrepreneurs.form.submit') | translate }}
+              </button>
+            </div>
           }
+          <p class="fm__note">{{ 'entrepreneurs.form.note' | translate }}</p>
         </div>
-        <app-campos-faltantes class="mt-3" [formulario]="form" [intento]="intentos()" />
+
+        <app-campos-faltantes [formulario]="form" [intento]="intentos()" />
+
+        @if (errorKey(); as clave) {
+          <p class="fm__alert" role="alert">
+            <mat-icon aria-hidden="true">error</mat-icon>
+            {{ clave | translate }}
+          </p>
+        }
       </form>
     </div>
   </section>
 
-  <!-- ─────────── CTA FINALE ─────────── -->
-  <section class="cta alt">
-    <div class="e3-container inner">
-      <p class="manifesto" e3Reveal>
-        {{ 'entrepreneurs.cta.manifesto_1' | translate }}
-        <span class="gold-txt">{{ 'entrepreneurs.cta.manifesto_2' | translate }}</span>
-      </p>
-      <p class="lede cta-lede" e3Reveal="2">{{ 'entrepreneurs.cta.lede' | translate }}</p>
-      <div e3Reveal="2">
-        <a href="#form" class="e3-btn" (click)="goTo('form', $event)">{{ 'landing.footer.apply' | translate }}</a>
-      </div>
+  <!-- ── Cierre: isla abeto noche. El botón es vélin: el tomate de la página es el del hero
+       y el de enviar, y nunca va sobre abeto. ── -->
+  <section class="sec sec--dark" aria-labelledby="en-cta-title">
+    <div class="wrap en-cta">
+      <h2 class="en-cta__title" id="en-cta-title">
+        {{ 'entrepreneurs.cta.manifesto_1' | translate }} {{ 'entrepreneurs.cta.manifesto_2' | translate }}
+      </h2>
+      <p class="en-cta__lede">{{ 'entrepreneurs.cta.lede' | translate }}</p>
+      <a class="button button--lg button--light" href="#form" (click)="goTo('form', $event)">{{ 'landing.footer.apply' | translate }}</a>
     </div>
   </section>
 </main>
 
-<!-- ─────────── FOOTER ─────────── -->
-<footer class="ftr">
-  <div class="e3-container">
-    <div class="ftr-top">
-      <div>
-        <a routerLink="/" class="brand"><span class="reticle"><i></i></span><span class="e3">Estimation<b>3D</b></span></a>
-        <p>{{ 'landing.footer.tagline' | translate }}</p>
-      </div>
-
-      <div>
-        <h5>{{ 'landing.footer.platform' | translate }}</h5>
-        <ul>
-          <li><a routerLink="/" fragment="processus">{{ 'landing.nav.process' | translate }}</a></li>
-          <li><a routerLink="/" fragment="services">{{ 'landing.nav.specialties' | translate }}</a></li>
-          <li><a routerLink="/" fragment="dossier">{{ 'landing.nav.cta' | translate }}</a></li>
-        </ul>
-      </div>
-
-      <div>
-        <h5>{{ 'landing.footer.explore' | translate }}</h5>
-        <ul>
-          <li><a routerLink="/journal">{{ 'landing.nav.journal' | translate }}</a></li>
-          <li><a routerLink="/entrepreneurs">{{ 'landing.nav.contractors' | translate }}</a></li>
-          <li><a href="#form" (click)="goTo('form', $event)">{{ 'landing.footer.apply' | translate }}</a></li>
-        </ul>
-      </div>
-
-      <div>
-        <h5>{{ 'landing.footer.contact' | translate }}</h5>
-        <ul>
-          <li><span>{{ 'landing.footer.city' | translate }}</span></li>
-          <li><a href="tel:+15145108819">514 510-8819</a></li>
-          <li><a href="mailto:info@estimation3d.com">info&#64;estimation3d.com</a></li>
-          <li><span>{{ 'landing.footer.pilot' | translate }}</span></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="ftr-bot">
-      <span>© {{ year }} HYGIENACTION · MONTRÉAL</span>
-      <span>EST3D — {{ 'entrepreneurs.footer.sign' | translate }}</span>
-    </div>
-  </div>
-</footer>
-
-<!-- ─────────── CONTRÔLES : LANGUE + THÈME ─────────── -->
-<div class="lang-toggle" role="group" [attr.aria-label]="'landing.controls.language' | translate">
-  @for (l of langs; track l) {
-    <!-- El CSS ya aplica text-transform:uppercase. -->
-    <button type="button" (click)="setLang(l)" [attr.aria-pressed]="lang.current() === l">{{ l }}</button>
-  }
-</div>
-
-<div class="theme-toggle" role="group" [attr.aria-label]="'landing.controls.theme' | translate">
-  <button type="button" (click)="setTheme('dark')" [attr.aria-pressed]="theme() === 'dark'">
-    <span class="d"></span><span>{{ 'landing.controls.dark' | translate }}</span>
-  </button>
-  <button type="button" (click)="setTheme('light')" [attr.aria-pressed]="theme() === 'light'">
-    <span class="d"></span><span>{{ 'landing.controls.light' | translate }}</span>
-  </button>
-</div>
+<app-site-footer />

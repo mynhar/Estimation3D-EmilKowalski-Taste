@@ -1,5 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../../services/auth-supabase.service';
 import { ExpedienteService } from '../../../services/expediente.service';
@@ -7,11 +12,12 @@ import { OfertaService } from '../../../services/oferta.service';
 import { ContratoService } from '../../../services/contrato.service';
 import { ArchivoService } from '../../../services/archivo.service';
 import {
-  OfertaForm, OfertaConConstructor, ArchivoRow, ESTADO_BADGE_OFERTA,
+  OfertaForm, OfertaConConstructor, ArchivoRow,
   serviciosParaContrato, serviciosDeOferta,
 } from '../../../models';
 import { OfertaRepartoComponent, alternarEnSeleccion } from '../../../shared/ui/oferta-reparto/oferta-reparto.component';
 import { CampoExtra, CamposFaltantesComponent, listaEstable } from '../../../shared/ui/campos-faltantes/campos-faltantes.component';
+import { StatusChipComponent } from '../../../shared/ui/status-chip/status-chip.component';
 
 /**
  * Ofertas de constructores de un expediente (admin).
@@ -22,9 +28,13 @@ import { CampoExtra, CamposFaltantesComponent, listaEstable } from '../../../sha
 @Component({
   selector: 'app-admin-file-builder-bids',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, TranslatePipe, OfertaRepartoComponent, CamposFaltantesComponent],
+  imports: [
+    FormsModule, TranslatePipe,
+    MatButtonModule, MatCheckboxModule, MatFormFieldModule, MatIconModule, MatInputModule,
+    OfertaRepartoComponent, CamposFaltantesComponent, StatusChipComponent,
+  ],
   templateUrl: './builder-bids.component.html',
-  styleUrl: './builder-bids.component.css',
+  styleUrls: ['../../../shared/ui/ficha/ficha.css', './builder-bids.component.css'],
 })
 export class AdminFileBuilderBidsComponent implements OnInit {
   private auth              = inject(AuthSupabaseService);
@@ -136,10 +146,6 @@ export class AdminFileBuilderBidsComponent implements OnInit {
   /** El reparto ya se aplicó en la base: releer. */
   async onRepartoAplicado(): Promise<void> {
     await this.cargarOfertas();
-  }
-
-  ofertaBadgeClass(estado: string): string {
-    return ESTADO_BADGE_OFERTA[estado] ?? 'bg-secondary-subtle text-secondary';
   }
 
   formatPlazo(min: number | null, max: number | null): string {

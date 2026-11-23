@@ -1,296 +1,235 @@
-<div class="md-page">
+<div class="page-wrapper md">
 
-  <!-- Encabezado -->
-  <header class="md-pagehead">
-    <span class="md-eyebrow">{{ 'my_documents.eyebrow' | translate }}</span>
-    <h1 class="md-pagetitle">{{ 'my_documents.title' | translate }}</h1>
-    <p class="md-pagesub">{{ 'my_documents.subtitle' | translate }}</p>
-  </header>
+  <app-page-header [titulo]="'my_documents.title' | translate"
+                   [contexto]="'my_documents.subtitle' | translate" />
 
-  <!-- Input compartido (oculto) -->
+  <!-- Input compartido (oculto): lo abre la zona de subida de cada dossier. -->
   <input #fileInput type="file" multiple class="md-hidden-input"
          (change)="onArchivosElegidos($event)" aria-hidden="true" tabindex="-1" />
 
-  <!-- Cargando -->
+  <!-- Anuncia la subida a los lectores de pantalla (el texto visible cambia dentro de un botón). -->
+  <p class="cdk-visually-hidden" role="status">
+    @if (subiendoId()) { {{ 'my_documents.uploading' | translate }} }
+  </p>
+
   @if (cargando()) {
-    <div class="md-loading"><span class="md-spinner" aria-hidden="true"></span></div>
-  }
-
-  <!-- Error -->
-  @else if (error()) {
-    <div class="md-alert md-alert--error" role="alert">
-      <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
-      <p>{{ error() }}</p>
-    </div>
-  }
-
-  <!-- Sin expedientes -->
-  @else if (expedientes().length === 0) {
-    <div class="md-empty">
-      <i class="bi bi-folder2-open" aria-hidden="true"></i>
-      <p class="md-empty__title">{{ 'my_documents.empty_title' | translate }}</p>
-      <p class="md-empty__hint">{{ 'my_documents.empty_hint' | translate }}</p>
-    </div>
-  }
-
-  @else {
-    <!-- Franja de resumen -->
-    <div class="md-stats">
-      <div class="md-stat">
-        <span class="md-stat__num">{{ conteoGlobal().todos }}</span>
-        <span class="md-stat__label">{{ 'my_documents.stat_files' | translate }}</span>
-      </div>
-      <div class="md-stat">
-        <span class="md-stat__num">{{ conteoGlobal().foto }}</span>
-        <span class="md-stat__label">{{ 'my_documents.stat_photos' | translate }}</span>
-      </div>
-      <div class="md-stat">
-        <span class="md-stat__num">{{ conteoGlobal().video }}</span>
-        <span class="md-stat__label">{{ 'my_documents.stat_videos' | translate }}</span>
-      </div>
-      <div class="md-stat">
-        <span class="md-stat__num">{{ conteoGlobal().documento }}</span>
-        <span class="md-stat__label">{{ 'my_documents.stat_documents' | translate }}</span>
-      </div>
-      <div class="md-stat md-stat--accent">
-        <span class="md-stat__num">{{ conteoGlobal().expedientes }}</span>
-        <span class="md-stat__label">{{ 'my_documents.stat_dossiers' | translate }}</span>
-      </div>
+    <div class="md-skel" aria-hidden="true">
+      <span class="skel skel--bar"></span>
+      <span class="skel skel--panel"></span>
     </div>
 
-    <!-- Barra: filtro + vista -->
+  } @else if (error()) {
+    <p class="md-error" role="alert">
+      <mat-icon aria-hidden="true">error</mat-icon>
+      {{ error() }}
+    </p>
+
+  } @else if (expedientes().length === 0) {
+    <app-empty-state class="md-empty"
+                     matIcon="folder_open"
+                     [titulo]="'my_documents.empty_title' | translate"
+                     [texto]="'my_documents.empty_hint' | translate" />
+
+  } @else {
+    <!-- Filtro por tipo (con cuántos hay de cada uno) y vista -->
     <div class="md-toolbar">
-      <div class="md-pills" role="group" [attr.aria-label]="'my_documents.filter_label' | translate">
-        <button class="md-pill" type="button"
-                [class.md-pill--active]="filtroTipo() === 'todos'"
-                [attr.aria-pressed]="filtroTipo() === 'todos'" (click)="setFiltro('todos')">
-          {{ 'my_documents.filter_all' | translate }}
-          <span class="md-pill__count">{{ conteoGlobal().todos }}</span>
-        </button>
-        <button class="md-pill" type="button"
-                [class.md-pill--active]="filtroTipo() === 'foto'"
-                [attr.aria-pressed]="filtroTipo() === 'foto'" (click)="setFiltro('foto')">
-          <i class="bi bi-image" aria-hidden="true"></i>{{ 'my_documents.type_foto' | translate }}
-          <span class="md-pill__count">{{ conteoGlobal().foto }}</span>
-        </button>
-        <button class="md-pill" type="button"
-                [class.md-pill--active]="filtroTipo() === 'video'"
-                [attr.aria-pressed]="filtroTipo() === 'video'" (click)="setFiltro('video')">
-          <i class="bi bi-camera-video" aria-hidden="true"></i>{{ 'my_documents.type_video' | translate }}
-          <span class="md-pill__count">{{ conteoGlobal().video }}</span>
-        </button>
-        <button class="md-pill" type="button"
-                [class.md-pill--active]="filtroTipo() === 'documento'"
-                [attr.aria-pressed]="filtroTipo() === 'documento'" (click)="setFiltro('documento')">
-          <i class="bi bi-file-earmark-text" aria-hidden="true"></i>{{ 'my_documents.type_documento' | translate }}
-          <span class="md-pill__count">{{ conteoGlobal().documento }}</span>
-        </button>
-      </div>
+      <mat-button-toggle-group class="md-filter" hideSingleSelectionIndicator
+                               [attr.aria-label]="'my_documents.filter_label' | translate"
+                               [value]="filtroTipo()" (change)="setFiltro($event.value)">
+        <mat-button-toggle value="todos">
+          {{ 'my_documents.filter_all' | translate }}&ngsp;<span class="md-filter__n">{{ conteoGlobal().todos }}</span>
+        </mat-button-toggle>
+        <mat-button-toggle value="foto">
+          <mat-icon class="md-filter__icon">image</mat-icon><span class="md-filter__label">{{ 'my_documents.stat_photos' | translate }}</span>&ngsp;<span class="md-filter__n">{{ conteoGlobal().foto }}</span>
+        </mat-button-toggle>
+        <mat-button-toggle value="video">
+          <mat-icon class="md-filter__icon">videocam</mat-icon><span class="md-filter__label">{{ 'my_documents.stat_videos' | translate }}</span>&ngsp;<span class="md-filter__n">{{ conteoGlobal().video }}</span>
+        </mat-button-toggle>
+        <mat-button-toggle value="documento">
+          <mat-icon class="md-filter__icon">description</mat-icon><span class="md-filter__label">{{ 'my_documents.stat_documents' | translate }}</span>&ngsp;<span class="md-filter__n">{{ conteoGlobal().documento }}</span>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
 
-      <div class="md-view" role="group" [attr.aria-label]="'my_documents.view_label' | translate">
-        <button class="md-view__btn" type="button"
-                [class.md-view__btn--active]="vista() === 'lista'"
-                [attr.aria-pressed]="vista() === 'lista'"
-                [title]="'my_documents.view_list' | translate"
-                [attr.aria-label]="'my_documents.view_list' | translate"
-                (click)="setVista('lista')">
-          <i class="bi bi-list-ul" aria-hidden="true"></i>
-        </button>
-        <button class="md-view__btn" type="button"
-                [class.md-view__btn--active]="vista() === 'galeria'"
-                [attr.aria-pressed]="vista() === 'galeria'"
-                [title]="'my_documents.view_gallery' | translate"
-                [attr.aria-label]="'my_documents.view_gallery' | translate"
-                (click)="setVista('galeria')">
-          <i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>
-        </button>
-      </div>
+      <mat-button-toggle-group class="md-view" hideSingleSelectionIndicator
+                               [attr.aria-label]="'my_documents.view_label' | translate"
+                               [value]="vista()" (change)="setVista($event.value)">
+        <mat-button-toggle value="lista" [aria-label]="'my_documents.view_list' | translate"
+                           [matTooltip]="'my_documents.view_list' | translate">
+          <mat-icon>view_list</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="galeria" [aria-label]="'my_documents.view_gallery' | translate"
+                           [matTooltip]="'my_documents.view_gallery' | translate">
+          <mat-icon>grid_view</mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
     </div>
 
-    <!-- Una tarjeta por expediente -->
+    <!-- Una tarjeta plegable por dossier -->
     <div class="md-accordion">
       @for (exp of expedientes(); track exp.expedienteId) {
-        <section class="md-exp">
+        <app-expediente-panel [numero]="exp.numero" [abierto]="isExpandido(exp.expedienteId)"
+                              (alternar)="toggle(exp.expedienteId)">
+          <span panelMeta class="md-meta">
+            <span class="md-meta__item">
+              <mat-icon aria-hidden="true">image</mat-icon>
+              <span class="md-fig">{{ exp.conteo.foto }}</span>
+              <span class="cdk-visually-hidden">{{ 'my_documents.stat_photos' | translate }}</span>
+            </span>
+            <span class="md-meta__item">
+              <mat-icon aria-hidden="true">videocam</mat-icon>
+              <span class="md-fig">{{ exp.conteo.video }}</span>
+              <span class="cdk-visually-hidden">{{ 'my_documents.stat_videos' | translate }}</span>
+            </span>
+            <span class="md-meta__item">
+              <mat-icon aria-hidden="true">description</mat-icon>
+              <span class="md-fig">{{ exp.conteo.documento }}</span>
+              <span class="cdk-visually-hidden">{{ 'my_documents.stat_documents' | translate }}</span>
+            </span>
+          </span>
 
-          <button class="md-exp__head" type="button"
-                  [attr.aria-expanded]="isExpandido(exp.expedienteId)"
-                  (click)="toggle(exp.expedienteId)">
-            <span class="md-exp__title">
-              <span class="md-folder-tile" aria-hidden="true"><i class="bi bi-folder2"></i></span>
-              <span class="md-exp__num">{{ 'my_documents.dossier' | translate }} {{ exp.numero }}</span>
-            </span>
-            <span class="md-exp__counts" aria-hidden="true">
-              <span class="md-count"><i class="bi bi-image"></i>{{ exp.conteo.foto }}</span>
-              <span class="md-count"><i class="bi bi-camera-video"></i>{{ exp.conteo.video }}</span>
-              <span class="md-count"><i class="bi bi-file-earmark-text"></i>{{ exp.conteo.documento }}</span>
-            </span>
-            <i class="bi md-exp__chev"
-               [class.bi-chevron-down]="!isExpandido(exp.expedienteId)"
-               [class.bi-chevron-up]="isExpandido(exp.expedienteId)" aria-hidden="true"></i>
+          <!-- Zona de subida: clic o arrastrar; el tipo se deduce del archivo. -->
+          <button class="md-drop" type="button" [id]="'md-up-' + exp.expedienteId"
+                  [class.is-drag]="dragId() === exp.expedienteId"
+                  [class.is-busy]="subiendoId() === exp.expedienteId"
+                  [attr.aria-busy]="subiendoId() === exp.expedienteId"
+                  (click)="pedirArchivos(exp.expedienteId, fileInput)"
+                  (dragover)="onDragOver(exp.expedienteId, $event)"
+                  (dragleave)="onDragLeave(exp.expedienteId)"
+                  (drop)="onDrop(exp.expedienteId, $event)">
+            @if (subiendoId() === exp.expedienteId) {
+              <span class="md-spinner" aria-hidden="true"></span>
+              <span class="md-drop__title">{{ 'my_documents.uploading' | translate }}</span>
+            } @else {
+              <mat-icon class="md-drop__icon" aria-hidden="true">upload_file</mat-icon>
+              <span class="md-drop__title">{{ 'my_documents.add_drop' | translate }}</span>
+              <span class="md-drop__sub">{{ 'my_documents.add_browse' | translate }}</span>
+            }
           </button>
 
-          @if (isExpandido(exp.expedienteId)) {
-            <div class="md-exp__body">
+          @if (visiblesEn(exp) === 0) {
+            <p class="md-none">
+              {{ (exp.total === 0 ? 'my_documents.dossier_empty' : 'my_documents.no_results') | translate }}
+            </p>
 
-              <!-- Zona de subida -->
-              <div class="md-upload"
-                   [class.md-upload--drag]="dragId() === exp.expedienteId"
-                   [class.md-upload--busy]="subiendoId() === exp.expedienteId"
-                   role="button" tabindex="0"
-                   [attr.aria-label]="'my_documents.add_aria' | translate"
-                   (click)="pedirArchivos(exp.expedienteId, fileInput)"
-                   (keyup.enter)="pedirArchivos(exp.expedienteId, fileInput)"
-                   (keyup.space)="pedirArchivos(exp.expedienteId, fileInput)"
-                   (dragover)="onDragOver(exp.expedienteId, $event)"
-                   (dragleave)="onDragLeave(exp.expedienteId)"
-                   (drop)="onDrop(exp.expedienteId, $event)">
-                @if (subiendoId() === exp.expedienteId) {
-                  <span class="md-spinner md-spinner--sm" aria-hidden="true"></span>
-                  <span class="md-upload__title">{{ 'my_documents.uploading' | translate }}</span>
+          } @else {
+            @for (grupo of gruposVisibles(exp); track grupo.rol) {
+              <section class="md-group">
+                <h3 class="md-group__h">
+                  <span class="md-group__tile" aria-hidden="true"><mat-icon>{{ iconoRol(grupo.rol).matIcon }}</mat-icon></span>
+                  {{ labelRol(grupo.rol) | translate }}
+                  <span class="md-group__n md-fig">{{ grupo.archivos.length }}</span>
+                </h3>
+
+                @if (vista() === 'galeria') {
+                  <ul class="md-gallery">
+                    @for (a of grupo.archivos; track a.id) {
+                      <li class="md-card">
+                        <button class="md-open md-open--card" type="button" (click)="ver(a)">
+                          <ng-container [ngTemplateOutlet]="miniatura"
+                                        [ngTemplateOutletContext]="{ $implicit: a, grande: true }" />
+                          <span class="md-open__text">
+                            <ng-container [ngTemplateOutlet]="texto" [ngTemplateOutletContext]="{ $implicit: a }" />
+                          </span>
+                        </button>
+                        <div class="md-card__foot">
+                          <ng-container [ngTemplateOutlet]="acciones"
+                                        [ngTemplateOutletContext]="{ $implicit: a, expId: exp.expedienteId }" />
+                        </div>
+                      </li>
+                    }
+                  </ul>
+
                 } @else {
-                  <span class="md-upload__icon" aria-hidden="true"><i class="bi bi-cloud-arrow-up"></i></span>
-                  <span class="md-upload__title">{{ 'my_documents.add_drop' | translate }}</span>
-                  <span class="md-upload__sub">{{ 'my_documents.add_browse' | translate }}</span>
-                }
-              </div>
-
-              @if (visiblesEn(exp) === 0) {
-                <p class="md-exp__empty">
-                  {{ (exp.total === 0 ? 'my_documents.dossier_empty' : 'my_documents.no_results') | translate }}
-                </p>
-              }
-
-              @else {
-                @for (grupo of gruposVisibles(exp); track grupo.rol) {
-                  <div class="md-group">
-                    <div class="md-group__head">
-                      <span class="md-group__tile" aria-hidden="true"><i class="bi {{ iconoRol(grupo.rol) }}"></i></span>
-                      <span class="md-group__title">{{ labelRol(grupo.rol) | translate }}</span>
-                      <span class="md-group__count">{{ grupo.archivos.length }}</span>
-                    </div>
-
-                    <!-- Vista galería -->
-                    @if (vista() === 'galeria') {
-                      <div class="md-gallery">
-                        @for (a of grupo.archivos; track a.id) {
-                          <div class="md-card">
-                            <button class="md-card__media" type="button" [attr.data-tipo]="a.tipo"
-                                    [title]="'my_documents.action_view' | translate" (click)="ver(a)">
-                              @if (thumbUrl(a); as src) {
-                                <img class="md-card__img" [src]="src" alt="" loading="lazy"
-                                     (error)="onThumbError(a.id)" />
-                              } @else if (a.fuente !== 'presentacion') {
-                                <i class="bi {{ iconoTipo(a.tipo) }}" aria-hidden="true"></i>
-                              }
-                              @if (a.fuente === 'presentacion') {
-                                <span class="md-play" aria-hidden="true"><i class="bi bi-play"></i></span>
-                              }
-                            </button>
-                            <div class="md-card__body">
-                              <div class="md-file__name" [title]="a.nombre">{{ a.nombre }}</div>
-                              <div class="md-file__meta">
-                                @if (a.fuente === 'presentacion') {
-                                  <span class="md-file__kind">{{ 'my_documents.presentation_video' | translate }}</span>&ngsp;
-                                  <span class="md-file__sep md-file__sep--kind" aria-hidden="true">·</span>
-                                }
-                                {{ formatTamano(a.tamanoBytes) }}
-                                <span class="md-file__sep" aria-hidden="true">·</span>
-                                {{ a.subidoPorNombre }}
-                              </div>
-                            </div>
-                            <div class="md-card__foot">
-                              <ng-container [ngTemplateOutlet]="acciones"
-                                            [ngTemplateOutletContext]="{ $implicit: a }"></ng-container>
-                            </div>
-                          </div>
-                        }
-                      </div>
+                  <ul class="md-files">
+                    @for (a of grupo.archivos; track a.id) {
+                      <li class="md-file">
+                        <button class="md-open" type="button" (click)="ver(a)">
+                          <ng-container [ngTemplateOutlet]="miniatura"
+                                        [ngTemplateOutletContext]="{ $implicit: a, grande: false }" />
+                          <span class="md-open__text">
+                            <ng-container [ngTemplateOutlet]="texto" [ngTemplateOutletContext]="{ $implicit: a }" />
+                          </span>
+                        </button>
+                        <ng-container [ngTemplateOutlet]="acciones"
+                                      [ngTemplateOutletContext]="{ $implicit: a, expId: exp.expedienteId }" />
+                      </li>
                     }
-
-                    <!-- Vista lista -->
-                    @else {
-                      <div class="md-files">
-                        @for (a of grupo.archivos; track a.id) {
-                          <div class="md-file">
-                            <button class="md-file-tile" type="button" [attr.data-tipo]="a.tipo"
-                                    [title]="'my_documents.action_view' | translate" (click)="ver(a)">
-                              @if (thumbUrl(a); as src) {
-                                <img class="md-thumb" [src]="src" alt="" loading="lazy"
-                                     (error)="onThumbError(a.id)" />
-                              } @else if (a.fuente !== 'presentacion') {
-                                <i class="bi {{ iconoTipo(a.tipo) }}" aria-hidden="true"></i>
-                              }
-                              @if (a.fuente === 'presentacion') {
-                                <span class="md-play" aria-hidden="true"><i class="bi bi-play"></i></span>
-                              }
-                            </button>
-
-                            <div class="md-file__info">
-                              <div class="md-file__name" [title]="a.nombre">{{ a.nombre }}</div>
-                              <div class="md-file__meta">
-                                @if (a.fuente === 'presentacion') {
-                                  <span class="md-file__kind">{{ 'my_documents.presentation_video' | translate }}</span>&ngsp;
-                                  <span class="md-file__sep md-file__sep--kind" aria-hidden="true">·</span>
-                                }
-                                {{ formatTamano(a.tamanoBytes) }}
-                                <span class="md-file__sep" aria-hidden="true">·</span>
-                                {{ 'my_documents.added_by' | translate }} {{ a.subidoPorNombre }}
-                              </div>
-                            </div>
-
-                            <ng-container [ngTemplateOutlet]="acciones"
-                                          [ngTemplateOutletContext]="{ $implicit: a }"></ng-container>
-                          </div>
-                        }
-                      </div>
-                    }
-                  </div>
+                  </ul>
                 }
-              }
-            </div>
+              </section>
+            }
           }
-        </section>
+        </app-expediente-panel>
       }
     </div>
   }
 </div>
 
-<!-- Acciones por archivo (compartidas lista/galería) -->
-<ng-template #acciones let-a>
+<!-- Miniatura: la foto o el póster del video si existen; si no, el icono del tipo. -->
+<ng-template #miniatura let-a let-grande="grande">
+  <span class="md-thumb" [class.md-thumb--lg]="grande" [attr.data-tipo]="a.tipo" aria-hidden="true">
+    @if (thumbUrl(a); as src) {
+      <img [src]="src" alt="" loading="lazy" (error)="onThumbError(a.id)" />
+    } @else {
+      <mat-icon>{{ iconoArchivo(a).matIcon }}</mat-icon>
+    }
+    @if (a.fuente === 'presentacion') {
+      <span class="md-play"><mat-icon>play_arrow</mat-icon></span>
+    }
+  </span>
+</ng-template>
+
+<!-- Nombre y datos del archivo (dentro del botón que lo abre) -->
+<ng-template #texto let-a>
+  <span class="md-name" [title]="a.nombre">{{ a.nombre }}</span>
+  <span class="md-info">
+    @if (a.fuente === 'presentacion') {
+      <span class="md-kind">{{ 'my_documents.presentation_video' | translate }}</span>
+    }
+    @if (a.tamanoBytes > 0) {
+      <span class="md-fig">{{ formatTamano(a.tamanoBytes) }}</span>
+    }
+    <!-- Autor desconocido ('—'): se omite la línea en vez de mostrar «Ajouté par —». -->
+    @if (a.subidoPorNombre && a.subidoPorNombre !== '—') {
+      <span>{{ 'my_documents.added_by' | translate }} {{ a.subidoPorNombre }}</span>
+    }
+  </span>
+</ng-template>
+
+<!-- Acciones por archivo (lista y galería). Ver = el propio botón del archivo. -->
+<ng-template #acciones let-a let-expId="expId">
   @if (confirmEliminarId() === a.id) {
     <div class="md-confirm">
       <span class="md-confirm__q">{{ 'my_documents.delete_confirm' | translate }}</span>
-      <button class="md-confirm__yes" type="button"
-              [disabled]="eliminandoId() === a.id" (click)="eliminar(a)">
-        @if (eliminandoId() === a.id) {
-          <span class="md-btn-spinner md-btn-spinner--danger" aria-hidden="true"></span>
-        } @else { {{ 'my_documents.delete_yes' | translate }} }
-      </button>
-      <button class="md-confirm__no" type="button"
-              [disabled]="eliminandoId() === a.id" (click)="cancelarEliminar()">
-        {{ 'my_documents.delete_no' | translate }}
-      </button>
+      <span class="md-confirm__btns">
+        <button mat-flat-button class="md-confirm__yes" type="button"
+                [disabled]="eliminandoId() === a.id" (click)="eliminar(a, expId)">
+          @if (eliminandoId() === a.id) { <span class="md-spinner md-spinner--btn" aria-hidden="true"></span> }
+          {{ 'my_documents.delete_yes' | translate }}
+        </button>
+        <button mat-button class="md-confirm__no" type="button" [id]="'md-del-keep-' + a.id"
+                [disabled]="eliminandoId() === a.id" (click)="cancelarEliminar(a.id)">
+          {{ 'my_documents.delete_no' | translate }}
+        </button>
+      </span>
     </div>
   } @else {
-    <div class="md-file__actions">
-      <button class="md-icon-btn" type="button"
-              [title]="'my_documents.action_view' | translate"
-              [attr.aria-label]="'my_documents.action_view' | translate" (click)="ver(a)">
-        <i class="bi bi-eye" aria-hidden="true"></i>
-      </button>
-      <!-- Tour 3D (enlace) y video de presentación: sólo se ven, no se descargan. -->
+    <div class="md-actions">
+      <!-- Tour 3D y video de presentación: sólo se ven, no se descargan. -->
       @if (a.fuente !== 'estimacion' && a.fuente !== 'presentacion') {
-        <button class="md-icon-btn" type="button"
-                [title]="'my_documents.action_download' | translate"
-                [attr.aria-label]="'my_documents.action_download' | translate" (click)="descargar(a)">
-          <i class="bi bi-download" aria-hidden="true"></i>
+        <button mat-icon-button type="button"
+                [matTooltip]="'my_documents.action_download' | translate"
+                [attr.aria-label]="('my_documents.action_download' | translate) + ' ' + a.nombre"
+                (click)="descargar(a)">
+          <mat-icon>download</mat-icon>
         </button>
       }
       @if (a.esPropio) {
-        <button class="md-icon-btn md-icon-btn--danger" type="button"
-                [title]="'my_documents.action_delete' | translate"
-                [attr.aria-label]="'my_documents.action_delete' | translate" (click)="pedirEliminar(a.id)">
-          <i class="bi bi-trash" aria-hidden="true"></i>
+        <button mat-icon-button class="md-del" type="button" [id]="'md-del-open-' + a.id"
+                [matTooltip]="'my_documents.action_delete' | translate"
+                [attr.aria-label]="('my_documents.action_delete' | translate) + ' ' + a.nombre"
+                (click)="pedirEliminar(a.id)">
+          <mat-icon>delete</mat-icon>
         </button>
       }
     </div>
@@ -303,14 +242,3 @@
   [acciones]="false"
   [soloLectura]="true"
   (cerrado)="presentacionAbierta.set(null)" />
-
-<!-- Lightbox de foto -->
-@if (fotoAmpliada()) {
-  <div class="md-lightbox" (click)="cerrarFoto()" role="dialog" aria-modal="true">
-    <button class="md-lightbox__close" type="button"
-            [attr.aria-label]="'my_documents.close' | translate" (click)="cerrarFoto()">
-      <i class="bi bi-x-lg" aria-hidden="true"></i>
-    </button>
-    <img [src]="fotoAmpliada()" alt="" class="md-lightbox__img" (click)="$event.stopPropagation()" />
-  </div>
-}

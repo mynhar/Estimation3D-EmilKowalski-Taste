@@ -30,7 +30,7 @@ export const IMMERSION_WORDS = ['1', '2', '3', '4'] as const;
 
 /**
  * Cotas sobre el escaneo del hero, en el sistema de coordenadas de la imagen
- * (900 × 920 px). Son medidas del plano Jolicoeur: la firma Clarté solo dibuja
+ * (900 × 920 px). Son medidas del plano Jolicoeur: la firma del escaneo solo dibuja
  * una cota cuando la medida es real.
  */
 export interface HeroCote {

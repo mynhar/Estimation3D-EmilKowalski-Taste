@@ -1,11 +1,16 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../services/auth-supabase.service';
 import { FILE_LIMITS, validateFile } from '../../shared/validators/file.validator';
 import { CampoExtra, CamposFaltantesComponent } from '../../shared/ui/campos-faltantes/campos-faltantes.component';
 import { PresentacionVideosComponent } from '../../shared/ui/presentacion-videos/presentacion-videos.component';
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
 
 interface PerfilRow {
   nombre:    string;
@@ -16,20 +21,16 @@ interface PerfilRow {
   proveedor: string | null;
 }
 
-const ROL_BADGE_CLASS: Record<string, string> = {
-  cliente:       'role-badge role-badge--cliente',
-  estimador:     'role-badge role-badge--estimador',
-  constructor:   'role-badge role-badge--constructor',
-  administrador: 'role-badge role-badge--administrador',
-};
-
 const FALLBACK = 'assets/avatar-fallback.jpg';
 const BUCKET   = 'archivos';
 
 @Component({
   selector: 'app-perfil',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, TranslatePipe, CamposFaltantesComponent, PresentacionVideosComponent],
+  imports: [
+    FormsModule, TranslatePipe, MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule,
+    CamposFaltantesComponent, PresentacionVideosComponent, PageHeaderComponent,
+  ],
   templateUrl: './perfil.component.html',
   styleUrl: './perfil.component.css',
 })
@@ -219,10 +220,6 @@ export class PerfilComponent implements OnInit {
   }
 
   rolLabel(rol: string): string { return 'role.' + rol; }
-
-  rolBadgeClass(rol: string): string {
-    return ROL_BADGE_CLASS[rol] ?? 'role-badge role-badge--cliente';
-  }
 
   get displayName(): string {
     const p = this.perfil();

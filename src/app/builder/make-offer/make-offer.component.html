@@ -1,639 +1,406 @@
-﻿<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     LIGHTBOX
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-@if (fotoAmpliada()) {
-  <div class="lightbox-overlay" (click)="cerrarFoto()">
-    <button class="lightbox-close" type="button" (click)="cerrarFoto()"
-            [title]="'common.close' | translate">
-      <i class="bi bi-x-lg"></i>
-    </button>
-    <div class="lightbox-container" (click)="$event.stopPropagation()">
-      <img [src]="fotoAmpliada()!" class="lightbox-img" alt="" />
-    </div>
-  </div>
-}
+﻿<div class="page-wrapper mo">
 
-<div class="page-wrapper">
-
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       ESTADO: CARGANDO
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ── Cargando ────────────────────────────────────────────────────────── -->
   @if (cargando()) {
-    <div class="page-loading">
-      <div class="spinner-border spinner-border-sm me-2" style="color:var(--ds-gold)" role="status">
-        <span class="visually-hidden">Cargandoâ€¦</span>
-      </div>
-      <span class="text-ink-muted">{{ 'common.loading' | translate }}</span>
+    <div class="mo-skel" role="status">
+      <span class="cdk-visually-hidden">{{ 'common.loading' | translate }}</span>
+      <span class="skel skel--title" aria-hidden="true"></span>
+      <span class="mo-skel__cols" aria-hidden="true">
+        <span class="skel skel--card"></span>
+        <span class="skel skel--form"></span>
+      </span>
     </div>
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       ESTADO: NO ENCONTRADO
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ── No encontrado ───────────────────────────────────────────────────── -->
   } @else if (!detalle()) {
-    <div class="empty-wrap">
-      <div class="card card-premium text-center px-4 py-5">
-        <div class="empty-icon mx-auto mb-4">
-          <i class="bi bi-exclamation-triangle"></i>
-        </div>
-        <h2 class="empty-title mb-2">{{ 'file.not_found' | translate }}</h2>
-        @if (errorMsg()) {
-          <p class="text-danger small mb-3">{{ errorMsg() | translate }}</p>
-        }
-        <div>
-          <button class="btn btn-outline-secondary" type="button" (click)="volver()">
-            <i class="bi bi-arrow-left me-1"></i>{{ 'common.back' | translate }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <app-empty-state class="mo-missing"
+                     matIcon="folder_off"
+                     [titulo]="'file.not_found' | translate"
+                     [texto]="errorMsg() ? (errorMsg() | translate) : ''">
+      <a actions mat-stroked-button routerLink="/builder/available-files">
+        <mat-icon>arrow_back</mat-icon>
+        {{ 'make_offer.back_to_files' | translate }}
+      </a>
+    </app-empty-state>
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       CONTENIDO PRINCIPAL
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
   } @else {
+    @let d = detalle()!;
 
-    <!-- â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-    <header class="page-header card card-premium mb-3 fade-up">
-      <div class="card-body px-4 px-lg-5 py-3">
-        <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
-
-          <div class="d-flex align-items-center gap-3">
-            <button class="btn-back" type="button" (click)="volver()"
-                    [title]="'common.back' | translate">
-              <i class="bi bi-arrow-left"></i>
-            </button>
-            <div>
-              <span class="eyebrow mb-1 d-block">
-                <i class="bi bi-send me-1"></i>{{ 'role.constructeur' | translate }}
-              </span>
-              <div class="d-flex align-items-center gap-2 flex-wrap">
-                <span class="exp-num">{{ detalle()!.numero }}</span>
-                @if (ofertaId()) {
-                  <span class="mode-tag mode-tag--editing">
-                    <i class="bi bi-pencil me-1"></i>{{ 'make_offer.editing_badge' | translate }}
-                  </span>
-                } @else {
-                  <span class="tag tag-gold" style="font-size:var(--ds-text-2xs)">
-                    <i class="bi bi-plus-circle me-1"></i>{{ 'make_offer.new_badge' | translate }}
-                  </span>
-                }
-              </div>
-              <p class="text-ink-secondary mt-1 mb-0" style="font-size:var(--ds-text-sm)">
-                {{ multiServicio() ? serviciosTexto() : servicioNombre() }}
-              </p>
-            </div>
-          </div>
-
-          @if (detalle()!.total_ofertas > 0) {
-            <span class="comp-pill">
-              <i class="bi bi-people me-1"></i>
-              {{ detalle()!.total_ofertas }}/5 {{ 'available_files.offers_label' | translate }}
-            </span>
-          }
-
-        </div>
+    <!-- ── Cabecera ──────────────────────────────────────────────────────── -->
+    <header class="mo-head">
+      <a mat-button class="mo-back" routerLink="/builder/available-files">
+        <mat-icon>arrow_back</mat-icon>
+        {{ 'make_offer.back_to_files' | translate }}
+      </a>
+      <app-page-header [titulo]="multiServicio() ? serviciosTexto() : servicioNombre()" />
+      <div class="mo-meta">
+        <span class="mo-fig">{{ d.numero }}</span>
+        @if (ofertaId()) {
+          <span class="mo-tag is-edit">
+            <mat-icon aria-hidden="true">edit</mat-icon>
+            {{ 'make_offer.editing_badge' | translate }}
+          </span>
+        } @else {
+          <span class="mo-tag">{{ 'make_offer.new_badge' | translate }}</span>
+        }
+        @if (d.total_ofertas > 0) {
+          <span class="mo-meta__item">
+            <mat-icon aria-hidden="true">group</mat-icon>
+            <span><span class="mo-fig">{{ d.total_ofertas }}/5</span> {{ 'available_files.offers_label' | translate }}</span>
+          </span>
+        }
       </div>
     </header>
 
-    <!-- â”€â”€ Main grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-    <div class="row g-3 align-items-start">
+    <div class="mo-layout">
 
-      <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-           COLUMNA IZQUIERDA â€” Info del expediente + Media
-      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-      <div class="col-lg-5 d-flex flex-column gap-3 fade-up" style="--delay:80ms">
+      <!-- ════ El dossier: lo que se ofertará ════ -->
+      <div class="mo-col">
 
-        <!-- Info del expediente â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-        <div class="info-card">
-
-          <div class="info-card__header">
-            <span class="section-heading">
-              <i class="bi bi-clipboard2-data me-2"></i>{{ 'make_offer.case_summary' | translate }}
-            </span>
-          </div>
-
-          <div class="context-row">
-            <div class="context-icon context-icon--service">
-              <i class="bi bi-tools"></i>
-            </div>
-            <div class="context-content">
+        <section class="mo-card" aria-labelledby="mo-summary-title">
+          <h2 id="mo-summary-title" class="mo-h2">{{ 'make_offer.case_summary' | translate }}</h2>
+          <dl class="mo-facts">
+            <div class="mo-fact mo-fact--wide">
               @if (multiServicio()) {
-                <!-- Varios: uno por línea, el principal primero -->
-                <p class="context-label" id="mo-servicios-label">{{ 'service_selector.name' | translate }}</p>
-                <ul class="context-list" aria-labelledby="mo-servicios-label">
-                  @for (s of serviciosNombres(); track s.id) {
-                    <li class="context-value">{{ s.nombre }}</li>
-                  }
-                </ul>
+                <dt>{{ 'service_selector.name' | translate }}</dt>
+                <dd>
+                  <ul class="mo-list">
+                    @for (s of serviciosNombres(); track s.id) { <li>{{ s.nombre }}</li> }
+                  </ul>
+                </dd>
               } @else {
-                <p class="context-label">{{ 'make_offer.service_label' | translate }}</p>
-                <p class="context-value">{{ servicioNombre() }}</p>
-                @if (servicioDescripcion()) {
-                  <p class="context-sub">{{ servicioDescripcion() }}</p>
-                }
+                <dt>{{ 'make_offer.service_label' | translate }}</dt>
+                <dd>
+                  {{ servicioNombre() }}
+                  @if (servicioDescripcion()) {
+                    <span class="mo-fact__sub">{{ servicioDescripcion() }}</span>
+                  }
+                </dd>
               }
             </div>
-          </div>
-
-          <div class="context-divider"></div>
-
-          <div class="context-row">
-            <div class="context-icon context-icon--location">
-              <i class="bi bi-geo-alt"></i>
-            </div>
-            <div class="context-content">
-              <p class="context-label">{{ 'make_offer.location_label' | translate }}</p>
-              <p class="context-value mb-1">{{ detalle()!.canton }}, {{ detalle()!.provincia }}</p>
-              <p class="context-sub mb-0">{{ detalle()!.direccion }}</p>
-              @if (detalle()!.referencia) {
-                <p class="context-sub mb-0">{{ detalle()!.referencia }}</p>
-              }
-            </div>
-          </div>
-
-          <div class="context-divider"></div>
-
-          <div class="context-row">
-            <div class="context-icon context-icon--date">
-              <i class="bi bi-calendar3"></i>
-            </div>
-            <div class="context-content">
-              <p class="context-label">{{ 'make_offer.scheduled_visit' | translate }}</p>
-              <p class="context-value mb-0">
-                {{ formatFecha(detalle()!.fecha_visita) }}
-                @if (formatHora(detalle()!.fecha_visita) !== 'â€”') {
-                  <span class="context-time">Â· {{ formatHora(detalle()!.fecha_visita) }}</span>
+            <div class="mo-fact mo-fact--wide">
+              <dt>{{ 'make_offer.location_label' | translate }}</dt>
+              <dd>
+                {{ d.canton }}, {{ d.provincia }}
+                <span class="mo-fact__sub">{{ d.direccion }}</span>
+                @if (d.referencia && d.referencia !== '—') {
+                  <span class="mo-fact__sub">{{ d.referencia }}</span>
                 }
-              </p>
+              </dd>
             </div>
-          </div>
-
-          <div class="context-divider"></div>
-
-          <div class="context-row">
-            <div class="context-icon context-icon--visit">
-              <i class="bi bi-calendar-check"></i>
-            </div>
-            <div class="context-content">
-              <p class="context-label">{{ 'make_offer.estimator_visit' | translate }}</p>
-              <p class="context-value mb-0">
-                {{ formatFecha(detalle()!.fecha_visita_real) }}
-                @if (formatHora(detalle()!.fecha_visita_real) !== 'â€”') {
-                  <span class="context-time">Â· {{ formatHora(detalle()!.fecha_visita_real) }}</span>
+            <div class="mo-fact">
+              <dt>{{ 'make_offer.scheduled_visit' | translate }}</dt>
+              <dd class="mo-fig">
+                {{ formatFecha(d.fecha_visita) }}
+                @if (formatHora(d.fecha_visita) !== '—') {
+                  <span class="mo-fact__sub">{{ formatHora(d.fecha_visita) }}</span>
                 }
-              </p>
+              </dd>
             </div>
-          </div>
-
-          @if (detalle()!.descripcion_problemas) {
-            <div class="context-divider"></div>
-            <div class="context-row context-row--last">
-              <div class="context-icon context-icon--warn">
-                <i class="bi bi-exclamation-triangle"></i>
+            <div class="mo-fact">
+              <dt>{{ 'make_offer.estimator_visit' | translate }}</dt>
+              <dd class="mo-fig">
+                {{ formatFecha(d.fecha_visita_real) }}
+                @if (formatHora(d.fecha_visita_real) !== '—') {
+                  <span class="mo-fact__sub">{{ formatHora(d.fecha_visita_real) }}</span>
+                }
+              </dd>
+            </div>
+            @if (d.descripcion_problemas) {
+              <div class="mo-fact mo-fact--wide">
+                <dt>{{ 'make_offer.problems_noted' | translate }}</dt>
+                <dd class="mo-notes">{{ d.descripcion_problemas }}</dd>
               </div>
-              <div class="context-content">
-                <p class="context-label">{{ 'make_offer.problems_noted' | translate }}</p>
-                <p class="context-sub context-sub--pre mb-0">{{ detalle()!.descripcion_problemas }}</p>
-              </div>
+            }
+          </dl>
+        </section>
+
+        <!-- Visita 3D -->
+        <section class="mo-section" aria-labelledby="mo-tour-title">
+          <h2 id="mo-tour-title" class="mo-h2">
+            {{ 'make_offer.tab_tour' | translate }}
+            @if (urlsTour.length > 1) { <span class="mo-count">{{ urlsTour.length }}</span> }
+          </h2>
+          @if (urlsTour.length > 0) {
+            <div class="mo-tours">
+              @for (url of urlsTour; track $index) {
+                <app-tour-poster [url]="url" [titulo]="tituloTour($index)" />
+              }
             </div>
+          } @else {
+            <p class="mo-muted">{{ 'make_offer.no_tour' | translate }}</p>
+          }
+          @if (matterportModelos().length) {
+            <app-matterport-info [modelos]="matterportModelos()" />
+          }
+        </section>
+
+        <!-- Fotos y documentos del dossier -->
+        <section class="mo-card" aria-labelledby="mo-photos-title">
+          <h2 id="mo-photos-title" class="mo-h2">
+            {{ 'make_offer.tab_photos' | translate }}
+            @if (fotos().length) { <span class="mo-count">{{ fotos().length }}</span> }
+          </h2>
+          @if (fotos().length === 0) {
+            <p class="mo-muted">{{ 'make_offer.no_photos' | translate }}</p>
+          } @else {
+            <ul class="mo-photos">
+              @for (f of fotos(); track f.id) {
+                <li>
+                  <button type="button" class="mo-photo" (click)="verFoto(f)" [attr.aria-label]="f.nombre_archivo">
+                    <img [src]="publicUrl(f.url_storage)" alt="" loading="lazy" />
+                  </button>
+                </li>
+              }
+            </ul>
           }
 
-        </div>
-
-        <!-- Media tabulada â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-        <div class="info-card overflow-hidden">
-
-          <div class="media-tabs">
-            <button class="media-tab" type="button"
-                    [class.media-tab--active]="tabMedia() === 'tour'"
-                    (click)="tabMedia.set('tour')">
-              <i class="bi bi-camera-video me-1"></i>{{ 'make_offer.tab_tour' | translate }}
-              @if (urlsTour.length > 0) {
-                <span class="media-tab__count">{{ urlsTour.length }}</span>
-              }
-            </button>
-            <button class="media-tab" type="button"
-                    [class.media-tab--active]="tabMedia() === 'fotos'"
-                    (click)="tabMedia.set('fotos')">
-              <i class="bi bi-images me-1"></i>{{ 'make_offer.tab_photos' | translate }}
-              @if (fotos().length > 0) {
-                <span class="media-tab__count">{{ fotos().length }}</span>
-              }
-            </button>
-            <button class="media-tab" type="button"
-                    [class.media-tab--active]="tabMedia() === 'docs'"
-                    (click)="tabMedia.set('docs')">
-              <i class="bi bi-file-earmark-text me-1"></i>{{ 'make_offer.tab_docs' | translate }}
-              @if (documentos().length > 0) {
-                <span class="media-tab__count">{{ documentos().length }}</span>
-              }
-            </button>
+          <div class="mo-block">
+            <h3 class="mo-label">
+              {{ 'make_offer.tab_docs' | translate }}
+              @if (documentos().length) { <span class="mo-count">{{ documentos().length }}</span> }
+            </h3>
+            @if (documentos().length === 0) {
+              <p class="mo-muted">{{ 'make_offer.no_docs' | translate }}</p>
+            } @else {
+              <ul class="mo-files">
+                @for (doc of documentos(); track doc.id) {
+                  <li class="mo-file">
+                    <mat-icon class="mo-file__icon" aria-hidden="true">description</mat-icon>
+                    <span class="mo-file__text">
+                      <span class="mo-file__name">{{ doc.nombre_archivo }}</span>
+                      <span class="mo-file__size">{{ formatTamano(doc.tamano_bytes) }}</span>
+                    </span>
+                    <a mat-button class="mo-file__open" [href]="publicUrl(doc.url_storage)" target="_blank" rel="noopener"
+                       [attr.aria-label]="('common.open' | translate) + ' ' + doc.nombre_archivo">
+                      <mat-icon>open_in_new</mat-icon>
+                      {{ 'common.open' | translate }}
+                    </a>
+                  </li>
+                }
+              </ul>
+            }
           </div>
-
-          <!-- Tab: Fotos -->
-          @if (tabMedia() === 'fotos') {
-            <div class="tab-body">
-              @if (fotos().length === 0) {
-                <div class="media-empty">
-                  <i class="bi bi-image"></i>
-                  <span>{{ 'make_offer.no_photos' | translate }}</span>
-                </div>
-              } @else {
-                <div class="photos-grid">
-                  @for (f of fotos(); track f.id) {
-                    <button class="photo-thumb" type="button"
-                            (click)="abrirFoto(f)" [title]="f.nombre_archivo">
-                      <img [src]="publicUrl(f.url_storage)"
-                           class="photo-thumb__img" [alt]="f.nombre_archivo" />
-                      <div class="photo-thumb__overlay" aria-hidden="true">
-                        <i class="bi bi-zoom-in"></i>
-                      </div>
-                    </button>
-                  }
-                </div>
-              }
-            </div>
-          }
-
-          <!-- Tab: Tour 3D -->
-          @if (tabMedia() === 'tour') {
-            <div class="tab-body">
-              @if (urlsTour.length > 0) {
-                <div class="d-flex flex-column gap-3">
-                  @for (url of urlsTour; track $index) {
-                    <div>
-                      <p class="tour-label">
-                        <i class="bi bi-camera-video me-1"></i>
-                        {{ 'estimator_file.tour_video_n' | translate:{ n: $index + 1 } }}
-                      </p>
-                      <div class="ratio ratio-16x9 rounded-3 overflow-hidden">
-                        <iframe [src]="getSafeUrl(url)" allowfullscreen
-                                allow="xr-spatial-tracking"
-                                [title]="'Video ' + ($index + 1)"></iframe>
-                      </div>
-                    </div>
-                  }
-                </div>
-              } @else {
-                <div class="media-empty">
-                  <i class="bi bi-camera-video"></i>
-                  <span>{{ 'make_offer.no_tour' | translate }}</span>
-                </div>
-              }
-
-              <!-- Datos de la propiedad escaneada -->
-              @if (matterportModelos().length) {
-                <div class="mt-3">
-                  <app-matterport-info [modelos]="matterportModelos()" />
-                </div>
-              }
-            </div>
-          }
-
-          <!-- Tab: Documentos -->
-          @if (tabMedia() === 'docs') {
-            <div class="tab-body tab-body--compact">
-              @if (documentos().length === 0) {
-                <div class="media-empty">
-                  <i class="bi bi-file-earmark"></i>
-                  <span>{{ 'make_offer.no_docs' | translate }}</span>
-                </div>
-              } @else {
-                <div class="file-list">
-                  @for (doc of documentos(); track doc.id) {
-                    <div class="file-row">
-                      <div class="file-row__icon">
-                        <i class="bi bi-file-earmark-text"></i>
-                      </div>
-                      <div class="file-row__info">
-                        <span class="file-row__name">{{ doc.nombre_archivo }}</span>
-                        <span class="file-row__meta">{{ formatTamano(doc.tamano_bytes) }}</span>
-                      </div>
-                      <button class="btn btn-outline-secondary btn-sm flex-shrink-0"
-                              type="button" (click)="verArchivo(doc)"
-                              [title]="'common.open' | translate">
-                        <i class="bi bi-box-arrow-up-right"></i>
-                      </button>
-                    </div>
-                  }
-                </div>
-              }
-            </div>
-          }
-
-        </div>
+        </section>
 
         <!-- Video de presentación del constructor (opcional). Va aparte de la
              oferta: se enlaza al expediente y cada acción se guarda al momento. -->
-        <div class="info-card">
-          <div class="info-card__header d-flex align-items-center">
-            <span class="section-heading">
-              <i class="bi bi-person-video3 me-2"></i>{{ 'expediente_video.title' | translate }}
-            </span>
-            <span class="opt-badge ms-2">{{ 'common.optional' | translate }}</span>
-          </div>
-          <div class="info-card__body">
-            @if (user()?.id; as constructorId) {
-              <app-video-expediente [expedienteId]="expedienteId"
-                                    [perfilId]="constructorId"
-                                    [numero]="detalle()!.numero" />
-            }
-          </div>
+        <section class="mo-card" aria-labelledby="mo-video-title">
+          <h2 id="mo-video-title" class="mo-h2">
+            {{ 'expediente_video.title' | translate }}
+            <span class="mo-tag">{{ 'common.optional' | translate }}</span>
+          </h2>
+          @if (user()?.id; as constructorId) {
+            <app-video-expediente [expedienteId]="expedienteId"
+                                  [perfilId]="constructorId"
+                                  [numero]="d.numero" />
+          }
+        </section>
+      </div>
+
+      <!-- ════ La oferta ════ -->
+      <section class="mo-card mo-form" aria-labelledby="mo-form-title">
+        <div class="mo-form__head">
+          <h2 id="mo-form-title" class="mo-h2">
+            {{ ofertaId() ? ('make_offer.update_title' | translate) : ('make_offer.form_title' | translate) }}
+          </h2>
+          <span class="mo-progress">
+            <span class="mo-fig">{{ completedSteps }}/{{ totalSteps }}</span>
+            {{ 'make_offer.steps_done' | translate }}
+          </span>
         </div>
 
-      </div><!-- /col izquierda -->
+        <form #f="ngForm" class="mo-fields" novalidate>
 
-      <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-           COLUMNA DERECHA â€” Formulario de oferta
-      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-      <div class="col-lg-7 fade-up" style="--delay:160ms">
-        <div class="sidebar-sticky">
-          <div class="form-card">
-
-            <!-- â”€â”€ Encabezado del formulario con progreso â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-            <div class="form-card__header">
-              <div class="d-flex align-items-center justify-content-between mb-2">
-                <span class="form-card__title">
-                  <i class="bi bi-pencil-square me-2"></i>
-                  {{ ofertaId() ? ('make_offer.update_title' | translate) : ('make_offer.form_title' | translate) }}
-                </span>
-                <span class="progress-label">
-                  <span class="progress-label__num">{{ completedSteps }}</span>/{{ totalSteps }}
-                  {{ 'make_offer.steps_done' | translate }}
-                </span>
-              </div>
-              <div class="progress-track">
-                <div class="progress-fill" [style.width.%]="(completedSteps / totalSteps) * 100"></div>
-              </div>
-              <div class="progress-steps">
-                @for (step of pasos; track step) {
-                  <div class="progress-step"
-                       [class.progress-step--done]="completedSteps >= step"></div>
-                }
-              </div>
+          <!-- Servicios de la oferta (solo con varios en el expediente) -->
+          @if (multiServicio()) {
+            <div class="mo-field-group">
+              <p class="mo-label" id="mo-oferta-servicios-label">{{ 'offer_services.label' | translate }}</p>
+              <p class="mo-hint" id="mo-oferta-servicios-hint">{{ 'offer_services.hint' | translate }}</p>
+              <app-servicio-selector
+                [opciones]="opcionesServicio()"
+                [(seleccion)]="servicioIdsOferta"
+                [validar]="intentado()"
+                [disabled]="enviando()"
+                [mostrarPrincipal]="false"
+                [compacto]="true"
+                labelledBy="mo-oferta-servicios-label"
+                describedBy="mo-oferta-servicios-hint" />
             </div>
+          }
 
-            <div class="form-card__body">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" hideRequiredMarker floatLabel="always" class="mo-price">
+            <mat-label>{{ 'make_offer.total_price' | translate }}</mat-label>
+            <span matTextPrefix>CA$&nbsp;</span>
+            <input matInput id="mo-precio" name="precio" type="number" inputmode="numeric"
+                   required min="1" step="1000" [(ngModel)]="precio" />
+            @if (multiServicio()) {
+              <mat-hint>{{ 'offer_services.price_hint' | translate }}</mat-hint>
+            }
+            @if (precio && precio > 0) {
+              <mat-hint align="end" class="mo-fig">{{ formatPrecio(precio) }}</mat-hint>
+            }
+            <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'make_offer.err_price' | translate }}</mat-error>
+          </mat-form-field>
 
-              <!-- â”€â”€ Precio â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-              <!-- Servicios de la oferta (solo con varios en el expediente) -->
-              @if (multiServicio()) {
-                <div class="form-field mb-4">
-                  <p class="form-field__label mb-1" id="mo-oferta-servicios-label">
-                    <i class="bi bi-tools me-1"></i>{{ 'offer_services.label' | translate }}
-                    <span class="req-mark">*</span>
-                  </p>
-                  <p class="field-hint mt-0 mb-2" id="mo-oferta-servicios-hint">{{ 'offer_services.hint' | translate }}</p>
-                  <app-servicio-selector
-                    [opciones]="opcionesServicio()"
-                    [(seleccion)]="servicioIdsOferta"
-                    [validar]="intentado()"
-                    [disabled]="enviando()"
-                    [mostrarPrincipal]="false"
-                    [compacto]="true"
-                    labelledBy="mo-oferta-servicios-label"
-                    describedBy="mo-oferta-servicios-hint" />
-                </div>
-              }
+          <fieldset class="mo-fieldset">
+            <legend class="mo-label">{{ 'make_offer.project_times' | translate }}</legend>
+            <div class="mo-grid3">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" hideRequiredMarker>
+                <mat-label>{{ 'make_offer.min_deadline' | translate }} ({{ 'offer.weeks' | translate }})</mat-label>
+                <input matInput id="mo-plazo-min" name="plazoMin" type="number" inputmode="numeric"
+                       required min="1" step="1" [(ngModel)]="plazoMin" />
+                <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'make_offer.err_plazo_min' | translate }}</mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" hideRequiredMarker>
+                <mat-label>{{ 'make_offer.max_deadline' | translate }} ({{ 'offer.weeks' | translate }})</mat-label>
+                <input matInput id="mo-plazo-max" name="plazoMax" type="number" inputmode="numeric"
+                       required min="1" step="1" [(ngModel)]="plazoMax" />
+                <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'make_offer.err_plazo_max' | translate }}</mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>{{ 'offer.warranty' | translate }} ({{ 'offer.years' | translate }})</mat-label>
+                <input matInput id="mo-garantia" name="garantia" type="number" inputmode="numeric"
+                       min="0" step="1" [(ngModel)]="garantiaAnos" />
+                <mat-hint>{{ 'common.optional' | translate }}</mat-hint>
+              </mat-form-field>
+            </div>
+          </fieldset>
 
-              <div class="form-field mb-4">
-                <label class="form-field__label" for="mo-precio">
-                  <i class="bi bi-coin me-1"></i>{{ 'make_offer.total_price' | translate }}
-                  <span class="req-mark">*</span>
-                </label>
-                @if (multiServicio()) {
-                  <p class="field-hint mt-0 mb-2">{{ 'offer_services.price_hint' | translate }}</p>
-                }
-                <div class="price-wrap" [class.price-wrap--focus]="false">
-                  <span class="price-currency">CA$</span>
-                  <input id="mo-precio" type="number" class="price-input"
-                         placeholder="0" min="1" step="1000"
-                         [(ngModel)]="precio" />
-                </div>
-                @if (precio && precio > 0) {
-                  <p class="field-hint field-hint--ok">
-                    <i class="bi bi-check-circle me-1"></i>
-                    {{ precio | number:'1.0-0' }} CAD
-                  </p>
-                }
-              </div>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" hideRequiredMarker class="mo-date">
+            <mat-label>{{ 'make_offer.start_date' | translate }}</mat-label>
+            <input matInput id="mo-fecha-inicio" name="fechaInicio" type="date" required [(ngModel)]="fechaInicio" />
+            <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'make_offer.err_date' | translate }}</mat-error>
+          </mat-form-field>
 
-              <!-- â”€â”€ Plazos + GarantÃ­a â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-              <div class="form-field mb-4">
-                <label class="form-field__label">
-                  <i class="bi bi-clock me-1"></i>{{ 'make_offer.project_times' | translate }}
-                </label>
-                <div class="row g-3">
-                  <div class="col-4">
-                    <label class="field-sublabel" for="mo-plazo-min">
-                      {{ 'make_offer.min_deadline' | translate }}
-                      <small class="text-ink-muted">({{ 'offer.weeks' | translate }})</small>
-                      <span class="req-mark">*</span>
-                    </label>
-                    <input id="mo-plazo-min" type="number" class="form-control" placeholder="1" min="1" step="1"
-                           [(ngModel)]="plazoMin" />
-                  </div>
-                  <div class="col-4">
-                    <label class="field-sublabel" for="mo-plazo-max">
-                      {{ 'make_offer.max_deadline' | translate }}
-                      <small class="text-ink-muted">({{ 'offer.weeks' | translate }})</small>
-                      <span class="req-mark">*</span>
-                    </label>
-                    <input id="mo-plazo-max" type="number" class="form-control" placeholder="4" min="1" step="1"
-                           [(ngModel)]="plazoMax" />
-                  </div>
-                  <div class="col-4">
-                    <label class="field-sublabel">
-                      {{ 'offer.warranty' | translate }}
-                      <small class="text-ink-muted">({{ 'offer.years' | translate }})</small>
-                    </label>
-                    <input type="number" class="form-control" placeholder="1" min="0" step="1"
-                           [(ngModel)]="garantiaAnos" />
-                  </div>
-                </div>
-              </div>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" hideRequiredMarker>
+            <mat-label>{{ 'make_offer.approach_desc' | translate }}</mat-label>
+            <textarea matInput id="mo-descripcion" name="descripcion" rows="6" required
+                      [(ngModel)]="descripcion"></textarea>
+            <mat-hint>{{ 'make_offer.approach_placeholder' | translate }}</mat-hint>
+            <mat-hint align="end" class="mo-fig">{{ descripcion.trim().length }} {{ 'common.chars' | translate }}</mat-hint>
+            <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'make_offer.err_desc' | translate }}</mat-error>
+          </mat-form-field>
+        </form>
 
-              <!-- â”€â”€ Fecha de inicio â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-              <div class="form-field mb-4">
-                <label class="form-field__label" for="mo-fecha-inicio">
-                  <i class="bi bi-calendar-event me-1"></i>{{ 'make_offer.start_date' | translate }}
-                  <span class="req-mark">*</span>
-                </label>
-                <input id="mo-fecha-inicio" type="date" class="form-control" [(ngModel)]="fechaInicio" />
-              </div>
+        <!-- Documento PDF de la oferta: clic o arrastre -->
+        <div class="mo-field-group">
+          <h3 class="mo-label" id="mo-docs-label">{{ 'make_offer.pdf_doc' | translate }}</h3>
+          <div id="mo-docs" class="mo-drop" role="group" aria-labelledby="mo-docs-label"
+               [class.is-drag]="dragDocs()"
+               [class.is-error]="intentado() && !ofertaId() && !documentosOferta().length"
+               (dragover)="onDragOverDocs($event)"
+               (dragleave)="onDragLeaveDocs()"
+               (drop)="onDropDocs($event)">
 
-              <!-- â”€â”€ DescripciÃ³n â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-              <div class="form-field mb-4">
-                <label class="form-field__label" for="mo-descripcion">
-                  <i class="bi bi-text-paragraph me-1"></i>{{ 'make_offer.approach_desc' | translate }}
-                  <span class="req-mark">*</span>
-                </label>
-                <textarea id="mo-descripcion" class="form-control" rows="4"
-                          [placeholder]="'make_offer.approach_placeholder' | translate"
-                          [(ngModel)]="descripcion"></textarea>
-                <p class="field-hint">{{ descripcion.trim().length }} {{ 'common.chars' | translate }}</p>
-              </div>
-
-              <!-- â”€â”€ Adjuntos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-              <div class="form-field mb-4">
-                <label class="form-field__label">
-                  <i class="bi bi-paperclip me-1"></i>{{ 'make_offer.attachments' | translate }}
-                </label>
-                <div class="attach-panel">
-
-                  <!-- PDF — varios documentos, clic o arrastre -->
-                  <div id="mo-docs" class="attach-item attach-item--docs"
-                       [class.attach-item--drag]="dragDocs()"
-                       (dragover)="onDragOverDocs($event)"
-                       (dragleave)="onDragLeaveDocs()"
-                       (drop)="onDropDocs($event)">
-                    <div class="attach-item__icon attach-item__icon--pdf">
-                      <i class="bi bi-file-earmark-pdf"></i>
-                    </div>
-                    <div class="attach-item__info">
-                      <p class="attach-item__label">
-                        {{ 'make_offer.pdf_doc' | translate }}
-                        @if (!ofertaId()) {
-                          <span class="req-mark">*</span>
-                        }
-                      </p>
-
-                      @if (!documentosActuales().length && !documentosOferta().length) {
-                        <p class="attach-item__empty">{{ 'make_offer.no_document' | translate }}</p>
+            @if (documentosActuales().length || documentosOferta().length) {
+              <ul class="mo-files">
+                @for (doc of documentosActuales(); track doc.id) {
+                  <li class="mo-file">
+                    <mat-icon class="mo-file__icon is-ok" aria-hidden="true">check_circle</mat-icon>
+                    <span class="mo-file__text"><span class="mo-file__name">{{ doc.nombre_archivo }}</span></span>
+                    <button mat-button type="button" class="mo-file__open" (click)="verArchivo(doc)"
+                            [attr.aria-label]="('make_offer.view' | translate) + ' ' + doc.nombre_archivo">
+                      {{ 'make_offer.view' | translate }}
+                    </button>
+                    <button mat-icon-button type="button" class="mo-del"
+                            [disabled]="eliminandoDoc() !== null"
+                            (click)="eliminarDocumentoGuardado(doc)"
+                            [attr.aria-label]="('common.delete' | translate) + ' ' + doc.nombre_archivo">
+                      @if (eliminandoDoc() === doc.id) {
+                        <span class="mo-spinner" aria-hidden="true"></span>
+                      } @else {
+                        <mat-icon>delete</mat-icon>
                       }
-
-                      @for (doc of documentosActuales(); track doc.id) {
-                        <p class="attach-item__name attach-item__name--saved">
-                          <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
-                          <span class="attach-item__fname" [title]="doc.nombre_archivo">{{ doc.nombre_archivo }}</span>
-                          <button class="attach-view-btn" type="button" (click)="verArchivo(doc)">
-                            {{ 'make_offer.view' | translate }}
-                          </button>
-                          <button class="attach-remove-btn" type="button"
-                                  [disabled]="eliminandoDoc() !== null"
-                                  [title]="'common.delete' | translate"
-                                  (click)="eliminarDocumentoGuardado(doc)">
-                            @if (eliminandoDoc() === doc.id) {
-                              <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-                            } @else {
-                              <i class="bi bi-trash" aria-hidden="true"></i>
-                            }
-                          </button>
-                        </p>
-                      }
-
-                      @for (file of documentosOferta(); track file.name + file.size; let i = $index) {
-                        <p class="attach-item__name attach-item__name--new">
-                          <i class="bi bi-check-circle" aria-hidden="true"></i>
-                          <span class="attach-item__fname" [title]="file.name">{{ file.name }}</span>
-                          <span class="attach-item__size">{{ formatTamano(file.size) }}</span>
-                          <button class="attach-remove-btn" type="button"
-                                  [title]="'common.delete' | translate"
-                                  (click)="quitarDocumentoPendiente(i)">
-                            <i class="bi bi-x-lg" aria-hidden="true"></i>
-                          </button>
-                        </p>
-                      }
-
-                      <p class="attach-item__hint">{{ 'my_documents.add_drop' | translate }}</p>
-                    </div>
-                    <label class="btn btn-outline-secondary btn-sm mb-0 flex-shrink-0">
-                      <i class="bi bi-upload me-1"></i>
-                      {{ 'make_offer.attach' | translate }}
-                      <input type="file" accept=".pdf" multiple class="d-none" (change)="onDocumentos($event)" />
-                    </label>
-                  </div>
-
-                </div>
-              </div>
-
-              <!-- â”€â”€ Checklist de completitud â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-              <div class="checklist mb-4">
-                <div class="checklist__item" [class.checklist__item--done]="!!precio && precio > 0">
-                  <i class="bi" [class.bi-check-circle-fill]="!!precio && precio > 0"
-                                [class.bi-circle]="!precio || precio <= 0"></i>
-                  {{ 'make_offer.checklist_price' | translate }}
-                </div>
-                <div class="checklist__item"
-                     [class.checklist__item--done]="!!plazoMin && plazoMin > 0 && !!plazoMax && plazoMax >= plazoMin">
-                  <i class="bi"
-                     [class.bi-check-circle-fill]="!!plazoMin && plazoMin > 0 && !!plazoMax && plazoMax >= plazoMin"
-                     [class.bi-circle]="!plazoMin || plazoMin <= 0 || !plazoMax || plazoMax < plazoMin"></i>
-                  {{ 'make_offer.checklist_deadline' | translate }}
-                </div>
-                <div class="checklist__item" [class.checklist__item--done]="!!fechaInicio">
-                  <i class="bi" [class.bi-check-circle-fill]="!!fechaInicio"
-                                [class.bi-circle]="!fechaInicio"></i>
-                  {{ 'make_offer.checklist_start' | translate }}
-                </div>
-                <div class="checklist__item" [class.checklist__item--done]="!!descripcion.trim()">
-                  <i class="bi" [class.bi-check-circle-fill]="!!descripcion.trim()"
-                                [class.bi-circle]="!descripcion.trim()"></i>
-                  {{ 'make_offer.checklist_desc' | translate }}
-                </div>
-                @if (!ofertaId()) {
-                  <div class="checklist__item" [class.checklist__item--done]="documentosOferta().length > 0">
-                    <i class="bi" [class.bi-check-circle-fill]="documentosOferta().length > 0"
-                                  [class.bi-circle]="documentosOferta().length === 0"></i>
-                    PDF
-                  </div>
+                    </button>
+                  </li>
                 }
-              </div>
-
-              <!-- â”€â”€ Feedback â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-              @if (errorEnvio()) {
-                <div class="feedback-msg feedback-msg--error mb-3">
-                  <i class="bi bi-exclamation-circle flex-shrink-0"></i>
-                  {{ errorEnvio() | translate }}
-                </div>
-              }
-              @if (exitoMsg()) {
-                <div class="feedback-msg feedback-msg--success mb-3">
-                  <i class="bi bi-check-circle-fill flex-shrink-0"></i>
-                  {{ exitoMsg() | translate }}
-                </div>
-              }
-
-              <!-- â”€â”€ Acciones â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-              <div class="d-flex flex-column gap-2">
-
-                <button class="btn-send" type="button"
-                        (click)="enviarOferta()"
-                        [disabled]="enviando() || (enviada() && !ofertaId())">
-                  @if (enviando()) {
-                    <span class="spinner-border spinner-border-sm" role="status"></span>
-                    {{ ofertaId() ? ('make_offer.updating' | translate) : ('make_offer.sending' | translate) }}
-                  } @else {
-                    <i class="bi" [class.bi-send-check]="!ofertaId()"
-                                  [class.bi-arrow-repeat]="!!ofertaId()"></i>
-                    {{ ofertaId() ? ('make_offer.update_offer' | translate) : ('make_offer.send_offer' | translate) }}
-                  }
-                </button>
-
-                @if (enviada() && !ofertaId()) {
-                  <button class="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2"
-                          type="button" (click)="verMisOfertas()">
-                    <i class="bi bi-list-check"></i>{{ 'make_offer.view_my_offers' | translate }}
-                  </button>
+                @for (file of documentosOferta(); track file.name + file.size; let i = $index) {
+                  <li class="mo-file">
+                    <mat-icon class="mo-file__icon" aria-hidden="true">picture_as_pdf</mat-icon>
+                    <span class="mo-file__text">
+                      <span class="mo-file__name">{{ file.name }}</span>
+                      <span class="mo-file__size">{{ formatTamano(file.size) }}</span>
+                    </span>
+                    <button mat-icon-button type="button" class="mo-del"
+                            (click)="quitarDocumentoPendiente(i)"
+                            [attr.aria-label]="('common.delete' | translate) + ' ' + file.name">
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  </li>
                 }
+              </ul>
+            } @else {
+              <p class="mo-drop__empty">
+                <mat-icon aria-hidden="true">upload_file</mat-icon>
+                {{ 'make_offer.no_document' | translate }}
+              </p>
+            }
 
-                <button class="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2"
-                        type="button" (click)="volver()">
-                  <i class="bi bi-arrow-left"></i>{{ 'make_offer.back_to_files' | translate }}
-                </button>
+            <div class="mo-drop__foot">
+              <button mat-stroked-button type="button" (click)="docInput.click()">
+                <mat-icon>attach_file</mat-icon>
+                {{ 'make_offer.attach' | translate }}
+              </button>
+              <span class="mo-hint">{{ 'my_documents.add_drop' | translate }}</span>
+              <input #docInput type="file" accept=".pdf,application/pdf" multiple hidden (change)="onDocumentos($event)" />
+            </div>
+          </div>
+          @if (intentado() && !ofertaId() && !documentosOferta().length) {
+            <p class="mo-error"><mat-icon aria-hidden="true">error</mat-icon>{{ 'make_offer.err_doc' | translate }}</p>
+          }
+        </div>
 
-              </div>
+        <!-- Lo que falta, de un vistazo -->
+        <!-- Solo visual: el recuento de la cabecera y el resumen de faltantes lo dicen en texto. -->
+        <ul class="mo-check" aria-hidden="true">
+          @for (c of checklist; track c.label) {
+            <li [class.is-done]="c.ok">
+              <mat-icon>{{ c.ok ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+              {{ c.label | translate }}
+            </li>
+          }
+        </ul>
 
-              <app-campos-faltantes class="mt-3" [extra]="faltantes" [intento]="intentos()" />
+        @if (errorEnvio()) {
+          <p class="mo-feedback is-error" role="alert">
+            <mat-icon aria-hidden="true">error</mat-icon>
+            {{ errorEnvio() | translate }}
+          </p>
+        }
+        @if (exitoMsg()) {
+          <p class="mo-feedback is-ok" role="status">
+            <mat-icon aria-hidden="true">check_circle</mat-icon>
+            {{ exitoMsg() | translate }}
+          </p>
+        }
 
-            </div><!-- /form-card__body -->
-          </div><!-- /form-card -->
-        </div><!-- /sidebar-sticky -->
-      </div><!-- /col derecha -->
+        <div class="mo-actions">
+          <button mat-flat-button type="button" class="mo-submit" [class.ds-cta]="!ofertaId()"
+                  (click)="enviar(f)"
+                  [disabled]="enviando() || (enviada() && !ofertaId())">
+            @if (enviando()) {
+              <span class="mo-spinner is-light" aria-hidden="true"></span>
+            } @else {
+              <mat-icon>{{ ofertaId() ? 'sync' : 'send' }}</mat-icon>
+            }
+            @if (enviando()) {
+              {{ ofertaId() ? ('make_offer.updating' | translate) : ('make_offer.sending' | translate) }}
+            } @else {
+              {{ ofertaId() ? ('make_offer.update_offer' | translate) : ('make_offer.send_offer' | translate) }}
+            }
+          </button>
 
-    </div><!-- /row -->
+          @if (enviada() && !ofertaId()) {
+            <a mat-stroked-button routerLink="/builder/my-offers">
+              <mat-icon>request_quote</mat-icon>
+              {{ 'make_offer.view_my_offers' | translate }}
+            </a>
+          }
+        </div>
 
+        <app-campos-faltantes [extra]="faltantes" [intento]="intentos()" />
+      </section>
+    </div>
   }
-
 </div>
-

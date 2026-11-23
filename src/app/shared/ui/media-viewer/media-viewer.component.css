@@ -1,6 +1,6 @@
 /* component: media viewer (tour 3D / vídeo a pantalla completa)
  * states: tour · vídeo · consejo de primera vez
- * contrast: texto blanco sobre ardoise profundo (≥ 14:1); consejo ink sobre blanco
+ * contrast: texto claro sobre el fondo del escaneo (≥ 14:1); consejo ink sobre blanco
  */
 :host {
   display: block;
@@ -34,6 +34,7 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-bold);
+  font-stretch: var(--ds-stretch-heading);
   letter-spacing: normal;
   white-space: nowrap;
   text-overflow: ellipsis;

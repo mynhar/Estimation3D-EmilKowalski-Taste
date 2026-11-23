@@ -1,559 +1,473 @@
-<div class="fte-root">
+<div class="page-wrapper fi">
 
-  <!-- ── Cargando ─────────────────────────────────────────────────────────── -->
+  <!-- ── Cargando ────────────────────────────────────────────────────────── -->
   @if (cargando()) {
-    <div class="fte-loading">
-      <span class="fte-spinner" role="status"></span>
-      {{ 'builder_offer.loading' | translate }}
+    <div class="fi-skel" role="status">
+      <span class="cdk-visually-hidden">{{ 'builder_offer.loading' | translate }}</span>
+      <span class="skel skel--title" aria-hidden="true"></span>
+      <span class="fi-skel__cols" aria-hidden="true">
+        <span class="skel skel--card"></span>
+        <span class="skel skel--form"></span>
+      </span>
     </div>
 
-  <!-- ── No encontrado ─────────────────────────────────────────────────────── -->
+  <!-- ── No encontrado ───────────────────────────────────────────────────── -->
   } @else if (!detalle()) {
-    <div class="fte-state-empty">
-      <div class="fte-state-empty__icon"><i class="bi bi-exclamation-triangle"></i></div>
-      <p class="fte-state-empty__title">{{ 'file.not_found' | translate }}</p>
-      @if (errorMsg()) {
-        <p class="fte-state-empty__msg">{{ errorMsg() | translate }}</p>
-      }
-      <button class="fte-btn-outline" (click)="volver()">
-        <i class="bi bi-arrow-left"></i>{{ 'common.back' | translate }}
+    <app-empty-state class="fi-missing"
+                     matIcon="folder_off"
+                     [titulo]="'file.not_found' | translate"
+                     [texto]="errorMsg() ? (errorMsg() | translate) : ''">
+      <button actions mat-stroked-button type="button" (click)="volver()">
+        <mat-icon>arrow_back</mat-icon>
+        {{ 'common.back' | translate }}
       </button>
-    </div>
+    </app-empty-state>
 
-  <!-- ── Contenido ─────────────────────────────────────────────────────────── -->
   } @else {
+    @let d = detalle()!;
 
-    <!-- Header -->
-    <header class="fte-header">
-      <div class="fte-header__content">
-        <button class="fte-back-btn" (click)="volver()" [title]="'common.back' | translate">
-          <i class="bi bi-arrow-left"></i>
-        </button>
-        <div>
-          <p class="fte-header__eyebrow">
-            <span class="fte-num-mono">{{ detalle()!.numero }}</span>
-            · {{ 'files_to_estimate.title' | translate }}
-          </p>
-          <h1 class="fte-header__title">{{ servicioNombre }}</h1>
-          <div class="fte-header__meta">
-            <span class="fte-meta-item">
-              <i class="bi bi-person"></i>{{ detalle()!.cliente_nombre }}
-            </span>
-            <span class="fte-meta-sep">·</span>
-            <span class="fte-meta-item">
-              <i class="bi bi-geo-alt"></i>{{ detalle()!.canton }}, {{ detalle()!.provincia }}
-            </span>
-          </div>
-        </div>
-      </div>
-      <div class="fte-header__badges">
+    <!-- ── Cabecera ────────────────────────────────────────────────────── -->
+    <header class="fi-head">
+      <button mat-button type="button" class="fi-back" (click)="volver()">
+        <mat-icon>arrow_back</mat-icon>
+        {{ 'common.back' | translate }}
+      </button>
+      <app-page-header [titulo]="servicioNombre" />
+      <div class="fi-meta">
+        <span class="fi-fig">{{ d.numero }}</span>
+        <span class="fi-meta__item">
+          <mat-icon aria-hidden="true">person</mat-icon>{{ d.cliente_nombre }}
+        </span>
+        <span class="fi-meta__item">
+          <mat-icon aria-hidden="true">location_on</mat-icon>{{ d.canton }}, {{ d.provincia }}
+        </span>
         @if (formularioCompleto) {
-          <span class="fte-badge fte-badge--success">
-            <i class="bi bi-check-circle"></i>{{ 'estimator_file.pill_ready' | translate }}
-          </span>
+          <span class="fi-tag is-ok"><mat-icon aria-hidden="true">check_circle</mat-icon>{{ 'estimator_file.pill_ready' | translate }}</span>
         } @else {
-          <span class="fte-badge fte-badge--warning">
-            <i class="bi bi-pencil"></i>{{ 'estimator_file.pill_in_progress' | translate }}
-          </span>
+          <span class="fi-tag is-warn"><mat-icon aria-hidden="true">edit</mat-icon>{{ 'estimator_file.pill_in_progress' | translate }}</span>
         }
         @if (fotosEstimador().length > 0) {
-          <span class="fte-badge fte-badge--info">
-            <i class="bi bi-images"></i>{{ fotosEstimador().length }}
+          <span class="fi-meta__item">
+            <mat-icon aria-hidden="true">photo_library</mat-icon>
+            <span><span class="fi-fig">{{ fotosEstimador().length }}</span> {{ (fotosEstimador().length === 1 ? 'estimator_file.photos_one' : 'estimator_file.photos_many') | translate }}</span>
           </span>
         }
       </div>
     </header>
 
-    <!-- Main grid -->
-    <div class="fte-main">
+    <div class="fi-layout">
 
-      <!-- ── Columna izquierda ──────────────────────────────────────────── -->
-      <div class="fte-col-main">
+      <!-- ══ Columna del dossier ══════════════════════════════════════════ -->
+      <div class="fi-col">
 
-        <!-- Detalles del expediente -->
-        <section class="fte-card">
-          <h2 class="fte-card__title">
-            <i class="bi bi-info-circle"></i>{{ 'estimator_file.details_title' | translate }}
-          </h2>
+        <!-- Datos del dossier -->
+        <section class="fi-card" aria-labelledby="fte-details-title">
+          <h2 id="fte-details-title" class="fi-h2">{{ 'estimator_file.details_title' | translate }}</h2>
 
-          <div class="fte-info-section">
-            <p class="fte-section-label">{{ 'builder_offer.client_label' | translate }}</p>
-            <div class="fte-info-grid">
-              <div class="fte-info-item">
-                <span class="fte-info-label">{{ 'common.name' | translate }}</span>
-                <span class="fte-info-value">{{ detalle()!.cliente_nombre }}</span>
+          <div class="fi-section">
+            <h3 class="fi-label">{{ 'builder_offer.client_label' | translate }}</h3>
+            <dl class="fi-facts">
+              <div class="fi-fact">
+                <dt>{{ 'common.name' | translate }}</dt>
+                <dd>{{ d.cliente_nombre }}</dd>
               </div>
-              <div class="fte-info-item">
-                <span class="fte-info-label">{{ 'common.phone' | translate }}</span>
-                <span class="fte-info-value">{{ detalle()!.cliente_telefono || '—' }}</span>
+              <div class="fi-fact">
+                <dt>{{ 'common.phone' | translate }}</dt>
+                <dd class="fi-fig">{{ d.cliente_telefono || '—' }}</dd>
               </div>
-            </div>
+            </dl>
           </div>
 
-          <div class="fte-divider"></div>
-
-          <div class="fte-info-section">
-            <p class="fte-section-label">{{ 'estimator_file.location_section' | translate }}</p>
-            <div class="fte-info-grid fte-info-grid--wide">
-              <div class="fte-info-item fte-info-item--full">
-                <span class="fte-info-label">{{ 'common.address' | translate }}</span>
-                <span class="fte-info-value">{{ detalle()!.direccion }}</span>
-                <span class="fte-info-value">{{ detalle()!.canton }}, {{ detalle()!.provincia }}, {{ detalle()!.distrito }}</span>
+          <div class="fi-block">
+            <h3 class="fi-label">{{ 'estimator_file.location_section' | translate }}</h3>
+            <dl class="fi-facts">
+              <div class="fi-fact is-wide">
+                <dt>{{ 'common.address' | translate }}</dt>
+                <dd>
+                  {{ d.direccion }}
+                  <span class="fi-fact__sub">{{ d.canton }}, {{ d.provincia }}, {{ d.distrito }}</span>
+                </dd>
               </div>
-              <div class="fte-info-item">
-                <span class="fte-info-label">{{ 'file.reference' | translate }}</span>
-                <span class="fte-info-value">{{ detalle()!.referencia || '—' }}</span>
+              <div class="fi-fact is-wide">
+                <dt>{{ 'file.reference' | translate }}</dt>
+                <dd class="fi-notes">{{ d.referencia || '—' }}</dd>
               </div>
-            </div>
+            </dl>
           </div>
 
-          <div class="fte-divider"></div>
-
-          <div class="fte-info-section">
-            <p class="fte-section-label">{{ 'estimator_file.planned_visit' | translate }}</p>
-            <div class="fte-info-grid">
-              <div class="fte-info-item">
-                <span class="fte-info-label">{{ 'common.date' | translate }}</span>
-                <span class="fte-info-value">{{ formatFecha(detalle()!.fecha_visita) }}</span>
+          <div class="fi-block">
+            <h3 class="fi-label">{{ 'estimator_file.planned_visit' | translate }}</h3>
+            <dl class="fi-facts">
+              <div class="fi-fact">
+                <dt>{{ 'common.date' | translate }}</dt>
+                <dd class="fi-fig">{{ formatFecha(d.fecha_visita) }}</dd>
               </div>
-              <div class="fte-info-item">
-                <span class="fte-info-label">{{ 'file.hour' | translate }}</span>
-                <span class="fte-info-value">{{ formatHora(detalle()!.fecha_visita) }}</span>
+              <div class="fi-fact">
+                <dt>{{ 'file.hour' | translate }}</dt>
+                <dd class="fi-fig">{{ formatHora(d.fecha_visita) }}</dd>
               </div>
-            </div>
+            </dl>
           </div>
         </section>
 
-        <!-- ── Archivos del cliente (solo lectura) ────────────────────── -->
+        <!-- Archivos que subió el cliente (solo lectura) -->
         @if (fotosCliente().length > 0 || videosCliente().length > 0 || documentosCliente().length > 0) {
-          <section class="fte-card">
-            <div class="fte-card__header">
-              <h2 class="fte-card__title">
-                <i class="bi bi-person-lines-fill"></i>{{ 'estimator_file.client_files_title' | translate }}
-              </h2>
-            </div>
+          <section class="fi-card" aria-labelledby="fte-client-files-title">
+            <h2 id="fte-client-files-title" class="fi-h2">{{ 'estimator_file.client_files_title' | translate }}</h2>
 
-            <!-- Fotos del cliente -->
             @if (fotosCliente().length > 0) {
-              <p class="fte-section-label">
-                <i class="bi bi-images"></i> {{ 'file.site_photos' | translate }} ({{ fotosCliente().length }})
-              </p>
-              <div class="fte-photo-grid">
-                @for (f of fotosCliente(); track f.id) {
-                  <div class="fte-photo-thumb">
-                    <img [src]="publicUrl(f.url_storage)"
-                         class="fte-photo-thumb__img"
-                         [title]="f.nombre_archivo"
-                         (click)="verArchivo(f)" />
-                  </div>
-                }
+              <div class="fi-section">
+                <h3 class="fi-label">
+                  {{ 'file.site_photos' | translate }} <span class="fi-count">{{ fotosCliente().length }}</span>
+                </h3>
+                <ul class="fi-photos">
+                  @for (f of fotosCliente(); track f.id) {
+                    <li>
+                      <button type="button" class="fi-photo" (click)="verArchivo(f)" [attr.aria-label]="f.nombre_archivo">
+                        <img [src]="publicUrl(f.url_storage)" alt="" loading="lazy" />
+                      </button>
+                    </li>
+                  }
+                </ul>
               </div>
             }
 
-            <!-- Videos del cliente -->
             @if (videosCliente().length > 0) {
-              <p class="fte-section-label">
-                <i class="bi bi-camera-video"></i> {{ 'builder_offer.videos' | translate }} ({{ videosCliente().length }})
-              </p>
-              @for (v of videosCliente(); track v.id) {
-                <div class="fte-file-row">
-                  <div class="fte-file-row__icon"><i class="bi bi-camera-video"></i></div>
-                  <div class="fte-file-row__info">
-                    <p class="fte-file-row__name">{{ v.nombre_archivo }}</p>
-                    <p class="fte-file-row__size">{{ formatTamano(v.tamano_bytes) }}</p>
-                  </div>
-                  <div class="fte-file-row__actions">
-                    <button class="fte-btn-icon" (click)="verArchivo(v)" [title]="'common.view' | translate">
-                      <i class="bi bi-eye"></i>
-                    </button>
-                  </div>
-                </div>
-              }
+              <div class="fi-section" [class.fi-block]="fotosCliente().length > 0">
+                <h3 class="fi-label">
+                  {{ 'builder_offer.videos' | translate }} <span class="fi-count">{{ videosCliente().length }}</span>
+                </h3>
+                <ul class="fi-files">
+                  @for (v of videosCliente(); track v.id) {
+                    <li class="fi-file">
+                      <mat-icon class="fi-file__icon" aria-hidden="true">videocam</mat-icon>
+                      <span class="fi-file__text">
+                        <span class="fi-file__name">{{ v.nombre_archivo }}</span>
+                        <span class="fi-file__size">{{ formatTamano(v.tamano_bytes) }}</span>
+                      </span>
+                      <button mat-button type="button" class="fi-file__open" (click)="verArchivo(v)"
+                              [attr.aria-label]="('common.view' | translate) + ' ' + v.nombre_archivo">
+                        {{ 'common.view' | translate }}
+                      </button>
+                    </li>
+                  }
+                </ul>
+              </div>
             }
 
-            <!-- Documentos del cliente -->
             @if (documentosCliente().length > 0) {
-              <p class="fte-section-label">
-                <i class="bi bi-file-earmark-text"></i> {{ 'file.technical_docs' | translate }} ({{ documentosCliente().length }})
-              </p>
-              @for (d of documentosCliente(); track d.id) {
-                <div class="fte-file-row">
-                  <div class="fte-file-row__icon"><i class="bi bi-file-earmark-text"></i></div>
-                  <div class="fte-file-row__info">
-                    <p class="fte-file-row__name">{{ d.nombre_archivo }}</p>
-                    <p class="fte-file-row__size">{{ formatTamano(d.tamano_bytes) }}</p>
-                  </div>
-                  <div class="fte-file-row__actions">
-                    <button class="fte-btn-icon" (click)="verDocumento(d)" [title]="'common.view' | translate">
-                      <i class="bi bi-eye"></i>
-                    </button>
-                  </div>
-                </div>
-              }
+              <div class="fi-section" [class.fi-block]="fotosCliente().length > 0 || videosCliente().length > 0">
+                <h3 class="fi-label">
+                  {{ 'file.technical_docs' | translate }} <span class="fi-count">{{ documentosCliente().length }}</span>
+                </h3>
+                <ul class="fi-files">
+                  @for (doc of documentosCliente(); track doc.id) {
+                    <li class="fi-file">
+                      <mat-icon class="fi-file__icon" aria-hidden="true">description</mat-icon>
+                      <span class="fi-file__text">
+                        <span class="fi-file__name">{{ doc.nombre_archivo }}</span>
+                        <span class="fi-file__size">{{ formatTamano(doc.tamano_bytes) }}</span>
+                      </span>
+                      <button mat-button type="button" class="fi-file__open" (click)="verDocumento(doc)"
+                              [attr.aria-label]="('common.view' | translate) + ' ' + doc.nombre_archivo">
+                        {{ 'common.view' | translate }}
+                      </button>
+                    </li>
+                  }
+                </ul>
+              </div>
             }
           </section>
         }
 
-        <!-- ── Fotos del sitio ────────────────────────────────────────── -->
-        <section class="fte-card">
-          <div class="fte-card__header">
-            <h2 class="fte-card__title">
-              <i class="bi bi-images"></i>{{ 'file.site_photos' | translate }}
-              @if (fotosEstimador().length > 0) {
-                <span class="fte-count-badge">{{ fotosEstimador().length }}</span>
-              }
+        <!-- Fotos del estimador -->
+        <section class="fi-card" aria-labelledby="fte-photos-title">
+          <div class="fi-card__head">
+            <h2 id="fte-photos-title" class="fi-h2">
+              {{ 'file.site_photos' | translate }}
+              @if (fotosEstimador().length > 0) { <span class="fi-count">{{ fotosEstimador().length }}</span> }
             </h2>
-            <label class="fte-btn-upload" [class.fte-btn-upload--busy]="subiendoFoto()">
+            <button mat-stroked-button type="button" [disabled]="subiendoFoto()" (click)="fotoInput.click()">
               @if (subiendoFoto()) {
-                <span class="fte-spinner-sm"></span>{{ 'estimator_file.uploading' | translate }}
+                <span class="fi-spinner" aria-hidden="true"></span>
               } @else {
-                <i class="bi bi-cloud-upload"></i>{{ 'estimator_file.upload_photos' | translate }}
+                <mat-icon>upload</mat-icon>
               }
-              <input type="file" accept="image/*" multiple class="fte-file-input"
-                     (change)="subirFotos($event)" [disabled]="subiendoFoto()"/>
-            </label>
+              {{ (subiendoFoto() ? 'estimator_file.uploading' : 'estimator_file.upload_photos') | translate }}
+            </button>
+            <input #fotoInput type="file" accept="image/*" multiple hidden
+                   (change)="subirFotos($event)" [disabled]="subiendoFoto()" />
           </div>
 
           @if (errorFotos()) {
-            <div class="fte-alert fte-alert--danger">
-              <i class="bi bi-exclamation-circle"></i>{{ errorFotos() }}
-            </div>
+            <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorFotos() }}</p>
           }
 
           @if (fotosEstimador().length === 0) {
-            <div class="fte-upload-empty">
-              <i class="bi bi-camera"></i>
-              <p>{{ 'estimator_file.no_photos_hint' | translate }}</p>
-            </div>
+            <p class="fi-empty"><mat-icon aria-hidden="true">add_a_photo</mat-icon>{{ 'estimator_file.no_photos_hint' | translate }}</p>
           } @else {
-            <div class="fte-photo-grid">
+            <ul class="fi-photos">
               @for (f of fotosEstimador(); track f.id) {
-                <div class="fte-photo-thumb">
-                  <img [src]="publicUrl(f.url_storage)"
-                       class="fte-photo-thumb__img"
-                       [title]="f.nombre_archivo"
-                       (click)="verArchivo(f)" />
-                  <button class="fte-photo-thumb__del"
-                          [title]="'estimator_file.delete_photo' | translate"
-                          (click)="eliminarArchivo(f, 'foto')">
-                    <i class="bi bi-x-lg"></i>
+                <li>
+                  <button type="button" class="fi-photo" (click)="verArchivo(f)" [attr.aria-label]="f.nombre_archivo">
+                    <img [src]="publicUrl(f.url_storage)" alt="" loading="lazy" />
                   </button>
-                </div>
+                  <button mat-icon-button type="button" class="fi-photo__del"
+                          [attr.aria-label]="('estimator_file.delete_photo' | translate) + ' ' + f.nombre_archivo"
+                          [matTooltip]="'estimator_file.delete_photo' | translate"
+                          (click)="eliminarArchivo(f, 'foto')">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </li>
               }
-            </div>
+            </ul>
           }
         </section>
 
-        <!-- ── Tour virtual ───────────────────────────────────────────── -->
-        <section class="fte-card">
-          <div class="fte-card__header">
-            <h2 class="fte-card__title">
-              <i class="bi bi-camera-video"></i>{{ 'estimator_file.tour_title' | translate }}
-              @if (urlsTour().length > 0) {
-                <span class="fte-count-badge">{{ urlsTour().length }}</span>
-              }
+        <!-- Tour virtual (Matterport): una fila por vídeo, desplegable -->
+        <section class="fi-card" aria-labelledby="fte-tour-title">
+          <div class="fi-card__head">
+            <h2 id="fte-tour-title" class="fi-h2">
+              {{ 'estimator_file.tour_title' | translate }}
+              @if (urlsTour().length > 0) { <span class="fi-count">{{ urlsTour().length }}</span> }
             </h2>
             @if (!mostrandoFormAdd() && editandoIndex() === null) {
-              <button class="fte-btn-secondary"
-                      (click)="mostrarFormAgregarVideo()"
-                      [disabled]="guardandoTour()">
-                <i class="bi bi-plus-lg"></i>{{ 'estimator_file.tour_add_video' | translate }}
+              <button mat-stroked-button type="button" [disabled]="guardandoTour()" (click)="mostrarFormAgregarVideo()">
+                <mat-icon>add</mat-icon>
+                {{ 'estimator_file.tour_add_video' | translate }}
               </button>
             }
           </div>
 
           @if (errorTour()) {
-            <div class="fte-alert fte-alert--danger">
-              <i class="bi bi-exclamation-circle"></i>{{ errorTour() }}
-            </div>
+            <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorTour() }}</p>
           }
           @if (!hasDraft() && (mostrandoFormAdd() || urlsTour().length === 0)) {
-            <div class="fte-alert fte-alert--info">
-              <i class="bi bi-info-circle"></i>{{ 'estimator_file.tour_draft_hint_alt' | translate }}
-            </div>
+            <p class="fi-feedback is-info"><mat-icon aria-hidden="true">info</mat-icon>{{ 'estimator_file.tour_draft_hint_alt' | translate }}</p>
           }
 
-          <div class="fte-tour-list">
-            @for (url of urlsTour(); track $index) {
-              <div class="fte-tour-item">
-
+          @if (urlsTour().length > 0) {
+            <ul class="fi-tours">
+              @for (url of urlsTour(); track $index) {
                 @if (editandoIndex() === $index) {
-                  <div class="fte-tour-edit">
-                    <p class="fte-tour-edit__label">
-                      <i class="bi bi-pencil"></i>
-                      {{ 'estimator_file.tour_video_n' | translate:{ n: $index + 1 } }}
-                    </p>
-                    <div class="fte-url-input-wrap">
-                      <i class="bi bi-link-45deg fte-url-input-icon"></i>
-                      <input type="url" class="fte-url-input"
-                             placeholder="https://my.matterport.com/show/?m=…"
-                             [(ngModel)]="editandoUrlTemp"
-                             [disabled]="guardandoTour()" />
-                    </div>
-                    <div class="fte-tour-edit__actions">
-                      <button class="fte-btn-gold"
-                              (click)="guardarEdicionVideo()"
-                              [disabled]="guardandoTour() || !editandoUrlTemp.trim()">
+                  <li class="fi-tour-form">
+                    <h3 class="fi-label">{{ 'estimator_file.tour_video_n' | translate:{ n: $index + 1 } }}</h3>
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                      <mat-label>{{ 'estimator_file.tour_url_label' | translate }}</mat-label>
+                      <mat-icon matPrefix aria-hidden="true">link</mat-icon>
+                      <input matInput type="url" inputmode="url" placeholder="https://my.matterport.com/show/?m=…"
+                             [(ngModel)]="editandoUrlTemp" [disabled]="guardandoTour()" />
+                    </mat-form-field>
+                    <div class="fte-inline-actions">
+                      <button mat-flat-button type="button"
+                              [disabled]="guardandoTour() || !editandoUrlTemp.trim()" (click)="guardarEdicionVideo()">
                         @if (guardandoTour()) {
-                          <span class="fte-spinner-sm"></span>{{ 'estimator_file.saving' | translate }}
+                          <span class="fi-spinner" aria-hidden="true"></span>
                         } @else {
-                          <i class="bi bi-check-lg"></i>{{ 'common.save' | translate }}
+                          <mat-icon>check</mat-icon>
                         }
+                        {{ (guardandoTour() ? 'estimator_file.saving' : 'common.save') | translate }}
                       </button>
-                      <button class="fte-btn-ghost"
-                              (click)="cancelarEdicionVideo()"
-                              [disabled]="guardandoTour()">
+                      <button mat-button type="button" [disabled]="guardandoTour()" (click)="cancelarEdicionVideo()">
                         {{ 'common.cancel' | translate }}
                       </button>
                     </div>
                     @if (editandoUrlSafe) {
-                      <p class="fte-preview-label">{{ 'estimator_file.preview_label' | translate }}</p>
-                      <div class="fte-iframe-wrap">
-                        <iframe [src]="editandoUrlSafe"
-                                allowfullscreen allow="xr-spatial-tracking"
-                                title="Vista previa"></iframe>
+                      <p class="fi-hint">{{ 'estimator_file.preview_label' | translate }}</p>
+                      <div class="fi-frame">
+                        <iframe [src]="editandoUrlSafe" allowfullscreen allow="xr-spatial-tracking"
+                                [title]="'estimator_file.preview_label' | translate"></iframe>
                       </div>
                     }
-                  </div>
-
+                  </li>
                 } @else {
-                  <div class="fte-tour-row" [class.fte-tour-row--expanded]="expandedIndex() === $index">
-                    <button class="fte-tour-row__toggle"
-                            (click)="toggleExpandVideo($index)">
-                      <i class="bi bi-camera-video"></i>
-                      <span class="fte-tour-row__label">
-                        {{ 'estimator_file.tour_video_n' | translate:{ n: $index + 1 } }}
-                      </span>
-                      <span class="fte-tour-row__url">{{ url }}</span>
-                      <i class="bi fte-tour-row__chevron"
-                         [class.bi-chevron-down]="expandedIndex() !== $index"
-                         [class.bi-chevron-up]="expandedIndex() === $index"></i>
-                    </button>
-                    <div class="fte-tour-row__actions">
-                      <button class="fte-btn-icon"
-                              (click)="iniciarEdicionVideo($index)"
-                              [disabled]="guardandoTour()"
-                              [title]="'common.edit' | translate">
-                        <i class="bi bi-pencil"></i>
+                  <li class="fi-tour" [class.is-open]="expandedIndex() === $index">
+                    <div class="fi-tour__row">
+                      <button type="button" class="fi-tour__toggle"
+                              [attr.aria-expanded]="expandedIndex() === $index"
+                              (click)="toggleExpandVideo($index)">
+                        <mat-icon aria-hidden="true">view_in_ar</mat-icon>
+                        <span class="fi-tour__text">
+                          <span class="fi-tour__name">{{ 'estimator_file.tour_video_n' | translate:{ n: $index + 1 } }}</span>
+                          <span class="fi-tour__url">{{ url }}</span>
+                        </span>
+                        <mat-icon class="fi-tour__chevron" aria-hidden="true">expand_more</mat-icon>
                       </button>
-                      <button class="fte-btn-icon fte-btn-icon--danger"
-                              (click)="eliminarVideo($index)"
-                              [disabled]="guardandoTour()"
-                              [title]="'estimator_file.tour_delete_video' | translate">
+                      <button mat-icon-button type="button" [disabled]="guardandoTour()"
+                              [attr.aria-label]="('common.edit' | translate) + ' ' + ('estimator_file.tour_video_n' | translate:{ n: $index + 1 })"
+                              [matTooltip]="'common.edit' | translate"
+                              (click)="iniciarEdicionVideo($index)">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                      <button mat-icon-button type="button" class="fi-del" [disabled]="guardandoTour()"
+                              [attr.aria-label]="'estimator_file.tour_delete_video' | translate"
+                              [matTooltip]="'estimator_file.tour_delete_video' | translate"
+                              (click)="eliminarVideo($index)">
                         @if (guardandoTour()) {
-                          <span class="fte-spinner-sm"></span>
+                          <span class="fi-spinner" aria-hidden="true"></span>
                         } @else {
-                          <i class="bi bi-trash3"></i>
+                          <mat-icon>delete</mat-icon>
                         }
                       </button>
                     </div>
-                  </div>
-                  @if (expandedIndex() === $index) {
-                    <div class="fte-iframe-wrap fte-iframe-wrap--connected">
-                      <iframe [src]="getSafeUrl(url)"
-                              allowfullscreen allow="xr-spatial-tracking"
-                              [title]="'Video ' + ($index + 1)"></iframe>
-                    </div>
-                  }
-                }
-
-              </div>
-            }
-
-            @if (urlsTour().length === 0 && !mostrandoFormAdd()) {
-              <div class="fte-upload-empty">
-                <i class="bi bi-camera-video"></i>
-                <p>{{ 'estimator_file.no_tour_use_add' | translate }}</p>
-              </div>
-            }
-
-            @if (mostrandoFormAdd()) {
-              <div class="fte-tour-edit" [class.fte-tour-edit--after-list]="urlsTour().length > 0">
-                <p class="fte-tour-edit__label">
-                  <i class="bi bi-plus-circle"></i>{{ 'estimator_file.tour_add_video' | translate }}
-                </p>
-                <div class="fte-url-input-wrap">
-                  <i class="bi bi-link-45deg fte-url-input-icon"></i>
-                  <input type="url" class="fte-url-input"
-                         placeholder="https://my.matterport.com/show/?m=…"
-                         [(ngModel)]="nuevoUrlInput"
-                         [disabled]="guardandoTour()" />
-                </div>
-                <div class="fte-tour-edit__actions">
-                  <button class="fte-btn-gold"
-                          (click)="agregarVideo()"
-                          [disabled]="guardandoTour() || !nuevoUrlInput.trim()">
-                    @if (guardandoTour()) {
-                      <span class="fte-spinner-sm"></span>{{ 'estimator_file.saving' | translate }}
-                    } @else {
-                      <i class="bi bi-plus-lg"></i>{{ 'estimator_file.tour_add_video' | translate }}
+                    @if (expandedIndex() === $index) {
+                      <div class="fi-frame">
+                        <iframe [src]="getSafeUrl(url)" allowfullscreen allow="xr-spatial-tracking"
+                                [title]="'estimator_file.tour_video_n' | translate:{ n: $index + 1 }"></iframe>
+                      </div>
                     }
-                  </button>
-                  <button class="fte-btn-ghost"
-                          (click)="cancelarAgregarVideo()"
-                          [disabled]="guardandoTour()">
-                    {{ 'common.cancel' | translate }}
-                  </button>
-                </div>
-                @if (nuevoUrlSafe) {
-                  <p class="fte-preview-label">{{ 'estimator_file.preview_label' | translate }}</p>
-                  <div class="fte-iframe-wrap">
-                    <iframe [src]="nuevoUrlSafe"
-                            allowfullscreen allow="xr-spatial-tracking"
-                            title="Vista previa"></iframe>
-                  </div>
+                  </li>
                 }
+              }
+            </ul>
+          } @else if (!mostrandoFormAdd()) {
+            <p class="fi-empty"><mat-icon aria-hidden="true">view_in_ar</mat-icon>{{ 'estimator_file.no_tour_use_add' | translate }}</p>
+          }
+
+          @if (mostrandoFormAdd()) {
+            <div class="fi-tour-form">
+              <h3 class="fi-label">{{ 'estimator_file.tour_add_video' | translate }}</h3>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>{{ 'estimator_file.tour_url_label' | translate }}</mat-label>
+                <mat-icon matPrefix aria-hidden="true">link</mat-icon>
+                <input matInput type="url" inputmode="url" placeholder="https://my.matterport.com/show/?m=…"
+                       [(ngModel)]="nuevoUrlInput" [disabled]="guardandoTour()" />
+              </mat-form-field>
+              <div class="fte-inline-actions">
+                <button mat-flat-button type="button"
+                        [disabled]="guardandoTour() || !nuevoUrlInput.trim()" (click)="agregarVideo()">
+                  @if (guardandoTour()) {
+                    <span class="fi-spinner" aria-hidden="true"></span>
+                  } @else {
+                    <mat-icon>add</mat-icon>
+                  }
+                  {{ (guardandoTour() ? 'estimator_file.saving' : 'estimator_file.tour_add_video') | translate }}
+                </button>
+                <button mat-button type="button" [disabled]="guardandoTour()" (click)="cancelarAgregarVideo()">
+                  {{ 'common.cancel' | translate }}
+                </button>
               </div>
-            }
-          </div>
+              @if (nuevoUrlSafe) {
+                <p class="fi-hint">{{ 'estimator_file.preview_label' | translate }}</p>
+                <div class="fi-frame">
+                  <iframe [src]="nuevoUrlSafe" allowfullscreen allow="xr-spatial-tracking"
+                          [title]="'estimator_file.preview_label' | translate"></iframe>
+                </div>
+              }
+            </div>
+          }
         </section>
 
-        <!-- ── Documentos técnicos ────────────────────────────────────── -->
-        <section class="fte-card">
-          <div class="fte-card__header">
-            <h2 class="fte-card__title">
-              <i class="bi bi-file-earmark-text"></i>{{ 'file.technical_docs' | translate }}
-              @if (documentosEstimador().length > 0) {
-                <span class="fte-count-badge">{{ documentosEstimador().length }}</span>
-              }
+        <!-- Documentos técnicos del estimador -->
+        <section class="fi-card" aria-labelledby="fte-docs-title">
+          <div class="fi-card__head">
+            <h2 id="fte-docs-title" class="fi-h2">
+              {{ 'file.technical_docs' | translate }}
+              @if (documentosEstimador().length > 0) { <span class="fi-count">{{ documentosEstimador().length }}</span> }
             </h2>
-            <label class="fte-btn-upload" [class.fte-btn-upload--busy]="subiendoDocumento()">
+            <button mat-stroked-button type="button" [disabled]="subiendoDocumento()" (click)="docInput.click()">
               @if (subiendoDocumento()) {
-                <span class="fte-spinner-sm"></span>{{ 'estimator_file.uploading' | translate }}
+                <span class="fi-spinner" aria-hidden="true"></span>
               } @else {
-                <i class="bi bi-cloud-upload"></i>{{ 'estimator_file.upload_doc' | translate }}
+                <mat-icon>upload_file</mat-icon>
               }
-              <input type="file"
-                     accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv"
-                     class="fte-file-input"
-                     (change)="subirDocumento($event)" [disabled]="subiendoDocumento()"/>
-            </label>
+              {{ (subiendoDocumento() ? 'estimator_file.uploading' : 'estimator_file.upload_doc') | translate }}
+            </button>
+            <input #docInput type="file" hidden
+                   accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv"
+                   (change)="subirDocumento($event)" [disabled]="subiendoDocumento()" />
           </div>
 
           @if (errorDocumentos()) {
-            <div class="fte-alert fte-alert--danger">
-              <i class="bi bi-exclamation-circle"></i>{{ errorDocumentos() }}
-            </div>
+            <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorDocumentos() }}</p>
           }
 
           @if (documentosEstimador().length === 0) {
-            <div class="fte-upload-empty">
-              <i class="bi bi-file-earmark"></i>
-              <p>{{ 'estimator_file.no_docs_hint' | translate }}</p>
-            </div>
+            <p class="fi-empty"><mat-icon aria-hidden="true">note_add</mat-icon>{{ 'estimator_file.no_docs_hint' | translate }}</p>
           } @else {
-            <div class="fte-file-list">
+            <ul class="fi-files">
               @for (doc of documentosEstimador(); track doc.id) {
-                <div class="fte-file-row">
-                  <div class="fte-file-row__icon">
-                    <i class="bi bi-file-earmark-text"></i>
-                  </div>
-                  <div class="fte-file-row__info">
-                    <p class="fte-file-row__name">{{ doc.nombre_archivo }}</p>
-                    <p class="fte-file-row__size">{{ formatTamano(doc.tamano_bytes) }}</p>
-                  </div>
-                  <div class="fte-file-row__actions">
-                    <button class="fte-btn-icon"
-                            (click)="verDocumento(doc)"
-                            [title]="'common.view' | translate">
-                      <i class="bi bi-eye"></i>
-                    </button>
-                    <button class="fte-btn-icon fte-btn-icon--danger"
-                            (click)="eliminarArchivo(doc, 'documento')"
-                            [title]="'common.delete' | translate">
-                      <i class="bi bi-trash3"></i>
-                    </button>
-                  </div>
-                </div>
+                <li class="fi-file">
+                  <mat-icon class="fi-file__icon" aria-hidden="true">description</mat-icon>
+                  <span class="fi-file__text">
+                    <span class="fi-file__name">{{ doc.nombre_archivo }}</span>
+                    <span class="fi-file__size">{{ formatTamano(doc.tamano_bytes) }}</span>
+                  </span>
+                  <button mat-button type="button" class="fi-file__open" (click)="verDocumento(doc)"
+                          [attr.aria-label]="('common.view' | translate) + ' ' + doc.nombre_archivo">
+                    {{ 'common.view' | translate }}
+                  </button>
+                  <button mat-icon-button type="button" class="fi-del" (click)="eliminarArchivo(doc, 'documento')"
+                          [attr.aria-label]="('common.delete' | translate) + ' ' + doc.nombre_archivo">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </li>
               }
-            </div>
+            </ul>
           }
         </section>
 
-        <!-- ── Video de presentación (opcional) ──────────────────────── -->
-        <!-- Cada acción se guarda al momento: no depende de los botones de
-             la estimación. -->
-        <section class="fte-card">
-          <div class="fte-card__header">
-            <h2 class="fte-card__title">
-              <i class="bi bi-person-video3"></i>{{ 'expediente_video.title' | translate }}
-              <span class="fte-opt">({{ 'common.optional' | translate }})</span>
-            </h2>
-          </div>
+        <!-- Vídeo de presentación: cada acción se guarda al momento, sin depender del informe -->
+        <section class="fi-card" aria-labelledby="fte-video-title">
+          <h2 id="fte-video-title" class="fi-h2">
+            {{ 'expediente_video.title' | translate }}
+            <span class="fi-opt">({{ 'common.optional' | translate }})</span>
+          </h2>
           @if (user()?.id; as estimadorId) {
             <app-video-expediente [expedienteId]="expedienteId"
                                   [perfilId]="estimadorId"
-                                  [numero]="detalle()!.numero" />
+                                  [numero]="d.numero" />
           }
         </section>
 
-        <!-- ── Invitación a constructores ─────────────────────────────── -->
-        <section class="fte-card">
-          <div class="fte-card__header">
-            <h2 class="fte-card__title">
-              <i class="bi bi-envelope-paper"></i>{{ 'admin_invite.title' | translate }}
-              @if (invitadosIds().size > 0) {
-                <span class="fte-count-badge">{{ invitadosIds().size }}</span>
-              }
-            </h2>
-          </div>
+        <!-- Invitación a constructores -->
+        <section class="fi-card" aria-labelledby="fte-invite-title">
+          <h2 id="fte-invite-title" class="fi-h2">
+            {{ 'admin_invite.title' | translate }}
+            @if (invitadosIds().size > 0) { <span class="fi-count">{{ invitadosIds().size }}</span> }
+          </h2>
 
           @if (constructores().length === 0) {
-            <div class="fte-upload-empty">
-              <i class="bi bi-people"></i>
-              <p>{{ 'admin_invite.no_constructores' | translate }}</p>
-            </div>
+            <p class="fi-empty"><mat-icon aria-hidden="true">group_off</mat-icon>{{ 'admin_invite.no_constructores' | translate }}</p>
           } @else {
-            <p class="fte-invite-hint">{{ 'admin_invite.hint' | translate }}</p>
-
-            <ul class="fte-invite-list" role="list">
+            <p class="fi-muted">{{ 'admin_invite.hint' | translate }}</p>
+            <ul class="fi-pick">
               @for (c of constructores(); track c.id) {
-                <li>
-                  <label class="fte-invite-row"
-                         [class.fte-invite-row--selected]="seleccionInvitados().has(c.id)"
-                         [class.fte-invite-row--disabled]="!c.email">
-                    <input type="checkbox" class="fte-invite-check"
-                           [checked]="seleccionInvitados().has(c.id)"
-                           (change)="toggleSeleccionInvitado(c.id)"
-                           [disabled]="!c.email || enviandoInvitacion() || guardando()
-                                       || abriendoATodos() || bloqueadoPorOferta" />
-                    <span class="fte-invite-row__info">
-                      <span class="fte-invite-row__name">{{ c.nombre }} {{ c.apellido }}</span>
-                      <span class="fte-invite-row__email">
-                        @if (c.email) {
-                          <i class="bi bi-envelope"></i>{{ c.email }}
-                        } @else {
-                          <i class="bi bi-envelope-slash"></i>{{ 'admin_invite.no_email' | translate }}
-                        }
-                      </span>
-                    </span>
-                    @if (estaInvitado(c.id)) {
-                      <span class="fte-invite-badge">
-                        <i class="bi bi-check-circle"></i>{{ 'admin_invite.invited' | translate }}
-                      </span>
-                    }
-                  </label>
-
-                  <!-- La contraseña guardada está hasheada: mandar una implica
-                       fijarla. Se deja vacía para no tocar el acceso actual. -->
-                  @if (seleccionInvitados().has(c.id)) {
-                    <div class="fte-invite-pass">
-                      @if (c.proveedor === 'email') {
-                        <label class="fte-invite-pass__label" [attr.for]="'invite-pass-' + c.id">
-                          <i class="bi bi-key"></i>{{ 'admin_invite.password_label' | translate }}
-                        </label>
-                        <input type="password" class="fte-input fte-invite-pass__input"
-                               [id]="'invite-pass-' + c.id"
-                               autocomplete="new-password"
-                               [placeholder]="'admin_invite.password_ph' | translate"
-                               [ngModel]="passwordInvitado(c.id)"
-                               (ngModelChange)="setPasswordInvitado(c.id, $event)"
-                               [disabled]="enviandoInvitacion() || guardando() || abriendoATodos()" />
-                        <p class="fte-invite-pass__hint">{{ 'admin_invite.password_hint' | translate }}</p>
+                <li class="fi-pick__item" [class.is-selected]="seleccionInvitados().has(c.id)">
+                  <div class="fi-pick__row">
+                    <mat-checkbox [checked]="seleccionInvitados().has(c.id)"
+                                  (change)="toggleSeleccionInvitado(c.id)"
+                                  [disabled]="!c.email || enviandoInvitacion() || guardando()
+                                              || abriendoATodos() || bloqueadoPorOferta">
+                      <span class="fi-pick__name">{{ c.nombre }} {{ c.apellido }}</span>
+                      @if (c.email) {
+                        <span class="fi-pick__sub"><mat-icon aria-hidden="true">mail</mat-icon>{{ c.email }}</span>
                       } @else {
-                        <p class="fte-invite-pass__hint">
-                          <i class="bi bi-shield-lock"></i>{{ 'admin_invite.password_google' | translate }}
-                        </p>
+                        <span class="fi-pick__sub"><mat-icon aria-hidden="true">unsubscribe</mat-icon>{{ 'admin_invite.no_email' | translate }}</span>
+                      }
+                    </mat-checkbox>
+                    @if (estaInvitado(c.id)) {
+                      <span class="fi-tag is-ok"><mat-icon aria-hidden="true">check_circle</mat-icon>{{ 'admin_invite.invited' | translate }}</span>
+                    }
+                  </div>
+                  <!-- La contraseña guardada está hasheada: mandar una implica fijarla.
+                       Se deja vacía para no tocar el acceso actual. -->
+                  @if (seleccionInvitados().has(c.id)) {
+                    <div class="fi-pick__extra">
+                      @if (c.proveedor === 'email') {
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                          <mat-label>{{ 'admin_invite.password_label' | translate }}</mat-label>
+                          <mat-icon matPrefix aria-hidden="true">key</mat-icon>
+                          <input matInput type="password" autocomplete="new-password"
+                                 [id]="'invite-pass-' + c.id"
+                                 [placeholder]="'admin_invite.password_ph' | translate"
+                                 [ngModel]="passwordInvitado(c.id)"
+                                 (ngModelChange)="setPasswordInvitado(c.id, $event)"
+                                 [disabled]="enviandoInvitacion() || guardando() || abriendoATodos()" />
+                        </mat-form-field>
+                        <p class="fi-hint">{{ 'admin_invite.password_hint' | translate }}</p>
+                      } @else {
+                        <p class="fi-hint"><mat-icon aria-hidden="true">shield_lock</mat-icon>{{ 'admin_invite.password_google' | translate }}</p>
                       }
                     </div>
                   }
@@ -562,273 +476,180 @@
             </ul>
           }
 
-          <!-- Avisos: valen también sin constructores en la lista, porque
-               «Todos los Constructores» sigue disponible. -->
+          <!-- Avisos: valen también sin constructores en la lista, porque «Tous les
+               constructeurs» sigue disponible. -->
           @if (errorInvitacionMsg()) {
-            <div class="fte-alert fte-alert--danger" role="alert">
-              <i class="bi bi-exclamation-circle"></i>{{ errorInvitacionMsg() | translate }}
-            </div>
+            <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorInvitacionMsg() | translate }}</p>
           }
           @if (exitoInvitacionMsg()) {
-            <div class="fte-alert fte-alert--success" role="status">
-              <i class="bi bi-check-circle"></i>{{ exitoInvitacionMsg() | translate:exitoInvitacionArgs() }}
-            </div>
+            <p class="fi-feedback is-ok" role="status"><mat-icon aria-hidden="true">check_circle</mat-icon>{{ exitoInvitacionMsg() | translate:exitoInvitacionArgs() }}</p>
           }
 
           @if (bloqueadoPorOferta) {
-            <p class="fte-invite-hint fte-invite-hint--sm">
-              <i class="bi bi-lock"></i>{{ 'admin_invite.locked_en_oferta' | translate }}
-            </p>
+            <p class="fi-hint"><mat-icon aria-hidden="true">lock</mat-icon>{{ 'admin_invite.locked_en_oferta' | translate }}</p>
           } @else {
-            <p class="fte-invite-hint fte-invite-hint--sm">
-              <i class="bi bi-people"></i>{{ 'admin_invite.all_builders_hint' | translate }}
-            </p>
-            <!-- «Enviar invitación-correo» guarda y envía además la estimación:
+            <p class="fi-hint"><mat-icon aria-hidden="true">groups</mat-icon>{{ 'admin_invite.all_builders_hint' | translate }}</p>
+            <!-- «Envoyer l'invitation-courriel» guarda y envía además la estimación:
                  mientras el informe esté incompleto, el botón está apagado. -->
             @if (constructores().length > 0 && (!formularioCompleto || !costoValido)) {
-              <p class="fte-invite-hint fte-invite-hint--sm">
-                <i class="bi bi-info-circle"></i>{{ 'admin_invite.send_and_estimate_hint' | translate }}
-              </p>
+              <p class="fi-hint"><mat-icon aria-hidden="true">info</mat-icon>{{ 'admin_invite.send_and_estimate_hint' | translate }}</p>
             }
           }
 
-          <!-- Confirmación: abrir a todos borra la lista de invitados. -->
           @if (confirmarAbrirATodos()) {
-            <div class="fte-invite-confirm" role="alertdialog" aria-live="polite"
-                 aria-labelledby="invite-confirm-title" aria-describedby="invite-confirm-body">
-              <p class="fte-invite-confirm__title" id="invite-confirm-title">
-                <i class="bi bi-exclamation-triangle"></i>
+            <div class="fi-confirm" role="alertdialog" aria-live="polite"
+                 aria-labelledby="fte-invite-confirm-title" aria-describedby="fte-invite-confirm-body">
+              <p class="fi-confirm__title" id="fte-invite-confirm-title">
+                <mat-icon aria-hidden="true">warning</mat-icon>
                 {{ 'admin_invite.all_builders_confirm_title' | translate }}
               </p>
-              <p class="fte-invite-confirm__body" id="invite-confirm-body">
-                {{ 'admin_invite.all_builders_confirm_body' | translate }}
-              </p>
+              <p id="fte-invite-confirm-body">{{ 'admin_invite.all_builders_confirm_body' | translate }}</p>
               @if (invitadosIds().size > 0) {
-                <p class="fte-invite-confirm__body">
-                  {{ 'admin_invite.all_builders_confirm_warning' | translate }}
-                </p>
+                <p>{{ 'admin_invite.all_builders_confirm_warning' | translate }}</p>
               }
-              <div class="fte-invite-confirm__actions">
-                <button type="button" class="fte-btn-draft fte-btn-invite"
-                        (click)="cancelarAbrirATodos()" [disabled]="abriendoATodos()">
-                  {{ 'common.cancel' | translate }}
-                </button>
-                <button type="button" class="fte-btn-submit fte-btn-invite"
-                        (click)="abrirATodosLosConstructores()" [disabled]="abriendoATodos()">
+              <div class="fte-inline-actions">
+                <button mat-flat-button type="button" [disabled]="abriendoATodos()" (click)="abrirATodosLosConstructores()">
                   @if (abriendoATodos()) {
-                    <span class="fte-spinner-sm"></span>{{ 'common.saving' | translate }}
+                    <span class="fi-spinner" aria-hidden="true"></span>
                   } @else {
-                    <i class="bi bi-people"></i>{{ 'admin_invite.all_builders_confirm_ok' | translate }}
+                    <mat-icon>groups</mat-icon>
                   }
+                  {{ (abriendoATodos() ? 'common.saving' : 'admin_invite.all_builders_confirm_ok') | translate }}
+                </button>
+                <button mat-button type="button" [disabled]="abriendoATodos()" (click)="cancelarAbrirATodos()">
+                  {{ 'common.cancel' | translate }}
                 </button>
               </div>
             </div>
           }
 
-          <div class="fte-invite-actions">
-            <span class="fte-invite-count">
-              {{ 'admin_invite.selected_count' | translate:{ n: seleccionInvitados().size } }}
-            </span>
-            <div class="fte-invite-buttons">
-              <!-- Retira las invitaciones por correo: el expediente vuelve a
-                   ser público y lo ve cualquier constructor. -->
-              <button type="button" class="fte-btn-draft fte-btn-invite" (click)="pedirAbrirATodos()"
+          <div class="fte-invite-foot">
+            <span class="fi-hint">{{ 'admin_invite.selected_count' | translate:{ n: seleccionInvitados().size } }}</span>
+            <div class="fte-inline-actions">
+              <!-- Retira las invitaciones por correo: el dossier vuelve a ser público. -->
+              <button mat-stroked-button type="button" (click)="pedirAbrirATodos()"
                       [disabled]="bloqueadoPorOferta || abriendoATodos() || confirmarAbrirATodos()
                                   || enviandoInvitacion() || guardando()">
-                @if (abriendoATodos()) {
-                  <span class="fte-spinner-sm"></span>{{ 'common.saving' | translate }}
-                } @else {
-                  <i class="bi bi-people"></i>{{ 'admin_invite.all_builders_btn' | translate }}
-                }
+                <mat-icon>groups</mat-icon>
+                {{ 'admin_invite.all_builders_btn' | translate }}
               </button>
-              <!-- Envía el correo y además hace lo mismo que «Enviar estimación». -->
-              <button type="button" class="fte-btn-submit fte-btn-invite" (click)="enviarInvitacionYEstimacion()"
+              <button mat-flat-button type="button" (click)="enviarInvitacionYEstimacion()"
                       [disabled]="bloqueadoPorOferta || enviandoInvitacion() || guardando() || abriendoATodos()
-                                  || confirmarAbrirATodos()
-                                  || seleccionInvitados().size === 0">
+                                  || confirmarAbrirATodos() || seleccionInvitados().size === 0">
                 @if (enviandoInvitacion() || guardando()) {
-                  <span class="fte-spinner-sm"></span>{{ 'admin_invite.sending' | translate }}
+                  <span class="fi-spinner" aria-hidden="true"></span>
                 } @else {
-                  <i class="bi bi-envelope-arrow-up"></i>{{ 'admin_invite.send_btn' | translate }}
+                  <mat-icon>forward_to_inbox</mat-icon>
                 }
+                {{ (enviandoInvitacion() || guardando() ? 'admin_invite.sending' : 'admin_invite.send_btn') | translate }}
               </button>
             </div>
           </div>
         </section>
-
       </div>
 
-      <!-- ── Columna derecha: formulario (sticky) ───────────────────────── -->
-      <aside class="fte-col-side">
-        <div class="fte-form-card">
-          <div class="fte-form-card__head">
-            <i class="bi bi-clipboard2-check"></i>
-            <h2 class="fte-form-card__title">{{ 'estimator_file.visit_doc_title' | translate }}</h2>
+      <!-- ══ Columna del informe de visita ════════════════════════════════ -->
+      <section class="fi-card fi-form" aria-labelledby="fte-form-title">
+        <h2 id="fte-form-title" class="fi-h2">{{ 'estimator_file.visit_doc_title' | translate }}</h2>
+
+        <div class="fi-fields">
+          <div class="fi-row2">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>{{ 'estimator_file.real_date' | translate }}</mat-label>
+              <input matInput id="est-fecha" type="date" required [(ngModel)]="fechaVisita" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>{{ 'file.hour' | translate }}</mat-label>
+              <input matInput id="est-hora" type="time" required [(ngModel)]="horaVisita" />
+            </mat-form-field>
           </div>
 
-          <div class="fte-form-body">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>{{ 'estimator_file.problems_observed' | translate }}</mat-label>
+            <textarea matInput id="est-problemas" rows="5" required
+                      [placeholder]="'estimator_file.problems_placeholder' | translate"
+                      [(ngModel)]="descripcionProblemas"></textarea>
+          </mat-form-field>
 
-            <!-- Fecha y hora -->
-            <div class="fte-field-row">
-              <div class="fte-field">
-                <label class="fte-label">
-                  <i class="bi bi-calendar3"></i>{{ 'estimator_file.real_date' | translate }}
-                  <span class="fte-req">*</span>
-                </label>
-                <input id="est-fecha" type="date" class="fte-input" [(ngModel)]="fechaVisita" />
-              </div>
-              <div class="fte-field">
-                <label class="fte-label">
-                  <i class="bi bi-clock"></i>{{ 'file.hour' | translate }}
-                  <span class="fte-req">*</span>
-                </label>
-                <input id="est-hora" type="time" class="fte-input" [(ngModel)]="horaVisita" />
-              </div>
+          <fieldset class="fi-fieldset">
+            <legend class="fi-label">
+              {{ 'estimator_file.approx_cost' | translate }}
+              <span class="fi-opt">({{ 'common.optional' | translate }})</span>
+            </legend>
+            <div class="fi-row2">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>{{ 'file.min' | translate }}</mat-label>
+                <span matTextPrefix>CA$&nbsp;</span>
+                <input matInput id="est-costo-min" type="number" inputmode="numeric" min="0" step="1000" placeholder="0"
+                       [(ngModel)]="costoMin" />
+              </mat-form-field>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>{{ 'file.max' | translate }}</mat-label>
+                <span matTextPrefix>CA$&nbsp;</span>
+                <input matInput id="est-costo-max" type="number" inputmode="numeric" min="0" step="1000" placeholder="0"
+                       [(ngModel)]="costoMax" />
+              </mat-form-field>
             </div>
-
-            <!-- Problemas observados -->
-            <div class="fte-field">
-              <label class="fte-label">
-                <i class="bi bi-card-text"></i>{{ 'estimator_file.problems_observed' | translate }}
-                <span class="fte-req">*</span>
-              </label>
-              <textarea id="est-problemas" class="fte-input fte-input--textarea" rows="4"
-                        [placeholder]="'estimator_file.problems_placeholder' | translate"
-                        [(ngModel)]="descripcionProblemas"></textarea>
-            </div>
-
-            <!-- Costo aproximado -->
-            <div class="fte-field">
-              <label class="fte-label">
-                <i class="bi bi-cash-coin"></i>{{ 'estimator_file.approx_cost' | translate }}
-                <span class="fte-opt">({{ 'common.optional' | translate }})</span>
-              </label>
-              <div class="fte-cost-row">
-                <div class="fte-cost-field">
-                  <span class="fte-cost-sub">{{ 'file.min' | translate }}</span>
-                  <div class="fte-input-group">
-                    <span class="fte-input-prefix">CA$</span>
-                    <input type="number" class="fte-input fte-input--num"
-                           placeholder="0" min="0" step="1000"
-                           id="est-costo-min" [attr.aria-label]="('estimator_file.approx_cost' | translate) + ' · ' + ('file.min' | translate)"
-                           [(ngModel)]="costoMin" />
-                  </div>
-                </div>
-                <span class="fte-cost-sep">→</span>
-                <div class="fte-cost-field">
-                  <span class="fte-cost-sub">{{ 'file.max' | translate }}</span>
-                  <div class="fte-input-group">
-                    <span class="fte-input-prefix">CA$</span>
-                    <input type="number" class="fte-input fte-input--num"
-                           placeholder="0" min="0" step="1000"
-                           id="est-costo-max" [attr.aria-label]="('estimator_file.approx_cost' | translate) + ' · ' + ('file.max' | translate)"
-                           [(ngModel)]="costoMax" />
-                  </div>
-                </div>
-              </div>
-              @if (!costoValido) {
-                <p class="fte-field-error">
-                  <i class="bi bi-exclamation-circle"></i>{{ 'estimator_file.cost_error' | translate }}
-                </p>
-              }
-            </div>
-
-            <!-- Notas internas -->
-            <div class="fte-field">
-              <label class="fte-label fte-label--muted">
-                <i class="bi bi-lock"></i>{{ 'estimator_file.internal_notes' | translate }}
-                <span class="fte-opt">({{ 'common.optional' | translate }})</span>
-              </label>
-              <textarea class="fte-input fte-input--textarea" rows="3"
-                        [placeholder]="'estimator_file.notes_placeholder' | translate"
-                        [(ngModel)]="notasInternas"></textarea>
-            </div>
-
-            <!-- Checklist de completado -->
-            <div class="fte-checklist">
-              <div class="fte-checklist-item" [class.fte-checklist-item--done]="!!fechaVisita">
-                <i class="bi"
-                   [class.bi-check-circle]="!!fechaVisita"
-                   [class.bi-circle]="!fechaVisita"></i>
-                {{ 'estimator_file.check_visit_date' | translate }}
-              </div>
-              <div class="fte-checklist-item" [class.fte-checklist-item--done]="!!horaVisita">
-                <i class="bi"
-                   [class.bi-check-circle]="!!horaVisita"
-                   [class.bi-circle]="!horaVisita"></i>
-                {{ 'estimator_file.check_visit_time' | translate }}
-              </div>
-              <div class="fte-checklist-item"
-                   [class.fte-checklist-item--done]="!!descripcionProblemas.trim()">
-                <i class="bi"
-                   [class.bi-check-circle]="!!descripcionProblemas.trim()"
-                   [class.bi-circle]="!descripcionProblemas.trim()"></i>
-                {{ 'estimator_file.problems_observed' | translate }}
-              </div>
-              <div class="fte-checklist-item"
-                   [class.fte-checklist-item--done]="costoMin !== null && costoMax !== null && costoValido">
-                <i class="bi"
-                   [class.bi-check-circle]="costoMin !== null && costoMax !== null && costoValido"
-                   [class.bi-circle]="costoMin === null || costoMax === null || !costoValido"></i>
-                {{ 'estimator_file.approx_cost' | translate }}
-                <span class="fte-opt">({{ 'common.optional' | translate }})</span>
-              </div>
-            </div>
-
-            <!-- Mensajes de borrador -->
-            @if (errorVisitaMsg()) {
-              <div class="fte-alert fte-alert--danger">
-                <i class="bi bi-exclamation-circle"></i>{{ errorVisitaMsg() | translate }}
-              </div>
+            @if (!costoValido) {
+              <p class="fi-error"><mat-icon aria-hidden="true">error</mat-icon>{{ 'estimator_file.cost_error' | translate }}</p>
             }
-            @if (exitoVisitaMsg()) {
-              <div class="fte-alert fte-alert--success">
-                <i class="bi bi-check-circle"></i>{{ exitoVisitaMsg() | translate }}
-              </div>
-            }
+          </fieldset>
 
-            <!-- Botones de acción -->
-            <div class="fte-actions">
-              <button class="fte-btn-draft"
-                      (click)="guardarVisita()"
-                      [disabled]="guardandoVisita()">
-                @if (guardandoVisita()) {
-                  <span class="fte-spinner-sm"></span>{{ 'estimator_file.saving' | translate }}
-                } @else {
-                  <i class="bi bi-floppy"></i>{{ 'estimator_file.save_draft' | translate }}
-                }
-              </button>
-              <button class="fte-btn-submit"
-                      (click)="guardarEstimacion()"
-                      [disabled]="guardando()">
-                @if (guardando()) {
-                  <span class="fte-spinner-sm"></span>{{ 'estimator_file.sending' | translate }}
-                } @else {
-                  <i class="bi bi-send-check"></i>{{ 'estimator_file.send_estimation' | translate }}
-                }
-              </button>
-            </div>
-            <!-- Los botones ya no se bloquean con el formulario incompleto: al
-                 pulsarlos, este resumen dice qué falta. -->
-            <app-campos-faltantes class="mt-3" [extra]="faltantesEst" [intento]="intentosEst()" />
-
-            <!-- Mensajes de envío -->
-            @if (errorGuardado()) {
-              <div class="fte-alert fte-alert--danger">
-                <i class="bi bi-exclamation-circle"></i>{{ errorGuardado() | translate }}
-              </div>
-            }
-            @if (exitoMsg()) {
-              <div class="fte-alert fte-alert--success">
-                <i class="bi bi-check-circle"></i>{{ exitoMsg() | translate }}
-              </div>
-            }
-
-          </div>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>{{ 'estimator_file.internal_notes' | translate }} ({{ 'common.optional' | translate }})</mat-label>
+            <mat-icon matSuffix aria-hidden="true">lock</mat-icon>
+            <textarea matInput rows="3" [(ngModel)]="notasInternas"></textarea>
+            <mat-hint>{{ 'estimator_file.notes_placeholder' | translate }}</mat-hint>
+          </mat-form-field>
         </div>
-      </aside>
 
+        <ul class="fi-check" aria-hidden="true">
+          @for (c of checklist; track c.label) {
+            <li [class.is-done]="c.ok">
+              @if (c.ok) { <mat-icon>check_circle</mat-icon> } @else { <mat-icon>radio_button_unchecked</mat-icon> }
+              {{ c.label | translate }}
+              @if (c.opcional) { <span>({{ 'common.optional' | translate }})</span> }
+            </li>
+          }
+        </ul>
+
+        @if (errorVisitaMsg()) {
+          <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorVisitaMsg() | translate }}</p>
+        }
+        @if (exitoVisitaMsg()) {
+          <p class="fi-feedback is-ok" role="status"><mat-icon aria-hidden="true">check_circle</mat-icon>{{ exitoVisitaMsg() | translate }}</p>
+        }
+
+        <div class="fi-actions">
+          <button mat-stroked-button type="button" [disabled]="guardandoVisita()" (click)="guardarVisita()">
+            @if (guardandoVisita()) {
+              <span class="fi-spinner" aria-hidden="true"></span>
+            } @else {
+              <mat-icon>save</mat-icon>
+            }
+            {{ (guardandoVisita() ? 'estimator_file.saving' : 'estimator_file.save_draft') | translate }}
+          </button>
+          <button mat-flat-button type="button" class="ds-cta" [disabled]="guardando()" (click)="guardarEstimacion()">
+            @if (guardando()) {
+              <span class="fi-spinner" aria-hidden="true"></span>
+            } @else {
+              <mat-icon>send</mat-icon>
+            }
+            {{ (guardando() ? 'estimator_file.sending' : 'estimator_file.send_estimation') | translate }}
+          </button>
+        </div>
+
+        <!-- Los botones no se bloquean con el formulario incompleto: al pulsarlos,
+             este resumen dice qué falta. -->
+        <app-campos-faltantes [extra]="faltantesEst" [intento]="intentosEst()" />
+
+        @if (errorGuardado()) {
+          <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorGuardado() | translate }}</p>
+        }
+        @if (exitoMsg()) {
+          <p class="fi-feedback is-ok" role="status"><mat-icon aria-hidden="true">check_circle</mat-icon>{{ exitoMsg() | translate }}</p>
+        }
+      </section>
     </div>
   }
-
 </div>

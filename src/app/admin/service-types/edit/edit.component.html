@@ -1,735 +1,400 @@
-<div class="container-fluid py-4 px-3 px-xl-4 stype-wrap">
+<div class="page-wrapper fc fc--narrow">
 
-  <!-- ── Encabezado (siempre visible) ──────────────────────────────────────── -->
-  <div class="stype-header mb-4">
-    <button class="btn-back" type="button"
-            (click)="cancelar()" [title]="'common.back' | translate">
-      <i class="bi bi-arrow-left" aria-hidden="true"></i>
+  <!-- ── Cabecera ────────────────────────────────────────────────────────── -->
+  <header class="fc-head">
+    <button mat-button type="button" class="fc-back" (click)="cancelar()">
+      <mat-icon>arrow_back</mat-icon>
+      {{ 'common.back' | translate }}
     </button>
-    <div>
-      <span class="eyebrow">{{ 'role.administrateur' | translate }}</span>
-      <h1 class="stype-title">{{ 'admin_service_types.edit_title' | translate }}</h1>
-    </div>
-  </div>
+    <app-page-header [titulo]="'admin_service_types.edit_title' | translate" />
+  </header>
 
-  <!-- ── Skeleton de carga ──────────────────────────────────────────────────── -->
   @if (cargando()) {
-    <div class="row justify-content-center" aria-hidden="true">
-      <div class="col-12 col-lg-9 col-xl-8">
+    <p class="fc-loading" role="status">
+      <span class="fc-spinner" aria-hidden="true"></span>
+      {{ 'common.loading' | translate }}
+    </p>
 
-        <div class="skel-panel skel-panel--identity mb-3">
-          <div class="skel-panel__body d-flex align-items-center gap-3">
-            <div class="skel skel--icon"></div>
-            <div class="flex-grow-1">
-              <div class="skel skel--line skel--md mb-2"></div>
-              <div class="skel skel--line skel--sm"></div>
-            </div>
-            <div class="skel skel--badge"></div>
+  } @else if (error()) {
+    <p class="fc-alert" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ error() }}</p>
+    <button mat-stroked-button type="button" class="cf-back" (click)="cancelar()">
+      <mat-icon>arrow_back</mat-icon>
+      {{ 'common.back' | translate }}
+    </button>
+
+  } @else if (servicio(); as s) {
+
+  <!-- Qué servicio es, antes del formulario -->
+  <section class="fc-identity" [attr.aria-label]="'admin_service_types.edit_title' | translate">
+    <span class="fc-avatar" aria-hidden="true"><mat-icon>category</mat-icon></span>
+    <div class="fc-identity__text">
+      <p class="fc-identity__name">{{ s.nombre_es }}</p>
+      <p class="fc-identity__meta"><span class="cf-fig">{{ s.codigo }}</span></p>
+    </div>
+    <ng-container [ngTemplateOutlet]="tplEstado" [ngTemplateOutletContext]="{ $implicit: s.activo }" />
+  </section>
+
+  <form class="fc-canvas" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+    <!-- ═══ Código (solo lectura) ═════════════════════════════════════════ -->
+    <section class="fc-card" aria-labelledby="st-code-title">
+      <h2 class="fc-h2" id="st-code-title">{{ 'admin_service_types.col_code' | translate }}</h2>
+      <mat-form-field appearance="outline" class="cf-code">
+        <mat-label>{{ 'admin_service_types.codigo_label' | translate }}</mat-label>
+        <input matInput [value]="s.codigo" readonly>
+        <mat-icon matIconSuffix aria-hidden="true">lock</mat-icon>
+        <mat-hint>{{ 'admin_service_types.codigo_note' | translate }}</mat-hint>
+      </mat-form-field>
+    </section>
+
+    <!-- ═══ Nombres ═══════════════════════════════════════════════════════ -->
+    <section class="fc-card" aria-labelledby="st-names-title">
+      <h2 class="fc-h2" id="st-names-title">{{ 'admin_service_types.section_names' | translate }}</h2>
+      <div class="fc-grid">
+        @for (l of idiomas; track l) {
+          <mat-form-field appearance="outline" hideRequiredMarker>
+            <mat-label>{{ ('admin_service_types.nombre_' + l) | translate }}</mat-label>
+            <input matInput [formControlName]="'nombre_' + l" [attr.name]="'nombre_' + l" autocomplete="off">
+            <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'admin_service_types.nombre_required' | translate }}</mat-error>
+          </mat-form-field>
+        }
+      </div>
+    </section>
+
+    <!-- ═══ Descripciones (opcionales al editar) ══════════════════════════ -->
+    <section class="fc-card" aria-labelledby="st-descs-title">
+      <h2 class="fc-h2" id="st-descs-title">{{ 'admin_service_types.section_descs' | translate }}</h2>
+      <div class="cf-stack">
+        @for (l of idiomas; track l) {
+          <mat-form-field appearance="outline">
+            <mat-label>{{ ('admin_service_types.desc_' + l) | translate }}</mat-label>
+            <textarea matInput rows="4" [formControlName]="'descripcion_' + l" [attr.name]="'descripcion_' + l"></textarea>
+          </mat-form-field>
+        }
+      </div>
+    </section>
+
+    <!-- ═══ Configuración ═════════════════════════════════════════════════ -->
+    <section class="fc-card" aria-labelledby="st-config-title">
+      <h2 class="fc-h2" id="st-config-title">{{ 'admin_service_types.section_config' | translate }}</h2>
+      <div class="cf-toggle-block">
+        <mat-slide-toggle class="cf-toggle" formControlName="activo" aria-describedby="st-active-hint">
+          {{ 'admin_service_types.active_label' | translate }}
+        </mat-slide-toggle>
+        <p class="fc-hint" id="st-active-hint">{{ 'admin_service_types.active_hint' | translate }}</p>
+      </div>
+    </section>
+
+    <!-- ── Acciones ─────────────────────────────────────────────────────── -->
+    <div class="fc-foot">
+      <app-campos-faltantes [formulario]="form" [intento]="intentos()" />
+      <div class="fc-foot__actions">
+        <button mat-button type="button" class="fc-cancel" (click)="cancelar()" [disabled]="guardando()">
+          {{ 'common.cancel' | translate }}
+        </button>
+        <!-- Configuración del catálogo, no una etapa del dossier: abeto, no tomate. -->
+        <button mat-flat-button type="submit" class="fc-save" [disabled]="guardando()">
+          @if (guardando()) { <span class="fc-spinner" aria-hidden="true"></span> } @else { <mat-icon>save</mat-icon> }
+          {{ (guardando() ? 'admin_service_types.saving' : 'admin_service_types.save_btn') | translate }}
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <!-- ═══ Fases del servicio (se guardan una a una, fuera del formulario) ══ -->
+  <section class="fc-card" aria-labelledby="st-fases-title">
+    <div class="ase-sub-head">
+      <div class="fc-card__titles">
+        <h2 class="fc-h2" id="st-fases-title">
+          {{ 'admin_service_types.fases.section' | translate }}
+          @if (!cargandoFases() && !errorFases()) { <span class="ase-count">{{ fases().length }}</span> }
+        </h2>
+        <p class="fc-hint">{{ 'admin_service_types.fases.hint' | translate }}</p>
+      </div>
+      <button mat-stroked-button type="button" class="ase-add" (click)="nuevaFase()" [disabled]="faseFormAbierto()">
+        <mat-icon>add</mat-icon>
+        {{ 'admin_service_types.fases.add_btn' | translate }}
+      </button>
+    </div>
+
+    @if (cargandoFases()) {
+      <div class="ase-skel" role="status">
+        <span class="cdk-visually-hidden">{{ 'common.loading' | translate }}</span>
+        @for (_ of [1, 2, 3]; track $index) { <span class="ase-skel__row" aria-hidden="true"></span> }
+      </div>
+
+    } @else if (errorFases()) {
+      <div class="ase-error" role="alert">
+        <p class="fc-alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorFases() }}</p>
+        <button mat-stroked-button type="button" (click)="cargarFases()">
+          <mat-icon>refresh</mat-icon>
+          {{ 'common.retry' | translate }}
+        </button>
+      </div>
+
+    } @else {
+
+      @if (faseFormAbierto()) {
+        <form class="ase-subform" [formGroup]="faseForm" (ngSubmit)="guardarFase()" novalidate
+              aria-labelledby="st-fase-form-title">
+          <h3 class="fc-h3" id="st-fase-form-title">
+            {{ (faseEditandoId() ? 'admin_service_types.fases.edit_title' : 'admin_service_types.fases.new_title') | translate }}
+          </h3>
+
+          <div class="ase-code-row">
+            <mat-form-field appearance="outline" hideRequiredMarker>
+              <mat-label>{{ 'admin_service_types.fases.codigo' | translate }}</mat-label>
+              <input matInput formControlName="codigo" placeholder="preparacion_encubrimiento"
+                     autocomplete="off" spellcheck="false">
+              <mat-error>
+                <mat-icon aria-hidden="true">error</mat-icon>
+                {{ (ff['codigo'].hasError('pattern') ? 'admin_service_types.fases.codigo_pattern' : 'admin_service_types.fases.codigo_required') | translate }}
+              </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline" hideRequiredMarker>
+              <mat-label>{{ 'admin_service_types.fases.orden' | translate }}</mat-label>
+              <input matInput type="number" min="1" formControlName="orden">
+            </mat-form-field>
           </div>
-        </div>
 
-        <div class="skel-panel">
-          <div class="skel-panel__body">
-            @for (_ of [1, 2, 3]; track $index) {
-              <div class="skel skel--section-hdr mb-3"></div>
-              <div class="row g-3 mb-5">
-                @for (_ of [1, 2, 3]; track $index) {
-                  <div class="col-md-4">
-                    <div class="skel skel--line skel--sm mb-2"></div>
-                    <div class="skel skel--field"></div>
-                  </div>
-                }
-              </div>
+          <div class="fc-grid">
+            @for (l of idiomas; track l) {
+              <mat-form-field appearance="outline" hideRequiredMarker>
+                <mat-label>{{ ('admin_service_types.nombre_' + l) | translate }}</mat-label>
+                <input matInput [formControlName]="'nombre_' + l" [attr.name]="'nombre_' + l" autocomplete="off">
+                <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'admin_service_types.nombre_required' | translate }}</mat-error>
+              </mat-form-field>
             }
           </div>
-        </div>
 
-      </div>
-    </div>
-
-  <!-- ── Error de carga ─────────────────────────────────────────────────────── -->
-  } @else if (error()) {
-    <div class="row justify-content-center">
-      <div class="col-12 col-lg-7 col-xl-6">
-        <div class="page-error" role="alert">
-          <div class="page-error__icon" aria-hidden="true">
-            <i class="bi bi-exclamation-triangle"></i>
+          <div class="fc-grid">
+            @for (l of idiomas; track l) {
+              <mat-form-field appearance="outline">
+                <mat-label>{{ ('admin_service_types.desc_' + l) | translate }}</mat-label>
+                <textarea matInput rows="2" [formControlName]="'descripcion_' + l" [attr.name]="'descripcion_' + l"></textarea>
+              </mat-form-field>
+            }
           </div>
-          <p class="page-error__msg">{{ error() }}</p>
-          <button class="btn btn-outline-secondary btn-sm" type="button" (click)="cancelar()">
-            <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>{{ 'common.back' | translate }}
-          </button>
-        </div>
-      </div>
-    </div>
 
-  <!-- ── Formulario ─────────────────────────────────────────────────────────── -->
-  } @else if (servicio()) {
-    <div class="row justify-content-center">
-      <div class="col-12 col-lg-9 col-xl-8">
+          <mat-slide-toggle class="cf-toggle" formControlName="activo">
+            {{ 'admin_service_types.fases.active_label' | translate }}
+          </mat-slide-toggle>
 
-        <!-- Ficha identificativa -->
-        <div class="identity-card mb-3">
-          <div class="identity-card__body">
-            <div class="identity-icon" aria-hidden="true">
-              <i class="bi bi-grid"></i>
-            </div>
-            <div class="flex-grow-1 min-w-0">
-              <div class="identity-nombre">{{ servicio()!.nombre_es }}</div>
-              <div class="identity-codigo font-monospace">{{ servicio()!.codigo }}</div>
-            </div>
-            <span class="status-badge ms-auto"
-                  [class.status-badge--active]="servicio()!.activo"
-                  [class.status-badge--inactive]="!servicio()!.activo">
-              <i class="bi"
-                 [class.bi-check-circle]="servicio()!.activo"
-                 [class.bi-x-circle]="!servicio()!.activo"
-                 aria-hidden="true"></i>
-              {{ (servicio()!.activo ? 'common.active' : 'common.inactive') | translate }}
-            </span>
-          </div>
-        </div>
+          <app-campos-faltantes [formulario]="faseForm" [intento]="intentosFase()" />
 
-        <!-- Formulario principal -->
-        <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
-          <div class="stype-card">
-            <div class="stype-card__body">
-
-              <!-- ── Código (solo lectura) ───────────────────────────────── -->
-              <div class="form-section mb-5">
-                <div class="form-section__header">
-                  <i class="bi bi-key" aria-hidden="true"></i>
-                  {{ 'admin_service_types.codigo_label' | translate }}
-                </div>
-                <label class="form-label" for="codigo-ro-input">
-                  {{ 'admin_service_types.codigo_label' | translate }}
-                </label>
-                <input id="codigo-ro-input" type="text" class="form-control code-readonly font-monospace"
-                       [value]="servicio()!.codigo" readonly aria-readonly="true" tabindex="-1" />
-                <p class="form-hint">
-                  <i class="bi bi-info-circle me-1" aria-hidden="true"></i>
-                  {{ 'admin_service_types.codigo_note' | translate }}
-                </p>
-              </div>
-
-              <div class="section-divider"></div>
-
-              <!-- ── Nombres ─────────────────────────────────────────────── -->
-              <div class="form-section mb-5">
-                <div class="form-section__header">
-                  <i class="bi bi-translate" aria-hidden="true"></i>
-                  {{ 'admin_service_types.section_names' | translate }}
-                </div>
-                <div class="row g-3">
-
-                  <div class="col-12 col-md-4">
-                    <label class="form-label" for="nombre-fr-input">
-                      {{ 'admin_service_types.nombre_fr' | translate }}
-                      <span class="req-mark" aria-hidden="true">*</span>
-                      <span class="lang-badge lang-badge--fr ms-1">FR</span>
-                    </label>
-                    <input id="nombre-fr-input" type="text" class="form-control"
-                           formControlName="nombre_fr"
-                           [class.is-invalid]="f['nombre_fr'].invalid && f['nombre_fr'].touched" />
-                    @if (f['nombre_fr'].invalid && f['nombre_fr'].touched) {
-                      <p class="field-error" role="alert">{{ 'admin_service_types.nombre_required' | translate }}</p>
-                    }
-                  </div>
-
-                  <div class="col-12 col-md-4">
-                    <label class="form-label" for="nombre-en-input">
-                      {{ 'admin_service_types.nombre_en' | translate }}
-                      <span class="req-mark" aria-hidden="true">*</span>
-                      <span class="lang-badge lang-badge--en ms-1">EN</span>
-                    </label>
-                    <input id="nombre-en-input" type="text" class="form-control"
-                           formControlName="nombre_en"
-                           [class.is-invalid]="f['nombre_en'].invalid && f['nombre_en'].touched" />
-                    @if (f['nombre_en'].invalid && f['nombre_en'].touched) {
-                      <p class="field-error" role="alert">{{ 'admin_service_types.nombre_required' | translate }}</p>
-                    }
-                  </div>
-
-                  <div class="col-12 col-md-4">
-                    <label class="form-label" for="nombre-es-input">
-                      {{ 'admin_service_types.nombre_es' | translate }}
-                      <span class="req-mark" aria-hidden="true">*</span>
-                      <span class="lang-badge lang-badge--es ms-1">ES</span>
-                    </label>
-                    <input id="nombre-es-input" type="text" class="form-control"
-                           formControlName="nombre_es"
-                           [class.is-invalid]="f['nombre_es'].invalid && f['nombre_es'].touched" />
-                    @if (f['nombre_es'].invalid && f['nombre_es'].touched) {
-                      <p class="field-error" role="alert">{{ 'admin_service_types.nombre_required' | translate }}</p>
-                    }
-                  </div>
-
-                </div>
-              </div>
-
-              <div class="section-divider"></div>
-
-              <!-- ── Descripciones ───────────────────────────────────────── -->
-              <div class="form-section mb-5">
-                <div class="form-section__header">
-                  <i class="bi bi-card-text" aria-hidden="true"></i>
-                  {{ 'admin_service_types.section_descs' | translate }}
-                </div>
-                <div class="row g-3">
-
-                  <div class="col-12 col-md-4">
-                    <label class="form-label" for="desc-fr-input">
-                      {{ 'admin_service_types.desc_fr' | translate }}
-                      <span class="lang-badge lang-badge--fr ms-1">FR</span>
-                    </label>
-                    <textarea id="desc-fr-input" class="form-control form-textarea"
-                              formControlName="descripcion_fr" rows="5"></textarea>
-                  </div>
-
-                  <div class="col-12 col-md-4">
-                    <label class="form-label" for="desc-en-input">
-                      {{ 'admin_service_types.desc_en' | translate }}
-                      <span class="lang-badge lang-badge--en ms-1">EN</span>
-                    </label>
-                    <textarea id="desc-en-input" class="form-control form-textarea"
-                              formControlName="descripcion_en" rows="5"></textarea>
-                  </div>
-
-                  <div class="col-12 col-md-4">
-                    <label class="form-label" for="desc-es-input">
-                      {{ 'admin_service_types.desc_es' | translate }}
-                      <span class="lang-badge lang-badge--es ms-1">ES</span>
-                    </label>
-                    <textarea id="desc-es-input" class="form-control form-textarea"
-                              formControlName="descripcion_es" rows="5"></textarea>
-                  </div>
-
-                </div>
-              </div>
-
-              <div class="section-divider"></div>
-
-              <!-- ── Configuración ───────────────────────────────────────── -->
-              <div class="form-section">
-                <div class="form-section__header">
-                  <i class="bi bi-sliders" aria-hidden="true"></i>
-                  {{ 'admin_service_types.section_config' | translate }}
-                </div>
-                <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox"
-                         formControlName="activo" id="chkActivo">
-                  <label class="form-check-label" for="chkActivo">
-                    {{ 'admin_service_types.active_label' | translate }}
-                    <small class="d-block mt-1">
-                      {{ 'admin_service_types.active_hint' | translate }}
-                    </small>
-                  </label>
-                </div>
-              </div>
-
-              <app-campos-faltantes class="mt-4" [formulario]="form" [intento]="intentos()" />
-            </div>
-
-            <!-- ── Footer acciones ─────────────────────────────────────── -->
-            <div class="stype-card__footer">
-              <button type="button" class="btn btn-outline-secondary"
-                      (click)="cancelar()" [disabled]="guardando()">
-                <i class="bi bi-x-lg me-1" aria-hidden="true"></i>{{ 'common.cancel' | translate }}
-              </button>
-              <button type="submit" class="btn btn-primary" [disabled]="guardando()">
-                @if (guardando()) {
-                  <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                  {{ 'admin_service_types.saving' | translate }}
-                } @else {
-                  <i class="bi bi-floppy me-1" aria-hidden="true"></i>
-                  {{ 'admin_service_types.save_btn' | translate }}
-                }
-              </button>
-            </div>
-
+          <div class="ase-subform__actions">
+            <button mat-button type="button" (click)="cancelarFase()" [disabled]="guardandoFase()">
+              {{ 'common.cancel' | translate }}
+            </button>
+            <button mat-flat-button type="submit" [disabled]="guardandoFase()">
+              @if (guardandoFase()) { <span class="fc-spinner" aria-hidden="true"></span> } @else { <mat-icon>save</mat-icon> }
+              {{ (guardandoFase() ? 'admin_service_types.saving' : 'common.save') | translate }}
+            </button>
           </div>
         </form>
+      }
 
-        <!-- ── Fases del servicio ─────────────────────────────────────────── -->
-        <div class="stype-card fases-card mt-3">
-          <div class="stype-card__body">
+      @if (fases().length === 0 && !faseFormAbierto()) {
+        <p class="ase-empty"><mat-icon aria-hidden="true">account_tree</mat-icon>{{ 'admin_service_types.fases.empty' | translate }}</p>
 
-            <div class="fases-head">
-              <div class="form-section__header mb-0">
-                <i class="bi bi-list-ol" aria-hidden="true"></i>
-                {{ 'admin_service_types.fases.section' | translate }}
-                @if (!cargandoFases() && !errorFases()) {
-                  <span class="fases-count">{{ fases().length }}</span>
-                }
-              </div>
-              <button type="button" class="btn btn-sm btn-primary"
-                      (click)="nuevaFase()" [disabled]="faseFormAbierto()">
-                <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>{{ 'admin_service_types.fases.add_btn' | translate }}
-              </button>
-            </div>
-
-            <p class="form-hint mb-4">
-              <i class="bi bi-info-circle me-1" aria-hidden="true"></i>
-              {{ 'admin_service_types.fases.hint' | translate }}
-            </p>
-
-            <!-- Skeleton -->
-            @if (cargandoFases()) {
-              <div aria-hidden="true">
-                @for (_ of [1, 2, 3]; track $index) {
-                  <div class="fase-item fase-item--skel">
-                    <div class="skel skel--orden"></div>
-                    <div class="flex-grow-1">
-                      <div class="skel skel--line skel--md mb-2"></div>
-                      <div class="skel skel--line skel--sm"></div>
-                    </div>
-                    <div class="skel skel--badge"></div>
-                  </div>
-                }
-              </div>
-
-            <!-- Error de carga -->
-            } @else if (errorFases()) {
-              <div class="fases-error" role="alert">
-                <p class="mb-2">
-                  <i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>{{ errorFases() }}
+      } @else if (fases().length > 0) {
+        <ul class="ase-list">
+          @for (fase of fases(); track fase.id) {
+            <li class="ase-item" [class.is-off]="!fase.activo" [class.is-editing]="faseEditandoId() === fase.id">
+              <span class="ase-item__lead cf-fig" aria-hidden="true">{{ fase.orden }}</span>
+              <div class="ase-item__main">
+                <p class="ase-item__name">
+                  <span class="cdk-visually-hidden">{{ fase.orden }}.</span>
+                  {{ nombreFase(fase) }}
                 </p>
-                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="cargarFases()">
-                  <i class="bi bi-arrow-clockwise me-1" aria-hidden="true"></i>{{ 'common.retry' | translate }}
-                </button>
+                <p class="ase-item__sub"><span class="cf-fig">{{ fase.codigo }}</span></p>
               </div>
-
-            } @else {
-
-              <!-- Formulario alta/edición -->
-              @if (faseFormAbierto()) {
-                <form [formGroup]="faseForm" (ngSubmit)="guardarFase()" novalidate class="fase-form mb-4">
-
-                  <div class="fase-form__title">
-                    <i class="bi" [class.bi-plus-circle]="!faseEditandoId()"
-                       [class.bi-pencil]="faseEditandoId()" aria-hidden="true"></i>
-                    {{ (faseEditandoId() ? 'admin_service_types.fases.edit_title'
-                                         : 'admin_service_types.fases.new_title') | translate }}
-                  </div>
-
-                  <!-- Código + orden -->
-                  <div class="row g-3">
-                    <div class="col-8 col-md-9">
-                      <label class="form-label" for="fase-codigo">
-                        {{ 'admin_service_types.fases.codigo' | translate }}
-                        <span class="req-mark" aria-hidden="true">*</span>
-                      </label>
-                      <input id="fase-codigo" type="text"
-                             class="form-control font-monospace" formControlName="codigo"
-                             placeholder="preparacion_encubrimiento"
-                             [class.is-invalid]="ff['codigo'].invalid && ff['codigo'].touched" />
-                      @if (ff['codigo'].invalid && ff['codigo'].touched) {
-                        <p class="field-error" role="alert">
-                          {{ (ff['codigo'].errors?.['pattern']
-                                ? 'admin_service_types.fases.codigo_pattern'
-                                : 'admin_service_types.fases.codigo_required') | translate }}
-                        </p>
-                      }
-                    </div>
-                    <div class="col-4 col-md-3">
-                      <label class="form-label" for="fase-orden">
-                        {{ 'admin_service_types.fases.orden' | translate }}
-                        <span class="req-mark" aria-hidden="true">*</span>
-                      </label>
-                      <input id="fase-orden" type="number" min="1"
-                             class="form-control" formControlName="orden"
-                             [class.is-invalid]="ff['orden'].invalid && ff['orden'].touched" />
-                    </div>
-                  </div>
-
-                  <!-- Nombres -->
-                  <div class="row g-3 mt-1">
-                    <div class="col-12 col-md-4">
-                      <label class="form-label" for="fase-nombre-fr">
-                        {{ 'admin_service_types.fases.nombre' | translate }}
-                        <span class="req-mark" aria-hidden="true">*</span>
-                        <span class="lang-badge lang-badge--fr ms-1">FR</span>
-                      </label>
-                      <input id="fase-nombre-fr" type="text" class="form-control" formControlName="nombre_fr"
-                             [class.is-invalid]="ff['nombre_fr'].invalid && ff['nombre_fr'].touched" />
-                    </div>
-                    <div class="col-12 col-md-4">
-                      <label class="form-label" for="fase-nombre-en">
-                        {{ 'admin_service_types.fases.nombre' | translate }}
-                        <span class="req-mark" aria-hidden="true">*</span>
-                        <span class="lang-badge lang-badge--en ms-1">EN</span>
-                      </label>
-                      <input id="fase-nombre-en" type="text" class="form-control" formControlName="nombre_en"
-                             [class.is-invalid]="ff['nombre_en'].invalid && ff['nombre_en'].touched" />
-                    </div>
-                    <div class="col-12 col-md-4">
-                      <label class="form-label" for="fase-nombre-es">
-                        {{ 'admin_service_types.fases.nombre' | translate }}
-                        <span class="req-mark" aria-hidden="true">*</span>
-                        <span class="lang-badge lang-badge--es ms-1">ES</span>
-                      </label>
-                      <input id="fase-nombre-es" type="text" class="form-control" formControlName="nombre_es"
-                             [class.is-invalid]="ff['nombre_es'].invalid && ff['nombre_es'].touched" />
-                    </div>
-                  </div>
-
-                  <!-- Descripciones -->
-                  <div class="row g-3 mt-1">
-                    <div class="col-12 col-md-4">
-                      <label class="form-label" for="fase-desc-fr">
-                        {{ 'admin_service_types.fases.descripcion' | translate }}
-                        <span class="lang-badge lang-badge--fr ms-1">FR</span>
-                      </label>
-                      <textarea id="fase-desc-fr" class="form-control form-textarea"
-                                formControlName="descripcion_fr" rows="2"></textarea>
-                    </div>
-                    <div class="col-12 col-md-4">
-                      <label class="form-label" for="fase-desc-en">
-                        {{ 'admin_service_types.fases.descripcion' | translate }}
-                        <span class="lang-badge lang-badge--en ms-1">EN</span>
-                      </label>
-                      <textarea id="fase-desc-en" class="form-control form-textarea"
-                                formControlName="descripcion_en" rows="2"></textarea>
-                    </div>
-                    <div class="col-12 col-md-4">
-                      <label class="form-label" for="fase-desc-es">
-                        {{ 'admin_service_types.fases.descripcion' | translate }}
-                        <span class="lang-badge lang-badge--es ms-1">ES</span>
-                      </label>
-                      <textarea id="fase-desc-es" class="form-control form-textarea"
-                                formControlName="descripcion_es" rows="2"></textarea>
-                    </div>
-                  </div>
-
-                  <!-- Activo -->
-                  <div class="form-check form-switch mt-3">
-                    <input class="form-check-input" type="checkbox" formControlName="activo" id="fase-activo">
-                    <label class="form-check-label" for="fase-activo">
-                      {{ 'admin_service_types.fases.active_label' | translate }}
-                    </label>
-                  </div>
-
-                  <app-campos-faltantes class="mb-3" [formulario]="faseForm" [intento]="intentosFase()" />
-
-                  <!-- Acciones del formulario -->
-                  <div class="fase-form__actions">
-                    <button type="button" class="btn btn-outline-secondary btn-sm"
-                            (click)="cancelarFase()" [disabled]="guardandoFase()">
-                      <i class="bi bi-x-lg me-1" aria-hidden="true"></i>{{ 'common.cancel' | translate }}
-                    </button>
-                    <button type="submit" class="btn btn-primary btn-sm" [disabled]="guardandoFase()">
-                      @if (guardandoFase()) {
-                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        {{ 'admin_service_types.saving' | translate }}
-                      } @else {
-                        <i class="bi bi-floppy me-1" aria-hidden="true"></i>{{ 'common.save' | translate }}
-                      }
-                    </button>
-                  </div>
-                </form>
-              }
-
-              <!-- Estado vacío -->
-              @if (fases().length === 0 && !faseFormAbierto()) {
-                <div class="fases-empty">
-                  <i class="bi bi-diagram-3" aria-hidden="true"></i>
-                  <p class="mb-0">{{ 'admin_service_types.fases.empty' | translate }}</p>
-                </div>
-
-              <!-- Lista de fases -->
-              } @else if (fases().length > 0) {
-                <ul class="fase-list">
-                  @for (fase of fases(); track fase.id) {
-                    <li class="fase-item"
-                        [class.fase-item--inactive]="!fase.activo"
-                        [class.fase-item--editing]="faseEditandoId() === fase.id">
-                      <span class="fase-orden">{{ fase.orden }}</span>
-
-                      <div class="fase-main min-w-0">
-                        <div class="fase-nombre">{{ nombreFase(fase) }}</div>
-                        <div class="fase-codigo font-monospace">{{ fase.codigo }}</div>
-                      </div>
-
-                      <span class="status-badge fase-status"
-                            [class.status-badge--active]="fase.activo"
-                            [class.status-badge--inactive]="!fase.activo">
-                        <i class="bi"
-                           [class.bi-check-circle]="fase.activo"
-                           [class.bi-x-circle]="!fase.activo" aria-hidden="true"></i>
-                        {{ (fase.activo ? 'common.active' : 'common.inactive') | translate }}
-                      </span>
-
-                      <div class="fase-actions">
-                        @if (confirmandoEliminarId() === fase.id) {
-                          <span class="fase-confirm">{{ 'admin_service_types.fases.confirm_delete' | translate }}</span>
-                          <button type="button" class="icon-btn icon-btn--danger"
-                                  (click)="confirmarEliminar(fase)" [disabled]="eliminandoId() === fase.id"
-                                  [title]="'common.delete' | translate">
-                            @if (eliminandoId() === fase.id) {
-                              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                            } @else {
-                              <i class="bi bi-check-lg" aria-hidden="true"></i>
-                            }
-                          </button>
-                          <button type="button" class="icon-btn"
-                                  (click)="cancelarEliminar()" [disabled]="eliminandoId() === fase.id"
-                                  [title]="'common.cancel' | translate">
-                            <i class="bi bi-x-lg" aria-hidden="true"></i>
-                          </button>
-                        } @else {
-                          <button type="button" class="icon-btn"
-                                  (click)="editarFase(fase)"
-                                  [title]="'admin_service_types.fases.edit_btn' | translate">
-                            <i class="bi bi-pencil" aria-hidden="true"></i>
-                          </button>
-                          <button type="button" class="icon-btn icon-btn--danger"
-                                  (click)="pedirEliminar(fase)"
-                                  [title]="'common.delete' | translate">
-                            <i class="bi bi-trash" aria-hidden="true"></i>
-                          </button>
-                        }
-                      </div>
-                    </li>
-                  }
-                </ul>
-              }
-            }
-
-          </div>
-        </div>
-
-        <!-- ── Actividades del servicio ───────────────────────────────────── -->
-        <div class="stype-card fases-card mt-3">
-          <div class="stype-card__body">
-
-            <div class="fases-head">
-              <div class="form-section__header mb-0">
-                <i class="bi bi-check2-square" aria-hidden="true"></i>
-                {{ 'admin_service_types.actividades.section' | translate }}
-                @if (!cargandoActividades() && !errorActividades()) {
-                  <span class="fases-count">{{ actividades().length }}</span>
+              <ng-container [ngTemplateOutlet]="tplEstado" [ngTemplateOutletContext]="{ $implicit: fase.activo }" />
+              <div class="ase-item__actions">
+                @if (confirmandoEliminarId() === fase.id) {
+                  <span class="ase-confirm">{{ 'admin_service_types.fases.confirm_delete' | translate }}</span>
+                  <button mat-icon-button type="button" class="ase-del" (click)="confirmarEliminar(fase)"
+                          [disabled]="eliminandoId() === fase.id"
+                          [attr.aria-label]="('common.delete' | translate) + ' : ' + nombreFase(fase)"
+                          [matTooltip]="'common.delete' | translate">
+                    @if (eliminandoId() === fase.id) { <span class="fc-spinner" aria-hidden="true"></span> } @else { <mat-icon>check</mat-icon> }
+                  </button>
+                  <button mat-icon-button type="button" (click)="cancelarEliminar()"
+                          [disabled]="eliminandoId() === fase.id"
+                          [attr.aria-label]="'common.cancel' | translate" [matTooltip]="'common.cancel' | translate">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                } @else {
+                  <button mat-icon-button type="button" (click)="editarFase(fase)"
+                          [attr.aria-label]="('admin_service_types.fases.edit_btn' | translate) + ' : ' + nombreFase(fase)"
+                          [matTooltip]="'admin_service_types.fases.edit_btn' | translate">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button type="button" class="ase-del" (click)="pedirEliminar(fase)"
+                          [attr.aria-label]="('common.delete' | translate) + ' : ' + nombreFase(fase)"
+                          [matTooltip]="'common.delete' | translate">
+                    <mat-icon>delete</mat-icon>
+                  </button>
                 }
               </div>
-              <button type="button" class="btn btn-sm btn-primary"
-                      (click)="nuevaActividad()" [disabled]="actividadFormAbierto()">
-                <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>{{ 'admin_service_types.actividades.add_btn' | translate }}
-              </button>
-            </div>
+            </li>
+          }
+        </ul>
+      }
+    }
+  </section>
 
-            <p class="form-hint mb-4">
-              <i class="bi bi-info-circle me-1" aria-hidden="true"></i>
-              {{ 'admin_service_types.actividades.hint' | translate }}
-            </p>
-
-            <!-- Skeleton -->
-            @if (cargandoActividades()) {
-              <div aria-hidden="true">
-                @for (_ of [1, 2, 3]; track $index) {
-                  <div class="fase-item fase-item--skel">
-                    <div class="skel skel--orden"></div>
-                    <div class="flex-grow-1">
-                      <div class="skel skel--line skel--md mb-2"></div>
-                      <div class="skel skel--line skel--sm"></div>
-                    </div>
-                    <div class="skel skel--badge"></div>
-                  </div>
-                }
-              </div>
-
-            <!-- Error de carga -->
-            } @else if (errorActividades()) {
-              <div class="fases-error" role="alert">
-                <p class="mb-2">
-                  <i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>{{ errorActividades() }}
-                </p>
-                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="cargarActividades()">
-                  <i class="bi bi-arrow-clockwise me-1" aria-hidden="true"></i>{{ 'common.retry' | translate }}
-                </button>
-              </div>
-
-            } @else {
-
-              <!-- Formulario alta/edición -->
-              @if (actividadFormAbierto()) {
-                <form [formGroup]="actividadForm" (ngSubmit)="guardarActividad()" novalidate class="fase-form mb-4">
-
-                  <div class="fase-form__title">
-                    <i class="bi" [class.bi-plus-circle]="!actividadEditandoId()"
-                       [class.bi-pencil]="actividadEditandoId()" aria-hidden="true"></i>
-                    {{ (actividadEditandoId() ? 'admin_service_types.actividades.edit_title'
-                                              : 'admin_service_types.actividades.new_title') | translate }}
-                  </div>
-
-                  <!-- Código + fase vinculada -->
-                  <div class="row g-3">
-                    <div class="col-12 col-md-6">
-                      <label class="form-label" for="acti-codigo">
-                        {{ 'admin_service_types.actividades.codigo' | translate }}
-                        <span class="req-mark" aria-hidden="true">*</span>
-                      </label>
-                      <input id="acti-codigo" type="text"
-                             class="form-control font-monospace" formControlName="codigo"
-                             placeholder="montaje_confinamiento"
-                             [class.is-invalid]="fa['codigo'].invalid && fa['codigo'].touched" />
-                      @if (fa['codigo'].invalid && fa['codigo'].touched) {
-                        <p class="field-error" role="alert">
-                          {{ (fa['codigo'].errors?.['pattern']
-                                ? 'admin_service_types.actividades.codigo_pattern'
-                                : 'admin_service_types.actividades.codigo_required') | translate }}
-                        </p>
-                      }
-                    </div>
-                    <div class="col-12 col-md-6">
-                      <label class="form-label" for="acti-fase">
-                        {{ 'admin_service_types.actividades.fase' | translate }}
-                      </label>
-                      <select id="acti-fase" class="form-select" formControlName="fase_id">
-                        <option value="">{{ 'admin_service_types.actividades.fase_none' | translate }}</option>
-                        @for (fase of fases(); track fase.id) {
-                          <option [value]="fase.id">{{ fase.orden }} · {{ nombreFase(fase) }}</option>
-                        }
-                      </select>
-                      <p class="form-hint">{{ 'admin_service_types.actividades.fase_hint' | translate }}</p>
-                    </div>
-                  </div>
-
-                  <!-- Nombres -->
-                  <div class="row g-3 mt-1">
-                    <div class="col-12 col-md-4">
-                      <label class="form-label" for="acti-nombre-fr">
-                        {{ 'admin_service_types.actividades.nombre' | translate }}
-                        <span class="req-mark" aria-hidden="true">*</span>
-                        <span class="lang-badge lang-badge--fr ms-1">FR</span>
-                      </label>
-                      <input id="acti-nombre-fr" type="text" class="form-control" formControlName="nombre_fr"
-                             [class.is-invalid]="fa['nombre_fr'].invalid && fa['nombre_fr'].touched" />
-                    </div>
-                    <div class="col-12 col-md-4">
-                      <label class="form-label" for="acti-nombre-en">
-                        {{ 'admin_service_types.actividades.nombre' | translate }}
-                        <span class="req-mark" aria-hidden="true">*</span>
-                        <span class="lang-badge lang-badge--en ms-1">EN</span>
-                      </label>
-                      <input id="acti-nombre-en" type="text" class="form-control" formControlName="nombre_en"
-                             [class.is-invalid]="fa['nombre_en'].invalid && fa['nombre_en'].touched" />
-                    </div>
-                    <div class="col-12 col-md-4">
-                      <label class="form-label" for="acti-nombre-es">
-                        {{ 'admin_service_types.actividades.nombre' | translate }}
-                        <span class="req-mark" aria-hidden="true">*</span>
-                        <span class="lang-badge lang-badge--es ms-1">ES</span>
-                      </label>
-                      <input id="acti-nombre-es" type="text" class="form-control" formControlName="nombre_es"
-                             [class.is-invalid]="fa['nombre_es'].invalid && fa['nombre_es'].touched" />
-                    </div>
-                  </div>
-
-                  <!-- Activo -->
-                  <div class="form-check form-switch mt-3">
-                    <input class="form-check-input" type="checkbox" formControlName="activo" id="acti-activo">
-                    <label class="form-check-label" for="acti-activo">
-                      {{ 'admin_service_types.actividades.active_label' | translate }}
-                    </label>
-                  </div>
-
-                  <app-campos-faltantes class="mb-3" [formulario]="actividadForm" [intento]="intentosActividad()" />
-
-                  <!-- Acciones del formulario -->
-                  <div class="fase-form__actions">
-                    <button type="button" class="btn btn-outline-secondary btn-sm"
-                            (click)="cancelarActividad()" [disabled]="guardandoActividad()">
-                      <i class="bi bi-x-lg me-1" aria-hidden="true"></i>{{ 'common.cancel' | translate }}
-                    </button>
-                    <button type="submit" class="btn btn-primary btn-sm" [disabled]="guardandoActividad()">
-                      @if (guardandoActividad()) {
-                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        {{ 'admin_service_types.saving' | translate }}
-                      } @else {
-                        <i class="bi bi-floppy me-1" aria-hidden="true"></i>{{ 'common.save' | translate }}
-                      }
-                    </button>
-                  </div>
-                </form>
-              }
-
-              <!-- Estado vacío -->
-              @if (actividades().length === 0 && !actividadFormAbierto()) {
-                <div class="fases-empty">
-                  <i class="bi bi-ui-checks" aria-hidden="true"></i>
-                  <p class="mb-0">{{ 'admin_service_types.actividades.empty' | translate }}</p>
-                </div>
-
-              <!-- Lista de actividades -->
-              } @else if (actividades().length > 0) {
-                <ul class="fase-list">
-                  @for (acti of actividades(); track acti.id) {
-                    <li class="fase-item"
-                        [class.fase-item--inactive]="!acti.activo"
-                        [class.fase-item--editing]="actividadEditandoId() === acti.id">
-                      <span class="acti-icon" aria-hidden="true"><i class="bi bi-check2-square"></i></span>
-
-                      <div class="fase-main min-w-0">
-                        <div class="fase-nombre">{{ nombreActividad(acti) }}</div>
-                        <div class="acti-sub">
-                          <span class="fase-codigo font-monospace">{{ acti.codigo }}</span>
-                          @if (nombreFaseVinculada(acti.fase_id); as faseNombre) {
-                            <span class="acti-fase-link">
-                              <i class="bi bi-diagram-2" aria-hidden="true"></i>{{ faseNombre }}
-                            </span>
-                          }
-                        </div>
-                      </div>
-
-                      <span class="status-badge fase-status"
-                            [class.status-badge--active]="acti.activo"
-                            [class.status-badge--inactive]="!acti.activo">
-                        <i class="bi"
-                           [class.bi-check-circle]="acti.activo"
-                           [class.bi-x-circle]="!acti.activo" aria-hidden="true"></i>
-                        {{ (acti.activo ? 'common.active' : 'common.inactive') | translate }}
-                      </span>
-
-                      <div class="fase-actions">
-                        @if (confirmandoEliminarActiId() === acti.id) {
-                          <span class="fase-confirm">{{ 'admin_service_types.actividades.confirm_delete' | translate }}</span>
-                          <button type="button" class="icon-btn icon-btn--danger"
-                                  (click)="confirmarEliminarActividad(acti)" [disabled]="eliminandoActividadId() === acti.id"
-                                  [title]="'common.delete' | translate">
-                            @if (eliminandoActividadId() === acti.id) {
-                              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                            } @else {
-                              <i class="bi bi-check-lg" aria-hidden="true"></i>
-                            }
-                          </button>
-                          <button type="button" class="icon-btn"
-                                  (click)="cancelarEliminarActividad()" [disabled]="eliminandoActividadId() === acti.id"
-                                  [title]="'common.cancel' | translate">
-                            <i class="bi bi-x-lg" aria-hidden="true"></i>
-                          </button>
-                        } @else {
-                          <button type="button" class="icon-btn"
-                                  (click)="editarActividad(acti)"
-                                  [title]="'admin_service_types.actividades.edit_btn' | translate">
-                            <i class="bi bi-pencil" aria-hidden="true"></i>
-                          </button>
-                          <button type="button" class="icon-btn icon-btn--danger"
-                                  (click)="pedirEliminarActividad(acti)"
-                                  [title]="'common.delete' | translate">
-                            <i class="bi bi-trash" aria-hidden="true"></i>
-                          </button>
-                        }
-                      </div>
-                    </li>
-                  }
-                </ul>
-              }
-            }
-
-          </div>
-        </div>
-
+  <!-- ═══ Actividades del servicio (igual que las fases) ═══════════════════ -->
+  <section class="fc-card" aria-labelledby="st-actis-title">
+    <div class="ase-sub-head">
+      <div class="fc-card__titles">
+        <h2 class="fc-h2" id="st-actis-title">
+          {{ 'admin_service_types.actividades.section' | translate }}
+          @if (!cargandoActividades() && !errorActividades()) { <span class="ase-count">{{ actividades().length }}</span> }
+        </h2>
+        <p class="fc-hint">{{ 'admin_service_types.actividades.hint' | translate }}</p>
       </div>
+      <button mat-stroked-button type="button" class="ase-add" (click)="nuevaActividad()" [disabled]="actividadFormAbierto()">
+        <mat-icon>add</mat-icon>
+        {{ 'admin_service_types.actividades.add_btn' | translate }}
+      </button>
     </div>
-  }
 
+    @if (cargandoActividades()) {
+      <div class="ase-skel" role="status">
+        <span class="cdk-visually-hidden">{{ 'common.loading' | translate }}</span>
+        @for (_ of [1, 2, 3]; track $index) { <span class="ase-skel__row" aria-hidden="true"></span> }
+      </div>
+
+    } @else if (errorActividades()) {
+      <div class="ase-error" role="alert">
+        <p class="fc-alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorActividades() }}</p>
+        <button mat-stroked-button type="button" (click)="cargarActividades()">
+          <mat-icon>refresh</mat-icon>
+          {{ 'common.retry' | translate }}
+        </button>
+      </div>
+
+    } @else {
+
+      @if (actividadFormAbierto()) {
+        <form class="ase-subform" [formGroup]="actividadForm" (ngSubmit)="guardarActividad()" novalidate
+              aria-labelledby="st-acti-form-title">
+          <h3 class="fc-h3" id="st-acti-form-title">
+            {{ (actividadEditandoId() ? 'admin_service_types.actividades.edit_title' : 'admin_service_types.actividades.new_title') | translate }}
+          </h3>
+
+          <div class="fc-grid fc-grid--2">
+            <mat-form-field appearance="outline" hideRequiredMarker>
+              <mat-label>{{ 'admin_service_types.actividades.codigo' | translate }}</mat-label>
+              <input matInput formControlName="codigo" placeholder="montaje_confinamiento"
+                     autocomplete="off" spellcheck="false">
+              <mat-error>
+                <mat-icon aria-hidden="true">error</mat-icon>
+                {{ (fa['codigo'].hasError('pattern') ? 'admin_service_types.actividades.codigo_pattern' : 'admin_service_types.actividades.codigo_required') | translate }}
+              </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>{{ 'admin_service_types.actividades.fase' | translate }}</mat-label>
+              <mat-select formControlName="fase_id">
+                <mat-option value="">{{ 'admin_service_types.actividades.fase_none' | translate }}</mat-option>
+                @for (fase of fases(); track fase.id) {
+                  <mat-option [value]="fase.id">{{ fase.orden }}. {{ nombreFase(fase) }}</mat-option>
+                }
+              </mat-select>
+              <mat-hint>{{ 'admin_service_types.actividades.fase_hint' | translate }}</mat-hint>
+            </mat-form-field>
+          </div>
+
+          <div class="fc-grid">
+            @for (l of idiomas; track l) {
+              <mat-form-field appearance="outline" hideRequiredMarker>
+                <mat-label>{{ ('admin_service_types.nombre_' + l) | translate }}</mat-label>
+                <input matInput [formControlName]="'nombre_' + l" [attr.name]="'nombre_' + l" autocomplete="off">
+                <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'admin_service_types.nombre_required' | translate }}</mat-error>
+              </mat-form-field>
+            }
+          </div>
+
+          <mat-slide-toggle class="cf-toggle" formControlName="activo">
+            {{ 'admin_service_types.actividades.active_label' | translate }}
+          </mat-slide-toggle>
+
+          <app-campos-faltantes [formulario]="actividadForm" [intento]="intentosActividad()" />
+
+          <div class="ase-subform__actions">
+            <button mat-button type="button" (click)="cancelarActividad()" [disabled]="guardandoActividad()">
+              {{ 'common.cancel' | translate }}
+            </button>
+            <button mat-flat-button type="submit" [disabled]="guardandoActividad()">
+              @if (guardandoActividad()) { <span class="fc-spinner" aria-hidden="true"></span> } @else { <mat-icon>save</mat-icon> }
+              {{ (guardandoActividad() ? 'admin_service_types.saving' : 'common.save') | translate }}
+            </button>
+          </div>
+        </form>
+      }
+
+      @if (actividades().length === 0 && !actividadFormAbierto()) {
+        <p class="ase-empty"><mat-icon aria-hidden="true">checklist</mat-icon>{{ 'admin_service_types.actividades.empty' | translate }}</p>
+
+      } @else if (actividades().length > 0) {
+        <ul class="ase-list">
+          @for (acti of actividades(); track acti.id) {
+            <li class="ase-item" [class.is-off]="!acti.activo" [class.is-editing]="actividadEditandoId() === acti.id">
+              <span class="ase-item__lead" aria-hidden="true"><mat-icon>task_alt</mat-icon></span>
+              <div class="ase-item__main">
+                <p class="ase-item__name">{{ nombreActividad(acti) }}</p>
+                <p class="ase-item__sub">
+                  <span class="cf-fig">{{ acti.codigo }}</span>
+                  @if (nombreFaseVinculada(acti.fase_id); as faseNombre) {
+                    <span class="ase-item__phase">
+                      <mat-icon aria-hidden="true">account_tree</mat-icon>
+                      <span class="cdk-visually-hidden">{{ 'admin_service_types.actividades.fase' | translate }} : </span>{{ faseNombre }}
+                    </span>
+                  }
+                </p>
+              </div>
+              <ng-container [ngTemplateOutlet]="tplEstado" [ngTemplateOutletContext]="{ $implicit: acti.activo }" />
+              <div class="ase-item__actions">
+                @if (confirmandoEliminarActiId() === acti.id) {
+                  <span class="ase-confirm">{{ 'admin_service_types.actividades.confirm_delete' | translate }}</span>
+                  <button mat-icon-button type="button" class="ase-del" (click)="confirmarEliminarActividad(acti)"
+                          [disabled]="eliminandoActividadId() === acti.id"
+                          [attr.aria-label]="('common.delete' | translate) + ' : ' + nombreActividad(acti)"
+                          [matTooltip]="'common.delete' | translate">
+                    @if (eliminandoActividadId() === acti.id) { <span class="fc-spinner" aria-hidden="true"></span> } @else { <mat-icon>check</mat-icon> }
+                  </button>
+                  <button mat-icon-button type="button" (click)="cancelarEliminarActividad()"
+                          [disabled]="eliminandoActividadId() === acti.id"
+                          [attr.aria-label]="'common.cancel' | translate" [matTooltip]="'common.cancel' | translate">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                } @else {
+                  <button mat-icon-button type="button" (click)="editarActividad(acti)"
+                          [attr.aria-label]="('admin_service_types.actividades.edit_btn' | translate) + ' : ' + nombreActividad(acti)"
+                          [matTooltip]="'admin_service_types.actividades.edit_btn' | translate">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button type="button" class="ase-del" (click)="pedirEliminarActividad(acti)"
+                          [attr.aria-label]="('common.delete' | translate) + ' : ' + nombreActividad(acti)"
+                          [matTooltip]="'common.delete' | translate">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                }
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    }
+  </section>
+  }
 </div>
+
+<ng-template #tplEstado let-activo>
+  @if (activo) {
+    <span class="fc-state is-ok"><mat-icon aria-hidden="true">check_circle</mat-icon>{{ 'common.active' | translate }}</span>
+  } @else {
+    <span class="fc-state"><mat-icon aria-hidden="true">block</mat-icon>{{ 'common.inactive' | translate }}</span>
+  }
+</ng-template>

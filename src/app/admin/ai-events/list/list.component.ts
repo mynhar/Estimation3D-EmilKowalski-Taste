@@ -1,18 +1,43 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, effect, inject, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AsistenteEventoRepository, AsistenteEvento, TipoEvento } from '../../../data';
 import { ToastService } from '../../../services/toast.service';
 import { PaginationComponent } from '../../../shared/pagination/pagination.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
 
 type FiltroTipo    = 'todos' | TipoEvento;
 type FiltroResuelto = 'todos' | 'pendiente' | 'resuelto';
 
+interface EstiloTipo { matIcon: string; tono: 'is-warn' | 'is-info'; }
+
+/** Icono y tono de cada tipo: lo que pide atención humana en ámbar, el resto informativo. */
+const TIPO_ESTILO: Record<string, EstiloTipo> = {
+  salud_mencionada:                { matIcon: 'health_and_safety', tono: 'is-warn' },
+  escalada_humana:                 { matIcon: 'support_agent',     tono: 'is-warn' },
+  caso_externo:                    { matIcon: 'explore_off',       tono: 'is-info' },
+  evidencia_incompleta_imprevisto: { matIcon: 'photo_camera',      tono: 'is-info' },
+  imprevisto_anticipado:           { matIcon: 'report',            tono: 'is-info' },
+  candidato_imprevisto:            { matIcon: 'lightbulb',         tono: 'is-info' },
+};
+const ESTILO_POR_DEFECTO: EstiloTipo = { matIcon: 'flag', tono: 'is-info' };
+
 @Component({
   selector: 'app-admin-ai-events-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, PaginationComponent],
+  imports: [
+    NgTemplateOutlet, TranslatePipe,
+    MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatIconModule, MatSelectModule,
+    PageHeaderComponent, EmptyStateComponent, PaginationComponent,
+  ],
   templateUrl: './list.component.html',
-  styleUrls: ['../../_shared/crud-list.css'],
+  styleUrls: ['../../../shared/ui/lista/lista.css', './list.component.css'],
 })
 export class AdminAiEventsListComponent implements OnInit {
   private repo      = inject(AsistenteEventoRepository);
@@ -98,16 +123,8 @@ export class AdminAiEventsListComponent implements OnInit {
     return this.translate.instant('admin_ai_events.tipo.' + tipo);
   }
 
-  tipoClase(tipo: string): string {
-    switch (tipo) {
-      case 'salud_mencionada':                return 'tipo-badge--salud';
-      case 'escalada_humana':                 return 'tipo-badge--escalada';
-      case 'caso_externo':                    return 'tipo-badge--externo';
-      case 'evidencia_incompleta_imprevisto': return 'tipo-badge--evidencia';
-      case 'imprevisto_anticipado':           return 'tipo-badge--imprevisto';
-      case 'candidato_imprevisto':            return 'tipo-badge--candidato';
-      default:                                return 'tipo-badge--evidencia';
-    }
+  tipoEstilo(tipo: string): EstiloTipo {
+    return TIPO_ESTILO[tipo] ?? ESTILO_POR_DEFECTO;
   }
 
   usuarioNombre(ev: AsistenteEvento): string {

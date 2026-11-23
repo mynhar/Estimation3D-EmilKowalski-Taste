@@ -1,509 +1,360 @@
-<section class="contract-detail">
+<div class="page-wrapper fi">
 
-  <!-- ── ENCABEZADO ──────────────────────────────────────────────────────── -->
-  <div class="detail-header">
-    <button class="btn-back" type="button" (click)="volver()">
-      <i class="bi bi-arrow-left"></i>
-      {{ 'common.back' | translate }}
-    </button>
-    <div class="header-title">
-      <h1 class="page-title">{{ 'admin_contract_detail.title' | translate }}</h1>
-      @if (contrato(); as c) {
-        <span class="expediente-badge">{{ c.expediente_numero }}</span>
-      }
-    </div>
-
-    @if (!cargando() && !error() && puedeCompletar) {
-      <button
-        class="btn-completar"
-        type="button"
-        [disabled]="completando()"
-        (click)="iniciarCompletar()"
-      >
-        <i class="bi bi-check2-circle"></i>
-        {{ 'admin_contract_detail.completar_btn' | translate }}
-      </button>
-    }
-
-    <!-- Contrato firmado: solo se indica el siguiente paso. La ejecución
-         arranca sola con el primer parte diario del seguimiento de obra. -->
-    @if (!cargando() && !error() && ejecucionPendiente) {
-      <span class="estado-ejecutar">
-        <i class="bi bi-play-circle" aria-hidden="true"></i>
-        {{ 'admin_contract_detail.ejecutar_indicador' | translate }}
-      </span>
-    }
-
-    @if (!cargando() && !error() && puedeFirmar) {
-      <button
-        class="btn-firmar"
-        type="button"
-        [disabled]="firmando()"
-        (click)="iniciarFirmar()"
-      >
-        <i class="bi bi-pen"></i>
-        {{ 'admin_contract_detail.firmar_btn' | translate }}
-      </button>
-    }
-
-    @if (!cargando() && !error() && puedeCancel) {
-      <button
-        class="btn-cancelar"
-        type="button"
-        [disabled]="cancelando()"
-        (click)="iniciarCancelar()"
-      >
-        <i class="bi bi-x-circle"></i>
-        {{ 'admin_contract_detail.cancelar_btn' | translate }}
-      </button>
-    }
-
-    @if (!cargando() && !error() && contrato() && !archivado()) {
-      <app-boton-archivar class="header-archivar" [control]="archivo" />
-    }
-  </div>
-
-  <!-- ── CONFIRMACIÓN ARCHIVAR (estado y llamada viven en el componente) ── -->
-  <app-archivar-expediente #archivo [expedienteId]="contrato()?.expediente_id ?? ''"
-                           [despues]="recargarTrasArchivar" />
-
-  @if (!cargando() && !error() && archivado()) {
-    <app-aviso-archivado class="aviso-archivado-bloque" ambito="admin" />
-  }
-
-  <!-- ── CONFIRMACIÓN CANCELAR ──────────────────────────────────────────── -->
-  @if (confirmandoCancelar()) {
-    <div class="confirm-panel" role="alert">
-      <div class="confirm-panel__body">
-        <i class="bi bi-exclamation-triangle confirm-panel__icon"></i>
-        <div>
-          <p class="confirm-panel__title">{{ 'admin_contract_detail.cancelar_confirm_title' | translate }}</p>
-          <p class="confirm-panel__desc">{{ 'admin_contract_detail.cancelar_confirm_desc' | translate }}</p>
-          @if (errorCancelar()) {
-            <p class="confirm-panel__error">{{ errorCancelar() }}</p>
-          }
-        </div>
-      </div>
-      <div class="confirm-panel__actions">
-        <button
-          class="btn-confirm-yes"
-          type="button"
-          [disabled]="cancelando()"
-          (click)="confirmarCancelar()"
-        >
-          @if (cancelando()) {
-            <span class="spinner-xs"></span>
-          }
-          {{ 'admin_contract_detail.cancelar_confirm_ok' | translate }}
-        </button>
-        <button
-          class="btn-confirm-no"
-          type="button"
-          [disabled]="cancelando()"
-          (click)="cancelarConfirmacion()"
-        >
-          {{ 'common.cancel' | translate }}
-        </button>
-      </div>
-    </div>
-  }
-
-  <!-- ── CONFIRMACIÓN COMPLETAR ────────────────────────────────────────── -->
-  @if (confirmandoCompletar()) {
-    <div class="confirm-panel confirm-panel--completar" role="alert">
-      <div class="confirm-panel__body">
-        <i class="bi bi-check2-circle confirm-panel__icon confirm-panel__icon--completar"></i>
-        <div>
-          <p class="confirm-panel__title confirm-panel__title--completar">{{ 'admin_contract_detail.completar_confirm_title' | translate }}</p>
-          <p class="confirm-panel__desc confirm-panel__desc--completar">{{ 'admin_contract_detail.completar_confirm_desc' | translate }}</p>
-          @if (errorCompletar()) {
-            <p class="confirm-panel__error">{{ errorCompletar() }}</p>
-          }
-        </div>
-      </div>
-      <div class="confirm-panel__actions">
-        <button
-          class="btn-confirm-completar"
-          type="button"
-          [disabled]="completando()"
-          (click)="confirmarCompletar()"
-        >
-          @if (completando()) {
-            <span class="spinner-xs"></span>
-          }
-          {{ 'admin_contract_detail.completar_confirm_ok' | translate }}
-        </button>
-        <button
-          class="btn-confirm-no"
-          type="button"
-          [disabled]="completando()"
-          (click)="cancelarCompletacion()"
-        >
-          {{ 'common.cancel' | translate }}
-        </button>
-      </div>
-    </div>
-  }
-
-  <!-- ── CONFIRMACIÓN FIRMAR ───────────────────────────────────────────── -->
-  @if (confirmandoFirmar()) {
-    <div class="confirm-panel confirm-panel--firm" role="alert">
-      <div class="confirm-panel__body">
-        <i class="bi bi-pen confirm-panel__icon confirm-panel__icon--firm"></i>
-        <div>
-          <p class="confirm-panel__title confirm-panel__title--firm">{{ 'admin_contract_detail.firmar_confirm_title' | translate }}</p>
-          <p class="confirm-panel__desc confirm-panel__desc--firm">{{ 'admin_contract_detail.firmar_confirm_desc' | translate }}</p>
-          @if (errorFirmar()) {
-            <p class="confirm-panel__error">{{ errorFirmar() }}</p>
-          }
-        </div>
-      </div>
-      <div class="confirm-panel__actions">
-        <button
-          class="btn-confirm-firm"
-          type="button"
-          [disabled]="firmando()"
-          (click)="confirmarFirmar()"
-        >
-          @if (firmando()) {
-            <span class="spinner-xs spinner-xs--firm"></span>
-          }
-          {{ 'admin_contract_detail.firmar_confirm_ok' | translate }}
-        </button>
-        <button
-          class="btn-confirm-no"
-          type="button"
-          [disabled]="firmando()"
-          (click)="cancelarFirmacion()"
-        >
-          {{ 'common.cancel' | translate }}
-        </button>
-      </div>
-    </div>
-  }
-
-  <!-- ── SKELETON ────────────────────────────────────────────────────────── -->
+  <!-- ── Cargando ────────────────────────────────────────────────────────── -->
   @if (cargando()) {
-    <div class="skeleton-wrap">
-      <div class="skeleton-section">
-        <div class="sk-line sk-title"></div>
-        <div class="sk-line sk-medium"></div>
-        <div class="sk-line sk-short"></div>
-      </div>
-      <div class="skeleton-section">
-        <div class="sk-line sk-title"></div>
-        <div class="sk-line sk-medium"></div>
-        <div class="sk-line sk-medium"></div>
-      </div>
+    <div class="fi-skel" role="status">
+      <span class="cdk-visually-hidden">{{ 'common.loading' | translate }}</span>
+      <span class="skel skel--title" aria-hidden="true"></span>
+      <span class="fi-skel__cols" aria-hidden="true">
+        <span class="skel skel--card"></span>
+        <span class="skel skel--card"></span>
+      </span>
     </div>
-  }
 
-  <!-- ── ERROR ──────────────────────────────────────────────────────────── -->
-  @if (error(); as msg) {
-    <div class="alert-error" role="alert">
-      <i class="bi bi-exclamation-triangle"></i>
-      {{ msg }}
-    </div>
-  }
+  <!-- ── Error ───────────────────────────────────────────────────────────── -->
+  } @else if (error() || !contrato()) {
+    <app-empty-state class="fi-missing" matIcon="error"
+                     [titulo]="'common.error' | translate"
+                     [texto]="error() ?? ''">
+      <button actions mat-stroked-button type="button" (click)="volver()">
+        <mat-icon>arrow_back</mat-icon>
+        {{ 'common.back' | translate }}
+      </button>
+    </app-empty-state>
 
-  <!-- ── DETALLE ─────────────────────────────────────────────────────────── -->
-  @if (!cargando() && !error() && contrato(); as c) {
+  } @else {
+    @let c = contrato()!;
 
-    <!-- ── Fila superior: expediente + partes + trabajos | contrato + oferta -->
-    <div class="detail-body">
+    <!-- ── Cabecera ────────────────────────────────────────────────────── -->
+    <header class="fi-head">
+      <button mat-button type="button" class="fi-back" (click)="volver()">
+        <mat-icon>arrow_back</mat-icon>
+        {{ 'common.back' | translate }}
+      </button>
+      <app-page-header [titulo]="'admin_contract_detail.title' | translate">
+        <div actions class="acd-actions">
+          @if (puedeCancel) {
+            <button mat-stroked-button type="button" class="acd-cancel"
+                    [disabled]="cancelando()" [attr.aria-expanded]="confirmandoCancelar()"
+                    (click)="iniciarCancelar()">
+              <mat-icon>cancel</mat-icon>
+              {{ 'admin_contract_detail.cancelar_btn' | translate }}
+            </button>
+          }
+          @if (!archivado()) {
+            <app-boton-archivar [control]="archivo" />
+          }
+          <!-- La siguiente etapa del contrato: firmar o dar por terminado. -->
+          @if (puedeFirmar) {
+            <button mat-flat-button type="button" class="ds-cta"
+                    [disabled]="firmando()" [attr.aria-expanded]="confirmandoFirmar()"
+                    (click)="iniciarFirmar()">
+              <mat-icon>draw</mat-icon>
+              {{ 'admin_contract_detail.firmar_btn' | translate }}
+            </button>
+          } @else if (puedeCompletar) {
+            <button mat-flat-button type="button" class="ds-cta"
+                    [disabled]="completando()" [attr.aria-expanded]="confirmandoCompletar()"
+                    (click)="iniciarCompletar()">
+              <mat-icon>task_alt</mat-icon>
+              {{ 'admin_contract_detail.completar_btn' | translate }}
+            </button>
+          }
+        </div>
+      </app-page-header>
+      <div class="fi-meta">
+        <span class="fi-fig">{{ c.expediente_numero }}</span>
+        <span class="fi-meta__item"><mat-icon aria-hidden="true">person</mat-icon>{{ c.cliente_nombre }}</span>
+        <span class="fi-meta__item"><mat-icon aria-hidden="true">engineering</mat-icon>{{ c.constructor_nombre }}</span>
+        <app-status-chip [estado]="c.estado" prefijo="admin_contract.contrato_" />
+        <!-- Firmado: la ejecución arranca sola con el primer parte diario del seguimiento. -->
+        @if (ejecucionPendiente) {
+          <span class="fi-tag is-info">
+            <mat-icon aria-hidden="true">play_circle</mat-icon>{{ 'admin_contract_detail.ejecutar_indicador' | translate }}
+          </span>
+        }
+      </div>
+    </header>
 
-      <!-- Col izquierda -->
-      <div class="col-main">
+    <app-archivar-expediente #archivo [expedienteId]="c.expediente_id" [separado]="false"
+                             [despues]="recargarTrasArchivar" />
 
-        <!-- EXPEDIENTE -->
-        <div class="detail-card">
-          <h2 class="card-section-title">
-            <i class="bi bi-folder2-open"></i>
-            {{ 'admin_contract_detail.section_expediente' | translate }}
-          </h2>
-          <dl class="info-grid">
-            <dt>{{ 'admin_contract_detail.numero' | translate }}</dt>
-            <dd>{{ c.expediente_numero }}</dd>
+    @if (archivado()) {
+      <app-aviso-archivado ambito="admin" />
+    }
+
+    <!-- ── Confirmaciones ──────────────────────────────────────────────── -->
+    @if (confirmandoCancelar()) {
+      <div class="acd-danger" role="alertdialog" aria-labelledby="acd-cancel-title" aria-describedby="acd-cancel-desc">
+        <p class="acd-danger__title" id="acd-cancel-title">
+          <mat-icon aria-hidden="true">warning</mat-icon>
+          {{ 'admin_contract_detail.cancelar_confirm_title' | translate }}
+        </p>
+        <p id="acd-cancel-desc">{{ 'admin_contract_detail.cancelar_confirm_desc' | translate }}</p>
+        @if (errorCancelar()) {
+          <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorCancelar() }}</p>
+        }
+        <div class="acd-inline-actions">
+          <button mat-flat-button type="button" class="acd-danger__ok"
+                  [disabled]="cancelando()" [attr.aria-busy]="cancelando()"
+                  (click)="confirmarCancelar()">
+            @if (cancelando()) { <span class="fi-spinner" aria-hidden="true"></span> } @else { <mat-icon>cancel</mat-icon> }
+            {{ 'admin_contract_detail.cancelar_confirm_ok' | translate }}
+          </button>
+          <button mat-button type="button" [disabled]="cancelando()" (click)="cancelarConfirmacion()">
+            {{ 'common.cancel' | translate }}
+          </button>
+        </div>
+      </div>
+    }
+
+    @if (confirmandoFirmar()) {
+      <div class="fi-confirm" role="alertdialog" aria-labelledby="acd-sign-title" aria-describedby="acd-sign-desc">
+        <p class="fi-confirm__title" id="acd-sign-title">
+          <mat-icon aria-hidden="true">draw</mat-icon>
+          {{ 'admin_contract_detail.firmar_confirm_title' | translate }}
+        </p>
+        <p id="acd-sign-desc">{{ 'admin_contract_detail.firmar_confirm_desc' | translate }}</p>
+        @if (errorFirmar()) {
+          <p class="fi-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorFirmar() }}</p>
+        }
+        <div class="acd-inline-actions">
+          <button mat-flat-button type="button" [disabled]="firmando()" [attr.aria-busy]="firmando()"
+                  (click)="confirmarFirmar()">
+            @if (firmando()) { <span class="fi-spinner" aria-hidden="true"></span> } @else { <mat-icon>check</mat-icon> }
+            {{ 'admin_contract_detail.firmar_confirm_ok' | translate }}
+          </button>
+          <button mat-button type="button" [disabled]="firmando()" (click)="cancelarFirmacion()">
+            {{ 'common.cancel' | translate }}
+          </button>
+        </div>
+      </div>
+    }
+
+    @if (confirmandoCompletar()) {
+      <div class="fi-confirm" role="alertdialog" aria-labelledby="acd-done-title" aria-describedby="acd-done-desc">
+        <p class="fi-confirm__title" id="acd-done-title">
+          <mat-icon aria-hidden="true">task_alt</mat-icon>
+          {{ 'admin_contract_detail.completar_confirm_title' | translate }}
+        </p>
+        <p id="acd-done-desc">{{ 'admin_contract_detail.completar_confirm_desc' | translate }}</p>
+        @if (errorCompletar()) {
+          <p class="fi-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorCompletar() }}</p>
+        }
+        <div class="acd-inline-actions">
+          <button mat-flat-button type="button" [disabled]="completando()" [attr.aria-busy]="completando()"
+                  (click)="confirmarCompletar()">
+            @if (completando()) { <span class="fi-spinner" aria-hidden="true"></span> } @else { <mat-icon>check</mat-icon> }
+            {{ 'admin_contract_detail.completar_confirm_ok' | translate }}
+          </button>
+          <button mat-button type="button" [disabled]="completando()" (click)="cancelarCompletacion()">
+            {{ 'common.cancel' | translate }}
+          </button>
+        </div>
+      </div>
+    }
+
+    <div class="fi-layout">
+
+      <!-- ══ Dossier, partes y trabajos ═══════════════════════════════════ -->
+      <div class="fi-col">
+
+        <section class="fi-card" aria-labelledby="acd-file-title">
+          <h2 id="acd-file-title" class="fi-h2">{{ 'admin_contract_detail.section_expediente' | translate }}</h2>
+          <dl class="fi-facts">
+            <div class="fi-fact">
+              <dt>{{ 'admin_contract_detail.numero' | translate }}</dt>
+              <dd class="fi-fig">{{ c.expediente_numero }}</dd>
+            </div>
+            <div class="fi-fact">
+              <dt>{{ 'admin_contract_detail.estado_exp' | translate }}</dt>
+              <dd><app-status-chip [estado]="c.expediente_estado" /></dd>
+            </div>
 
             @let servicios = serviciosContrato(c);
             @if (servicios.length > 1) {
               <!-- Varios: cada servicio con su descripción -->
-              <dt>{{ 'admin_contract_detail.servicios' | translate }}</dt>
-              <dd>
-                <ul class="servicios-list">
-                  @for (s of servicios; track s.id) {
-                    <li>
-                      <span class="servicios-list__nombre">{{ s.nombre }}</span>
-                      @if (s.descripcion) {
-                        <span class="servicios-list__desc text-muted-sm">{{ s.descripcion }}</span>
-                      }
-                    </li>
-                  }
-                </ul>
-              </dd>
-            } @else if (servicios.length === 1) {
-              <dt>{{ 'admin_contract_detail.servicio' | translate }}</dt>
-              <dd>{{ servicios[0].nombre }}</dd>
-
-              @if (servicios[0].descripcion) {
-                <dt>{{ 'admin_contract_detail.servicio_desc' | translate }}</dt>
-                <dd class="text-muted-sm">{{ servicios[0].descripcion }}</dd>
-              }
+              <div class="fi-fact is-wide">
+                <dt>{{ 'admin_contract_detail.servicios' | translate }}</dt>
+                <dd>
+                  <ul class="acd-services">
+                    @for (s of servicios; track s.id) {
+                      <li>
+                        {{ s.nombre }}
+                        @if (s.descripcion) { <span class="fi-fact__sub">{{ s.descripcion }}</span> }
+                      </li>
+                    }
+                  </ul>
+                </dd>
+              </div>
             } @else {
-              <dt>{{ 'admin_contract_detail.servicio' | translate }}</dt>
-              <dd>—</dd>
-            }
-
-            <dt>{{ 'admin_contract_detail.estado_exp' | translate }}</dt>
-            <dd>
-              <span class="badge-estado" [class]="badgeExpediente(c.expediente_estado)">
-                {{ ('state.' + c.expediente_estado) | translate }}
-              </span>
-            </dd>
-
-            <dt>{{ 'admin_contract_detail.direccion' | translate }}</dt>
-            <dd>{{ c.direccion }}</dd>
-
-            <dt>{{ 'admin_contract_detail.localidad' | translate }}</dt>
-            <dd>
-              {{ c.canton }}
-              @if (c.distrito) { – {{ c.distrito }} }
-              , {{ c.provincia }}
-            </dd>
-          </dl>
-        </div>
-
-        <!-- PARTES -->
-        <div class="detail-card">
-          <h2 class="card-section-title">
-            <i class="bi bi-people"></i>
-            {{ 'admin_contract_detail.section_partes' | translate }}
-          </h2>
-
-          <div class="partes-grid">
-
-            <!-- Cliente -->
-            <div class="parte-block">
-              <p class="parte-label">{{ 'admin_contract_detail.cliente' | translate }}</p>
-              <p class="parte-value">{{ c.cliente_nombre }}</p>
-              @if (c.cliente_telefono && c.cliente_telefono !== '—') {
-                <p class="parte-contact">
-                  <i class="bi bi-telephone"></i> {{ c.cliente_telefono }}
-                </p>
-              }
-              @if (c.cliente_email && c.cliente_email !== '—') {
-                <p class="parte-contact">
-                  <i class="bi bi-envelope"></i> {{ c.cliente_email }}
-                </p>
-              }
-            </div>
-
-            <!-- Constructor -->
-            <div class="parte-block">
-              <p class="parte-label">{{ 'admin_contract_detail.constructor' | translate }}</p>
-              <p class="parte-value">{{ c.constructor_nombre }}</p>
-              @if (c.constructor_telefono && c.constructor_telefono !== '—') {
-                <p class="parte-contact">
-                  <i class="bi bi-telephone"></i> {{ c.constructor_telefono }}
-                </p>
-              }
-              @if (c.constructor_email && c.constructor_email !== '—') {
-                <p class="parte-contact">
-                  <i class="bi bi-envelope"></i> {{ c.constructor_email }}
-                </p>
-              }
-            </div>
-
-            <!-- Estimador -->
-            @if (c.estimador_nombre) {
-              <div class="parte-block">
-                <p class="parte-label">{{ 'admin_contract_detail.estimador' | translate }}</p>
-                <p class="parte-value">{{ c.estimador_nombre }}</p>
-                @if (c.estimador_telefono) {
-                  <p class="parte-contact">
-                    <i class="bi bi-telephone"></i> {{ c.estimador_telefono }}
-                  </p>
-                }
-                @if (c.estimador_email) {
-                  <p class="parte-contact">
-                    <i class="bi bi-envelope"></i> {{ c.estimador_email }}
-                  </p>
-                }
+              <div class="fi-fact is-wide">
+                <dt>{{ 'admin_contract_detail.servicio' | translate }}</dt>
+                <dd>
+                  {{ servicios.length ? servicios[0].nombre : '—' }}
+                  @if (servicios.length && servicios[0].descripcion) {
+                    <span class="fi-fact__sub">{{ servicios[0].descripcion }}</span>
+                  }
+                </dd>
               </div>
             }
 
-          </div>
-        </div>
+            <div class="fi-fact is-wide">
+              <dt>{{ 'admin_contract_detail.direccion' | translate }}</dt>
+              <dd>
+                {{ c.direccion }}
+                <span class="fi-fact__sub">{{ localidad(c) }}</span>
+              </dd>
+            </div>
+          </dl>
+        </section>
 
-        <!-- DESCRIPCIÓN DE TRABAJOS -->
+        <!-- Partes: cliente, constructor y, si lo hay, estimador -->
+        <section class="fi-card" aria-labelledby="acd-parties-title">
+          <h2 id="acd-parties-title" class="fi-h2">{{ 'admin_contract_detail.section_partes' | translate }}</h2>
+          <div class="acd-parties">
+            <ng-container [ngTemplateOutlet]="tplParte"
+                          [ngTemplateOutletContext]="{ $implicit: 'admin_contract_detail.cliente', nombre: c.cliente_nombre, tel: c.cliente_telefono, email: c.cliente_email }" />
+            <ng-container [ngTemplateOutlet]="tplParte"
+                          [ngTemplateOutletContext]="{ $implicit: 'admin_contract_detail.constructor', nombre: c.constructor_nombre, tel: c.constructor_telefono, email: c.constructor_email }" />
+            @if (c.estimador_nombre) {
+              <ng-container [ngTemplateOutlet]="tplParte"
+                            [ngTemplateOutletContext]="{ $implicit: 'admin_contract_detail.estimador', nombre: c.estimador_nombre, tel: c.estimador_telefono, email: c.estimador_email }" />
+            }
+          </div>
+        </section>
+
         @if (c.descripcion_trabajo) {
-          <div class="detail-card">
-            <h2 class="card-section-title">
-              <i class="bi bi-card-text"></i>
-              {{ 'admin_contract_detail.section_trabajos' | translate }}
-            </h2>
-            <p class="descripcion-texto">{{ c.descripcion_trabajo }}</p>
-          </div>
+          <section class="fi-card" aria-labelledby="acd-work-title">
+            <h2 id="acd-work-title" class="fi-h2">{{ 'admin_contract_detail.section_trabajos' | translate }}</h2>
+            <p class="acd-notes">{{ c.descripcion_trabajo }}</p>
+          </section>
         }
-
       </div>
 
-      <!-- Col derecha -->
-      <div class="col-aside">
+      <!-- ══ Contrato y oferta ════════════════════════════════════════════ -->
+      <div class="fi-col">
 
-        <!-- CONTRATO -->
-        <div class="detail-card aside-card">
-          <h2 class="card-section-title">
-            <i class="bi bi-file-earmark-text"></i>
-            {{ 'admin_contract_detail.section_contrato' | translate }}
-          </h2>
-          <dl class="info-grid">
-            <dt>{{ 'admin_contract_detail.estado_contrato' | translate }}</dt>
-            <dd>
-              <span class="badge-estado" [class]="badgeContrato(c.estado)">
-                @switch (c.estado) {
-                  @case ('generado')     { {{ 'admin_contract.contrato_generado'     | translate }} }
-                  @case ('firmado')      { {{ 'admin_contract.contrato_firmado'      | translate }} }
-                  @case ('en_ejecucion') { {{ 'admin_contract.contrato_en_ejecucion' | translate }} }
-                  @case ('completado')   { {{ 'admin_contract.contrato_completado'   | translate }} }
-                  @case ('cancelado')    { {{ 'admin_contract.contrato_cancelado'    | translate }} }
-                  @default               { {{ c.estado }} }
-                }
-              </span>
-            </dd>
-
-            <dt>{{ 'admin_contract_detail.precio' | translate }}</dt>
-            <dd class="precio-valor">{{ formatPrecio(c.precio_final) }}</dd>
-
+        <section class="fi-card" aria-labelledby="acd-contract-title">
+          <h2 id="acd-contract-title" class="fi-h2">{{ 'admin_contract_detail.section_contrato' | translate }}</h2>
+          <div class="acd-price">
+            <span class="acd-price__label">{{ 'admin_contract_detail.precio' | translate }}</span>
+            <span class="acd-price__amount fi-fig">{{ formatPrecio(c.precio_final) }}</span>
+          </div>
+          <dl class="fi-facts">
+            <div class="fi-fact">
+              <dt>{{ 'admin_contract_detail.estado_contrato' | translate }}</dt>
+              <dd><app-status-chip [estado]="c.estado" prefijo="admin_contract.contrato_" /></dd>
+            </div>
             @if (c.garantia_anos != null) {
-              <dt>{{ 'admin_contract_detail.garantia' | translate }}</dt>
-              <dd>{{ c.garantia_anos }} {{ 'admin_contract.years' | translate }}</dd>
+              <div class="fi-fact">
+                <dt>{{ 'admin_contract_detail.garantia' | translate }}</dt>
+                <dd><span class="fi-fig">{{ c.garantia_anos }}</span> {{ 'admin_contract.years' | translate }}</dd>
+              </div>
             }
-
-            <dt>{{ 'admin_contract_detail.generado_en' | translate }}</dt>
-            <dd>{{ formatFecha(c.generado_en) }}</dd>
-
+            <div class="fi-fact">
+              <dt>{{ 'admin_contract_detail.generado_en' | translate }}</dt>
+              <dd class="fi-fig">{{ formatFecha(c.generado_en) }}</dd>
+            </div>
             @if (c.firmado_en) {
-              <dt>{{ 'admin_contract_detail.firmado_en' | translate }}</dt>
-              <dd>{{ formatFecha(c.firmado_en) }}</dd>
+              <div class="fi-fact">
+                <dt>{{ 'admin_contract_detail.firmado_en' | translate }}</dt>
+                <dd class="fi-fig">{{ formatFecha(c.firmado_en) }}</dd>
+              </div>
             }
           </dl>
-        </div>
+        </section>
 
-        <!-- OFERTA -->
-        <div class="detail-card aside-card">
-          <h2 class="card-section-title">
-            <i class="bi bi-tag"></i>
-            {{ 'admin_contract_detail.section_oferta' | translate }}
-          </h2>
-          <dl class="info-grid">
+        <section class="fi-card" aria-labelledby="acd-offer-title">
+          <h2 id="acd-offer-title" class="fi-h2">{{ 'admin_contract_detail.section_oferta' | translate }}</h2>
+          <dl class="fi-facts">
             @if (c.oferta_fecha_inicio) {
-              <dt>{{ 'admin_contract_detail.fecha_inicio' | translate }}</dt>
-              <dd>{{ formatFecha(c.oferta_fecha_inicio) }}</dd>
+              <div class="fi-fact">
+                <dt>{{ 'admin_contract_detail.fecha_inicio' | translate }}</dt>
+                <dd class="fi-fig">{{ formatFecha(c.oferta_fecha_inicio) }}</dd>
+              </div>
             }
-            <dt>{{ 'admin_contract_detail.plazo' | translate }}</dt>
-            <dd>{{ formatPlazo(c.plazo_semanas_min, c.plazo_semanas_max) }}</dd>
+            <div class="fi-fact">
+              <dt>{{ 'admin_contract_detail.plazo' | translate }}</dt>
+              <dd class="fi-fig">{{ formatPlazo(c.plazo_semanas_min, c.plazo_semanas_max) }}</dd>
+            </div>
           </dl>
-        </div>
-
+        </section>
       </div>
     </div>
 
-    <!-- ── PDF (ancho completo) ──────────────────────────────────────────── -->
-    <div class="pdf-section detail-card" [class]="'pdf-' + pdfTamano()">
-      <div class="pdf-header">
-        <h2 class="card-section-title mb-0">
-          <i class="bi bi-file-pdf"></i>
-          {{ 'admin_contract_detail.section_pdf' | translate }}
-        </h2>
-
-        <div class="pdf-controls">
-          <!-- Selector de idioma -->
-          <div class="lang-selector" role="group" [attr.aria-label]="'admin_contract_detail.pdf_lang' | translate">
+    <!-- ══ PDF del contrato (ancho completo) ════════════════════════════════ -->
+    <section class="fi-card acd-pdf" [class.is-large]="pdfTamano() === 'grande'" aria-labelledby="acd-pdf-title">
+      <div class="fi-card__head">
+        <h2 id="acd-pdf-title" class="fi-h2">{{ 'admin_contract_detail.section_pdf' | translate }}</h2>
+        <div class="acd-pdf__controls">
+          <mat-button-toggle-group class="acd-lang" hideSingleSelectionIndicator
+                                   [attr.aria-label]="'admin_contract_detail.pdf_lang' | translate"
+                                   [value]="pdfUrl() ? langPdf() : null"
+                                   [disabled]="generandoPdf()"
+                                   (change)="verPdf($event.value)">
             @for (lang of LANGS; track lang) {
-              <button
-                class="lang-chip"
-                [class.lang-chip--active]="langPdf() === lang"
-                type="button"
-                (click)="verPdf(lang)"
-                [disabled]="generandoPdf()"
-              >
-                {{ ('admin_contract_detail.lang_' + lang) | translate }}
-              </button>
+              <mat-button-toggle [value]="lang">{{ ('admin_contract_detail.lang_' + lang) | translate }}</mat-button-toggle>
             }
-          </div>
-
-          <!-- Ampliar / Reducir (sólo cuando visible y con PDF) -->
+          </mat-button-toggle-group>
           @if (pdfTamano() !== 'oculto' && pdfUrl()) {
-            <button
-              class="btn-ctrl"
-              type="button"
-              (click)="toggleTamano()"
-              [title]="(pdfTamano() === 'grande' ? 'admin_contract_detail.reducir_pdf' : 'admin_contract_detail.ampliar_pdf') | translate"
-            >
-              @if (pdfTamano() === 'grande') {
-                <i class="bi bi-arrows-angle-contract"></i>
-              } @else {
-                <i class="bi bi-arrows-angle-expand"></i>
-              }
+            <button mat-icon-button type="button" (click)="toggleTamano()"
+                    [attr.aria-label]="(pdfTamano() === 'grande' ? 'admin_contract_detail.reducir_pdf' : 'admin_contract_detail.ampliar_pdf') | translate"
+                    [matTooltip]="(pdfTamano() === 'grande' ? 'admin_contract_detail.reducir_pdf' : 'admin_contract_detail.ampliar_pdf') | translate">
+              @if (pdfTamano() === 'grande') { <mat-icon>close_fullscreen</mat-icon> } @else { <mat-icon>open_in_full</mat-icon> }
             </button>
           }
-
-          <!-- Contraer / Mostrar -->
-          <button
-            class="btn-ctrl"
-            type="button"
-            (click)="toggleVisibilidad()"
-            [title]="(pdfTamano() === 'oculto' ? 'admin_contract_detail.mostrar_pdf' : 'admin_contract_detail.ocultar_pdf') | translate"
-          >
-            @if (pdfTamano() === 'oculto') {
-              <i class="bi bi-chevron-down"></i>
-            } @else {
-              <i class="bi bi-chevron-up"></i>
-            }
+          <button mat-icon-button type="button" (click)="toggleVisibilidad()"
+                  aria-controls="acd-pdf-body"
+                  [attr.aria-expanded]="pdfTamano() !== 'oculto'"
+                  [attr.aria-label]="(pdfTamano() === 'oculto' ? 'admin_contract_detail.mostrar_pdf' : 'admin_contract_detail.ocultar_pdf') | translate"
+                  [matTooltip]="(pdfTamano() === 'oculto' ? 'admin_contract_detail.mostrar_pdf' : 'admin_contract_detail.ocultar_pdf') | translate">
+            @if (pdfTamano() === 'oculto') { <mat-icon>expand_more</mat-icon> } @else { <mat-icon>expand_less</mat-icon> }
           </button>
         </div>
       </div>
 
-      <!-- Cuerpo del PDF (oculto cuando pdfTamano === 'oculto') -->
-      @if (pdfTamano() !== 'oculto') {
-        @if (!pdfUrl() && !generandoPdf()) {
-          <!-- Estado inicial: selección de idioma -->
-          <div class="pdf-prompt">
-            <i class="bi bi-file-earmark-pdf pdf-prompt-icon"></i>
-            <p class="pdf-prompt-text">{{ 'admin_contract_detail.pdf_prompt' | translate }}</p>
-            <div class="lang-selector lang-selector--large">
+      <div id="acd-pdf-body" class="acd-pdf__body" [hidden]="pdfTamano() === 'oculto'">
+        @if (generandoPdf()) {
+          <p class="acd-pdf__state" role="status">
+            <span class="fi-spinner" aria-hidden="true"></span>
+            {{ 'admin_contract_detail.pdf_generando' | translate }}
+          </p>
+        } @else if (pdfUrl()) {
+          <iframe class="acd-pdf__frame" [src]="pdfUrl()" [title]="'admin_contract_detail.section_pdf' | translate"></iframe>
+        } @else {
+          <!-- Aún sin PDF: se elige el idioma y se genera en el navegador. -->
+          <div class="acd-pdf__prompt">
+            <mat-icon aria-hidden="true">picture_as_pdf</mat-icon>
+            <p>{{ 'admin_contract_detail.pdf_prompt' | translate }}</p>
+            <div class="acd-inline-actions">
               @for (lang of LANGS; track lang) {
-                <button
-                  class="lang-chip lang-chip--large"
-                  type="button"
-                  (click)="verPdf(lang)"
-                >
+                <button mat-stroked-button type="button" (click)="verPdf(lang)">
                   {{ ('admin_contract_detail.lang_' + lang) | translate }}
-                  <span class="lang-chip-label">{{ lang.toUpperCase() }}</span>
                 </button>
               }
             </div>
           </div>
         }
-
-        @if (generandoPdf()) {
-          <div class="pdf-loading">
-            <span class="spinner-md"></span>
-            {{ 'admin_contract_detail.pdf_generando' | translate }}
-          </div>
-        }
-
-        @if (pdfUrl() && !generandoPdf()) {
-          <iframe
-            class="pdf-frame"
-            [src]="pdfUrl()"
-            title="Contrato PDF"
-          ></iframe>
-        }
-      }
-    </div>
-
+      </div>
+    </section>
   }
+</div>
 
-</section>
+<!-- Una parte del contrato: nombre y, si los hay, teléfono y correo como enlaces. -->
+<ng-template #tplParte let-etiqueta let-nombre="nombre" let-tel="tel" let-email="email">
+  <div class="acd-party">
+    <p class="acd-party__label">{{ etiqueta | translate }}</p>
+    <p class="acd-party__name">{{ nombre }}</p>
+    @if (tel && tel !== '—') {
+      <a class="acd-party__link fi-fig" [href]="'tel:' + tel">
+        <mat-icon aria-hidden="true">call</mat-icon>{{ tel }}
+      </a>
+    }
+    @if (email && email !== '—') {
+      <a class="acd-party__link" [href]="'mailto:' + email">
+        <mat-icon aria-hidden="true">mail</mat-icon>{{ email }}
+      </a>
+    }
+  </div>
+</ng-template>

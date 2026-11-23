@@ -1,9 +1,16 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { Router, RouterLink } from '@angular/router';
+import { NgTemplateOutlet } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../services/auth-supabase.service';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
+import { StatusChipComponent } from '../../shared/ui/status-chip/status-chip.component';
 import { AdminDashboardService, DashboardStats, TimelineEvent } from './admin-dashboard.service';
 import { nombreServicio } from '../../models';
 
@@ -17,15 +24,18 @@ interface FunnelItem { estado: string; count: number }
 @Component({
   selector: 'app-admin-dashboard',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, PaginationComponent, RouterLink],
+  imports: [
+    NgTemplateOutlet, RouterLink, TranslatePipe,
+    MatButtonModule, MatButtonToggleModule, MatIconModule, MatTooltipModule,
+    PaginationComponent, PageHeaderComponent, StatusChipComponent,
+  ],
   templateUrl: './dashboard.component.html',
-  styleUrl:    './dashboard.component.css',
+  styleUrls: ['../../shared/ui/lista/lista.css', './dashboard.component.css'],
 })
 export class AdminDashboardComponent implements OnInit {
   private svc       = inject(AdminDashboardService);
   private auth      = inject(AuthSupabaseService);
   private translate = inject(TranslateService);
-  private router    = inject(Router);
 
   user   = toSignal(this.auth.user$);
   perfil = signal<{ nombre: string | null; apellido: string | null } | null>(null);
@@ -179,16 +189,14 @@ export class AdminDashboardComponent implements OnInit {
     return ev.servicio ? nombreServicio(ev.servicio, this.translate.currentLang ?? 'fr') : '';
   }
 
-  tipoIcon(tipo: string): string {
-    const m: Record<string, string> = {
-      expediente: 'bi bi-folder2',
-      estimacion: 'bi bi-clipboard-data',
-      oferta:     'bi bi-box',
-      contrato:   'bi bi-file-earmark-text',
-      obra:       'bi bi-hammer',
-    };
-    return m[tipo] ?? 'bi bi-circle';
-  }
+  /** Icono por tipo de evento: los mismos que la navegación del admin. */
+  readonly TIPO_ICON: Record<TimelineEvent['tipo'], { matIcon: string }> = {
+    expediente: { matIcon: 'folder_open' },
+    estimacion: { matIcon: 'fact_check' },
+    oferta:     { matIcon: 'request_quote' },
+    contrato:   { matIcon: 'contract' },
+    obra:       { matIcon: 'construction' },
+  };
 
   /** Ruta de edición por tipo de evento (la línea de actividad es clicable). */
   private readonly TL_RUTA: Record<TimelineEvent['tipo'], string> = {
@@ -199,30 +207,9 @@ export class AdminDashboardComponent implements OnInit {
     obra:       '/admin/construction-monitoring/monitoring',
   };
 
-  onTimelineClick(ev: TimelineEvent): void {
-    if (!ev.entityId) return;
+  /** Destino de un evento, o null si no lleva a ninguna ficha. */
+  rutaEvento(ev: TimelineEvent): string[] | null {
     const ruta = this.TL_RUTA[ev.tipo];
-    if (ruta) this.router.navigate([ruta, ev.entityId]);
+    return ev.entityId && ruta ? [ruta, ev.entityId] : null;
   }
-
-  /** Navega a la lista de expedientes por estimar filtrada por estado. */
-  irAEstimaciones(estado: 'nuevo' | 'en_estimacion' | 'estimado'): void {
-    this.router.navigate(['/admin/to-estimate'], { queryParams: { estado } });
-  }
-
-  /** Navega a la lista de usuarios filtrada por constructores activos. */
-  irAConstructoresActivos(): void {
-    this.router.navigate(['/admin/user'], { queryParams: { rol: 'constructor', activo: 'activo' } });
-  }
-
-  /** Navega a la lista de ofertas filtrada por estado de expediente. */
-  irAOfertas(estado: 'estimado' | 'en_oferta' | 'adjudicado'): void {
-    this.router.navigate(['/admin/offer'], { queryParams: { estado } });
-  }
-
-  /** Navega al seguimiento de obra filtrado por estado de contrato. */
-  irASeguimientoObra(estado: 'todos' | 'en_ejecucion' | 'completado'): void {
-    this.router.navigate(['/admin/construction-monitoring/list'], { queryParams: { estado } });
-  }
-
 }

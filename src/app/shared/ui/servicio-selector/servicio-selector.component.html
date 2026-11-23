@@ -8,14 +8,9 @@
     <p class="srv-count" aria-live="polite">
       {{ 'service_selector.count' | translate: { n: totalMarcados(), total: opciones().length } }}
     </p>
-    <button type="button" class="btn btn-link srv-all" (click)="alternarTodos()">
-      @if (todos()) {
-        <i class="bi bi-x-lg" aria-hidden="true"></i>
-        {{ 'service_selector.clear' | translate }}
-      } @else {
-        <i class="bi bi-check2-all" aria-hidden="true"></i>
-        {{ 'service_selector.select_all' | translate }}
-      }
+    <button mat-button type="button" class="srv-all" (click)="alternarTodos()">
+      @if (todos()) { <mat-icon>close</mat-icon> } @else { <mat-icon>done_all</mat-icon> }
+      {{ (todos() ? 'service_selector.clear' : 'service_selector.select_all') | translate }}
     </button>
   </div>
 
@@ -25,12 +20,12 @@
       @let sel = marcado(s.id);
       @let esPrincipal = hayVarios() && principal() === s.id;
       <label class="srv-card" [class.srv-card--selected]="sel">
-        <input type="checkbox" class="visually-hidden"
+        <input type="checkbox" class="cdk-visually-hidden"
                [value]="s.id"
                [checked]="sel"
                (change)="alternar(s.id)" />
         <span class="srv-icon">
-          <i class="bi {{ icono(s.codigo) }}" aria-hidden="true"></i>
+          <mat-icon aria-hidden="true">{{ icono(s.codigo) }}</mat-icon>
         </span>
         <span class="srv-text">
           <span class="srv-name">{{ s.nombre }}</span>
@@ -49,7 +44,7 @@
           }
         </span>
         <span class="srv-box" aria-hidden="true">
-          <i class="bi bi-check-lg"></i>
+          <mat-icon>check</mat-icon>
         </span>
       </label>
     }
@@ -58,7 +53,7 @@
 
 @if (error()) {
   <p class="srv-error" [id]="errorId" role="alert">
-    <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+    <mat-icon aria-hidden="true">error</mat-icon>
     {{ 'service_selector.required' | translate }}
   </p>
 }

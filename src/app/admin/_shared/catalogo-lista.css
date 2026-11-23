@@ -1,0 +1,36 @@
+/* Catálogos de administración: lista (prefijo cl-)
+ * Tipos de servicio, fichas normativas e imprevistos comparten la misma lista: código, nombre,
+ * un texto de apoyo (descripción, resumen o servicio) y el estado activo/inactivo.
+ * Complemento de shared/ui/lista/lista.css:
+ *   styleUrls: ['…/shared/ui/lista/lista.css', '…/admin/_shared/catalogo-lista.css']
+ *
+ * states: cargando · error · sin elementos · filtros sin resultados · tabla (desde 768px) ·
+ *         tarjetas (móvil) · inactivo atenuado (.is-off)
+ * contrast: nombre ink 13.6:1 · texto de apoyo ink-secondary sobre vélin
+ * type: el código al 75 % con tabular-nums
+ * Sin tomate: crear un elemento del catálogo es configuración, no una etapa del dossier
+ * (botón relleno abeto).
+ */
+:host { display: block; }
+
+.cl-name { min-width: 12rem; }
+.cl-name .ls-table__link { font-weight: var(--ds-weight-semibold); }
+
+/* Texto de apoyo: dos líneas como mucho en la tabla; en la tarjeta, tres. El texto completo
+   va en el title. Se recorta un <span> dentro de la celda, nunca la celda (dejaría de serlo). */
+.cl-desc,
+.cl-card-desc {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  max-width: 60ch;
+  color: var(--ds-ink-secondary);
+}
+.cl-card-desc {
+  margin: 0;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  font-size: var(--ds-text-sm);
+}

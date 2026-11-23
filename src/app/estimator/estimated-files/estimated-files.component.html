@@ -1,460 +1,307 @@
-<div class="ef-root">
+<div class="page-wrapper ls">
 
-  <!-- ── Header ───────────────────────────────────────────────────────────── -->
-  <header class="ef-header">
-    <div class="ef-header__text">
-      <p class="ef-eyebrow">
-        <i class="bi bi-clipboard-check" aria-hidden="true"></i>
-        {{ 'estimated_files.title' | translate }}
-      </p>
-      <h1 class="ef-title">{{ 'estimated_files.subtitle' | translate }}</h1>
-    </div>
+  <app-page-header [titulo]="'estimated_files.title' | translate"
+                   [contexto]="'estimated_files.subtitle' | translate" />
 
-    <div class="ef-kpis">
-      <div class="ef-kpi">
-        <span class="ef-kpi__value">{{ expedientes().length }}</span>
-        <span class="ef-kpi__label">{{ 'common.total' | translate }}</span>
-      </div>
-      @if (contarEstado('contratado') > 0) {
-        <div class="ef-kpi ef-kpi--contratado">
-          <span class="ef-kpi__value">{{ contarEstado('contratado') }}</span>
-          <span class="ef-kpi__label">{{ 'state.contratado' | translate }}</span>
-        </div>
-      }
-      @if (contarEstado('adjudicado') > 0) {
-        <div class="ef-kpi ef-kpi--adjudicado">
-          <span class="ef-kpi__value">{{ contarEstado('adjudicado') }}</span>
-          <span class="ef-kpi__label">{{ 'state.adjudicado' | translate }}</span>
-        </div>
-      }
-      @if (contarEstado('en_oferta') > 0) {
-        <div class="ef-kpi ef-kpi--oferta">
-          <span class="ef-kpi__value">{{ contarEstado('en_oferta') }}</span>
-          <span class="ef-kpi__label">{{ 'state.en_oferta' | translate }}</span>
-        </div>
-      }
-    </div>
-  </header>
-
-  <!-- ── Loading ──────────────────────────────────────────────────────────── -->
+  <!-- ── Cargando ────────────────────────────────────────────────────────── -->
   @if (cargando()) {
-    <div class="ef-loading">
-      <span class="ef-loading__spinner" aria-hidden="true"></span>
-      {{ 'estimated_files.loading' | translate }}
+    <div class="ls-grid" role="status">
+      <span class="cdk-visually-hidden">{{ 'estimated_files.loading' | translate }}</span>
+      @for (_ of [1, 2, 3]; track $index) {
+        <span class="skel" aria-hidden="true"></span>
+      }
     </div>
 
+  <!-- ── Sin estimaciones ────────────────────────────────────────────────── -->
   } @else if (expedientes().length === 0) {
-
-    <!-- ── Empty ─────────────────────────────────────────────────────────── -->
-    <div class="ef-empty">
-      <div class="ef-empty__icon"><i class="bi bi-clipboard-check" aria-hidden="true"></i></div>
-      <h2 class="ef-empty__title">{{ 'estimated_files.empty_title' | translate }}</h2>
-      <p class="ef-empty__text">
-        {{ 'estimated_files.empty_text' | translate }}
-        <strong>{{ 'nav.en_estimation' | translate }}</strong>
-        {{ 'estimated_files.empty_text_after' | translate }}
-      </p>
-    </div>
+    <app-empty-state class="ls-empty"
+                     matIcon="task_alt"
+                     [titulo]="'estimated_files.empty_title' | translate"
+                     [texto]="('estimated_files.empty_text' | translate) + ' ' + ('nav.en_estimation' | translate) + ' ' + ('estimated_files.empty_text_after' | translate)">
+      <a actions mat-stroked-button routerLink="/estimator/files-under-estimation">
+        {{ 'nav.en_estimation' | translate }}
+      </a>
+    </app-empty-state>
 
   } @else {
 
-    <!-- ── Toolbar ───────────────────────────────────────────────────────── -->
-    <div class="ef-toolbar">
-
-      <!-- Estado chips -->
-      <div class="ef-chips" role="group">
-        <button class="ef-chip"
-                [class.ef-chip--active]="filtroEstado() === null"
-                (click)="filtroEstado.set(null)">
-          <span class="ef-chip__dot ef-chip__dot--todos" aria-hidden="true"></span>
-          {{ 'common.all' | translate }}
-          <span class="ef-chip__count">{{ expedientes().length }}</span>
-        </button>
-
-        @for (chip of estadoChips; track chip.value) {
-          @if (contarEstado(chip.value) > 0) {
-            <button class="ef-chip"
-                    [class.ef-chip--active]="filtroEstado() === chip.value"
-                    [class.ef-chip--estimado]="chip.value === 'estimado'"
-                    [class.ef-chip--en_oferta]="chip.value === 'en_oferta'"
-                    [class.ef-chip--adjudicado]="chip.value === 'adjudicado'"
-                    [class.ef-chip--contratado]="chip.value === 'contratado'"
-                    [class.ef-chip--cancelado]="chip.value === 'cancelado'"
-                    (click)="filtroEstado.set(filtroEstado() === chip.value ? null : chip.value)">
-              <span class="ef-chip__dot"
-                    [class.ef-chip__dot--estimado]="chip.value === 'estimado'"
-                    [class.ef-chip__dot--en_oferta]="chip.value === 'en_oferta'"
-                    [class.ef-chip__dot--adjudicado]="chip.value === 'adjudicado'"
-                    [class.ef-chip__dot--contratado]="chip.value === 'contratado'"
-                    [class.ef-chip__dot--cancelado]="chip.value === 'cancelado'"
-                    aria-hidden="true"></span>
-              {{ ('state.' + chip.value) | translate }}
-              <span class="ef-chip__count">{{ contarEstado(chip.value) }}</span>
-            </button>
-          }
-        }
-      </div>
-
-      <!-- Search -->
-      <div class="ef-search">
-        <i class="bi bi-search ef-search__icon" aria-hidden="true"></i>
-        <input class="ef-search__input"
-               type="search"
+    <!-- ── Búsqueda, estado (con recuento) y vista ───────────────────────── -->
+    <div class="ls-tools">
+      <mat-form-field class="ls-search" appearance="outline" subscriptSizing="dynamic">
+        <mat-label>{{ 'common.search' | translate }}</mat-label>
+        <mat-icon matPrefix aria-hidden="true">search</mat-icon>
+        <input matInput type="search" autocomplete="off"
                [placeholder]="'estimated_files.search_placeholder' | translate"
-               [ngModel]="busqueda()"
-               (ngModelChange)="busqueda.set($event)" />
-        @if (hayFiltros()) {
-          <button class="ef-search__clear" (click)="limpiarFiltros()"
-                  [title]="'common.clear' | translate">
-            <i class="bi bi-x" aria-hidden="true"></i>
-          </button>
-        }
+               [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)" />
+      </mat-form-field>
+
+      <div class="ls-filter is-grid">
+        <span class="ls-filter__label" id="ef-state-label">{{ 'estimated_files.col_status' | translate }}</span>
+        <mat-button-toggle-group class="ls-toggle" hideSingleSelectionIndicator
+                                 aria-labelledby="ef-state-label"
+                                 [value]="filtroEstado() ?? 'todos'"
+                                 (change)="filtroEstado.set($event.value === 'todos' ? null : $event.value)">
+          <mat-button-toggle value="todos">
+            {{ 'common.all' | translate }} <span class="ls-count">{{ expedientes().length }}</span>
+          </mat-button-toggle>
+          @for (estado of estadosConDatos(); track estado) {
+            <mat-button-toggle [value]="estado">
+              {{ ('state.' + estado) | translate }} <span class="ls-count">{{ contarEstado(estado) }}</span>
+            </mat-button-toggle>
+          }
+        </mat-button-toggle-group>
       </div>
 
-      <!-- Vista tabla / tarjetas -->
-      <div class="ef-view-toggle d-none d-md-inline-flex" role="group"
-           [attr.aria-label]="'estimated_files.view_cards' | translate">
-        <button type="button" class="ef-view-toggle__btn"
-                [class.ef-view-toggle__btn--active]="vista() === 'tabla'"
-                [attr.aria-pressed]="vista() === 'tabla'"
-                (click)="setVista('tabla')"
-                [title]="'estimated_files.view_table' | translate">
-          <i class="bi bi-table" aria-hidden="true"></i>
-        </button>
-        <button type="button" class="ef-view-toggle__btn"
-                [class.ef-view-toggle__btn--active]="vista() === 'tarjetas'"
-                [attr.aria-pressed]="vista() === 'tarjetas'"
-                (click)="setVista('tarjetas')"
-                [title]="'estimated_files.view_cards' | translate">
-          <i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>
-        </button>
-      </div>
-
+      <mat-button-toggle-group class="ls-toggle ls-view" hideSingleSelectionIndicator
+                               [value]="vista()" (change)="setVista($event.value)">
+        <mat-button-toggle value="tarjetas" [aria-label]="'estimated_files.view_cards' | translate"
+                           [matTooltip]="'estimated_files.view_cards' | translate">
+          <mat-icon>grid_view</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="tabla" [aria-label]="'estimated_files.view_table' | translate"
+                           [matTooltip]="'estimated_files.view_table' | translate">
+          <mat-icon>table_rows</mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
     </div>
 
-    <!-- ── Sin resultados ────────────────────────────────────────────────── -->
-    @if (expedientesFiltrados().length === 0) {
-      <div class="ef-empty ef-empty--inline">
-        <div class="ef-empty__icon">
-          <i class="bi bi-search" aria-hidden="true"></i>
-        </div>
-        <h2 class="ef-empty__title">{{ 'common.no_results' | translate }}</h2>
-        <p class="ef-empty__text">{{ 'estimated_files.no_filter_text' | translate }}</p>
-        <button class="ef-clear-btn" (click)="limpiarFiltros()">
-          <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+    <div class="ls-status">
+      @if (hayFiltros()) {
+        <p class="ls-showing" role="status">
+          {{ 'common.showing' | translate }} {{ expedientesFiltrados().length }}
+          {{ 'common.of' | translate }} {{ expedientes().length }} {{ 'common.files_count' | translate }}
+        </p>
+        <button mat-button type="button" class="ls-clear" (click)="limpiarFiltros()">
+          <mat-icon>close</mat-icon>
           {{ 'common.clear' | translate }}
         </button>
-      </div>
+      }
+      <p class="ls-showing ef-sort">
+        <mat-icon aria-hidden="true">sort</mat-icon>
+        {{ 'estimated_files.sorted_recent' | translate }}
+      </p>
+    </div>
+
+    @if (expedientesFiltrados().length === 0) {
+      <app-empty-state class="ls-empty"
+                       matIcon="filter_alt_off"
+                       [titulo]="'common.no_results' | translate"
+                       [texto]="'estimated_files.no_filter_text' | translate">
+        <button actions mat-stroked-button type="button" (click)="limpiarFiltros()">
+          {{ 'common.clear_filters' | translate }}
+        </button>
+      </app-empty-state>
 
     } @else {
 
-      <!-- ── Conteo de resultados ─────────────────────────────────────────── -->
-      <div class="ef-results-bar">
-        <span class="ef-results-count">
-          {{ expedientesFiltrados().length }}
-          @if (expedientesFiltrados().length !== expedientes().length) {
-            <span class="ef-results-total">/ {{ expedientes().length }}</span>
-          }
-          {{ 'common.total' | translate }}
-        </span>
-        <span class="ef-results-sep" aria-hidden="true">·</span>
-        <span class="ef-results-hint">
-          <i class="bi bi-sort-down-alt" aria-hidden="true"></i>
-          {{ 'estimated_files.sorted_recent' | translate }}
-        </span>
-      </div>
-
-      <!-- ── Vista tabla (escritorio) ─────────────────────────────────────── -->
-      <div class="ef-table-card d-none" [class.d-md-block]="vista() === 'tabla'">
-        <table class="ef-table">
-          <thead>
-            <tr>
-              <th class="ef-table__col-photo" aria-hidden="true"></th>
-              <th class="ef-table__col-num">{{ 'estimated_files.col_number' | translate }}</th>
-              <th>{{ 'estimated_files.col_service' | translate }}</th>
-              <th>{{ 'estimated_files.col_client' | translate }}</th>
-              <th>{{ 'estimated_files.col_location' | translate }}</th>
-              <th class="ef-table__col-date">{{ 'estimated_files.col_visit' | translate }}</th>
-              <th>{{ 'estimated_files.col_status' | translate }}</th>
-              <th class="ef-table__col-action"></th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (exp of expedientesPaginados(); track exp.id) {
-              <tr class="ef-table__row ef-table__row--clickable"
-                  (click)="abrir(exp.id)"
-                  [class.ef-table__row--confirming]="confirmandoId() === exp.id"
-                  [class.ef-table__row--cancelado]="exp.estado === 'cancelado'">
-
-                <td class="ef-table__col-photo">
-                  <div class="ef-thumb">
-                    @if (fotoExpediente(exp); as foto) {
-                      <img [src]="foto" loading="lazy" [alt]="exp.numero"
-                           (error)="onFotoError(exp.id)" />
-                    } @else {
-                      <i class="bi bi-badge-3d" aria-hidden="true"
-                         [title]="'estimated_files.photo_none' | translate"></i>
-                    }
-                  </div>
-                </td>
-
-                <td class="ef-table__col-num">
-                  <span class="ef-num">{{ exp.numero }}</span>
-                </td>
-
-                <td><span class="ef-table__service">{{ servicioNombre(exp) }}</span></td>
-
-                <td>{{ exp.cliente_nombre }}</td>
-
-                <td class="ef-table__addr" [title]="direccionCompleta(exp)">
-                  @if (direccionLinea1(exp)) {
-                    <span class="ef-table__addr-line">{{ direccionLinea1(exp) }}</span>
-                  }
-                  @if (direccionLinea2(exp)) {
-                    <span class="ef-table__addr-line ef-table__muted">{{ direccionLinea2(exp) }}</span>
-                  }
-                </td>
-
-                <td class="ef-table__col-date">
-                  <span class="ef-table__fecha">
-                    {{ formatFecha(exp.fecha_visita) }}
-                    @if (formatHora(exp.fecha_visita) !== '—') {
-                      <span class="ef-hora">{{ formatHora(exp.fecha_visita) }}</span>
-                    }
-                  </span>
-                </td>
-
-                <td>
-                  <span class="ef-badge badge rounded-pill {{ badgeClass(exp.estado) }}">
-                    {{ estadoLabel(exp.estado) | translate }}
-                  </span>
-                  <!-- Una marca por contrato con la obra al 100 % (contrato aún abierto) -->
-                  @if (obrasTerminadasDe(exp).length > 0) {
-                  <ul class="ef-obras ef-obras--table">
-                    @for (c of obrasTerminadasDe(exp); track c.id) {
-                      <li class="ef-obra">
-                        <span class="tag tag-gold ef-obra__tag">
-                          <i class="bi bi-flag" aria-hidden="true"></i>{{ 'monitoring.obra_terminada_badge' | translate }}
-                        </span>
-                        <span class="ef-obra__svc">{{ serviciosContrato(c) }}</span>
-                      </li>
-                    }
-                  </ul>
-                }
-                </td>
-
-                <td class="ef-table__col-action" (click)="$event.stopPropagation()">
-                  @if (confirmandoId() === exp.id) {
-                    <div class="ef-actions ef-actions--row">
-                      <button class="ef-btn ef-btn--danger ef-btn--row"
-                              (click)="eliminarEstimacion(exp)"
-                              [disabled]="eliminando()">
-                        @if (eliminando()) {
-                          <span class="ef-spinner" aria-hidden="true"></span>
-                          {{ 'estimated_files.deleting' | translate }}
-                        } @else {
-                          <i class="bi bi-trash3" aria-hidden="true"></i>
-                          {{ 'estimated_files.confirm_delete' | translate }}
-                        }
-                      </button>
-                      <button class="ef-btn ef-btn--ghost"
-                              (click)="cancelarConfirmacion()"
-                              [disabled]="eliminando()">
-                        {{ 'common.cancel' | translate }}
-                      </button>
-                    </div>
-                    @if (errorEliminar()) {
-                      <p class="ef-confirm__err ef-table__err">{{ errorEliminar() }}</p>
-                    }
-                  } @else {
-                    <div class="ef-actions ef-actions--row">
-                      <button class="ef-btn ef-btn--primary ef-btn--row" (click)="ver(exp.id)">
-                        <i class="bi bi-eye" aria-hidden="true"></i>
-                        {{ 'estimated_files.view_detail' | translate }}
-                      </button>
-                      @if (exp.estado !== 'adjudicado' && exp.estado !== 'contratado') {
-                        <button class="ef-btn ef-btn--icon ef-btn--delete"
-                                (click)="pedirConfirmacion(exp.id)"
-                                [title]="'estimated_files.delete_title' | translate">
-                          <i class="bi bi-trash3" aria-hidden="true"></i>
-                        </button>
-                      }
-                    </div>
-                  }
-                </td>
+      <!-- ── Tabla (escritorio, si se elige) ─────────────────────────────── -->
+      @if (vista() === 'tabla') {
+        <div class="ls-table-wrap">
+          <table class="ls-table">
+            <thead>
+              <tr>
+                <th scope="col">{{ 'estimated_files.col_service' | translate }}</th>
+                <th scope="col">{{ 'estimated_files.col_client' | translate }}</th>
+                <th scope="col">{{ 'estimated_files.col_location' | translate }}</th>
+                <th scope="col">{{ 'estimated_files.col_visit' | translate }}</th>
+                <th scope="col">{{ 'estimated_files.col_status' | translate }}</th>
+                <th scope="col"><span class="cdk-visually-hidden">{{ 'estimated_files.view_detail' | translate }}</span></th>
               </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-
-      <!-- ── Grid de tarjetas (móvil siempre · escritorio por defecto) ─────── -->
-      <div class="ef-grid" [class.d-md-none]="vista() === 'tabla'">
-
-        @for (exp of expedientesPaginados(); track exp.id; let idx = $index) {
-
-          <article class="ef-card" role="button" tabindex="0"
-                   (click)="abrir(exp.id)"
-                   (keydown.enter)="abrir(exp.id)"
-                   (keydown.space)="$event.preventDefault(); abrir(exp.id)"
-                   [class.ef-card--estimado]="exp.estado === 'estimado'"
-                   [class.ef-card--en_oferta]="exp.estado === 'en_oferta'"
-                   [class.ef-card--adjudicado]="exp.estado === 'adjudicado'"
-                   [class.ef-card--contratado]="exp.estado === 'contratado'"
-                   [class.ef-card--cancelado]="exp.estado === 'cancelado'"
-                   [class.ef-card--reciente]="idx === 0 && paginaActual() === 1 && !hayFiltros()">
-
-            <!-- Foto del expediente (miniatura del tour 3D) -->
-            <div class="ef-card__photo">
-              @if (fotoExpediente(exp); as foto) {
-                <img class="ef-card__photo-img" [src]="foto" loading="lazy"
-                     [alt]="exp.numero" (error)="onFotoError(exp.id)" />
-              } @else {
-                <div class="ef-card__photo-empty"
-                     [title]="'estimated_files.photo_none' | translate">
-                  <i class="bi bi-badge-3d" aria-hidden="true"></i>
-                </div>
-              }
-            </div>
-
-            <!-- Cabecera: número + badge -->
-            <div class="ef-card__head">
-              <div class="ef-card__left">
-                <span class="ef-num">{{ exp.numero }}</span>
-                @if (idx === 0 && paginaActual() === 1 && !hayFiltros()) {
-                  <span class="ef-reciente-tag">{{ 'common.recent' | translate }}</span>
-                }
-              </div>
-              <span class="ef-badge badge rounded-pill {{ badgeClass(exp.estado) }}">
-                @if (exp.estado === 'contratado') {
-                  <i class="bi bi-trophy-fill me-1" aria-hidden="true"></i>
-                }
-                {{ estadoLabel(exp.estado) | translate }}
-              </span>
-            </div>
-
-            <!-- Servicio -->
-            <p class="ef-servicio">{{ servicioNombre(exp) }}</p>
-
-            <!-- Datos del cliente y ubicación -->
-            <div class="ef-meta-list">
-              <div class="ef-meta">
-                <i class="bi bi-person" aria-hidden="true"></i>
-                <span>{{ exp.cliente_nombre }}</span>
-              </div>
-              @if (direccionLinea1(exp) || direccionLinea2(exp)) {
-                <div class="ef-meta ef-addr" [title]="direccionCompleta(exp)">
-                  <i class="bi bi-geo-alt" aria-hidden="true"></i>
-                  <span class="ef-addr__text">
-                    @if (direccionLinea1(exp)) {
-                      <span class="ef-addr__line">{{ direccionLinea1(exp) }}</span>
-                    }
-                    @if (direccionLinea2(exp)) {
-                      <span class="ef-addr__line ef-addr__line--muted">{{ direccionLinea2(exp) }}</span>
-                    }
-                  </span>
-                </div>
-              }
-            </div>
-
-            <!-- Fecha de visita -->
-            <div class="ef-fecha">
-              <i class="bi bi-calendar3" aria-hidden="true"></i>
-              <span>{{ formatFecha(exp.fecha_visita) }}</span>
-              @if (formatHora(exp.fecha_visita) !== '—') {
-                <span class="ef-hora">{{ formatHora(exp.fecha_visita) }}</span>
-              }
-            </div>
-
-            <!-- Una marca por contrato con la obra al 100 % (contrato aún abierto) -->
-            @if (obrasTerminadasDe(exp).length > 0) {
-              <ul class="ef-obras">
-                @for (c of obrasTerminadasDe(exp); track c.id) {
-                  <li class="ef-obra">
-                    <span class="tag tag-gold ef-obra__tag">
-                      <i class="bi bi-flag" aria-hidden="true"></i>{{ 'monitoring.obra_terminada_badge' | translate }}
+            </thead>
+            <tbody>
+              @for (exp of expedientesPaginados(); track exp.id) {
+                <tr class="ls-table__row is-link" (click)="abrir(exp.id)">
+                  <td>
+                    <div class="ls-table__main">
+                      <span class="ls-thumb">
+                        @if (fotoExpediente(exp); as foto) {
+                          <img [src]="foto" loading="lazy" alt="" (error)="onFotoError(exp.id)" />
+                        } @else {
+                          <mat-icon aria-hidden="true">view_in_ar</mat-icon>
+                        }
+                      </span>
+                      <span class="ls-table__text">
+                        <a class="ls-table__link" [id]="'ef-t-' + exp.id"
+                           [routerLink]="['/estimator/estimated-file', exp.id]"
+                           (click)="$event.stopPropagation()">{{ servicioNombre(exp) }}</a>
+                        <span class="ls-table__sub ls-fig">{{ exp.numero }}</span>
+                      </span>
+                    </div>
+                  </td>
+                  <td>{{ exp.cliente_nombre }}</td>
+                  <td class="is-addr" [title]="direccionCompleta(exp)">
+                    <span class="ls-table__text">
+                      @if (direccionLinea1(exp)) { <span>{{ direccionLinea1(exp) }}</span> }
+                      @if (direccionLinea2(exp)) { <span class="ls-table__sub">{{ direccionLinea2(exp) }}</span> }
                     </span>
-                    <span class="ef-obra__svc">{{ serviciosContrato(c) }}</span>
-                  </li>
+                  </td>
+                  <td>
+                    <span class="ls-fig ls-nowrap">{{ formatFecha(exp.fecha_visita) }}</span>
+                    @if (formatHora(exp.fecha_visita) !== '—') {
+                      <span class="ls-table__sub ls-fig ef-hora">{{ formatHora(exp.fecha_visita) }}</span>
+                    }
+                  </td>
+                  <td>
+                    <span class="ls-table__text">
+                      <app-status-chip [estado]="exp.estado ?? ''" />
+                      <ng-container [ngTemplateOutlet]="obras" [ngTemplateOutletContext]="{ $implicit: exp }" />
+                    </span>
+                  </td>
+                  <td class="ls-table__action" (click)="$event.stopPropagation()">
+                    <div class="ef-row-actions">
+                      <ng-container [ngTemplateOutlet]="acciones"
+                                    [ngTemplateOutletContext]="{ $implicit: exp, ref: 'ef-t-' + exp.id }" />
+                    </div>
+                  </td>
+                </tr>
+                @if (confirmandoId() === exp.id) {
+                  <tr class="ef-confirm-row">
+                    <td colspan="6">
+                      <ng-container [ngTemplateOutlet]="confirmacion" [ngTemplateOutletContext]="{ $implicit: exp }" />
+                    </td>
+                  </tr>
                 }
-              </ul>
-            }
+              }
+            </tbody>
+          </table>
+        </div>
+      }
 
-            <!-- Acciones (los botones internos no deben disparar la navegación) -->
-            <div class="ef-card__foot" (click)="$event.stopPropagation()"
-                 (keydown.enter)="$event.stopPropagation()"
-                 (keydown.space)="$event.stopPropagation()">
+      <!-- ── Tarjetas (en móvil siempre; en escritorio, salvo vista tabla) ── -->
+      <ul class="ls-grid" [class.is-mobile-only]="vista() === 'tabla'">
+        @for (exp of expedientesPaginados(); track exp.id; let idx = $index) {
+          <li class="ls-card" [class.is-out]="exp.estado === 'cancelado' || exp.estado === 'archivado'">
+            <span class="ls-card__photo">
+              @if (fotoExpediente(exp); as foto) {
+                <img [src]="foto" loading="lazy" alt="" (error)="onFotoError(exp.id)" />
+              } @else {
+                <mat-icon aria-hidden="true">view_in_ar</mat-icon>
+                <span class="ls-card__nophoto">{{ 'estimated_files.photo_none' | translate }}</span>
+              }
+            </span>
+
+            <div class="ls-card__body">
+              <span class="ls-tags">
+                <app-status-chip [estado]="exp.estado ?? ''" />
+                @if (idx === 0 && paginaActual() === 1 && !hayFiltros()) {
+                  <span class="ls-tag">{{ 'common.recent' | translate }}</span>
+                }
+              </span>
+
+              <h2 class="ls-card__title">
+                <a class="ls-card__link" [id]="'ef-c-' + exp.id"
+                   [routerLink]="['/estimator/estimated-file', exp.id]">{{ servicioNombre(exp) }}</a>
+              </h2>
+              <p class="ls-card__num">{{ exp.numero }}</p>
+
+              <p class="ls-card__line">
+                <mat-icon aria-hidden="true">person</mat-icon>
+                <span>{{ exp.cliente_nombre }}</span>
+              </p>
+              @if (direccionLinea1(exp) || direccionLinea2(exp)) {
+                <p class="ls-card__line" [title]="direccionCompleta(exp)">
+                  <mat-icon aria-hidden="true">location_on</mat-icon>
+                  <span>
+                    @if (direccionLinea1(exp)) { {{ direccionLinea1(exp) }} }
+                    @if (direccionLinea2(exp)) { <span class="ls-card__sub">{{ direccionLinea2(exp) }}</span> }
+                  </span>
+                </p>
+              }
+
+              <ng-container [ngTemplateOutlet]="obras" [ngTemplateOutletContext]="{ $implicit: exp }" />
+
+              <div class="ls-card__foot">
+                <span>
+                  <mat-icon aria-hidden="true">calendar_month</mat-icon>
+                  <strong class="ls-fig">{{ formatFecha(exp.fecha_visita) }}</strong>
+                  @if (formatHora(exp.fecha_visita) !== '—') { <span class="ls-fig">{{ formatHora(exp.fecha_visita) }}</span> }
+                </span>
+              </div>
 
               @if (confirmandoId() === exp.id) {
-
-                <div class="ef-confirm">
-                  <p class="ef-confirm__msg">
-                    <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
-                    {{ 'estimated_files.confirm_before' | translate }}
-                    <strong>{{ 'state.nuevo' | translate }}</strong>
-                    {{ 'estimated_files.confirm_after' | translate }}
-                  </p>
-                  @if (errorEliminar()) {
-                    <p class="ef-confirm__err">{{ errorEliminar() }}</p>
-                  }
-                  <div class="ef-confirm__actions">
-                    <button class="ef-btn ef-btn--danger"
-                            (click)="eliminarEstimacion(exp)"
-                            [disabled]="eliminando()">
-                      @if (eliminando()) {
-                        <span class="ef-spinner" aria-hidden="true"></span>
-                        {{ 'estimated_files.deleting' | translate }}
-                      } @else {
-                        <i class="bi bi-trash3" aria-hidden="true"></i>
-                        {{ 'estimated_files.confirm_delete' | translate }}
-                      }
-                    </button>
-                    <button class="ef-btn ef-btn--ghost"
-                            (click)="cancelarConfirmacion()"
-                            [disabled]="eliminando()">
-                      {{ 'common.cancel' | translate }}
-                    </button>
-                  </div>
+                <div class="ef-card-confirm">
+                  <ng-container [ngTemplateOutlet]="confirmacion" [ngTemplateOutletContext]="{ $implicit: exp }" />
                 </div>
-
               } @else {
-
-                <div class="ef-actions">
-                  <button class="ef-btn ef-btn--primary" (click)="ver(exp.id)">
-                    <i class="bi bi-eye" aria-hidden="true"></i>
-                    {{ 'estimated_files.view_detail' | translate }}
-                  </button>
-                  @if (exp.estado !== 'adjudicado' && exp.estado !== 'contratado') {
-                    <button class="ef-btn ef-btn--icon ef-btn--delete"
-                            (click)="pedirConfirmacion(exp.id)"
-                            [title]="'estimated_files.delete_title' | translate">
-                      <i class="bi bi-trash3" aria-hidden="true"></i>
-                    </button>
-                  }
+                <div class="ef-card-actions">
+                  <ng-container [ngTemplateOutlet]="acciones"
+                                [ngTemplateOutletContext]="{ $implicit: exp, ref: 'ef-c-' + exp.id }" />
                 </div>
-
               }
-
             </div>
-
-          </article>
-
+          </li>
         }
+      </ul>
 
-      </div>
-
-      <!-- ── Paginación ────────────────────────────────────────────────────── -->
-      <div class="ef-pagination-wrap">
-        <app-pagination
-          [total]="expedientesFiltrados().length"
-          [page]="paginaActual()"
-          [pageSize]="POR_PAGINA"
-          (pageChange)="paginaActual.set($event)">
-        </app-pagination>
-      </div>
-
+      <app-pagination [total]="expedientesFiltrados().length"
+                      [page]="paginaActual()"
+                      [pageSize]="POR_PAGINA"
+                      (pageChange)="paginaActual.set($event)" />
     }
-
   }
-
 </div>
+
+<!-- Obra terminada al 100 % por contrato (aún abierto): icono y texto. -->
+<ng-template #obras let-exp>
+  @if (obrasTerminadasDe(exp).length > 0) {
+    <ul class="ef-obras">
+      @for (c of obrasTerminadasDe(exp); track c.id) {
+        <li>
+          <span class="ls-tag is-ok"><mat-icon aria-hidden="true">flag</mat-icon>{{ 'monitoring.obra_terminada_badge' | translate }}</span>
+          @if (serviciosContrato(c)) { <span class="ef-obras__svc">{{ serviciosContrato(c) }}</span> }
+        </li>
+      }
+    </ul>
+  }
+</ng-template>
+
+<!-- Ver el detalle y, si aún no hay contrato ni adjudicación, borrar la estimación. -->
+<ng-template #acciones let-exp let-ref="ref">
+  <button mat-stroked-button type="button" class="ef-view" [attr.aria-describedby]="ref" (click)="ver(exp.id)">
+    {{ 'estimated_files.view_detail' | translate }}
+  </button>
+  @if (exp.estado !== 'adjudicado' && exp.estado !== 'contratado') {
+    <button mat-icon-button type="button" class="ls-delete"
+            [attr.aria-describedby]="ref"
+            [attr.aria-label]="'estimated_files.delete_title' | translate"
+            [matTooltip]="'estimated_files.delete_title' | translate"
+            [attr.aria-expanded]="confirmandoId() === exp.id"
+            (click)="pedirConfirmacion(exp.id)">
+      <mat-icon>delete</mat-icon>
+    </button>
+  }
+</ng-template>
+
+<!-- Confirmación del borrado: qué pasa, error si lo hay, y las dos salidas. -->
+<ng-template #confirmacion let-exp>
+  <div class="ef-confirm" role="group" [attr.aria-label]="'estimated_files.delete_title' | translate">
+    <p class="ef-confirm__msg">
+      <mat-icon aria-hidden="true">warning</mat-icon>
+      <span>
+        {{ 'estimated_files.confirm_before' | translate }}
+        <strong>{{ 'state.nuevo' | translate }}</strong>
+        {{ 'estimated_files.confirm_after' | translate }}
+      </span>
+    </p>
+    @if (errorEliminar()) {
+      <p class="ef-confirm__err" role="alert">
+        <mat-icon aria-hidden="true">error</mat-icon>
+        <span>{{ errorEliminar() }}</span>
+      </p>
+    }
+    <div class="ef-confirm__actions">
+      <button mat-flat-button type="button" class="ls-danger"
+              [disabled]="eliminando()" (click)="eliminarEstimacion(exp)">
+        @if (eliminando()) {
+          <span class="ls-spinner" aria-hidden="true"></span>
+        } @else {
+          <mat-icon>delete</mat-icon>
+        }
+        {{ (eliminando() ? 'estimated_files.deleting' : 'estimated_files.confirm_delete') | translate }}
+      </button>
+      <button mat-button type="button" [disabled]="eliminando()" (click)="cancelarConfirmacion()">
+        {{ 'common.cancel' | translate }}
+      </button>
+    </div>
+  </div>
+</ng-template>

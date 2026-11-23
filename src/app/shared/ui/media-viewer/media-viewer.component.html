@@ -13,6 +13,8 @@
               [src]="url"
               allow="fullscreen; xr-spatial-tracking"
               [title]="data.titulo"></iframe>
+    } @else if (data.tipo === 'foto') {
+      <img class="mv__video"[src]="data.url" [alt]="data.titulo" />
     } @else {
       <video class="mv__video" [src]="data.url" controls autoplay playsinline preload="metadata"></video>
     }

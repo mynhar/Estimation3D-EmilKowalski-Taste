@@ -8,17 +8,16 @@ import { ExpedienteService } from '../../../services/expediente.service';
 import { ContratoService } from '../../../services/contrato.service';
 import { EstimacionService } from '../../../services/estimacion.service';
 import { ContratoObraResumen, ExpedienteCliente, nombreServicio } from '../../../models';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { PaginationComponent } from '../../../shared/pagination/pagination.component';
-import { ClaudeIconComponent } from '../../../shared/ui/claude-icon/claude-icon.component';
-
-// Config por estado. La etiqueta y el mensaje de ayuda son claves i18n
-// (`state.<estado>` y `state_hint.<estado>`) que resuelve la plantilla;
-// aquí solo viven la clase semántica, el icono y el paso del pipeline.
-interface EstadoCfg {
-  clase: string;
-  icono: string;
-  pipelineIdx: number;
-}
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
+import { StatusChipComponent } from '../../../shared/ui/status-chip/status-chip.component';
+import { StageLineComponent } from '../../../shared/ui/stage-line/stage-line.component';
+import { etapaDossier } from '../../../shared/util/etapas';
 
 type Filtro = 'todos' | 'activos' | 'finalizados';
 type VistaExpedientes = 'tabla' | 'tarjetas';
@@ -26,7 +25,10 @@ type VistaExpedientes = 'tabla' | 'tarjetas';
 @Component({
   selector: 'app-my-files',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, TranslatePipe, PaginationComponent, ClaudeIconComponent],
+  imports: [
+    RouterLink, TranslatePipe, MatButtonModule, MatButtonToggleModule, MatIconModule, MatTooltipModule,
+    PaginationComponent, PageHeaderComponent, EmptyStateComponent, StatusChipComponent, StageLineComponent,
+  ],
   templateUrl: './my-files.component.html',
   styleUrl: './my-files.component.css',
 })
@@ -85,31 +87,6 @@ export class MyFilesComponent implements OnInit {
   countTodos      = computed(() => this.expedientes().length);
   countActivos    = computed(() => this.expedientes().filter(e => e.estado !== 'cancelado' && e.estado !== 'contratado').length);
   countFinalizados= computed(() => this.expedientes().filter(e => e.estado === 'contratado' || e.estado === 'cancelado').length);
-
-  // ── Pipeline milestones ────────────────────────────────────────────────────
-  readonly PIPELINE = [
-    { label: 'pipeline.received' },
-    { label: 'pipeline.review'   },
-    { label: 'pipeline.offers'   },
-    { label: 'pipeline.chosen'   },
-    { label: 'pipeline.signed'   },
-  ];
-
-  // ── State config ───────────────────────────────────────────────────────────
-  private readonly ESTADO_CFG: Record<string, EstadoCfg> = {
-    nuevo:         { clase: 'status-badge--nuevo',         icono: 'bi-inbox',              pipelineIdx: 0 },
-    en_estimacion: { clase: 'status-badge--en_estimacion', icono: 'bi-clipboard2-pulse',   pipelineIdx: 1 },
-    estimado:      { clase: 'status-badge--estimado',      icono: 'bi-check-circle',       pipelineIdx: 1 },
-    en_oferta:     { clase: 'status-badge--en_oferta',     icono: 'bi-cash-coin',          pipelineIdx: 2 },
-    adjudicado:    { clase: 'status-badge--adjudicado',    icono: 'bi-trophy',             pipelineIdx: 3 },
-    contratado:    { clase: 'status-badge--contratado',    icono: 'bi-file-earmark-check', pipelineIdx: 4 },
-    cancelado:     { clase: 'status-badge--cancelado',     icono: 'bi-x-circle',           pipelineIdx: -1 },
-    archivado:     { clase: 'status-badge--archivado',     icono: 'bi-archive',            pipelineIdx: -1 },
-  };
-
-  private readonly FALLBACK_CFG: EstadoCfg = {
-    clase: 'status-badge--cancelado', icono: 'bi-question-circle', pipelineIdx: 0,
-  };
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
   async ngOnInit() {
@@ -186,23 +163,13 @@ export class MyFilesComponent implements OnInit {
   }
 
   // ── Helpers ────────────────────────────────────────────────────────────────
-  estadoCfg(estado: string): EstadoCfg {
-    return this.ESTADO_CFG[estado] ?? this.FALLBACK_CFG;
+  /** Etapa 1–6 de la tarjeta (sin contratos: la lista no los carga); 0 = fuera del flujo. */
+  etapa(exp: ExpedienteCliente): number {
+    return etapaDossier(exp.estado);
   }
 
-  dotActive(estado: string, stepIdx: number): boolean {
-    if (estado === 'cancelado') return false;
-    return (this.ESTADO_CFG[estado]?.pipelineIdx ?? 0) >= stepIdx;
-  }
-
-  dotCurrent(estado: string, stepIdx: number): boolean {
-    if (estado === 'cancelado') return false;
-    return (this.ESTADO_CFG[estado]?.pipelineIdx ?? 0) === stepIdx;
-  }
-
-  connectorBlue(estado: string, connectorIdx: number): boolean {
-    if (estado === 'cancelado') return false;
-    return (this.ESTADO_CFG[estado]?.pipelineIdx ?? 0) >= connectorIdx;
+  abrir(id: string): void {
+    this.router.navigate(['/client/file/my-file', id]);
   }
 
   servicioNombre(s: ExpedienteCliente['servicio']): string {

@@ -1,8 +1,11 @@
-/* component: tablero del cliente (Clarté)
+/* component: tablero del cliente (Trait rouge)
  * states: cargando · sin expedientes · con expedientes (uno o varios) · sin medios · cancelado
  *         interactivos: default · hover · focus-visible · active · disabled (borrando)
- * contrast: títulos ink (13.9:1) · texto ink-secondary (10.6:1) · secundarios ink-muted (6.1:1)
- *           enlaces action (6.5:1) · barras menthe solo como gráfico, el valor va en texto
+ * contrast: títulos ink (11.8:1) · texto ink-secondary (8.7:1) · secundarios ink-muted (6.1:1)
+ *           enlaces action (8.4:1) · barras solo como gráfico, el valor va en texto
+ *           tomate: solo el botón de «Prochaine étape» (o el de crear el primer dossier),
+ *           blanco encima 4.8:1; «Nouveau dossier» de contorno para no competir con él
+ * type: títulos 112 %; importes, porcentajes y contadores 75 % con tabular-nums
  */
 
 .dash {
@@ -16,6 +19,7 @@
 .dash-h2 {
   margin: 0;
   font-family: var(--ds-font-display);
+  font-stretch: var(--ds-stretch-heading);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
   line-height: var(--ds-leading-snug);
@@ -75,10 +79,11 @@
   height: 28px;
   padding: 0 var(--ds-space-2);
   border-radius: var(--ds-radius-pill);
-  background: var(--ds-stone);
+  background: var(--ds-band);
   color: var(--ds-ink);
   font-size: var(--ds-text-sm);
   font-weight: var(--ds-weight-bold);
+  font-stretch: var(--ds-stretch-figure);
   font-variant-numeric: tabular-nums;
 }
 
@@ -119,10 +124,11 @@
   width: 32px;
   height: 32px;
   border-radius: var(--ds-radius-circle);
-  background: var(--ds-stone);
+  background: var(--ds-band);
   color: var(--ds-ink);
   font-family: var(--ds-font-display);
   font-weight: var(--ds-weight-bold);
+  font-stretch: var(--ds-stretch-figure);
   font-variant-numeric: tabular-nums;
 }
 .dash-steps__text {
@@ -135,6 +141,7 @@
 .dash-steps__text strong { color: var(--ds-ink); }
 
 .dash-cta { width: 100%; min-height: 48px; }
+.dash-new { min-height: 44px; }
 @media (min-width: 600px) {
   .dash-cta { width: auto; }
 }
@@ -150,7 +157,7 @@
   align-items: center;
   padding: var(--ds-space-4);
   border-radius: var(--ds-radius-lg);
-  background: var(--ds-scan-soft);
+  background: var(--ds-action-faint);
   color: var(--ds-ink);
 }
 .dash-notice__icon { color: var(--ds-action); }
@@ -258,6 +265,7 @@
   font-family: var(--ds-font-display);
   font-size: clamp(var(--ds-text-2xl), 2vw + 1.25rem, var(--ds-text-3xl));
   font-weight: var(--ds-weight-bold);
+  font-stretch: var(--ds-stretch-heading);
   line-height: var(--ds-leading-tight);
   color: var(--ds-ink);
   overflow-wrap: anywhere;
@@ -377,17 +385,18 @@
   white-space: nowrap;
 }
 
-/* Aún sin tour: banda pierre con los tres pasos como una cota. */
+/* Aún sin tour: banda kraft con los tres pasos como una cota. */
 .dash-pending {
   display: grid;
   gap: var(--ds-space-3);
   padding: var(--ds-space-5);
   border-radius: var(--ds-radius-lg);
-  background: var(--ds-stone);
+  background: var(--ds-band);
 }
 .dash-pending__title {
   margin: 0;
   font-family: var(--ds-font-display);
+  font-stretch: var(--ds-stretch-heading);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
   color: var(--ds-ink);
@@ -419,6 +428,7 @@
   content: counter(paso);
   display: block;
   font-family: var(--ds-font-display);
+  font-stretch: var(--ds-stretch-figure);
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-bold);
   color: var(--ds-ink);
@@ -448,7 +458,7 @@
   width: 48px;
   height: 48px;
   border-radius: var(--ds-radius-circle);
-  background: var(--ds-stone);
+  background: var(--ds-band);
   color: var(--ds-ink-secondary);
 }
 .dash-person__text { display: grid; min-width: 0; }
@@ -465,6 +475,7 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-3xl);
   font-weight: var(--ds-weight-black);
+  font-stretch: var(--ds-stretch-figure);
   line-height: var(--ds-leading-tight);
   font-variant-numeric: tabular-nums;
   color: var(--ds-ink);
@@ -496,6 +507,7 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-2xl);
   font-weight: var(--ds-weight-black);
+  font-stretch: var(--ds-stretch-figure);
   font-variant-numeric: tabular-nums;
   color: var(--ds-ink);
 }
@@ -503,13 +515,13 @@
   height: 8px;
   overflow: hidden;
   border-radius: var(--ds-radius-pill);
-  background: var(--ds-stone);
+  background: var(--ds-band);
 }
 .dash-bar__fill {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--ds-scan);
+  background: var(--ds-action-soft);
   box-shadow: inset 0 0 0 1px var(--ds-action);
   transition: width var(--ds-duration-slow) var(--ds-ease-out);
 }
@@ -643,7 +655,7 @@
   background: var(--ds-action);
 }
 .dash-cal__day.is-anchor { background: var(--ds-ink); color: var(--ds-ink-inverse); }
-.dash-cal__day.is-anchor::after { background: var(--ds-scan); }
+.dash-cal__day.is-anchor::after { background: var(--ds-ink-inverse); }
 
 .dash-events {
   display: grid;

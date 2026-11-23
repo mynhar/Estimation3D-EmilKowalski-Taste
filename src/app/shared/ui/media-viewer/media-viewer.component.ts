@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe } from '@ngx-translate/core';
 
 export interface MediaViewerData {
-  tipo: 'tour' | 'video';
+  tipo: 'tour' | 'video' | 'foto';
   url: string;
   /** Título ya traducido (barra superior y nombre accesible del diálogo). */
   titulo: string;
@@ -15,7 +15,7 @@ export interface MediaViewerData {
 const TIP_KEY = 'matterport_tip_shown';
 
 /**
- * Visor a pantalla completa para un tour 3D (Matterport) o un vídeo.
+ * Visor a pantalla completa para un tour 3D (Matterport), un vídeo o una foto.
  *
  * El iframe solo existe mientras el diálogo está abierto: el tour no se descarga
  * hasta que el cliente lo pide, y el dedo nunca queda atrapado en el modelo

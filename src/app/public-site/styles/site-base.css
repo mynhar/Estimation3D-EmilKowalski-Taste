@@ -1,0 +1,196 @@
+/* Base común de las páginas públicas (landing, Le Journal, Entrepreneurs) y de
+ * su cabecera y pie: contenedor, salto al contenido, botones, enlace, marca y
+ * secciones. Sale tal cual de la landing (Trait rouge), para que las tres
+ * páginas hablen el mismo sistema. El :host de cada página (fondo, tipografía,
+ * --hd-h) lo pone la propia página.
+ *
+ * contrast: vélin sobre abeto 9.7:1 · ink sobre vélin 13.6:1 · blanco sobre tomate 4.8:1
+ *           tomate: un solo .button--cta a la vista, nunca texto ni junto al abeto
+ */
+
+/* Contenedor: márgenes de 16 / 24 / 40 px. */
+.wrap {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: var(--ds-space-4);
+}
+@media (min-width: 768px) { .wrap { padding-inline: var(--ds-space-5); } }
+@media (min-width: 1200px) { .wrap { padding-inline: var(--ds-space-7); } }
+
+.skip {
+  position: absolute;
+  top: var(--ds-space-2);
+  left: var(--ds-space-4);
+  z-index: calc(var(--ds-z-sticky) + 1);
+  padding: var(--ds-space-2) var(--ds-space-4);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-ink);
+  color: var(--ds-ink-inverse);
+  font-weight: var(--ds-weight-bold);
+  transform: translateY(-200%);
+}
+.skip:focus { transform: none; outline: none; box-shadow: var(--ds-focus-ring); }
+
+main:focus,
+.sec:focus { outline: none; }
+
+/* El reboot global (src/styles/base.css) da color fijo a h1–h6 y tamaño y float a legend. */
+h1, h2, h3 { color: inherit; }
+legend { float: none; width: auto; font-size: inherit; line-height: inherit; }
+
+/* ── Botones y enlaces ──────────────────────────────────────────────────── */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ds-space-2);
+  min-height: 44px;
+  padding: 0 var(--ds-space-5);
+  border: 1px solid transparent;
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-action);
+  color: var(--ds-on-action);
+  font: inherit;
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  transition: background-color var(--ds-duration-fast) var(--ds-ease-out),
+              transform 160ms var(--ds-ease-out);
+}
+.button:active { transform: scale(0.97); background: var(--ds-action-pressed); }
+.button:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
+.button:disabled { opacity: 0.7; cursor: progress; transform: none; }
+.button--lg { min-height: 52px; padding: 0 var(--ds-space-6); font-size: var(--ds-text-lg); }
+.button--outline {
+  border-color: var(--ds-border-strong);
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+}
+.button--outline:active { background: var(--ds-bg-alt); }
+/* Siguiente etapa: el único botón tomate a la vista. Ni texto tomate ni tomate junto al abeto. */
+.button--cta { background: var(--ds-cta); color: var(--ds-on-cta); }
+.button--cta:active { background: var(--ds-cta-pressed); }
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  border-radius: var(--ds-radius-sm);
+  color: var(--ds-action);
+  font-weight: var(--ds-weight-bold);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+.link:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
+
+@media (hover: hover) and (pointer: fine) {
+  .button:hover { background: var(--ds-action-hover); }
+  .button--outline:hover { background: var(--ds-bg-alt); border-color: var(--ds-ink-faint); }
+  .button--cta:hover { background: var(--ds-cta-hover); }
+  .link:hover { color: var(--ds-action-hover); text-decoration-thickness: 2px; }
+}
+
+/* ── Marca: cuadro abeto con la cota vélin (mismo signo que la app) ─────── */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  min-height: 44px;
+  border-radius: var(--ds-radius-md);
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+.brand:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
+.brand__mark {
+  position: relative;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-action);
+}
+.brand__mark::after {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-left: 2px solid var(--ds-ink-inverse);
+  border-bottom: 2px solid var(--ds-ink-inverse);
+}
+.brand__name {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-xl);
+  font-weight: var(--ds-weight-black);
+  font-stretch: var(--ds-stretch-heading);
+  letter-spacing: -0.01em;
+}
+
+/* ── Secciones ──────────────────────────────────────────────────────────── */
+.sec {
+  padding-block: var(--ds-space-9);
+  scroll-margin-top: var(--hd-h);
+}
+@media (min-width: 992px) {
+  .sec { padding-block: var(--ds-space-11); }
+}
+.sec--band { background: var(--ds-band); }
+.sec--rule { border-top: 1px solid var(--ds-border); }
+/* Isla abeto noche: vélin 13.6:1, secundario (ink-inverse-muted) 9.3:1. El foco va en vélin. */
+.sec--dark {
+  --ds-focus-ring: 0 0 0 2px var(--ds-dark-surface-deep), 0 0 0 4px var(--ds-ink-inverse);
+  background: var(--ds-dark-surface-deep);
+  color: var(--ds-ink-inverse);
+}
+
+.sec__head {
+  display: grid;
+  gap: var(--ds-space-4);
+  max-width: 46rem;
+  margin-bottom: var(--ds-space-7);
+}
+.sec__title {
+  max-width: 20ch;
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: clamp(1.875rem, 2.2vw + 1.2rem, 3rem);
+  font-weight: var(--ds-weight-black);
+  font-stretch: var(--ds-stretch-heading);
+  line-height: 1.04;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.sec__lead {
+  max-width: 58ch;
+  margin: 0;
+  font-size: var(--ds-text-lg);
+  color: var(--ds-ink-secondary);
+  text-wrap: pretty;
+}
+
+/* ── Miga de pan (Le Journal, Entrepreneurs) ────────────────────────────── */
+.crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 0 var(--ds-space-6);
+  padding: 0;
+  list-style: none;
+  font-size: var(--ds-text-sm);
+  color: var(--ds-ink-muted);
+}
+.crumbs li + li::before {
+  content: '/';
+  margin: 0 var(--ds-space-2);
+}
+.crumbs a {
+  border-radius: var(--ds-radius-sm);
+  color: var(--ds-ink-secondary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.crumbs a:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
+.crumbs [aria-current] { color: var(--ds-ink); font-weight: var(--ds-weight-semibold); }

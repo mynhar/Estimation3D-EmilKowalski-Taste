@@ -1,36 +1,27 @@
-import {
-  ChangeDetectionStrategy, Component, ViewEncapsulation, computed, signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 
-import { RevealDirective } from '../../landing-page/directives/reveal.directive';
-import { SweepDirective } from '../../landing-page/directives/sweep.directive';
-import { SitePageBase } from '../site-page.base';
+import { SiteFooterComponent } from '../chrome/site-footer.component';
+import { SiteHeaderComponent } from '../chrome/site-header.component';
 import { JOURNAL_CARDS, JOURNAL_CATS, JournalCat } from './journal.data';
 
 /**
- * Le Journal — página pública (sin guard). Puerto de
- * `Estimation3D - Journal.html`.
+ * Le Journal — página pública (sin guard), Trait rouge. Cabecera y pie son los
+ * de la landing (`app-site-header` / `app-site-footer`).
  *
- * El filtro por categoría del original ocultaba fichas con `style.display`;
- * aquí es una signal derivada, así que la rejilla sólo contiene las fichas
- * visibles y el lector de pantalla no anuncia las ocultas.
+ * El filtro por categoría es una signal derivada: la rejilla solo contiene las
+ * fichas visibles y el lector de pantalla no anuncia las ocultas.
  */
 @Component({
   selector: 'app-journal',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.Emulated,
-  imports: [RouterLink, TranslatePipe, RevealDirective, SweepDirective],
+  imports: [RouterLink, TranslatePipe, SiteHeaderComponent, SiteFooterComponent],
   templateUrl: './journal.component.html',
-  styleUrls: ['../styles/site-chrome.css', './journal.component.css'],
-  host: {
-    'class': 'e3-public-page',
-    '[attr.data-theme]': 'theme()',
-  },
+  styleUrls: ['../styles/site-base.css', './journal.component.css'],
 })
-export class JournalComponent extends SitePageBase {
-  readonly year = new Date().getFullYear();
+export class JournalComponent {
+  private host = inject(ElementRef<HTMLElement>).nativeElement as HTMLElement;
 
   readonly cats = JOURNAL_CATS;
   readonly activeCat = signal<JournalCat>('all');
@@ -41,4 +32,10 @@ export class JournalComponent extends SitePageBase {
   });
 
   setCat(cat: JournalCat): void { this.activeCat.set(cat); }
+
+  /** «Aller au contenu»: foco en el <main> sin que el router trate el ancla. */
+  saltar(event: Event): void {
+    event.preventDefault();
+    this.host.querySelector<HTMLElement>('#contenu')?.focus();
+  }
 }

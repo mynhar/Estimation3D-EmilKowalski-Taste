@@ -1,670 +1,532 @@
-<div class="ef-root">
+<div class="page-wrapper fi">
 
-  <!-- ── Loading ───────────────────────────────────────────────────────────── -->
+  <!-- ── Cargando ────────────────────────────────────────────────────────── -->
   @if (cargando()) {
-    <div class="ef-loading">
-      <span class="ef-spinner" aria-hidden="true"></span>
-      {{ 'builder_offer.loading' | translate }}
+    <div class="fi-skel" role="status">
+      <span class="cdk-visually-hidden">{{ 'builder_offer.loading' | translate }}</span>
+      <span class="skel skel--title" aria-hidden="true"></span>
+      <span class="fi-skel__cols" aria-hidden="true">
+        <span class="skel skel--card"></span>
+        <span class="skel skel--form"></span>
+      </span>
     </div>
 
+  <!-- ── No encontrado ───────────────────────────────────────────────────── -->
   } @else if (!detalle()) {
-
-    <!-- ── Error ─────────────────────────────────────────────────────────── -->
-    <div class="ef-empty">
-      <div class="ef-empty__icon ef-empty__icon--warn">
-        <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
-      </div>
-      <h2 class="ef-empty__title">{{ 'file.not_found' | translate }}</h2>
-      @if (errorMsg()) {
-        <p class="ef-empty__text">{{ errorMsg() | translate }}</p>
-      }
-      <button class="ef-btn ef-btn--ghost" (click)="volver()">
-        <i class="bi bi-arrow-left" aria-hidden="true"></i>
+    <app-empty-state class="fi-missing"
+                     matIcon="folder_off"
+                     [titulo]="'file.not_found' | translate"
+                     [texto]="errorMsg() ? (errorMsg() | translate) : ''">
+      <button actions mat-stroked-button type="button" (click)="volver()">
+        <mat-icon>arrow_back</mat-icon>
         {{ 'common.back' | translate }}
       </button>
-    </div>
+    </app-empty-state>
 
   } @else {
+    @let d = detalle()!;
+    @let est = estimacion();
 
-    <!-- ── Header ────────────────────────────────────────────────────────── -->
-    <header class="ef-header">
-
-      <div class="ef-header__left">
-        <button class="ef-btn-back" (click)="volver()" [title]="'common.back' | translate">
-          <i class="bi bi-arrow-left" aria-hidden="true"></i>
-        </button>
-        <div class="ef-header__text">
-          <p class="ef-eyebrow">
-            <i class="bi bi-clipboard-check" aria-hidden="true"></i>
-            {{ 'estimator_file.print_estimation_completed' | translate }}
-          </p>
-          <h1 class="ef-title">{{ servicioNombre }}</h1>
-          <div class="ef-header__badges">
-            <span class="ef-num">{{ detalle()!.numero }}</span>
-            <span class="ef-badge badge rounded-pill {{ badgeClass(detalle()!.estado) }}">
-              @if (detalle()!.estado === 'contratado') {
-                <i class="bi bi-trophy-fill me-1" aria-hidden="true"></i>
-              } @else if (detalle()!.estado === 'adjudicado') {
-                <i class="bi bi-award me-1" aria-hidden="true"></i>
-              }
-              {{ ('state.' + detalle()!.estado) | translate }}
-            </span>
-            @if (detalle()!.estimador_nombre) {
-              <span class="ef-estimador">
-                <i class="bi bi-person-check" aria-hidden="true"></i>
-                {{ detalle()!.estimador_nombre }}
-              </span>
-            }
-          </div>
-        </div>
-      </div>
-
-      <button class="ef-btn ef-btn--print" (click)="imprimir()">
-        <i class="bi bi-printer" aria-hidden="true"></i>
-        {{ 'estimator_file.print' | translate }}
+    <!-- ── Cabecera ────────────────────────────────────────────────────── -->
+    <header class="fi-head">
+      <button mat-button type="button" class="fi-back" (click)="volver()">
+        <mat-icon>arrow_back</mat-icon>
+        {{ 'estimator_file.back_to_estimations' | translate }}
       </button>
-
+      <app-page-header [titulo]="servicioNombre">
+        <button actions mat-stroked-button type="button" (click)="imprimir()">
+          <mat-icon>print</mat-icon>
+          {{ 'estimator_file.print' | translate }}
+        </button>
+      </app-page-header>
+      <div class="fi-meta">
+        <span class="fi-fig">{{ d.numero }}</span>
+        <app-status-chip [estado]="d.estado" />
+        @if (d.estimador_nombre) {
+          <span class="fi-meta__item">
+            <mat-icon aria-hidden="true">how_to_reg</mat-icon>{{ d.estimador_nombre }}
+          </span>
+        }
+      </div>
     </header>
 
-    <!-- ── Main grid ─────────────────────────────────────────────────────── -->
-    <div class="ef-main">
+    <div class="fi-layout">
 
-      <!-- LEFT: expedition info + files ──────────────────────────────────── -->
-      <div class="ef-col-main">
+      <!-- ══ Columna del dossier ══════════════════════════════════════════ -->
+      <div class="fi-col">
 
-        <!-- Datos del expediente -->
-        <section class="ef-card">
-          <div class="ef-card__head">
-            <p class="ef-section-label">{{ 'estimator_file.file_data_title' | translate }}</p>
-          </div>
-          <div class="ef-card__body">
-
-            <div class="ef-info-grid">
-              <div class="ef-info-item">
-                <p class="ef-info-label">{{ 'builder_offer.client_label' | translate }}</p>
-                <p class="ef-info-value">{{ detalle()!.cliente_nombre }}</p>
-              </div>
-              <div class="ef-info-item">
-                <p class="ef-info-label">{{ 'common.phone' | translate }}</p>
-                <p class="ef-info-value">
-                  @if (detalle()!.cliente_telefono) {
-                    <a href="tel:{{ detalle()!.cliente_telefono }}" class="ef-tel-link">
-                      <i class="bi bi-telephone" aria-hidden="true"></i>
-                      {{ detalle()!.cliente_telefono }}
-                    </a>
-                  } @else { — }
-                </p>
-              </div>
+        <!-- Datos del dossier -->
+        <section class="fi-card" aria-labelledby="efd-data-title">
+          <h2 id="efd-data-title" class="fi-h2">{{ 'estimator_file.file_data_title' | translate }}</h2>
+          <dl class="fi-facts">
+            <div class="fi-fact">
+              <dt>{{ 'builder_offer.client_label' | translate }}</dt>
+              <dd>{{ d.cliente_nombre }}</dd>
             </div>
-
-            <div class="ef-divider"></div>
-
-            <div class="ef-info-grid">
-              <div class="ef-info-item ef-info-item--wide">
-                <p class="ef-info-label">{{ 'common.address' | translate }}</p>
-                <p class="ef-info-value">{{ detalle()!.direccion }}</p>
-                <p class="ef-info-value">{{ detalle()!.canton }}, {{ detalle()!.provincia }}, {{ detalle()!.distrito }}</p>
-                <p class="ef-info-value ef-info-value--upper">{{ 'footer.country' | translate }}</p>
-              </div>
-              <div class="ef-info-item">
-                <p class="ef-info-label">{{ 'file.reference' | translate }}</p>
-                <p class="ef-info-value">{{ detalle()!.referencia || '—' }}</p>
-              </div>
+            <div class="fi-fact">
+              <dt>{{ 'common.phone' | translate }}</dt>
+              <dd class="fi-fig">
+                @if (d.cliente_telefono) {
+                  <a class="efd-tel" [href]="'tel:' + d.cliente_telefono">{{ d.cliente_telefono }}</a>
+                } @else { — }
+              </dd>
             </div>
-
-            <div class="ef-divider"></div>
-
-            <div class="ef-info-grid">
-              <div class="ef-info-item">
-                <p class="ef-info-label">{{ 'estimator_file.scheduled_visit' | translate }}</p>
-                <p class="ef-info-value">{{ formatFecha(detalle()!.fecha_visita) }}</p>
-              </div>
-              <div class="ef-info-item">
-                <p class="ef-info-label">{{ 'file.hour' | translate }}</p>
-                <p class="ef-info-value">{{ formatHora(detalle()!.fecha_visita) }}</p>
-              </div>
+          </dl>
+          <dl class="fi-facts fi-block">
+            <div class="fi-fact is-wide">
+              <dt>{{ 'common.address' | translate }}</dt>
+              <dd>
+                {{ d.direccion }}
+                <span class="fi-fact__sub">{{ d.canton }}, {{ d.provincia }}, {{ d.distrito }}</span>
+                <span class="fi-fact__sub">{{ 'footer.country' | translate }}</span>
+              </dd>
             </div>
-
-          </div>
+            <div class="fi-fact is-wide">
+              <dt>{{ 'file.reference' | translate }}</dt>
+              <dd class="fi-notes">{{ d.referencia || '—' }}</dd>
+            </div>
+          </dl>
+          <dl class="fi-facts fi-block">
+            <div class="fi-fact">
+              <dt>{{ 'estimator_file.scheduled_visit' | translate }}</dt>
+              <dd class="fi-fig">{{ formatFecha(d.fecha_visita) }}</dd>
+            </div>
+            <div class="fi-fact">
+              <dt>{{ 'file.hour' | translate }}</dt>
+              <dd class="fi-fig">{{ formatHora(d.fecha_visita) }}</dd>
+            </div>
+          </dl>
         </section>
 
-        <!-- Archivos del cliente (solo lectura): fotos, videos y documentos que
-             agregó el cliente. -->
-        <section class="ef-card">
-          <div class="ef-card__head">
-            <p class="ef-section-label">{{ 'estimator_file.client_files_title' | translate }}</p>
-          </div>
-          <div class="ef-card__body ef-card__body--files">
+        <!-- Archivos del cliente (solo lectura) -->
+        <section class="fi-card" aria-labelledby="efd-client-files-title">
+          <h2 id="efd-client-files-title" class="fi-h2">{{ 'estimator_file.client_files_title' | translate }}</h2>
 
-            @if (fotosCliente().length === 0 && videosCliente().length === 0 && documentosCliente().length === 0) {
-              <div class="ef-file-section">
-                <div class="ef-upload-empty">
-                  <i class="bi bi-folder2" aria-hidden="true"></i>
-                  {{ 'estimator_file.no_docs' | translate }}
-                </div>
-              </div>
-            }
+          @if (fotosCliente().length === 0 && videosCliente().length === 0 && documentosCliente().length === 0) {
+            <p class="fi-empty"><mat-icon aria-hidden="true">folder_open</mat-icon>{{ 'estimator_file.no_docs' | translate }}</p>
+          }
 
-            <!-- Fotos del cliente -->
-            @if (fotosCliente().length > 0) {
-              <div class="ef-file-section">
-                <div class="ef-file-section__head">
-                  <h3 class="ef-file-title">
-                    <i class="bi bi-images" aria-hidden="true"></i>
-                    {{ 'file.site_photos' | translate }}
-                    <span class="ef-count">{{ fotosCliente().length }}</span>
-                  </h3>
-                </div>
-                <div class="ef-photos-grid">
-                  @for (f of fotosCliente(); track f.id) {
-                    <div class="ef-photo">
-                      <img [src]="publicUrl(f.url_storage)" class="ef-photo__img"
-                           [title]="f.nombre_archivo" (click)="verArchivo(f)" />
-                    </div>
-                  }
-                </div>
-              </div>
-            }
-
-            <!-- Videos del cliente -->
-            @if (videosCliente().length > 0) {
-              <div class="ef-file-section">
-                <div class="ef-file-section__head">
-                  <h3 class="ef-file-title">
-                    <i class="bi bi-camera-video" aria-hidden="true"></i>
-                    {{ 'builder_offer.videos' | translate }}
-                    <span class="ef-count">{{ videosCliente().length }}</span>
-                  </h3>
-                </div>
-                <div class="ef-doc-list">
-                  @for (v of videosCliente(); track v.id) {
-                    <div class="ef-doc-row">
-                      <div class="ef-doc-row__icon">
-                        <i class="bi bi-camera-video-fill" aria-hidden="true"></i>
-                      </div>
-                      <div class="ef-doc-row__info">
-                        <p class="ef-doc-row__name">{{ v.nombre_archivo }}</p>
-                        <p class="ef-doc-row__meta">{{ formatTamano(v.tamano_bytes) }}</p>
-                      </div>
-                      <div class="ef-doc-row__actions">
-                        <button class="ef-btn ef-btn--icon" (click)="verArchivo(v)"
-                                [title]="'common.open' | translate">
-                          <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
-                        </button>
-                      </div>
-                    </div>
-                  }
-                </div>
-              </div>
-            }
-
-            <!-- Documentos del cliente -->
-            @if (documentosCliente().length > 0) {
-              <div class="ef-file-section">
-                <div class="ef-file-section__head">
-                  <h3 class="ef-file-title">
-                    <i class="bi bi-file-earmark-text" aria-hidden="true"></i>
-                    {{ 'file.technical_docs' | translate }}
-                    <span class="ef-count">{{ documentosCliente().length }}</span>
-                  </h3>
-                </div>
-                <div class="ef-doc-list">
-                  @for (doc of documentosCliente(); track doc.id) {
-                    <div class="ef-doc-row">
-                      <div class="ef-doc-row__icon">
-                        <i class="bi bi-file-earmark-text-fill" aria-hidden="true"></i>
-                      </div>
-                      <div class="ef-doc-row__info">
-                        <p class="ef-doc-row__name">{{ doc.nombre_archivo }}</p>
-                        <p class="ef-doc-row__meta">{{ formatTamano(doc.tamano_bytes) }}</p>
-                      </div>
-                      <div class="ef-doc-row__actions">
-                        <button class="ef-btn ef-btn--icon" (click)="verDocumento(doc)"
-                                [title]="'common.open' | translate">
-                          <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
-                        </button>
-                      </div>
-                    </div>
-                  }
-                </div>
-              </div>
-            }
-
-          </div>
-        </section>
-
-        <!-- Archivos del expediente -->
-        <section class="ef-card">
-          <div class="ef-card__head">
-            <p class="ef-section-label">{{ 'estimator_file.file_attachments' | translate }}</p>
-          </div>
-          <div class="ef-card__body ef-card__body--files">
-
-            <!-- ── Fotos ────────────────────────────────────────────────── -->
-            <div class="ef-file-section">
-              <div class="ef-file-section__head">
-                <h3 class="ef-file-title">
-                  <i class="bi bi-images" aria-hidden="true"></i>
-                  {{ 'file.site_photos' | translate }}
-                  @if (fotosEstimador().length > 0) {
-                    <span class="ef-count">{{ fotosEstimador().length }}</span>
-                  }
-                </h3>
-                <label class="ef-btn ef-btn--upload" [class.ef-btn--loading]="subiendoFoto()">
-                  <i class="bi bi-cloud-upload" aria-hidden="true"></i>
-                  {{ subiendoFoto() ? ('estimator_file.uploading' | translate) : ('estimator_file.upload_photos' | translate) }}
-                  <input type="file" accept="image/*" multiple class="ef-file-input"
-                         (change)="subirFotos($event)" [disabled]="subiendoFoto()" />
-                </label>
-              </div>
-              @if (errorFotos()) {
-                <div class="ef-alert">{{ errorFotos() }}</div>
-              }
-              @if (fotosEstimador().length === 0) {
-                <div class="ef-upload-empty">
-                  <i class="bi bi-image" aria-hidden="true"></i>
-                  {{ 'estimator_file.no_photos' | translate }}
-                </div>
-              } @else {
-                <div class="ef-photos-grid">
-                  @for (f of fotosEstimador(); track f.id) {
-                    <div class="ef-photo">
-                      <img [src]="publicUrl(f.url_storage)" class="ef-photo__img"
-                           [title]="f.nombre_archivo" (click)="verArchivo(f)" />
-                      <button class="ef-photo__delete"
-                              [title]="'common.delete' | translate"
-                              (click)="eliminarArchivo(f, 'foto')">
-                        <i class="bi bi-x-lg" aria-hidden="true"></i>
-                      </button>
-                    </div>
-                  }
-                </div>
-              }
-            </div>
-
-            <div class="ef-divider"></div>
-
-            <!-- ── Tour virtual ──────────────────────────────────────────── -->
-            <div class="ef-file-section">
-              <div class="ef-file-section__head">
-                <h3 class="ef-file-title">
-                  <i class="bi bi-camera-video" aria-hidden="true"></i>
-                  {{ 'estimator_file.tour_title' | translate }}
-                  @if (urlsTour().length > 0) {
-                    <span class="ef-count">{{ urlsTour().length }}</span>
-                  }
-                </h3>
-                @if (!mostrandoFormAdd() && editandoIndex() === null) {
-                  <button class="ef-btn ef-btn--upload"
-                          (click)="mostrarFormAgregarVideo()"
-                          [disabled]="guardandoTour()">
-                    <i class="bi bi-plus-lg" aria-hidden="true"></i>
-                    {{ 'estimator_file.tour_add_video' | translate }}
-                  </button>
+          @if (fotosCliente().length > 0) {
+            <div class="fi-section">
+              <h3 class="fi-label">
+                {{ 'file.site_photos' | translate }} <span class="fi-count">{{ fotosCliente().length }}</span>
+              </h3>
+              <ul class="fi-photos">
+                @for (f of fotosCliente(); track f.id) {
+                  <li>
+                    <button type="button" class="fi-photo" (click)="verArchivo(f)" [attr.aria-label]="f.nombre_archivo">
+                      <img [src]="publicUrl(f.url_storage)" alt="" loading="lazy" />
+                    </button>
+                  </li>
                 }
-              </div>
-              @if (errorTour()) {
-                <div class="ef-alert">{{ errorTour() }}</div>
+              </ul>
+            </div>
+          }
+
+          @if (videosCliente().length > 0) {
+            <div class="fi-section" [class.fi-block]="fotosCliente().length > 0">
+              <h3 class="fi-label">
+                {{ 'builder_offer.videos' | translate }} <span class="fi-count">{{ videosCliente().length }}</span>
+              </h3>
+              <ul class="fi-files">
+                @for (v of videosCliente(); track v.id) {
+                  <li class="fi-file">
+                    <mat-icon class="fi-file__icon" aria-hidden="true">videocam</mat-icon>
+                    <span class="fi-file__text">
+                      <span class="fi-file__name">{{ v.nombre_archivo }}</span>
+                      <span class="fi-file__size">{{ formatTamano(v.tamano_bytes) }}</span>
+                    </span>
+                    <button mat-button type="button" class="fi-file__open" (click)="verArchivo(v)"
+                            [attr.aria-label]="('common.open' | translate) + ' ' + v.nombre_archivo">
+                      {{ 'common.open' | translate }}
+                    </button>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+
+          @if (documentosCliente().length > 0) {
+            <div class="fi-section" [class.fi-block]="fotosCliente().length > 0 || videosCliente().length > 0">
+              <h3 class="fi-label">
+                {{ 'file.technical_docs' | translate }} <span class="fi-count">{{ documentosCliente().length }}</span>
+              </h3>
+              <ul class="fi-files">
+                @for (doc of documentosCliente(); track doc.id) {
+                  <li class="fi-file">
+                    <mat-icon class="fi-file__icon" aria-hidden="true">description</mat-icon>
+                    <span class="fi-file__text">
+                      <span class="fi-file__name">{{ doc.nombre_archivo }}</span>
+                      <span class="fi-file__size">{{ formatTamano(doc.tamano_bytes) }}</span>
+                    </span>
+                    <button mat-button type="button" class="fi-file__open" (click)="verDocumento(doc)"
+                            [attr.aria-label]="('common.open' | translate) + ' ' + doc.nombre_archivo">
+                      {{ 'common.open' | translate }}
+                    </button>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+        </section>
+
+        <!-- Archivos del estimador: fotos, tour, ficha Matterport y documentos -->
+        <section class="fi-card" aria-labelledby="efd-attach-title">
+          <h2 id="efd-attach-title" class="fi-h2">{{ 'estimator_file.file_attachments' | translate }}</h2>
+
+          <!-- Fotos -->
+          <div class="fi-section">
+            <div class="fi-card__head">
+              <h3 class="fi-label">
+                {{ 'file.site_photos' | translate }}
+                @if (fotosEstimador().length > 0) { <span class="fi-count">{{ fotosEstimador().length }}</span> }
+              </h3>
+              <button mat-stroked-button type="button" [disabled]="subiendoFoto()" (click)="fotoInput.click()">
+                @if (subiendoFoto()) {
+                  <span class="fi-spinner" aria-hidden="true"></span>
+                } @else {
+                  <mat-icon>upload</mat-icon>
+                }
+                {{ (subiendoFoto() ? 'estimator_file.uploading' : 'estimator_file.upload_photos') | translate }}
+              </button>
+              <input #fotoInput type="file" accept="image/*" multiple hidden
+                     (change)="subirFotos($event)" [disabled]="subiendoFoto()" />
+            </div>
+            @if (errorFotos()) {
+              <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorFotos() }}</p>
+            }
+            @if (fotosEstimador().length === 0) {
+              <p class="fi-empty"><mat-icon aria-hidden="true">add_a_photo</mat-icon>{{ 'estimator_file.no_photos' | translate }}</p>
+            } @else {
+              <ul class="fi-photos">
+                @for (f of fotosEstimador(); track f.id) {
+                  <li>
+                    <button type="button" class="fi-photo" (click)="verArchivo(f)" [attr.aria-label]="f.nombre_archivo">
+                      <img [src]="publicUrl(f.url_storage)" alt="" loading="lazy" />
+                    </button>
+                    <button mat-icon-button type="button" class="fi-photo__del"
+                            [attr.aria-label]="('common.delete' | translate) + ' ' + f.nombre_archivo"
+                            [matTooltip]="'common.delete' | translate"
+                            (click)="eliminarArchivo(f, 'foto')">
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+
+          <!-- Tour virtual -->
+          <div class="fi-section fi-block">
+            <div class="fi-card__head">
+              <h3 class="fi-label">
+                {{ 'estimator_file.tour_title' | translate }}
+                @if (urlsTour().length > 0) { <span class="fi-count">{{ urlsTour().length }}</span> }
+              </h3>
+              @if (!mostrandoFormAdd() && editandoIndex() === null) {
+                <button mat-stroked-button type="button" [disabled]="guardandoTour()" (click)="mostrarFormAgregarVideo()">
+                  <mat-icon>add</mat-icon>
+                  {{ 'estimator_file.tour_add_video' | translate }}
+                </button>
               }
+            </div>
+            @if (errorTour()) {
+              <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorTour() }}</p>
+            }
 
-              <!-- Lista de videos -->
-              @for (url of urlsTour(); track $index) {
-                <div class="ef-tour-item">
-
+            @if (urlsTour().length > 0) {
+              <ul class="fi-tours">
+                @for (url of urlsTour(); track $index) {
                   @if (editandoIndex() === $index) {
-                    <div class="ef-tour-edit">
-                      <p class="ef-tour-edit__title">
-                        <i class="bi bi-pencil" aria-hidden="true"></i>
-                        {{ 'estimator_file.tour_video_n' | translate:{ n: $index + 1 } }}
-                      </p>
-                      <div class="ef-url-input-wrap">
-                        <i class="bi bi-link-45deg ef-url-icon" aria-hidden="true"></i>
-                        <input type="url" class="ef-url-input"
-                               placeholder="https://my.matterport.com/show/?m=…"
-                               [(ngModel)]="editandoUrlTemp"
-                               [disabled]="guardandoTour()" />
-                      </div>
-                      <div class="ef-tour-edit__actions">
-                        <button class="ef-btn ef-btn--save"
-                                (click)="guardarEdicionVideo()"
-                                [disabled]="guardandoTour() || !editandoUrlTemp.trim()">
+                    <li class="fi-tour-form">
+                      <h4 class="fi-label">{{ 'estimator_file.tour_video_n' | translate:{ n: $index + 1 } }}</h4>
+                      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                        <mat-label>{{ 'estimator_file.tour_url_label' | translate }}</mat-label>
+                        <mat-icon matPrefix aria-hidden="true">link</mat-icon>
+                        <input matInput type="url" inputmode="url" placeholder="https://my.matterport.com/show/?m=…"
+                               [(ngModel)]="editandoUrlTemp" [disabled]="guardandoTour()" />
+                      </mat-form-field>
+                      <div class="efd-inline-actions">
+                        <button mat-flat-button type="button"
+                                [disabled]="guardandoTour() || !editandoUrlTemp.trim()" (click)="guardarEdicionVideo()">
                           @if (guardandoTour()) {
-                            <span class="ef-spinner ef-spinner--sm" aria-hidden="true"></span>
-                            {{ 'estimator_file.saving' | translate }}
+                            <span class="fi-spinner" aria-hidden="true"></span>
                           } @else {
-                            <i class="bi bi-check-lg" aria-hidden="true"></i>
-                            {{ 'common.save' | translate }}
+                            <mat-icon>check</mat-icon>
                           }
+                          {{ (guardandoTour() ? 'estimator_file.saving' : 'common.save') | translate }}
                         </button>
-                        <button class="ef-btn ef-btn--ghost"
-                                (click)="cancelarEdicionVideo()"
-                                [disabled]="guardandoTour()">
+                        <button mat-button type="button" [disabled]="guardandoTour()" (click)="cancelarEdicionVideo()">
                           {{ 'common.cancel' | translate }}
                         </button>
                       </div>
                       @if (editandoUrlSafe) {
-                        <p class="ef-preview-label">{{ 'estimator_file.preview_label' | translate }}</p>
-                        <div class="ef-iframe-wrap">
-                          <iframe [src]="editandoUrlSafe" allowfullscreen
-                                  allow="xr-spatial-tracking" title="Vista previa"></iframe>
+                        <p class="fi-hint">{{ 'estimator_file.preview_label' | translate }}</p>
+                        <div class="fi-frame">
+                          <iframe [src]="editandoUrlSafe" allowfullscreen allow="xr-spatial-tracking"
+                                  [title]="'estimator_file.preview_label' | translate"></iframe>
                         </div>
                       }
-                    </div>
-
+                    </li>
                   } @else {
-                    <div class="ef-tour-row" [class.ef-tour-row--expanded]="expandedIndex() === $index">
-                      <button class="ef-tour-row__toggle" (click)="toggleExpandVideo($index)">
-                        <i class="bi bi-camera-video-fill ef-tour-icon" aria-hidden="true"></i>
-                        <span class="ef-tour-row__label">
-                          {{ 'estimator_file.tour_video_n' | translate:{ n: $index + 1 } }}
-                        </span>
-                        <span class="ef-tour-row__url">{{ url }}</span>
-                        <i class="bi ms-auto"
-                           [class.bi-chevron-down]="expandedIndex() !== $index"
-                           [class.bi-chevron-up]="expandedIndex() === $index"
-                           aria-hidden="true"></i>
-                      </button>
-                      <div class="ef-tour-row__actions">
-                        <button class="ef-btn ef-btn--icon"
-                                (click)="iniciarEdicionVideo($index)"
-                                [disabled]="guardandoTour()"
-                                [title]="'common.edit' | translate">
-                          <i class="bi bi-pencil" aria-hidden="true"></i>
+                    <li class="fi-tour" [class.is-open]="expandedIndex() === $index">
+                      <div class="fi-tour__row">
+                        <button type="button" class="fi-tour__toggle"
+                                [attr.aria-expanded]="expandedIndex() === $index"
+                                (click)="toggleExpandVideo($index)">
+                          <mat-icon aria-hidden="true">view_in_ar</mat-icon>
+                          <span class="fi-tour__text">
+                            <span class="fi-tour__name">{{ 'estimator_file.tour_video_n' | translate:{ n: $index + 1 } }}</span>
+                            <span class="fi-tour__url">{{ url }}</span>
+                          </span>
+                          <mat-icon class="fi-tour__chevron" aria-hidden="true">expand_more</mat-icon>
                         </button>
-                        <button class="ef-btn ef-btn--icon ef-btn--icon-danger"
-                                (click)="eliminarVideo($index)"
-                                [disabled]="guardandoTour()"
-                                [title]="'estimator_file.tour_delete_video' | translate">
+                        <button mat-icon-button type="button" [disabled]="guardandoTour()"
+                                [attr.aria-label]="('common.edit' | translate) + ' ' + ('estimator_file.tour_video_n' | translate:{ n: $index + 1 })"
+                                [matTooltip]="'common.edit' | translate"
+                                (click)="iniciarEdicionVideo($index)">
+                          <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button type="button" class="fi-del" [disabled]="guardandoTour()"
+                                [attr.aria-label]="'estimator_file.tour_delete_video' | translate"
+                                [matTooltip]="'estimator_file.tour_delete_video' | translate"
+                                (click)="eliminarVideo($index)">
                           @if (guardandoTour()) {
-                            <span class="ef-spinner ef-spinner--sm" aria-hidden="true"></span>
+                            <span class="fi-spinner" aria-hidden="true"></span>
                           } @else {
-                            <i class="bi bi-trash3" aria-hidden="true"></i>
+                            <mat-icon>delete</mat-icon>
                           }
                         </button>
                       </div>
-                    </div>
-                    @if (expandedIndex() === $index) {
-                      <div class="ef-iframe-wrap ef-iframe-wrap--tour">
-                        <iframe [src]="getSafeUrl(url)"
-                                allowfullscreen allow="xr-spatial-tracking"
-                                [title]="'Video ' + ($index + 1)"></iframe>
-                      </div>
-                    }
-                  }
-
-                </div>
-              }
-
-              @if (urlsTour().length === 0 && !mostrandoFormAdd()) {
-                <div class="ef-upload-empty">
-                  <i class="bi bi-camera-video" aria-hidden="true"></i>
-                  {{ 'estimator_file.no_tour' | translate }}
-                </div>
-              }
-
-              @if (mostrandoFormAdd()) {
-                <div class="ef-tour-edit" [class.ef-tour-edit--bordered]="urlsTour().length > 0">
-                  <p class="ef-tour-edit__title">
-                    <i class="bi bi-plus-circle" aria-hidden="true"></i>
-                    {{ 'estimator_file.tour_add_video' | translate }}
-                  </p>
-                  <div class="ef-url-input-wrap">
-                    <i class="bi bi-link-45deg ef-url-icon" aria-hidden="true"></i>
-                    <input type="url" class="ef-url-input"
-                           placeholder="https://my.matterport.com/show/?m=…"
-                           [(ngModel)]="nuevoUrlInput"
-                           [disabled]="guardandoTour()" />
-                  </div>
-                  <div class="ef-tour-edit__actions">
-                    <button class="ef-btn ef-btn--save"
-                            (click)="agregarVideo()"
-                            [disabled]="guardandoTour() || !nuevoUrlInput.trim()">
-                      @if (guardandoTour()) {
-                        <span class="ef-spinner ef-spinner--sm" aria-hidden="true"></span>
-                        {{ 'estimator_file.saving' | translate }}
-                      } @else {
-                        <i class="bi bi-plus-lg" aria-hidden="true"></i>
-                        {{ 'estimator_file.tour_add_video' | translate }}
+                      @if (expandedIndex() === $index) {
+                        <div class="fi-frame">
+                          <iframe [src]="getSafeUrl(url)" allowfullscreen allow="xr-spatial-tracking"
+                                  [title]="'estimator_file.tour_video_n' | translate:{ n: $index + 1 }"></iframe>
+                        </div>
                       }
-                    </button>
-                    <button class="ef-btn ef-btn--ghost"
-                            (click)="cancelarAgregarVideo()"
-                            [disabled]="guardandoTour()">
-                      {{ 'common.cancel' | translate }}
-                    </button>
-                  </div>
-                  @if (nuevoUrlSafe) {
-                    <p class="ef-preview-label">{{ 'estimator_file.preview_label' | translate }}</p>
-                    <div class="ef-iframe-wrap">
-                      <iframe [src]="nuevoUrlSafe" allowfullscreen
-                              allow="xr-spatial-tracking" title="Vista previa"></iframe>
-                    </div>
+                    </li>
                   }
-                </div>
-              }
-            </div>
-
-            <!-- Ficha de la propiedad escaneada (Matterport) -->
-            <app-matterport-info
-              [modelos]="matterportModelos()"
-              [puedeSincronizar]="true"
-              [sincronizando]="sincronizandoMp()"
-              [errorClave]="errorMpClave()"
-              [exitoClave]="exitoMpClave()"
-              (sincronizar)="sincronizarMatterport()" />
-
-            <div class="ef-divider"></div>
-
-            <!-- ── Documentos ────────────────────────────────────────────── -->
-            <div class="ef-file-section">
-              <div class="ef-file-section__head">
-                <h3 class="ef-file-title">
-                  <i class="bi bi-file-earmark-text" aria-hidden="true"></i>
-                  {{ 'file.technical_docs' | translate }}
-                  @if (documentosEstimador().length > 0) {
-                    <span class="ef-count">{{ documentosEstimador().length }}</span>
-                  }
-                </h3>
-                <label class="ef-btn ef-btn--upload" [class.ef-btn--loading]="subiendoDocumento()">
-                  <i class="bi bi-cloud-upload" aria-hidden="true"></i>
-                  {{ subiendoDocumento() ? ('estimator_file.uploading' | translate) : ('estimator_file.upload_doc' | translate) }}
-                  <input type="file"
-                         accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv"
-                         class="ef-file-input"
-                         (change)="subirDocumento($event)"
-                         [disabled]="subiendoDocumento()" />
-                </label>
-              </div>
-              @if (errorDocumentos()) {
-                <div class="ef-alert">{{ errorDocumentos() }}</div>
-              }
-              @if (documentosEstimador().length === 0) {
-                <div class="ef-upload-empty">
-                  <i class="bi bi-file-earmark" aria-hidden="true"></i>
-                  {{ 'estimator_file.no_docs' | translate }}
-                </div>
-              } @else {
-                <div class="ef-doc-list">
-                  @for (doc of documentosEstimador(); track doc.id) {
-                    <div class="ef-doc-row">
-                      <div class="ef-doc-row__icon">
-                        <i class="bi bi-file-earmark-text-fill" aria-hidden="true"></i>
-                      </div>
-                      <div class="ef-doc-row__info">
-                        <p class="ef-doc-row__name">{{ doc.nombre_archivo }}</p>
-                        <p class="ef-doc-row__meta">{{ formatTamano(doc.tamano_bytes) }}</p>
-                      </div>
-                      <div class="ef-doc-row__actions">
-                        <button class="ef-btn ef-btn--icon" (click)="verDocumento(doc)"
-                                [title]="'common.open' | translate">
-                          <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
-                        </button>
-                        <button class="ef-btn ef-btn--icon ef-btn--icon-danger"
-                                (click)="eliminarArchivo(doc, 'documento')"
-                                [title]="'common.delete' | translate">
-                          <i class="bi bi-trash3" aria-hidden="true"></i>
-                        </button>
-                      </div>
-                    </div>
-                  }
-                </div>
-              }
-            </div>
-
-          </div>
-        </section>
-
-        <!-- Video de presentación del estimador (opcional). Cada acción se
-             guarda al momento. -->
-        <section class="ef-card">
-          <div class="ef-card__head">
-            <p class="ef-section-label">
-              {{ 'expediente_video.title' | translate }}
-              <span class="ef-opt">({{ 'common.optional' | translate }})</span>
-            </p>
-          </div>
-          <div class="ef-card__body">
-            @if (userId) {
-              <app-video-expediente [expedienteId]="expedienteId"
-                                    [perfilId]="userId"
-                                    [numero]="detalle()!.numero" />
+                }
+              </ul>
+            } @else if (!mostrandoFormAdd()) {
+              <p class="fi-empty"><mat-icon aria-hidden="true">view_in_ar</mat-icon>{{ 'estimator_file.no_tour' | translate }}</p>
             }
-          </div>
-        </section>
 
-      </div><!-- /ef-col-main -->
-
-      <!-- RIGHT: sidebar ──────────────────────────────────────────────────── -->
-      <aside class="ef-col-side">
-
-        <!-- Cost card -->
-        @if (estimacion()?.costo_estimado !== null && estimacion()?.costo_estimado !== undefined) {
-          <div class="ef-cost-card">
-            <p class="ef-cost-eyebrow">{{ 'estimator_file.cost_section' | translate }}</p>
-            <div class="ef-cost-row">
-              <div class="ef-cost-item">
-                <p class="ef-cost-label">{{ 'file.min' | translate }}</p>
-                <p class="ef-cost-value">{{ formatCosto(estimacion()!.costo_estimado) }}</p>
-              </div>
-              @if (estimacion()!.costo_estimado_max !== null) {
-                <i class="bi bi-arrow-right ef-cost-arrow" aria-hidden="true"></i>
-                <div class="ef-cost-item">
-                  <p class="ef-cost-label">{{ 'file.max' | translate }}</p>
-                  <p class="ef-cost-value">{{ formatCosto(estimacion()!.costo_estimado_max) }}</p>
+            @if (mostrandoFormAdd()) {
+              <div class="fi-tour-form">
+                <h4 class="fi-label">{{ 'estimator_file.tour_add_video' | translate }}</h4>
+                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                  <mat-label>{{ 'estimator_file.tour_url_label' | translate }}</mat-label>
+                  <mat-icon matPrefix aria-hidden="true">link</mat-icon>
+                  <input matInput type="url" inputmode="url" placeholder="https://my.matterport.com/show/?m=…"
+                         [(ngModel)]="nuevoUrlInput" [disabled]="guardandoTour()" />
+                </mat-form-field>
+                <div class="efd-inline-actions">
+                  <button mat-flat-button type="button"
+                          [disabled]="guardandoTour() || !nuevoUrlInput.trim()" (click)="agregarVideo()">
+                    @if (guardandoTour()) {
+                      <span class="fi-spinner" aria-hidden="true"></span>
+                    } @else {
+                      <mat-icon>add</mat-icon>
+                    }
+                    {{ (guardandoTour() ? 'estimator_file.saving' : 'estimator_file.tour_add_video') | translate }}
+                  </button>
+                  <button mat-button type="button" [disabled]="guardandoTour()" (click)="cancelarAgregarVideo()">
+                    {{ 'common.cancel' | translate }}
+                  </button>
                 </div>
-              }
-            </div>
-            <p class="ef-cost-visit">
-              <i class="bi bi-calendar-check" aria-hidden="true"></i>
-              {{ 'estimator_file.real_visit' | translate }}
-              {{ formatFecha(estimacion()!.fecha_visita_real) }}
-              @if (formatHora(estimacion()!.fecha_visita_real) !== '—') {
-                &nbsp;·&nbsp;{{ formatHora(estimacion()!.fecha_visita_real) }}
-              }
-            </p>
-          </div>
-        }
-
-        <!-- Documentación de la estimación -->
-        <section class="ef-card">
-          <div class="ef-card__head">
-            <p class="ef-section-label">{{ 'estimator_file.estimation_doc_title' | translate }}</p>
-          </div>
-          <div class="ef-card__body">
-            @if (!estimacion()) {
-              <div class="ef-upload-empty">
-                <i class="bi bi-clipboard" aria-hidden="true"></i>
-                {{ 'estimator_file.no_estimation_doc' | translate }}
-              </div>
-            } @else {
-              @if (estimacion()!.fecha_visita_real) {
-                <div class="ef-info-grid ef-info-grid--2">
-                  <div class="ef-info-item">
-                    <p class="ef-info-label">{{ 'estimator_file.real_visit_date' | translate }}</p>
-                    <p class="ef-info-value">{{ formatFecha(estimacion()!.fecha_visita_real) }}</p>
+                @if (nuevoUrlSafe) {
+                  <p class="fi-hint">{{ 'estimator_file.preview_label' | translate }}</p>
+                  <div class="fi-frame">
+                    <iframe [src]="nuevoUrlSafe" allowfullscreen allow="xr-spatial-tracking"
+                            [title]="'estimator_file.preview_label' | translate"></iframe>
                   </div>
-                  <div class="ef-info-item">
-                    <p class="ef-info-label">{{ 'file.hour' | translate }}</p>
-                    <p class="ef-info-value">{{ formatHora(estimacion()!.fecha_visita_real) }}</p>
-                  </div>
-                </div>
-                <div class="ef-divider"></div>
-              }
-              @if (estimacion()!.descripcion_problemas) {
-                <div class="ef-info-item ef-info-item--block">
-                  <p class="ef-info-label">{{ 'estimator_file.problems_observed' | translate }}</p>
-                  <p class="ef-desc-block">{{ estimacion()!.descripcion_problemas }}</p>
-                </div>
-                <div class="ef-divider"></div>
-              }
-              <div class="ef-info-item ef-info-item--block">
-                <p class="ef-info-label">{{ 'estimator_file.internal_notes' | translate }}</p>
-                @if (estimacion()!.notas_internas) {
-                  <p class="ef-desc-block">{{ estimacion()!.notas_internas }}</p>
-                } @else {
-                  <p class="ef-info-value ef-info-value--muted">—</p>
                 }
               </div>
             }
           </div>
+
+          <app-matterport-info [modelos]="matterportModelos()"
+                               [puedeSincronizar]="true"
+                               [sincronizando]="sincronizandoMp()"
+                               [errorClave]="errorMpClave()"
+                               [exitoClave]="exitoMpClave()"
+                               (sincronizar)="sincronizarMatterport()" />
+
+          <!-- Documentos técnicos -->
+          <div class="fi-section fi-block">
+            <div class="fi-card__head">
+              <h3 class="fi-label">
+                {{ 'file.technical_docs' | translate }}
+                @if (documentosEstimador().length > 0) { <span class="fi-count">{{ documentosEstimador().length }}</span> }
+              </h3>
+              <button mat-stroked-button type="button" [disabled]="subiendoDocumento()" (click)="docInput.click()">
+                @if (subiendoDocumento()) {
+                  <span class="fi-spinner" aria-hidden="true"></span>
+                } @else {
+                  <mat-icon>upload_file</mat-icon>
+                }
+                {{ (subiendoDocumento() ? 'estimator_file.uploading' : 'estimator_file.upload_doc') | translate }}
+              </button>
+              <input #docInput type="file" hidden
+                     accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv"
+                     (change)="subirDocumento($event)" [disabled]="subiendoDocumento()" />
+            </div>
+            @if (errorDocumentos()) {
+              <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorDocumentos() }}</p>
+            }
+            @if (documentosEstimador().length === 0) {
+              <p class="fi-empty"><mat-icon aria-hidden="true">note_add</mat-icon>{{ 'estimator_file.no_docs' | translate }}</p>
+            } @else {
+              <ul class="fi-files">
+                @for (doc of documentosEstimador(); track doc.id) {
+                  <li class="fi-file">
+                    <mat-icon class="fi-file__icon" aria-hidden="true">description</mat-icon>
+                    <span class="fi-file__text">
+                      <span class="fi-file__name">{{ doc.nombre_archivo }}</span>
+                      <span class="fi-file__size">{{ formatTamano(doc.tamano_bytes) }}</span>
+                    </span>
+                    <button mat-button type="button" class="fi-file__open" (click)="verDocumento(doc)"
+                            [attr.aria-label]="('common.open' | translate) + ' ' + doc.nombre_archivo">
+                      {{ 'common.open' | translate }}
+                    </button>
+                    <button mat-icon-button type="button" class="fi-del" (click)="eliminarArchivo(doc, 'documento')"
+                            [attr.aria-label]="('common.delete' | translate) + ' ' + doc.nombre_archivo">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
         </section>
 
-        <!-- Acciones -->
-        <div class="ef-actions-card">
-          <button class="ef-btn ef-btn--primary ef-btn--full" (click)="imprimir()">
-            <i class="bi bi-printer" aria-hidden="true"></i>
+        <!-- Vídeo de presentación: cada acción se guarda al momento -->
+        <section class="fi-card" aria-labelledby="efd-video-title">
+          <h2 id="efd-video-title" class="fi-h2">
+            {{ 'expediente_video.title' | translate }}
+            <span class="fi-opt">({{ 'common.optional' | translate }})</span>
+          </h2>
+          @if (userId) {
+            <app-video-expediente [expedienteId]="expedienteId"
+                                  [perfilId]="userId"
+                                  [numero]="d.numero" />
+          }
+        </section>
+      </div>
+
+      <!-- ══ Columna de la estimación ═════════════════════════════════════ -->
+      <div class="fi-col">
+
+        <!-- Coste aproximado: la cifra que más se consulta, en banda kraft -->
+        @if (est?.costo_estimado !== null && est?.costo_estimado !== undefined) {
+          <section class="efd-cost" aria-labelledby="efd-cost-title">
+            <h2 id="efd-cost-title" class="efd-cost__title">{{ 'estimator_file.cost_section' | translate }}</h2>
+            <dl class="efd-cost__row">
+              <div>
+                <dt>{{ 'file.min' | translate }}</dt>
+                <dd class="fi-fig">{{ formatCosto(est!.costo_estimado) }}</dd>
+              </div>
+              @if (est!.costo_estimado_max !== null) {
+                <div>
+                  <dt>{{ 'file.max' | translate }}</dt>
+                  <dd class="fi-fig">{{ formatCosto(est!.costo_estimado_max) }}</dd>
+                </div>
+              }
+            </dl>
+            <p class="efd-cost__visit">
+              <mat-icon aria-hidden="true">event_available</mat-icon>
+              <span>
+                {{ 'estimator_file.real_visit' | translate }}
+                <span class="fi-fig">{{ formatFecha(est!.fecha_visita_real) }}</span>
+                @if (formatHora(est!.fecha_visita_real) !== '—') {
+                  <span class="fi-fig">, {{ formatHora(est!.fecha_visita_real) }}</span>
+                }
+              </span>
+            </p>
+          </section>
+        }
+
+        <!-- Informe de la visita (solo lectura) -->
+        <section class="fi-card" aria-labelledby="efd-doc-title">
+          <h2 id="efd-doc-title" class="fi-h2">{{ 'estimator_file.estimation_doc_title' | translate }}</h2>
+          @if (!est) {
+            <p class="fi-empty"><mat-icon aria-hidden="true">assignment</mat-icon>{{ 'estimator_file.no_estimation_doc' | translate }}</p>
+          } @else {
+            <dl class="fi-facts">
+              @if (est.fecha_visita_real) {
+                <div class="fi-fact">
+                  <dt>{{ 'estimator_file.real_visit_date' | translate }}</dt>
+                  <dd class="fi-fig">{{ formatFecha(est.fecha_visita_real) }}</dd>
+                </div>
+                <div class="fi-fact">
+                  <dt>{{ 'file.hour' | translate }}</dt>
+                  <dd class="fi-fig">{{ formatHora(est.fecha_visita_real) }}</dd>
+                </div>
+              }
+              @if (est.descripcion_problemas) {
+                <div class="fi-fact is-wide">
+                  <dt>{{ 'estimator_file.problems_observed' | translate }}</dt>
+                  <dd class="fi-notes">{{ est.descripcion_problemas }}</dd>
+                </div>
+              }
+              <div class="fi-fact is-wide">
+                <dt class="efd-private"><mat-icon aria-hidden="true">lock</mat-icon>{{ 'estimator_file.internal_notes' | translate }}</dt>
+                <dd class="fi-notes">{{ est.notas_internas || '—' }}</dd>
+              </div>
+            </dl>
+          }
+        </section>
+
+        <!-- Acciones: imprimir, volver y, si aún no hay adjudicación ni contrato, borrar -->
+        <section class="fi-card efd-actions" [attr.aria-label]="'estimator_file.print_export' | translate">
+          <button mat-flat-button type="button" (click)="imprimir()">
+            <mat-icon>print</mat-icon>
             {{ 'estimator_file.print_export' | translate }}
           </button>
-          <button class="ef-btn ef-btn--ghost ef-btn--full" (click)="volver()">
-            <i class="bi bi-arrow-left" aria-hidden="true"></i>
+          <button mat-button type="button" (click)="volver()">
+            <mat-icon>arrow_back</mat-icon>
             {{ 'estimator_file.back_to_estimations' | translate }}
           </button>
 
-          @if (detalle()!.estado !== 'adjudicado' && detalle()!.estado !== 'contratado') {
+          @if (d.estado !== 'adjudicado' && d.estado !== 'contratado') {
             @if (!confirmandoEliminar()) {
-              <button class="ef-btn ef-btn--danger-ghost ef-btn--full"
-                      (click)="confirmandoEliminar.set(true)">
-                <i class="bi bi-trash3" aria-hidden="true"></i>
+              <button mat-stroked-button type="button" class="efd-delete" (click)="confirmandoEliminar.set(true)">
+                <mat-icon>delete</mat-icon>
                 {{ 'estimated_files.delete_title' | translate }}
               </button>
             } @else {
-              <div class="ef-confirm">
-                <p class="ef-confirm__msg">
-                  <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
-                  {{ 'estimated_files.confirm_before' | translate }}
-                  <strong>{{ 'state.nuevo' | translate }}</strong>
-                  {{ 'estimated_files.confirm_after' | translate }}
+              <div class="efd-confirm" role="group" [attr.aria-label]="'estimated_files.delete_title' | translate">
+                <p class="efd-confirm__msg">
+                  <mat-icon aria-hidden="true">warning</mat-icon>
+                  <span>
+                    {{ 'estimated_files.confirm_before' | translate }}
+                    <strong>{{ 'state.nuevo' | translate }}</strong>
+                    {{ 'estimated_files.confirm_after' | translate }}
+                  </span>
                 </p>
                 @if (errorEliminar()) {
-                  <p class="ef-confirm__err">{{ errorEliminar() }}</p>
+                  <p class="efd-confirm__msg" role="alert"><mat-icon aria-hidden="true">error</mat-icon><span>{{ errorEliminar() }}</span></p>
                 }
-                <div class="ef-confirm__actions">
-                  <button class="ef-btn ef-btn--danger"
-                          (click)="eliminarEstimacion()"
-                          [disabled]="eliminando()">
+                <div class="efd-inline-actions">
+                  <button mat-flat-button type="button" class="efd-danger"
+                          [disabled]="eliminando()" (click)="eliminarEstimacion()">
                     @if (eliminando()) {
-                      <span class="ef-spinner ef-spinner--sm" aria-hidden="true"></span>
-                      {{ 'estimated_files.deleting' | translate }}
+                      <span class="fi-spinner" aria-hidden="true"></span>
                     } @else {
-                      <i class="bi bi-trash3" aria-hidden="true"></i>
-                      {{ 'estimated_files.confirm_delete' | translate }}
+                      <mat-icon>delete</mat-icon>
                     }
+                    {{ (eliminando() ? 'estimated_files.deleting' : 'estimated_files.confirm_delete') | translate }}
                   </button>
-                  <button class="ef-btn ef-btn--ghost"
-                          (click)="confirmandoEliminar.set(false)"
-                          [disabled]="eliminando()">
+                  <button mat-button type="button" [disabled]="eliminando()" (click)="confirmandoEliminar.set(false)">
                     {{ 'common.cancel' | translate }}
                   </button>
                 </div>
               </div>
             }
           }
-        </div>
-
-      </aside>
-
-    </div><!-- /ef-main -->
-
+        </section>
+      </div>
+    </div>
   }
-
 </div>

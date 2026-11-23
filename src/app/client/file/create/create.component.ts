@@ -1,5 +1,11 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal, computed } from '@angular/core';
+import { LowerCasePipe } from '@angular/common';
 import { Router } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
@@ -9,6 +15,7 @@ import { ExpedienteService } from '../../../services/expediente.service';
 import { Servicio, PROVINCIAS_CANADA, SERVICIOS_FALLBACK } from '../../../models';
 import { ServicioOpcion, ServicioSelectorComponent, resumirServicios } from '../../../shared/ui/servicio-selector/servicio-selector.component';
 import { CAMPOS_FALTANTES, CampoExtra } from '../../../shared/ui/campos-faltantes/campos-faltantes.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
 
 /**
  * Dirección del PERFIL del cliente. Solo se lee: es el punto de partida de la
@@ -25,9 +32,13 @@ interface PerfilDireccion {
 @Component({
   selector: 'app-file-create',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, TranslatePipe, ServicioSelectorComponent, ...CAMPOS_FALTANTES],
+  imports: [
+    ReactiveFormsModule, TranslatePipe, LowerCasePipe,
+    MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSelectModule,
+    PageHeaderComponent, ServicioSelectorComponent, ...CAMPOS_FALTANTES,
+  ],
   templateUrl: './create.component.html',
-  styleUrl: './create.component.css',
+  styleUrls: ['../../../shared/ui/alta/alta.css', './create.component.css'],
 })
 export class FileCreateComponent implements OnInit {
   private auth              = inject(AuthSupabaseService);
@@ -92,35 +103,28 @@ export class FileCreateComponent implements OnInit {
   readonly provinciasCanada = PROVINCIAS_CANADA;
   readonly CA_POSTAL_RE     = /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/;
 
-  readonly STEPS = [
-    'service_selector.name',
-    'file_create.step2_name',
-    'file_create.step3_name',
-    'file_create.step4_name',
-  ];
-
-  /** Filas del resumen en vivo del raíl, en el mismo orden que STEPS. */
+  /** Filas del resumen en vivo del raíl, en el orden de las cuatro secciones. */
   readonly RESUMEN_META = [
-    { label: 'service_selector.name',  icon: 'bi-tools'     },
-    { label: 'file_create.step2_name', icon: 'bi-person'    },
-    { label: 'file_create.step3_name', icon: 'bi-calendar3' },
-    { label: 'file_create.step4_name', icon: 'bi-geo-alt'   },
+    { label: 'service_selector.name',  matIcon: 'construction' },
+    { label: 'file_create.step2_name', matIcon: 'person'       },
+    { label: 'file_create.step3_name', matIcon: 'event'        },
+    { label: 'file_create.step4_name', matIcon: 'location_on'  },
   ];
 
-  /** «¿Qué pasa después?» — línea de tiempo del proceso, en el raíl. */
+  /** «¿Qué pasa después?»: el proceso, en el raíl. */
   readonly PROCESO = [
-    { num: '01', title: 'file_create.process1_title', text: 'file_create.process1_text' },
-    { num: '02', title: 'file_create.process2_title', text: 'file_create.process2_text' },
-    { num: '03', title: 'file_create.process3_title', text: 'file_create.process3_text' },
-    { num: '04', title: 'file_create.process4_title', text: 'file_create.process4_text' },
+    { title: 'file_create.process1_title', text: 'file_create.process1_text' },
+    { title: 'file_create.process2_title', text: 'file_create.process2_text' },
+    { title: 'file_create.process3_title', text: 'file_create.process3_text' },
+    { title: 'file_create.process4_title', text: 'file_create.process4_text' },
   ];
 
   readonly tiposInmueble = [
-    { value: 'casa',            label: 'file_create.type_casa',           icon: 'bi-house-door'  },
-    { value: 'apartamento',     label: 'file_create.type_apartamento',    icon: 'bi-building'    },
-    { value: 'edificio',        label: 'file_create.type_edificio',       icon: 'bi-buildings'   },
-    { value: 'local_comercial', label: 'file_create.type_local_comercial',icon: 'bi-shop'        },
-    { value: 'otro',            label: 'file_create.type_otro',           icon: 'bi-three-dots'  },
+    { value: 'casa',            label: 'file_create.type_casa',            matIcon: 'house'      },
+    { value: 'apartamento',     label: 'file_create.type_apartamento',     matIcon: 'apartment'  },
+    { value: 'edificio',        label: 'file_create.type_edificio',        matIcon: 'domain'     },
+    { value: 'local_comercial', label: 'file_create.type_local_comercial', matIcon: 'storefront' },
+    { value: 'otro',            label: 'file_create.type_otro',            matIcon: 'more_horiz' },
   ];
 
   // ── Forms ──────────────────────────────────────────────────────────────────
@@ -249,7 +253,7 @@ export class FileCreateComponent implements OnInit {
 
     const ev     = this.expedienteValue();
     const visita = ev.fecha_visita
-      ? `${ev.fecha_visita}${ev.hora_visita ? ' · ' + ev.hora_visita : ''}`
+      ? `${ev.fecha_visita}${ev.hora_visita ? ', ' + ev.hora_visita : ''}`
       : null;
 
     const lv    = this.localizacionValue();

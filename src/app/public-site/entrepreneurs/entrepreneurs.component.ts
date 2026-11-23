@@ -2,23 +2,25 @@ import {
   AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators,
 } from '@angular/forms';
 import {
-  ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation, computed, inject, signal,
+  ChangeDetectionStrategy, Component, ElementRef, OnInit, computed, inject, signal,
 } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe } from '@ngx-translate/core';
 
-import { RevealDirective } from '../../landing-page/directives/reveal.directive';
-import { SweepDirective } from '../../landing-page/directives/sweep.directive';
 import { SERVICIOS_FALLBACK, Servicio } from '../../models';
 import { AuthSupabaseService } from '../../services/auth-supabase.service';
 import { EdgeErrorService } from '../../services/edge-error.service';
+import { LangService } from '../../services/lang.service';
 import { SolicitudConstructorService } from '../../services/solicitud-constructor.service';
-import { SitePageBase } from '../site-page.base';
-import {
-  BENEFITS, FAQ_IDS, PROBLEM_CELLS, REQUIREMENTS, SPECIALTY_SLOTS, STEPS,
-} from './entrepreneurs.data';
 import { CAMPOS_FALTANTES } from '../../shared/ui/campos-faltantes/campos-faltantes.component';
+import { SiteFooterComponent } from '../chrome/site-footer.component';
+import { SiteHeaderComponent } from '../chrome/site-header.component';
+import {
+  AVAIL_ICON, BENEFITS, FAQ_IDS, PROBLEM_CELLS, REQUIREMENTS, SPECIALTY_SLOTS, STEPS,
+} from './entrepreneurs.data';
 
 /** Licencia RBQ de Quebec: diez dígitos en tres bloques, «0000-0000-00». */
 const RBQ_RE = /^\d{4}-\d{4}-\d{2}$/;
@@ -36,40 +38,40 @@ function especialidadRequerida(ctrl: AbstractControl): ValidationErrors | null {
 }
 
 /**
- * Entrepreneurs — página pública (sin guard). Puerto de
- * `Estimation3D - Entrepreneurs.html`.
+ * Entrepreneurs: página pública (sin guard), Trait rouge. Cabecera y pie son
+ * los de la landing (`app-site-header` / `app-site-footer`); aquí la siguiente
+ * etapa es postular, así que el tomate es «Postuler comme partenaire» y el
+ * «Créer mon dossier» de la cabecera va de contorno.
  *
- * Dos cambios respecto al original, ambos por la misma razón — no medir el DOM
- * desde TypeScript:
- *  · el acordeón de FAQ guarda el id abierto en una signal, y el CSS anima con
- *    `grid-template-rows: 0fr → 1fr` en vez de escribir `maxHeight = scrollHeight`;
- *  · el formulario es reactivo y valida en el cliente antes de enviar.
+ * - El acordeón de FAQ guarda el id abierto en una signal y el CSS anima
+ *   `grid-template-rows: 0fr → 1fr`, sin medir el DOM. La respuesta cerrada es
+ *   `inert`: ni se lee ni recibe foco.
+ * - El formulario es reactivo y valida en el cliente antes de enviar.
  */
 @Component({
   selector: 'app-entrepreneurs',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.Emulated,
-  imports: [RouterLink, TranslatePipe, ReactiveFormsModule, RevealDirective, SweepDirective, ...CAMPOS_FALTANTES],
+  imports: [
+    NgOptimizedImage, RouterLink, TranslatePipe, ReactiveFormsModule, MatIconModule,
+    SiteHeaderComponent, SiteFooterComponent, ...CAMPOS_FALTANTES,
+  ],
   templateUrl: './entrepreneurs.component.html',
-  styleUrls: ['../styles/site-chrome.css', './entrepreneurs.component.css'],
-  host: {
-    'class': 'e3-public-page',
-    '[attr.data-theme]': 'theme()',
-  },
+  styleUrls: ['../styles/site-base.css', '../styles/site-blocks.css', './entrepreneurs.component.css'],
 })
-export class EntrepreneursComponent extends SitePageBase implements OnInit {
+export class EntrepreneursComponent implements OnInit {
+  private host = inject(ElementRef<HTMLElement>).nativeElement as HTMLElement;
   private fb = inject(FormBuilder);
   private auth = inject(AuthSupabaseService);
   private candidaturas = inject(SolicitudConstructorService);
   private edgeErrors = inject(EdgeErrorService);
-
-  readonly year = new Date().getFullYear();
+  private lang = inject(LangService);
 
   readonly problemCells = PROBLEM_CELLS;
   readonly steps = STEPS;
   readonly benefits = BENEFITS;
   readonly requirements = REQUIREMENTS;
   readonly specialtySlots = SPECIALTY_SLOTS;
+  readonly availIcon = AVAIL_ICON;
   readonly faqIds = FAQ_IDS;
 
   /** Id de la pregunta abierta; `null` cuando todas están cerradas. */
@@ -77,9 +79,9 @@ export class EntrepreneursComponent extends SitePageBase implements OnInit {
   /** Envíos con campos sin completar: cada uno trae el resumen de lo que falta. */
   readonly intentos = signal(0);
 
-  // Las casillas de especialidad ya no salen de una constante local: lo que el
+  // Las casillas de especialidad salen de la tabla `servicio`: lo que el
   // candidato puede declarar tiene que ser exactamente lo que la aplicación
-  // sabe estimar, así que la lista es la tabla `servicio`.
+  // sabe estimar.
   private serviciosRaw = signal<Servicio[]>([]);
   readonly loadingServices = signal(true);
 
@@ -115,7 +117,7 @@ export class EntrepreneursComponent extends SitePageBase implements OnInit {
     message: [''],
   });
 
-  /** Marca los campos con error sólo después del primer intento de envío. */
+  /** Marca los campos con error solo después del primer intento de envío. */
   readonly submitted = signal(false);
   readonly sent = signal(false);
   readonly sending = signal(false);
@@ -146,6 +148,20 @@ export class EntrepreneursComponent extends SitePageBase implements OnInit {
     if (error) console.error('servicio table error:', error.message);
     this.serviciosRaw.set(data?.length ? (data as unknown as Servicio[]) : SERVICIOS_FALLBACK);
     this.loadingServices.set(false);
+  }
+
+  /**
+   * Desplazamiento a una sección de la propia página; deja el foco en ella. Se
+   * busca dentro del host y no en `document`: la parte autenticada de la app
+   * puede tener ids iguales montados a la vez.
+   */
+  goTo(id: string, event?: Event): void {
+    event?.preventDefault();
+    const el = this.host.querySelector<HTMLElement>('#' + id);
+    if (!el) return;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    el.focus({ preventScroll: true });
   }
 
   toggleFaq(id: string): void {
@@ -184,7 +200,7 @@ export class EntrepreneursComponent extends SitePageBase implements OnInit {
     return this.form.controls.specialites.value.includes(id);
   }
 
-  /** true cuando hay que pintar el campo en rojo. */
+  /** true cuando hay que marcar el campo como erróneo. */
   invalid(name: keyof typeof this.form.controls): boolean {
     const c = this.form.controls[name];
     return c.invalid && (c.touched || this.submitted());

@@ -1,18 +1,31 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, effect, inject, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../../services/auth-supabase.service';
 import { ImprevistoCatalogoRepository, ImprevistoCatalogo } from '../../../data';
 import { PaginationComponent } from '../../../shared/pagination/pagination.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
 
 type FiltroActivo = 'todos' | 'activo' | 'inactivo';
 
 @Component({
   selector: 'app-admin-imprevistos-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, TranslatePipe, PaginationComponent],
+  imports: [
+    NgTemplateOutlet, RouterLink, TranslatePipe,
+    MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTooltipModule,
+    PageHeaderComponent, EmptyStateComponent, PaginationComponent,
+  ],
   templateUrl: './list.component.html',
-  styleUrls: ['../../_shared/crud-list.css'],
+  styleUrls: ['../../../shared/ui/lista/lista.css', '../../_shared/catalogo-lista.css'],
 })
 export class AdminImprevistosListComponent implements OnInit {
   private repo      = inject(ImprevistoCatalogoRepository);

@@ -1,195 +1,70 @@
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     Estimation3D — Le Journal (página pública)
-     Portado de "Estimation3D - Journal.html". El texto vive en i18n bajo
-     `journal.*`; la cabecera y el pie comparten las claves `landing.*`.
-     ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- Le Journal, dirección Trait rouge. El texto vive en i18n bajo `journal.*`. -->
+<a class="skip" href="#contenu" (click)="saltar($event)">{{ 'nav.skip' | translate }}</a>
 
-<!-- ─────────── HEADER ─────────── -->
-<header class="hdr" [class.scrolled]="scrolled()">
-  <div class="in">
-    <a routerLink="/" class="brand" [attr.aria-label]="'landing.nav.home_aria' | translate">
-      <span class="reticle"><i></i></span>
-      <span class="e3">Estimation<b>3D</b></span>
-    </a>
+<app-site-header pagina="journal" />
 
-    <nav class="nav-links">
-      <a routerLink="/" fragment="processus">{{ 'landing.nav.process' | translate }}</a>
-      <a routerLink="/" fragment="services">{{ 'landing.nav.specialties' | translate }}</a>
-      <a routerLink="/journal" class="gold-txt" aria-current="page">{{ 'landing.nav.journal' | translate }}</a>
-      <a routerLink="/entrepreneurs">{{ 'landing.nav.contractors' | translate }}</a>
-      <a class="tel" href="tel:+15145108819" [attr.aria-label]="'landing.nav.phone_aria' | translate">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.2 2.2 6.6 5 5.3 6.4a8.6 8.6 0 0 0 4.3 4.3L11 9.4l2.8 1.4v2.4a1 1 0 0 1-1.1 1A11.5 11.5 0 0 1 2.2 3.3a1 1 0 0 1 1-1.1h2Z"/></svg>
-        514&nbsp;510-8819
-      </a>
-    </nav>
+<main id="contenu" tabindex="-1">
 
-    <div class="hdr-actions">
-      <a routerLink="/" fragment="dossier" class="e3-btn cta">
-        {{ 'landing.nav.cta' | translate }}
-        <svg class="ar" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M1 6h13M10 1l5 5-5 5"/></svg>
-      </a>
-      <a routerLink="/login" class="login">{{ 'landing.nav.login' | translate }}</a>
-    </div>
+  <!-- ── Artículos: título, filtro y rejilla ──────────────────────────────── -->
+  <section class="sec jr" aria-labelledby="jr-title">
+    <div class="wrap">
+      <nav class="crumbs" [attr.aria-label]="'journal.crumbs.aria' | translate">
+        <ol>
+          <li><a routerLink="/">{{ 'journal.crumbs.home' | translate }}</a></li>
+          <li aria-current="page">{{ 'journal.crumbs.current' | translate }}</li>
+        </ol>
+      </nav>
 
-    <button class="burger" type="button" (click)="toggleMenu()"
-            [attr.aria-label]="'landing.nav.menu' | translate"
-            [attr.aria-expanded]="menuOpen()">
-      <span></span><span></span><span></span>
-    </button>
-  </div>
-</header>
+      <header class="jr-head">
+        <h1 class="jr-title" id="jr-title">{{ 'journal.hero.title' | translate }}</h1>
+        <p class="sec__lead">{{ 'journal.hero.lede' | translate }}</p>
+      </header>
 
-<nav class="mobile-nav" [class.open]="menuOpen()">
-  <a routerLink="/" fragment="processus" (click)="closeMenu()"><span class="num">01</span><span>{{ 'landing.nav.process' | translate }}</span></a>
-  <a routerLink="/" fragment="services" (click)="closeMenu()"><span class="num">02</span><span>{{ 'landing.nav.specialties' | translate }}</span></a>
-  <a routerLink="/journal" (click)="closeMenu()"><span class="num">03</span><span>{{ 'landing.nav.journal' | translate }}</span></a>
-  <a routerLink="/entrepreneurs" (click)="closeMenu()"><span class="num">04</span><span>{{ 'landing.nav.contractors' | translate }}</span></a>
-  <a href="tel:+15145108819" (click)="closeMenu()" [attr.aria-label]="'landing.nav.phone_aria' | translate"><span class="num">05</span><span>514&nbsp;510-8819</span></a>
-  <a routerLink="/" fragment="dossier" (click)="closeMenu()"><span class="num">06</span><span>{{ 'landing.nav.cta' | translate }}</span></a>
-  <a routerLink="/login" (click)="closeMenu()"><span class="num">07</span><span>{{ 'landing.nav.login' | translate }}</span></a>
-</nav>
-
-<main>
-
-  <!-- ─────────── SUB-HERO ─────────── -->
-  <section class="subhero">
-    <div class="glow" aria-hidden="true"></div>
-    <div class="e3-container">
-      <div class="crumbs" e3Reveal>
-        <a routerLink="/">{{ 'journal.crumbs.home' | translate }}</a>
-        <span class="sep">/</span>
-        <span>{{ 'journal.crumbs.current' | translate }}</span>
-      </div>
-      <h1 e3Reveal="1">
-        <span class="gold-txt">{{ 'journal.hero.title_gold' | translate }}</span>{{ 'journal.hero.title_rest' | translate }}
-      </h1>
-      <p class="lede" e3Reveal="2">{{ 'journal.hero.lede' | translate }}</p>
-    </div>
-  </section>
-
-  <!-- ─────────── FILTRES ─────────── -->
-  <section class="pt-0">
-    <div class="e3-container">
-      <div class="cat-row" e3Reveal role="group" [attr.aria-label]="'journal.filter.aria' | translate">
+      <div class="jr-cats" role="group" [attr.aria-label]="'journal.filter.aria' | translate">
         @for (c of cats; track c) {
-          <button class="chip" type="button" [class.active]="activeCat() === c"
-                  [attr.aria-pressed]="activeCat() === c" (click)="setCat(c)">
+          <button class="jr-cat" type="button" [attr.aria-pressed]="activeCat() === c" (click)="setCat(c)">
             {{ 'journal.cats.' + c | translate }}
           </button>
         }
       </div>
-    </div>
-  </section>
 
-  <!-- ─────────── GRILLE ─────────── -->
-  <section class="pt-0">
-    <div class="e3-container">
-      <!-- TODO(article): las fichas son <article> y no <a> porque la página de
-           artículo ("Estimation3D - Article.html") todavía no se ha convertido a
-           Angular. En cuanto exista la ruta, basta con volverlas
-           <a class="jcard" [routerLink]="['/journal', c.id]">. -->
-      <div class="jgrid" e3Reveal>
+      <!-- Fichas sin enlace: las páginas de artículo aún no existen. Cuando las
+           haya, el título pasa a ser <a [routerLink]="['/journal', c.id]">. -->
+      <ul class="jr-grid">
         @for (c of cards(); track c.id) {
-          <article class="jcard">
-            <span class="jc-cat">{{ 'journal.cats.' + c.cat | translate }}</span>
-            <h3>{{ 'journal.cards.' + c.id + '.title' | translate }}</h3>
-            <p class="jc-sum">{{ 'journal.cards.' + c.id + '.sum' | translate }}</p>
-            <span class="jc-meta">
-              <span>{{ 'journal.cards.' + c.id + '.meta' | translate }}</span>
-              <span class="arrow" aria-hidden="true">→</span>
-            </span>
-          </article>
+          <li>
+            <article class="jr-card">
+              <p class="jr-card__cat">{{ 'journal.cats.' + c.cat | translate }}</p>
+              <h2 class="jr-card__title">{{ 'journal.cards.' + c.id + '.title' | translate }}</h2>
+              <p class="jr-card__sum">{{ 'journal.cards.' + c.id + '.sum' | translate }}</p>
+              <p class="jr-card__meta">{{ 'journal.cards.' + c.id + '.meta' | translate }}</p>
+            </article>
+          </li>
         }
-      </div>
+      </ul>
     </div>
   </section>
 
-  <div class="dimline">
-    <span class="seg"></span>
-    <span class="lbl"><b>{{ 'journal.featured.label' | translate }}</b> &nbsp;·&nbsp; {{ 'journal.featured.sub' | translate }}</span>
-    <span class="seg"></span>
-  </div>
+  <!-- ── En vedette ───────────────────────────────────────────────────────── -->
+  <section class="sec sec--band" aria-labelledby="jr-feat-title">
+    <div class="wrap">
+      <header class="sec__head">
+        <h2 class="sec__title" id="jr-feat-title">{{ 'journal.featured.label' | translate }}</h2>
+        <p class="sec__lead">{{ 'journal.featured.sub' | translate }}</p>
+      </header>
 
-  <!-- ─────────── EN VEDETTE ─────────── -->
-  <section class="pt-30">
-    <div class="e3-container">
-      <article class="featured-wrap" e3Reveal>
-        <div class="featured-img" e3Sweep>
-          <span class="ftag data"><span class="v">SCAN</span> · Outremont</span>
-          <img src="assets/landing/scan-plan-outremont.jpg"
-               [alt]="'journal.featured.img_alt' | translate" loading="lazy" />
-          <div class="sweep" aria-hidden="true"></div>
-        </div>
-        <div class="featured-body">
-          <span class="kicker">{{ 'journal.cats.decider' | translate }}</span>
-          <h3>{{ 'journal.featured.title' | translate }}</h3>
-          <p>{{ 'journal.featured.text' | translate }}</p>
-          <!-- TODO(article): mismo motivo que la rejilla. -->
-          <span class="read">{{ 'journal.featured.meta' | translate }}</span>
+      <article class="jr-feat">
+        <img class="jr-feat__img" src="assets/landing/scan-plan-outremont.jpg"
+             [alt]="'journal.featured.img_alt' | translate" loading="lazy" width="1600" height="904" />
+        <div class="jr-feat__body">
+          <p class="jr-card__cat">{{ 'journal.cats.decider' | translate }}</p>
+          <h3 class="jr-feat__title">{{ 'journal.featured.title' | translate }}</h3>
+          <p class="jr-feat__text">{{ 'journal.featured.text' | translate }}</p>
+          <p class="jr-card__meta">{{ 'journal.featured.meta' | translate }}</p>
         </div>
       </article>
     </div>
   </section>
 </main>
 
-<!-- ─────────── FOOTER ─────────── -->
-<footer class="ftr">
-  <div class="e3-container">
-    <div class="ftr-top">
-      <div>
-        <a routerLink="/" class="brand"><span class="reticle"><i></i></span><span class="e3">Estimation<b>3D</b></span></a>
-        <p>{{ 'landing.footer.tagline' | translate }}</p>
-      </div>
-
-      <div>
-        <h5>{{ 'landing.footer.platform' | translate }}</h5>
-        <ul>
-          <li><a routerLink="/" fragment="processus">{{ 'landing.nav.process' | translate }}</a></li>
-          <li><a routerLink="/" fragment="services">{{ 'landing.nav.specialties' | translate }}</a></li>
-          <li><a routerLink="/" fragment="dossier">{{ 'landing.nav.cta' | translate }}</a></li>
-        </ul>
-      </div>
-
-      <div>
-        <h5>{{ 'landing.footer.explore' | translate }}</h5>
-        <ul>
-          <li><a routerLink="/journal">{{ 'landing.nav.journal' | translate }}</a></li>
-          <li><a routerLink="/entrepreneurs">{{ 'landing.nav.contractors' | translate }}</a></li>
-          <li><a routerLink="/entrepreneurs" fragment="form">{{ 'landing.footer.apply' | translate }}</a></li>
-        </ul>
-      </div>
-
-      <div>
-        <h5>{{ 'landing.footer.contact' | translate }}</h5>
-        <ul>
-          <li><span>{{ 'landing.footer.city' | translate }}</span></li>
-          <li><a href="tel:+15145108819">514 510-8819</a></li>
-          <li><a href="mailto:info@estimation3d.com">info&#64;estimation3d.com</a></li>
-          <li><span>{{ 'landing.footer.pilot' | translate }}</span></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="ftr-bot">
-      <span>© {{ year }} HYGIENACTION · MONTRÉAL</span>
-      <span>EST3D — {{ 'journal.footer.sign' | translate }}</span>
-    </div>
-  </div>
-</footer>
-
-<!-- ─────────── CONTRÔLES : LANGUE + THÈME ─────────── -->
-<div class="lang-toggle" role="group" [attr.aria-label]="'landing.controls.language' | translate">
-  @for (l of langs; track l) {
-    <!-- El CSS ya aplica text-transform:uppercase. -->
-    <button type="button" (click)="setLang(l)" [attr.aria-pressed]="lang.current() === l">{{ l }}</button>
-  }
-</div>
-
-<div class="theme-toggle" role="group" [attr.aria-label]="'landing.controls.theme' | translate">
-  <button type="button" (click)="setTheme('dark')" [attr.aria-pressed]="theme() === 'dark'">
-    <span class="d"></span><span>{{ 'landing.controls.dark' | translate }}</span>
-  </button>
-  <button type="button" (click)="setTheme('light')" [attr.aria-pressed]="theme() === 'light'">
-    <span class="d"></span><span>{{ 'landing.controls.light' | translate }}</span>
-  </button>
-</div>
+<app-site-footer />

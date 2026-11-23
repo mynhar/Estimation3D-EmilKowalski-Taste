@@ -7,13 +7,21 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ContratoService } from '../../../services/contrato.service';
 import { AvisoArchivadoComponent } from '../../../shared/ui/aviso-archivado/aviso-archivado.component';
 import { ArchivarExpedienteComponent } from '../../../shared/ui/archivar-expediente/archivar-expediente.component';
 import { BotonArchivarComponent } from '../../../shared/ui/archivar-expediente/boton-archivar.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
+import { StatusChipComponent } from '../../../shared/ui/status-chip/status-chip.component';
 import {
   ContratoAdminDetalle, ContratoPdfData, nombreServicio, descripcionServicio, serviciosParaContrato,
 } from '../../../models';
@@ -23,9 +31,14 @@ type LangPdf = 'es' | 'en' | 'fr';
 @Component({
   selector: 'app-admin-contract-edit',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, AvisoArchivadoComponent, ArchivarExpedienteComponent, BotonArchivarComponent],
+  imports: [
+    NgTemplateOutlet, TranslatePipe,
+    MatButtonModule, MatButtonToggleModule, MatIconModule, MatTooltipModule,
+    PageHeaderComponent, EmptyStateComponent, StatusChipComponent,
+    AvisoArchivadoComponent, ArchivarExpedienteComponent, BotonArchivarComponent,
+  ],
   templateUrl: './edit.component.html',
-  styleUrl: './edit.component.css',
+  styleUrls: ['../../../shared/ui/ficha/ficha.css', './edit.component.css'],
 })
 export class AdminContractEditComponent implements OnInit, OnDestroy {
   private route           = inject(ActivatedRoute);
@@ -277,25 +290,9 @@ export class AdminContractEditComponent implements OnInit, OnDestroy {
     }));
   }
 
-  badgeExpediente(estado: string): string {
-    const map: Record<string, string> = {
-      adjudicado: 'badge-adjudicado',
-      contratado: 'badge-contratado',
-      archivado:  'badge-archivado',
-    };
-    return map[estado] ?? 'badge-adjudicado';
-  }
-
-  badgeContrato(estado: string): string {
-    const map: Record<string, string> = {
-      generado:     'badge-contrato-generado',
-      firmado:      'badge-contrato-firmado',
-      en_ejecucion: 'badge-contrato-en-ejecucion',
-      completado:   'badge-contrato-completado',
-      cancelado:    'badge-contrato-cancelado',
-      archivado:    'badge-archivado',
-    };
-    return map[estado] ?? '';
+  /** Ciudad, código postal y provincia: «Montréal – H2X 1Y4, QC». */
+  localidad(c: ContratoAdminDetalle): string {
+    return `${[c.canton, c.distrito].filter(Boolean).join(' – ')}, ${c.provincia}`;
   }
 
   formatFecha(valor: string | null): string {

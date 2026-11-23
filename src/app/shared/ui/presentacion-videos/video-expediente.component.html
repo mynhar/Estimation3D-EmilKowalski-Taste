@@ -16,9 +16,9 @@
 
   } @else if (errorCarga()) {
     <div class="ve-error" role="alert">
-      <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+      <mat-icon aria-hidden="true">error</mat-icon>
       <p>{{ 'expediente_video.errors.load' | translate }}</p>
-      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="cargar()">
+      <button mat-stroked-button type="button" (click)="cargar()">
         {{ 'common.retry' | translate }}
       </button>
     </div>
@@ -28,7 +28,7 @@
     @if (subiendo(); as titulo) {
       <div class="ve-slot" aria-busy="true">
         <div class="ve-thumb ve-thumb--busy">
-          <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+          <span class="ve-spinner" aria-hidden="true"></span>
         </div>
         <div class="ve-slot__text">
           <p class="ve-slot__eyebrow" role="status">{{ 'presentation_videos.uploading' | translate }}</p>
@@ -44,26 +44,27 @@
             @if (miniaturas()[v.id]; as src) {
               <img [src]="src" alt="">
             } @else {
-              <i class="bi bi-camera-video ve-thumb__fallback" aria-hidden="true"></i>
+              <mat-icon class="ve-thumb__fallback" aria-hidden="true">videocam</mat-icon>
             }
-            <span class="ve-thumb__play" aria-hidden="true"><i class="bi bi-play"></i></span>
+            <span class="ve-thumb__play" aria-hidden="true"><mat-icon>play_arrow</mat-icon></span>
             <span class="ve-thumb__dur">{{ duracion(v) }}</span>
           </button>
 
           <div class="ve-slot__text">
             <p class="ve-slot__eyebrow">
-              <i class="bi bi-check-circle" aria-hidden="true"></i>{{ 'expediente_video.current' | translate }}
+              <mat-icon aria-hidden="true">check_circle</mat-icon>{{ 'expediente_video.current' | translate }}
             </p>
             <button type="button" class="ve-slot__title ve-slot__title--link" (click)="abierto.set(v)">{{ v.titulo }}</button>
             <p class="ve-slot__meta">
-              {{ origen(v) | translate }}<span class="ve-sep" aria-hidden="true">·</span>{{ relativo(v) }}
+              <span>{{ origen(v) | translate }}</span>
+              <span>{{ relativo(v) }}</span>
             </p>
             @if (editable()) {
-              <button type="button" class="ve-remove" (click)="quitar()" [disabled]="ocupado()">
+              <button mat-button type="button" class="ve-remove" (click)="quitar()" [disabled]="ocupado()">
                 @if (tarea()?.tipo === 'quitando') {
-                  <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                  <span class="ve-spinner" aria-hidden="true"></span>
                 } @else {
-                  <i class="bi bi-x-circle" aria-hidden="true"></i>
+                  <mat-icon>link_off</mat-icon>
                 }
                 {{ 'expediente_video.remove' | translate }}
               </button>
@@ -73,7 +74,7 @@
 
       } @else {
         <div class="ve-empty">
-          <i class="bi bi-person-video3" aria-hidden="true"></i>
+          <mat-icon aria-hidden="true">co_present</mat-icon>
           <p>{{ (editable() ? 'expediente_video.empty' : 'expediente_video.empty_locked') | translate }}</p>
         </div>
       }
@@ -82,22 +83,22 @@
     <!-- ── Agregar o cambiar ──────────────────────────────────────────────── -->
     @if (editable()) {
       <div class="ve-actions" role="group" [attr.aria-label]="'expediente_video.actions_label' | translate">
-        <button type="button" class="btn btn-sm btn-outline-primary ve-btn" (click)="grabar()" [disabled]="ocupado()">
-          <span class="ve-dot" aria-hidden="true"></span>
+        <button mat-stroked-button type="button" class="ve-btn" (click)="grabar()" [disabled]="ocupado()">
+          <mat-icon class="ve-rec">radio_button_checked</mat-icon>
           {{ (actual() ? 'expediente_video.record_other' : 'expediente_video.record') | translate }}
         </button>
-        <button type="button" class="btn btn-sm btn-outline-secondary ve-btn" (click)="subir()" [disabled]="ocupado()">
-          <i class="bi bi-upload" aria-hidden="true"></i>
+        <button mat-stroked-button type="button" class="ve-btn" (click)="subir()" [disabled]="ocupado()">
+          <mat-icon>upload</mat-icon>
           {{ (actual() ? 'expediente_video.upload_other' : 'expediente_video.upload') | translate }}
         </button>
         @if (otros().length) {
-          <button type="button" class="btn btn-sm btn-outline-secondary ve-btn" (click)="abrirBiblioteca()" [disabled]="ocupado()">
-            <i class="bi bi-collection-play" aria-hidden="true"></i>
+          <button mat-stroked-button type="button" class="ve-btn" (click)="abrirBiblioteca()" [disabled]="ocupado()">
+            <mat-icon>video_library</mat-icon>
             {{ 'expediente_video.choose' | translate }}
             <span class="ve-count">{{ otros().length }}</span>
           </button>
         }
-        <input #archivoInput type="file" class="d-none"
+        <input #archivoInput type="file" hidden
                accept="video/mp4,video/webm,video/quicktime"
                (change)="alElegirArchivo($event)">
       </div>
@@ -115,7 +116,7 @@
     </div>
 
     <fieldset class="ve-pick" [disabled]="ocupado()">
-      <legend class="visually-hidden">{{ 'expediente_video.choose_title' | translate }}</legend>
+      <legend class="cdk-visually-hidden">{{ 'expediente_video.choose_title' | translate }}</legend>
       @for (v of otros(); track v.id) {
         <label class="ve-opt" [class.is-selected]="elegido() === v.id">
           <input type="radio" name="veVideo" class="ve-opt__radio"
@@ -124,14 +125,15 @@
             @if (miniaturas()[v.id]; as src) {
               <img [src]="src" alt="" loading="lazy">
             } @else {
-              <i class="bi bi-camera-video"></i>
+              <mat-icon>videocam</mat-icon>
             }
             <span class="ve-thumb__dur">{{ duracion(v) }}</span>
           </span>
           <span class="ve-opt__text">
             <span class="ve-opt__title">{{ v.titulo }}</span>
             <span class="ve-opt__meta">
-              {{ origen(v) | translate }}<span class="ve-sep" aria-hidden="true">·</span>{{ relativo(v) }}
+              <span>{{ origen(v) | translate }}</span>
+              <span>{{ relativo(v) }}</span>
             </span>
           </span>
         </label>
@@ -139,12 +141,14 @@
     </fieldset>
 
     <div class="ve-dialog__foot">
-      <button type="button" class="btn btn-outline-secondary" (click)="cerrarBiblioteca()" [disabled]="ocupado()">
+      <button mat-button type="button" (click)="cerrarBiblioteca()" [disabled]="ocupado()">
         {{ 'common.cancel' | translate }}
       </button>
-      <button type="submit" class="btn btn-primary" [disabled]="ocupado() || !elegido()">
+      <button mat-flat-button type="submit" [disabled]="ocupado() || !elegido()">
         @if (tarea()?.tipo === 'guardando') {
-          <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+          <span class="ve-spinner is-light" aria-hidden="true"></span>
+        } @else {
+          <mat-icon>check</mat-icon>
         }
         {{ 'expediente_video.use' | translate }}
       </button>

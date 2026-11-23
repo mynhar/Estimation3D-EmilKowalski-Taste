@@ -1,5 +1,13 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../../services/auth-supabase.service';
@@ -8,6 +16,7 @@ import { FaseServicioRepository } from '../../../data/fase-servicio.repository';
 import { ActividadServicioRepository } from '../../../data/actividad-servicio.repository';
 import { FaseServicio, ActividadServicio } from '../../../models/seguimiento.model';
 import { CAMPOS_FALTANTES } from '../../../shared/ui/campos-faltantes/campos-faltantes.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
 
 interface Servicio {
   id:             number;
@@ -24,9 +33,14 @@ interface Servicio {
 @Component({
   selector: 'app-admin-service-type-edit',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, TranslatePipe, ...CAMPOS_FALTANTES],
+  imports: [
+    NgTemplateOutlet, ReactiveFormsModule, TranslatePipe,
+    MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSelectModule,
+    MatSlideToggleModule, MatTooltipModule,
+    PageHeaderComponent, ...CAMPOS_FALTANTES,
+  ],
   templateUrl: './edit.component.html',
-  styleUrl:    './edit.component.css',
+  styleUrls: ['../../../shared/ui/alta/alta.css', '../../_shared/catalogo-form.css', './edit.component.css'],
 })
 export class AdminServiceTypeEditComponent implements OnInit {
   private fb        = inject(FormBuilder);
@@ -46,6 +60,8 @@ export class AdminServiceTypeEditComponent implements OnInit {
   guardando = signal(false);
   error     = signal<string | null>(null);
   servicio  = signal<Servicio | null>(null);
+  /** Los tres idiomas del catálogo, en el orden de los campos. */
+  readonly idiomas = ['fr', 'en', 'es'] as const;
 
   // ── Estado del panel de fases ──────────────────────────────────────────────
   fases                 = signal<FaseServicio[]>([]);

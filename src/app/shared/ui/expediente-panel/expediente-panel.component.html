@@ -1,17 +1,16 @@
 <section class="xp">
-  <button class="xp__head" type="button"
-          [attr.aria-expanded]="abierto()"
-          [attr.aria-controls]="abierto() ? cuerpoId : null"
-          (click)="alternar.emit()">
-    <span class="xp__title">
-      <span class="xp__tile" aria-hidden="true"><i class="bi bi-folder2"></i></span>
-      <span class="xp__num">{{ 'my_documents.dossier' | translate }} {{ numero() }}</span>
-    </span>
-    <span class="xp__meta"><ng-content select="[panelMeta]" /></span>
-    <i class="bi xp__chev"
-       [class.bi-chevron-down]="!abierto()"
-       [class.bi-chevron-up]="abierto()" aria-hidden="true"></i>
-  </button>
+  <!-- Acordeón: el botón va dentro de un título para que lo que cuelga (h3) tenga padre. -->
+  <h2 class="xp__h">
+    <button class="xp__head" type="button"
+            [attr.aria-expanded]="abierto()"
+            [attr.aria-controls]="abierto() ? cuerpoId : null"
+            (click)="alternar.emit()">
+      <span class="xp__tile" aria-hidden="true"><mat-icon>folder</mat-icon></span>
+      <span class="xp__num">{{ 'my_documents.dossier' | translate }} <span class="xp__fig">{{ numero() }}</span></span>
+      <span class="xp__meta"><ng-content select="[panelMeta]" /></span>
+      <mat-icon class="xp__chev" [class.is-open]="abierto()" aria-hidden="true">expand_more</mat-icon>
+    </button>
+  </h2>
 
   @if (abierto()) {
     <div class="xp__body" [class.xp__body--bandeja]="bandeja()" [id]="cuerpoId">

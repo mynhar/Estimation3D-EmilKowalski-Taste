@@ -2,7 +2,8 @@
  * parent: client/dashboard, client/file/my-file, client/builder-offer
  * states: default · hover · focus-visible · active · detalle abierto · cancelado/archivado
  *         · completado (barra y cifra en verde con su texto de estado)
- * contrast: nombres y cifras ink (13.9:1) · texto ink-secondary (10.6:1)
+ * contrast: nombres y cifras ink (13.6:1 sobre vélin) · texto ink-secondary (10:1)
+ * type: nombres 112 %; porcentajes, precios y total 75 % con tabular-nums
  *           insignias con los tokens -ink sobre su fondo suave (≥ 5:1)
  *
  * Una fila por contrato separada por filetes y el costo total como línea de
@@ -34,6 +35,7 @@
   min-width: 0;
   margin: 0;
   font-family: var(--ds-font-display);
+  font-stretch: var(--ds-stretch-heading);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
   line-height: var(--ds-leading-snug);
@@ -71,6 +73,7 @@
 .cx-row__name {
   margin: 0;
   font-family: var(--ds-font-display);
+  font-stretch: var(--ds-stretch-heading);
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-bold);
   line-height: var(--ds-leading-snug);
@@ -96,7 +99,7 @@
 }
 .cx-badge--generado     { background: var(--ds-info-soft);    color: var(--ds-info-ink); }
 .cx-badge--firmado      { background: var(--ds-action-soft);  color: var(--ds-action-ink); }
-.cx-badge--en_ejecucion { background: var(--ds-scan-soft);    color: var(--ds-action-ink); }
+.cx-badge--en_ejecucion { background: var(--ds-action-faint);    color: var(--ds-action-ink); }
 .cx-badge--completado   { background: var(--ds-success-soft); color: var(--ds-success-ink); }
 .cx-badge--cancelado,
 .cx-badge--archivado    { background: var(--ds-bg-alt);       color: var(--ds-ink-secondary); }
@@ -121,6 +124,7 @@
 }
 .cx-row__pct {
   font-family: var(--ds-font-display);
+  font-stretch: var(--ds-stretch-figure);
   font-size: var(--ds-text-2xl);
   font-weight: var(--ds-weight-black);
   line-height: 1;
@@ -136,17 +140,17 @@
   color: var(--ds-ink-secondary);
 }
 
-/* La medida real va en menthe (firma del escaneo); el valor, en texto. */
+/* La barra es refuerzo gráfico (relleno con filete abeto); el valor va en texto. */
 .cx-bar {
   height: 8px;
   overflow: hidden;
   border-radius: var(--ds-radius-pill);
-  background: var(--ds-stone);
+  background: var(--ds-band);
 }
 .cx-bar__fill {
   height: 100%;
   border-radius: inherit;
-  background: var(--ds-scan);
+  background: var(--ds-action-soft);
   box-shadow: inset 0 0 0 1px var(--ds-action);
 }
 .cx-bar__fill--done { background: var(--ds-success); box-shadow: none; }
@@ -178,6 +182,7 @@
 }
 .cx-row__price {
   font-family: var(--ds-font-display);
+  font-stretch: var(--ds-stretch-figure);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
   line-height: 1.1;
@@ -317,6 +322,7 @@
 }
 .cx__total-value {
   font-family: var(--ds-font-display);
+  font-stretch: var(--ds-stretch-figure);
   font-size: clamp(var(--ds-text-xl), 7cqi, var(--ds-text-3xl));
   font-weight: var(--ds-weight-black);
   line-height: 1;

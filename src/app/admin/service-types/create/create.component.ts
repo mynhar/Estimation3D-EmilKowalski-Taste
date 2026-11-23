@@ -1,17 +1,27 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../../services/auth-supabase.service';
 import { ToastService } from '../../../services/toast.service';
 import { CAMPOS_FALTANTES } from '../../../shared/ui/campos-faltantes/campos-faltantes.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
 
 @Component({
   selector: 'app-admin-service-type-create',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, TranslatePipe, ...CAMPOS_FALTANTES],
+  imports: [
+    ReactiveFormsModule, TranslatePipe,
+    MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSlideToggleModule,
+    PageHeaderComponent, ...CAMPOS_FALTANTES,
+  ],
   templateUrl: './create.component.html',
-  styleUrl:    './create.component.css',
+  styleUrls: ['../../../shared/ui/alta/alta.css', '../../_shared/catalogo-form.css'],
 })
 export class AdminServiceTypeCreateComponent {
   private fb        = inject(FormBuilder);
@@ -21,6 +31,8 @@ export class AdminServiceTypeCreateComponent {
   private translate = inject(TranslateService);
 
   guardando = signal(false);
+  /** Los tres idiomas del catálogo, en el orden de los campos. */
+  readonly idiomas = ['fr', 'en', 'es'] as const;
   /** Intentos de envío con campos sin completar: cada uno trae el resumen de lo que falta. */
   intentos  = signal(0);
 

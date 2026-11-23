@@ -1,6 +1,7 @@
 /* component: page header
  * states: con o sin contexto, con o sin acciones
- * contrast: título ink (13.9:1), contexto ink-muted (5.9:1 sobre bg)
+ * contrast: título ink (11.9:1 sobre crema), contexto ink-muted (6.1:1)
+ * type: título de pantalla en display 125 %
  */
 :host {
   display: flex;
@@ -15,10 +16,11 @@
 .ph__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: clamp(var(--ds-text-2xl), 1.4rem + 2vw, var(--ds-text-4xl));
-  font-weight: var(--ds-weight-bold);
+  font-size: clamp(var(--ds-text-2xl), 1.3rem + 1.8vw, 2.75rem);
+  font-weight: var(--ds-weight-black);
+  font-stretch: var(--ds-stretch-display);
   line-height: var(--ds-leading-tight);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   color: var(--ds-ink);
   overflow-wrap: anywhere;
 }

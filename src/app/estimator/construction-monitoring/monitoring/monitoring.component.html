@@ -1,57 +1,38 @@
-<div class="cm-page">
+<div class="page-wrapper ecm">
 
-  <!-- Volver a la lista -->
-  <a class="cm-back" routerLink="/estimator/construction-monitoring/list">
-    <i class="bi bi-arrow-left" aria-hidden="true"></i>
-    {{ 'common.back' | translate }}
-  </a>
-
-  <!-- Encabezado de página -->
-  <header class="cm-pagehead">
-    <span class="cm-eyebrow">{{ 'role.estimateur' | translate }}</span>
-    <h1 class="cm-pagetitle">{{ 'construction_monitoring.title' | translate }}</h1>
-    @if (obra(); as o) {
-      <p class="cm-pagesub">
-        <span class="cm-exp-num">{{ o.expedienteNumero }}</span>
-      </p>
-    }
+  <header class="ecm-head">
+    <a mat-button class="ecm-back" routerLink="/estimator/construction-monitoring/list">
+      <mat-icon>arrow_back</mat-icon>
+      {{ 'common.back' | translate }}
+    </a>
+    <!-- El número del dossier lo da la cabecera de la tarjeta de obra. -->
+    <app-page-header [titulo]="'construction_monitoring.title' | translate" />
   </header>
 
-  <!-- Cargando -->
   @if (cargando()) {
-    <div class="cm-loading">
-      <span class="cm-spinner"></span>
-    </div>
-  }
+    <span class="skel" role="status">
+      <span class="cdk-visually-hidden">{{ 'common.loading' | translate }}</span>
+    </span>
 
-  <!-- Error -->
-  @else if (error()) {
-    <div class="cm-alert cm-alert--error">
-      <i class="bi bi-exclamation-triangle"></i>
-      <p>{{ error() }}</p>
-    </div>
-  }
+  } @else if (error()) {
+    <p class="ecm-error" role="alert">
+      <mat-icon aria-hidden="true">error</mat-icon>
+      {{ error() }}
+    </p>
 
   <!-- El contrato no está entre los expedientes de este estimador -->
-  @else if (noAccesible()) {
-    <div class="cm-empty">
-      <i class="bi bi-shield-lock"></i>
-      <p class="cm-empty__title">{{ 'estimator_monitoring.no_access_title' | translate }}</p>
-      <p class="cm-empty__hint">{{ 'estimator_monitoring.no_access_hint' | translate }}</p>
-    </div>
-  }
+  } @else if (noAccesible()) {
+    <app-empty-state class="ecm-empty" matIcon="lock"
+                     [titulo]="'estimator_monitoring.no_access_title' | translate"
+                     [texto]="'estimator_monitoring.no_access_hint' | translate" />
 
   <!-- Sin seguimiento para este contrato -->
-  @else if (!obra()) {
-    <div class="cm-empty">
-      <i class="bi bi-hammer"></i>
-      <p class="cm-empty__title">{{ 'client_monitoring.empty_title' | translate }}</p>
-      <p class="cm-empty__hint">{{ 'client_monitoring.empty_hint' | translate }}</p>
-    </div>
-  }
+  } @else if (!obra()) {
+    <app-empty-state class="ecm-empty" matIcon="construction"
+                     [titulo]="'client_monitoring.empty_title' | translate"
+                     [texto]="'client_monitoring.empty_hint' | translate" />
 
-  <!-- Tarjeta de la obra seleccionada -->
-  @else {
+  } @else {
     <app-obra-card [obra]="obra()!" />
   }
 </div>

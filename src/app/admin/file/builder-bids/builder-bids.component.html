@@ -1,32 +1,18 @@
-<!-- Ofertas de constructores — extraído de admin/file/edit.
-     Tarjeta 1: lista de ofertas (selección + adjudicación).
-     Tarjeta 2: edición de la oferta seleccionada. -->
+<!-- Ofertas de los contratistas (administración): pestaña de admin/file/edit.
+     Dos columnas desde 1100px: la lista (reparto en bloque y adjudicación) | la oferta abierta (editable). -->
+<div class="fi-layout">
 
-<!-- ─────────────────────────────────────────────────────────
-     OFERTAS DE CONSTRUCTORES (selección + adjudicación)
-────────────────────────────────────────────────────────── -->
-<div class="detail-card">
-  <div class="detail-card__head">
-    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
-         fill="none" stroke="currentColor" stroke-width="1.5"
-         stroke-linecap="round" stroke-linejoin="round"
-         class="section-label__icon me-2" aria-hidden="true">
-      <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
-      <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
-    </svg>
-    <span class="section-label">{{ 'builder_offer.title' | translate }}</span>
-    <span class="archivo-count ms-auto">{{ ofertas().length }}</span>
-  </div>
-  <div class="detail-card__body">
+  <!-- ── Ofertas recibidas ─────────────────────────────────────────────── -->
+  <section class="fi-card" aria-labelledby="bb-title">
+    <h2 id="bb-title" class="fi-h2">
+      {{ 'builder_offer.title' | translate }}
+      @if (ofertas().length > 0) { <span class="fi-count">{{ ofertas().length }}</span> }
+    </h2>
 
     @if (ofertas().length === 0) {
-      <div class="pending-notice">
-        <i class="bi bi-inbox me-2" aria-hidden="true"></i>
-        {{ 'builder_offer.no_offers' | translate }}
-      </div>
+      <p class="fi-empty"><mat-icon aria-hidden="true">inbox</mat-icon>{{ 'builder_offer.no_offers' | translate }}</p>
     } @else {
-      <!-- Aceptar / rechazar / reactivar en bloque. Mismo componente que en
-           admin/offer/edit: una sola implementación para las dos pantallas. -->
+      <!-- Rechazar / reactivar en bloque. Mismo componente que en admin/offer/edit. -->
       <app-oferta-reparto
         [expedienteId]="expedienteId()"
         [ofertas]="ofertas()"
@@ -34,41 +20,35 @@
         [(seleccion)]="seleccion"
         (aplicado)="onRepartoAplicado()" />
 
-      <!-- Adjudicar. A diferencia de la barra, esto SÍ crea contratos: uno por
-           oferta marcada, cada uno con su PDF. Vive aquí y no en el componente
-           compartido porque el PDF se arma con datos del expediente, el cliente
-           y el servicio que carga esta pantalla. -->
+      <!-- Adjudicar las marcadas. A diferencia de la barra, esto SÍ crea contratos: uno por
+           oferta marcada, cada uno con su PDF. Vive aquí porque el PDF se arma con datos
+           del dossier, el cliente y el servicio que carga esta pantalla. -->
       @if (seleccionadasParaAdjudicar().length > 0) {
         @if (!confirmandoAdjudicarSeleccion()) {
-          <button class="bids-btn-adjudicar" type="button"
+          <button mat-stroked-button type="button" class="bb-award"
                   (click)="confirmandoAdjudicarSeleccion.set(true)"
                   [disabled]="adjudicando() || !puedeAdjudicarSeleccion()">
-            <i class="bi bi-trophy" aria-hidden="true"></i>
+            <mat-icon>emoji_events</mat-icon>
             {{ 'admin_offer.adjudicar_seleccion' | translate:{ n: seleccionadasParaAdjudicar().length } }}
           </button>
         } @else {
-          <div class="bids-adjudicar-confirm">
-            <p class="bids-confirm-msg">
-              <i class="bi bi-trophy" aria-hidden="true"></i>
+          <div class="fi-confirm" role="alertdialog" aria-labelledby="bb-award-title">
+            <p class="fi-confirm__title" id="bb-award-title">
+              <mat-icon aria-hidden="true">emoji_events</mat-icon>
               {{ 'admin_offer.adjudicar_confirm_n' | translate:{ n: seleccionadasParaAdjudicar().length } }}
             </p>
-            <ul class="bids-adjudicar-list">
+            <ul class="bb-award-list">
               @for (o of seleccionadasParaAdjudicar(); track o.id) {
-                <li>{{ o.constructor_nombre }} — {{ formatCosto(o.precio) }}</li>
+                <li><span>{{ o.constructor_nombre }}</span><span class="fi-fig">{{ formatCosto(o.precio) }}</span></li>
               }
             </ul>
-            <p class="bids-confirm-note">
-              <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
-              {{ 'admin_offer.adjudicar_reemplaza' | translate }}
-            </p>
-            <div class="bids-confirm-btns">
-              <button class="bids-btn-confirm" type="button"
-                      (click)="adjudicarSeleccion()" [disabled]="adjudicando()">
-                <i class="bi bi-check-lg" aria-hidden="true"></i>
-                {{ 'common.confirm' | translate }}
+            <p>{{ 'admin_offer.adjudicar_reemplaza' | translate }}</p>
+            <div class="bb-inline-actions">
+              <button mat-flat-button type="button" (click)="adjudicarSeleccion()" [disabled]="adjudicando()">
+                @if (adjudicando()) { <span class="fi-spinner" aria-hidden="true"></span> } @else { <mat-icon>check</mat-icon> }
+                {{ (adjudicando() ? 'builder_offer.processing' : 'common.confirm') | translate }}
               </button>
-              <button class="bids-btn-cancel" type="button"
-                      (click)="confirmandoAdjudicarSeleccion.set(false)" [disabled]="adjudicando()">
+              <button mat-button type="button" (click)="confirmandoAdjudicarSeleccion.set(false)" [disabled]="adjudicando()">
                 {{ 'common.cancel' | translate }}
               </button>
             </div>
@@ -76,276 +56,219 @@
         }
       }
 
-      <div class="offers-grid">
+      <ul class="bb-offers">
         @for (oferta of ofertas(); track oferta.id; let i = $index) {
-          <div class="offer-card"
-               [class.offer-card--selected]="esSeleccionada(oferta.id)"
-               [class.offer-card--aceptada]="oferta.estado === 'aceptada' && !esEliminada(oferta)"
-               [class.offer-card--rechazada]="oferta.estado === 'rechazada' && !esEliminada(oferta)"
-               [class.offer-card--eliminada]="esEliminada(oferta)"
-               [class.offer-card--marcada]="estaMarcada(oferta)"
-               [attr.role]="esEliminada(oferta) ? null : 'button'"
-               [attr.tabindex]="esEliminada(oferta) ? null : 0"
-               [attr.aria-pressed]="esEliminada(oferta) ? null : esSeleccionada(oferta.id)"
-               (click)="seleccionarOferta(oferta)"
-               (keydown.enter)="seleccionarOferta(oferta)"
-               (keydown.space)="$event.preventDefault(); seleccionarOferta(oferta)">
+          <!-- Pulsar la tarjeta abre la oferta a la derecha; el botón «Modifier» hace lo mismo con teclado. -->
+          <li class="bb-offer"
+              [class.is-selected]="esSeleccionada(oferta.id) && !esEliminada(oferta)"
+              [class.is-marked]="estaMarcada(oferta)"
+              [class.is-out]="esEliminada(oferta)"
+              (click)="seleccionarOferta(oferta)">
 
-            <div class="offer-card__top">
-              <!-- Marca la oferta para el reparto. No abre nada: detiene la
-                   propagación para no confundirse con la selección de edición. -->
+            <div class="bb-offer__top">
+              <!-- Marca la oferta para el reparto. No abre nada: no propaga el clic. -->
               @if (puedeSeleccionar() && !esEliminada(oferta)) {
-                <label class="offer-card__pick" (click)="$event.stopPropagation()">
-                  <input type="checkbox" class="rep-check"
-                         [checked]="estaMarcada(oferta)"
-                         (change)="alternarMarca(oferta)"
-                         [attr.aria-label]="('admin_offer.reparto_marcar' | translate) + ' ' + oferta.constructor_nombre">
-                </label>
+                <mat-checkbox class="bb-offer__pick" (click)="$event.stopPropagation()"
+                              [checked]="estaMarcada(oferta)"
+                              (change)="alternarMarca(oferta)"
+                              [aria-label]="('admin_offer.reparto_marcar' | translate) + ' ' + oferta.constructor_nombre" />
               }
-              <span class="offer-card__index">#{{ i + 1 }}</span>
-              <div class="d-flex align-items-center gap-1">
-                @if (esSeleccionada(oferta.id) && !esEliminada(oferta)) {
-                  <span class="selected-badge" [title]="'builder_offer.selected_badge' | translate">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2"
-                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                      <path d="M20 6 9 17l-5-5"/>
-                    </svg>
-                  </span>
-                }
-                <!-- El estado se conserva aunque esté dada de baja: el badge de
-                     baja se añade al lado, no lo sustituye. -->
-                <span class="badge rounded-pill px-2 py-1 {{ ofertaBadgeClass(oferta.estado) }}">
-                  {{ ('state.' + oferta.estado) | translate }}
-                </span>
+              <span class="bb-offer__index fi-fig">#{{ i + 1 }}</span>
+              <span class="bb-offer__tags">
+                <!-- El estado se conserva aunque esté retirada: la etiqueta de baja va al lado. -->
+                <app-status-chip [estado]="oferta.estado" />
                 @if (esEliminada(oferta)) {
-                  <span class="offer-card__removed-badge" [title]="oferta.eliminada_en">
-                    <i class="bi bi-archive" aria-hidden="true"></i>
-                    {{ 'admin_offer.oferta_eliminada' | translate }}
+                  <span class="fi-tag" [title]="oferta.eliminada_en ?? ''">
+                    <mat-icon aria-hidden="true">archive</mat-icon>{{ 'admin_offer.oferta_eliminada' | translate }}
                   </span>
                 }
-              </div>
+              </span>
             </div>
 
-            <div class="offer-card__price-block">
-              <p class="offer-price mb-0">{{ formatCosto(oferta.precio) }}</p>
-              <p class="offer-price-label mb-0">{{ 'builder_offer.total_price' | translate }}</p>
+            <div class="bb-offer__price">
+              <span class="bb-offer__amount fi-fig">{{ formatCosto(oferta.precio) }}</span>
+              <span class="bb-offer__label">{{ 'builder_offer.total_price' | translate }}</span>
             </div>
 
-            <div class="offer-card__section">
-              <p class="offer-meta-label">{{ 'offers_received.builder' | translate }}</p>
-              <p class="offer-builder-name mb-0">{{ oferta.constructor_nombre }}</p>
+            <div class="bb-offer__builder">
+              <span class="bb-offer__label">{{ 'offers_received.builder' | translate }}</span>
+              <span class="bb-offer__name" [id]="'bb-name-' + oferta.id">{{ oferta.constructor_nombre }}</span>
               @if (oferta.constructor_telefono) {
-                <a href="tel:{{ oferta.constructor_telefono }}"
-                   class="offer-contact d-inline-flex align-items-center gap-1 mt-1"
-                   (click)="$event.stopPropagation()">
-                  <i class="bi bi-telephone" aria-hidden="true"></i>{{ oferta.constructor_telefono }}
+                <a class="bb-offer__tel fi-fig" href="tel:{{ oferta.constructor_telefono }}" (click)="$event.stopPropagation()">
+                  <mat-icon aria-hidden="true">call</mat-icon>{{ oferta.constructor_telefono }}
                 </a>
               }
             </div>
 
-            <div class="offer-card__meta-grid">
-              <div class="offer-meta-item">
-                <span class="offer-meta-label">{{ 'offers_received.deadline' | translate }}</span>
-                <span class="offer-meta-value">{{ formatPlazo(oferta.plazo_semanas_min, oferta.plazo_semanas_max) }}</span>
+            <dl class="fi-facts bb-offer__facts">
+              <div class="fi-fact">
+                <dt>{{ 'offers_received.deadline' | translate }}</dt>
+                <dd class="fi-fig">{{ formatPlazo(oferta.plazo_semanas_min, oferta.plazo_semanas_max) }}</dd>
               </div>
-              <div class="offer-meta-item">
-                <span class="offer-meta-label">{{ 'offer.start_date' | translate }}</span>
-                <span class="offer-meta-value">{{ formatFecha(oferta.fecha_inicio) }}</span>
+              <div class="fi-fact">
+                <dt>{{ 'offer.start_date' | translate }}</dt>
+                <dd class="fi-fig">{{ formatFecha(oferta.fecha_inicio) }}</dd>
               </div>
               @if (oferta.garantia_anos) {
-                <div class="offer-meta-item">
-                  <span class="offer-meta-label">{{ 'offer.warranty' | translate }}</span>
-                  <span class="offer-meta-value">{{ oferta.garantia_anos }} {{ 'offer.years' | translate }}</span>
+                <div class="fi-fact">
+                  <dt>{{ 'offer.warranty' | translate }}</dt>
+                  <dd><span class="fi-fig">{{ oferta.garantia_anos }}</span> {{ 'offer.years' | translate }}</dd>
                 </div>
               }
-            </div>
-
-            @if (oferta.descripcion) {
-              <div class="offer-card__section">
-                <p class="offer-meta-label">{{ 'builder_offer.approach' | translate }}</p>
-                <p class="offer-desc mb-0">{{ oferta.descripcion }}</p>
-              </div>
-            }
+              @if (oferta.descripcion) {
+                <div class="fi-fact is-wide">
+                  <dt>{{ 'builder_offer.approach' | translate }}</dt>
+                  <dd class="fi-notes">{{ oferta.descripcion }}</dd>
+                </div>
+              }
+            </dl>
 
             @if (oferta.videos.length > 0) {
-              <div class="offer-card__section" (click)="$event.stopPropagation()">
+              <div class="bb-offer__media" (click)="$event.stopPropagation()">
                 @for (v of oferta.videos; track v.id) {
-                  <button class="offer-video-btn w-100" type="button"
-                          (click)="toggleVideoOferta(oferta.id, v)">
-                    <i class="bi" [class.bi-camera-video]="videoOfertaUrl(oferta.id) === null"
-                       [class.bi-x-circle]="videoOfertaUrl(oferta.id) !== null" aria-hidden="true"></i>
-                    {{ (videoOfertaUrl(oferta.id) !== null
-                        ? 'builder_offer.close_video'
-                        : 'builder_offer.view_video') | translate }}
+                  <button mat-stroked-button type="button" (click)="toggleVideoOferta(oferta.id, v)"
+                          [attr.aria-expanded]="videoOfertaUrl(oferta.id) !== null">
+                    @if (videoOfertaUrl(oferta.id) === null) { <mat-icon>play_circle</mat-icon> } @else { <mat-icon>close</mat-icon> }
+                    {{ (videoOfertaUrl(oferta.id) !== null ? 'builder_offer.close_video' : 'builder_offer.view_video') | translate }}
                   </button>
                 }
                 @if (videoOfertaUrl(oferta.id); as vurl) {
-                  <video class="offer-video-el mt-2" controls [src]="vurl"></video>
+                  <video class="bb-offer__video" controls [src]="vurl"></video>
                 }
               </div>
             }
 
             @if (oferta.documentos.length > 0) {
-              <div class="offer-docs" (click)="$event.stopPropagation()">
+              <ul class="fi-files bb-offer__docs" (click)="$event.stopPropagation()">
                 @for (d of oferta.documentos; track d.id) {
-                  <button class="offer-doc-chip" type="button" (click)="verArchivo(d)">
-                    <i class="bi bi-file-earmark-text" aria-hidden="true"></i>
-                    <span class="offer-doc-chip__name">{{ d.nombre_archivo }}</span>
-                    <span class="offer-doc-chip__size">{{ formatTamano(d.tamano_bytes) }}</span>
-                  </button>
+                  <li class="fi-file">
+                    <mat-icon class="fi-file__icon" aria-hidden="true">description</mat-icon>
+                    <span class="fi-file__text">
+                      <span class="fi-file__name" [title]="d.nombre_archivo">{{ d.nombre_archivo }}</span>
+                      <span class="fi-file__size">{{ formatTamano(d.tamano_bytes) }}</span>
+                    </span>
+                    <button mat-button type="button" class="fi-file__open" (click)="verArchivo(d)"
+                            [attr.aria-label]="('common.open' | translate) + ' ' + d.nombre_archivo">
+                      {{ 'common.open' | translate }}
+                    </button>
+                  </li>
                 }
-              </div>
+              </ul>
             }
-          </div>
+
+            @if (!esEliminada(oferta)) {
+              <button mat-stroked-button type="button" class="bb-offer__open"
+                      [attr.aria-pressed]="esSeleccionada(oferta.id)"
+                      [attr.aria-describedby]="'bb-name-' + oferta.id"
+                      (click)="$event.stopPropagation(); seleccionarOferta(oferta)">
+                @if (esSeleccionada(oferta.id)) { <mat-icon>check</mat-icon> } @else { <mat-icon>edit</mat-icon> }
+                {{ (esSeleccionada(oferta.id) ? 'builder_offer.selected_badge' : 'common.edit') | translate }}
+              </button>
+            }
+          </li>
         }
+      </ul>
+
+      <!-- ── Adjudicar la oferta abierta ──────────────────────────────────── -->
+      <div class="bb-foot">
+        @if (errorAdj()) {
+          <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorAdj() | translate }}</p>
+        } @else if (exitoAdj()) {
+          <p class="fi-feedback is-ok" role="status"><mat-icon aria-hidden="true">check_circle</mat-icon>{{ exitoAdj() | translate }}</p>
+        } @else if (yaContratado() && ofertaSeleccionada()?.estado !== 'aceptada' && puedeAdjudicar()) {
+          <p class="fi-feedback is-warn"><mat-icon aria-hidden="true">warning</mat-icon>{{ 'builder_offer.replace_warning' | translate }}</p>
+        }
+
+        <div class="bb-foot__row">
+          @if (ofertaSeleccionada(); as sel) {
+            <span class="fi-hint">{{ 'builder_offer.selected_badge' | translate }} : {{ sel.constructor_nombre }}</span>
+          }
+          <button mat-flat-button type="button" class="bb-foot__btn" (click)="adjudicarOferta()" [disabled]="!puedeAdjudicar()">
+            @if (adjudicando()) { <span class="fi-spinner" aria-hidden="true"></span> } @else { <mat-icon>check_circle</mat-icon> }
+            {{ (adjudicando() ? 'builder_offer.processing' : yaContratado() ? 'builder_offer.change_btn' : 'builder_offer.accept_btn') | translate }}
+          </button>
+        </div>
       </div>
     }
-  </div>
+  </section>
 
-  @if (ofertas().length > 0) {
-    <div class="detail-card__foot">
-      @if (errorAdj()) {
-        <span class="save-msg save-msg--err">
-          <i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>{{ errorAdj() | translate }}
-        </span>
-      } @else if (exitoAdj()) {
-        <span class="save-msg save-msg--ok">
-          <i class="bi bi-check-circle me-1" aria-hidden="true"></i>{{ exitoAdj() | translate }}
-        </span>
-      } @else if (yaContratado() && ofertaSeleccionada()?.estado !== 'aceptada' && puedeAdjudicar()) {
-        <span class="save-msg save-msg--warn">
-          <i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>{{ 'builder_offer.replace_warning' | translate }}
-        </span>
-      } @else if (estado() === 'contratado') {
-        <span class="save-msg">{{ 'admin_file_edit.contract_note' | translate }}</span>
-      } @else { <span></span> }
+  <!-- ── Oferta abierta (editable) ─────────────────────────────────────── -->
+  <section class="fi-card fi-form" aria-labelledby="bb-sel-title">
+    <h2 id="bb-sel-title" class="fi-h2">{{ 'offer.selected_builder' | translate }}</h2>
 
-      <button type="button" class="btn-save" (click)="adjudicarOferta()" [disabled]="!puedeAdjudicar()">
-        @if (adjudicando()) {
-          <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
-          {{ 'builder_offer.processing' | translate }}
-        } @else {
-          <i class="bi bi-check-circle me-2" aria-hidden="true"></i>
-          {{ (yaContratado() ? 'builder_offer.change_btn' : 'builder_offer.accept_btn') | translate }}
-        }
-      </button>
-    </div>
-  }
-</div>
-
-<!-- ─────────────────────────────────────────────────────────
-     OFERTA DEL CONSTRUCTOR SELECCIONADO (editable)
-────────────────────────────────────────────────────────── -->
-<div class="detail-card mt-4">
-  <div class="detail-card__head">
-    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
-         fill="none" stroke="currentColor" stroke-width="1.5"
-         stroke-linecap="round" stroke-linejoin="round"
-         class="section-label__icon me-2" aria-hidden="true">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-    </svg>
-    <span class="section-label">{{ 'offer.selected_builder' | translate }}</span>
-  </div>
-  <div class="detail-card__body">
-    @if (ofertas().length === 0) {
-      <div class="pending-notice">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-             fill="none" stroke="currentColor" stroke-width="1.5"
-             stroke-linecap="round" stroke-linejoin="round" class="me-2 flex-shrink-0" aria-hidden="true">
-          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-        </svg>
-        {{ 'admin_file_edit.constructor_no_offers' | translate }}
-      </div>
-    } @else {
-
-      <div class="constructor-chip mb-3">
-        <div class="constructor-avatar" aria-hidden="true">
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
-               fill="none" stroke="currentColor" stroke-width="1.5"
-               stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-          </svg>
-        </div>
-        <div class="min-w-0">
-          <p class="constructor-nombre mb-0">{{ ofertaSeleccionada()?.constructor_nombre }}</p>
-          <span class="badge rounded-pill px-2 py-1
-            {{ ofertaSeleccionada()?.estado === 'aceptada' ? 'bg-success-subtle text-success-emphasis'
-              : ofertaSeleccionada()?.estado === 'rechazada' ? 'bg-secondary-subtle text-secondary'
-              : 'bg-warning-subtle text-warning-emphasis' }}">
-            {{ ('state.' + (ofertaSeleccionada()?.estado ?? '')) | translate }}
-          </span>
-        </div>
+    @if (ofertaSeleccionada(); as sel) {
+      <div class="bb-sel">
+        <span class="bb-sel__avatar" aria-hidden="true"><mat-icon>engineering</mat-icon></span>
+        <span class="bb-sel__name">{{ sel.constructor_nombre }}</span>
+        <app-status-chip [estado]="sel.estado" />
       </div>
 
-      <div class="row g-3">
-        <div class="col-12">
-          <label class="form-label" for="of-precio">
-            {{ 'offer.price' | translate }} (CAD) <span class="req-mark" aria-hidden="true">*</span>
-          </label>
-          <input id="of-precio" type="number" class="form-control" min="0"
-                 [(ngModel)]="precio" name="precio" [disabled]="!puedeEditarOferta" />
+      <div class="fi-fields">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>{{ 'offer.price' | translate }}</mat-label>
+          <span matTextPrefix>CA$&nbsp;</span>
+          <input matInput id="of-precio" type="number" inputmode="numeric" min="0" required
+                 [(ngModel)]="precio" [disabled]="!puedeEditarOferta" />
+        </mat-form-field>
+
+        <div class="fi-row2">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>{{ 'make_offer.min_deadline' | translate }}</mat-label>
+            <input matInput id="of-pmin" type="number" inputmode="numeric" min="1" required
+                   [(ngModel)]="plazoMin" [disabled]="!puedeEditarOferta" />
+            <span matTextSuffix>{{ 'offer.weeks' | translate }}</span>
+          </mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>{{ 'make_offer.max_deadline' | translate }}</mat-label>
+            <input matInput id="of-pmax" type="number" inputmode="numeric" min="1" required
+                   [(ngModel)]="plazoMax" [disabled]="!puedeEditarOferta" />
+            <span matTextSuffix>{{ 'offer.weeks' | translate }}</span>
+          </mat-form-field>
         </div>
-        <div class="col-6">
-          <label class="form-label" for="of-pmin">{{ 'make_offer.min_deadline' | translate }} <span class="req-mark">*</span></label>
-          <input id="of-pmin" type="number" class="form-control" min="1"
-                 [(ngModel)]="plazoMin" name="plazoMin" [disabled]="!puedeEditarOferta" />
+
+        <div class="fi-row2">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>{{ 'offer.warranty' | translate }}</mat-label>
+            <input matInput id="of-gar" type="number" inputmode="numeric" min="0"
+                   [(ngModel)]="garantiaAnos" [disabled]="!puedeEditarOferta" />
+            <span matTextSuffix>{{ 'offer.years' | translate }}</span>
+          </mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>{{ 'offer.start_date' | translate }}</mat-label>
+            <input matInput id="of-inicio" type="date" required
+                   [(ngModel)]="fechaInicio" [disabled]="!puedeEditarOferta" />
+          </mat-form-field>
         </div>
-        <div class="col-6">
-          <label class="form-label" for="of-pmax">{{ 'make_offer.max_deadline' | translate }} <span class="req-mark">*</span></label>
-          <input id="of-pmax" type="number" class="form-control" min="1"
-                 [(ngModel)]="plazoMax" name="plazoMax" [disabled]="!puedeEditarOferta" />
-        </div>
-        <div class="col-6">
-          <label class="form-label" for="of-gar">
-            {{ 'offer.warranty' | translate }}
-            <span class="opt-label">({{ 'offer.years' | translate }})</span>
-          </label>
-          <input id="of-gar" type="number" class="form-control" min="0"
-                 [(ngModel)]="garantiaAnos" name="garantiaAnos" [disabled]="!puedeEditarOferta" />
-        </div>
-        <div class="col-6">
-          <label class="form-label" for="of-inicio">{{ 'offer.start_date' | translate }} <span class="req-mark">*</span></label>
-          <input id="of-inicio" type="date" class="form-control"
-                 [(ngModel)]="fechaInicio" name="fechaInicio" [disabled]="!puedeEditarOferta" />
-        </div>
-        <div class="col-12">
-          <label class="form-label" for="of-desc">{{ 'offer.approach' | translate }} <span class="req-mark">*</span></label>
-          <textarea id="of-desc" class="form-control" rows="3"
-                    [(ngModel)]="descripcionOferta" name="descripcionOferta"
-                    [disabled]="!puedeEditarOferta"></textarea>
-        </div>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>{{ 'offer.approach' | translate }}</mat-label>
+          <textarea matInput id="of-desc" rows="5" required
+                    [(ngModel)]="descripcionOferta" [disabled]="!puedeEditarOferta"></textarea>
+        </mat-form-field>
       </div>
 
-      <app-campos-faltantes class="mt-3" [extra]="faltantesOferta" [intento]="intentosOf()" />
+      <app-campos-faltantes [extra]="faltantesOferta" [intento]="intentosOf()" />
 
       @if (!puedeEditarOferta) {
-        <div class="pending-notice mt-3">
-          <i class="bi bi-lock me-2" aria-hidden="true"></i>{{ 'admin_offer.delete_blocked' | translate }}
+        <p class="fi-hint"><mat-icon aria-hidden="true">lock</mat-icon>{{ 'admin_offer.delete_blocked' | translate }}</p>
+      } @else {
+        @if (errorOf()) {
+          <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorOf() | translate }}</p>
+        } @else if (exitoOf()) {
+          <p class="fi-feedback is-ok" role="status"><mat-icon aria-hidden="true">check_circle</mat-icon>{{ 'make_offer.success_updated' | translate }}</p>
+        }
+        <div class="fi-actions">
+          <button mat-flat-button type="button" (click)="guardarOferta()" [disabled]="guardandoOf()">
+            @if (guardandoOf()) { <span class="fi-spinner" aria-hidden="true"></span> } @else { <mat-icon>save</mat-icon> }
+            {{ (guardandoOf() ? 'common.saving' : 'admin_file_edit.save_constructor') | translate }}
+          </button>
         </div>
       }
-    }
-  </div>
-
-  @if (ofertas().length > 0 && puedeEditarOferta) {
-    <div class="detail-card__foot">
+    } @else {
+      <p class="fi-empty"><mat-icon aria-hidden="true">schedule</mat-icon>{{ 'admin_file_edit.constructor_no_offers' | translate }}</p>
       @if (errorOf()) {
-        <span class="save-msg save-msg--err">
-          <i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>{{ errorOf() | translate }}
-        </span>
-      } @else if (exitoOf()) {
-        <span class="save-msg save-msg--ok">
-          <i class="bi bi-check-circle me-1" aria-hidden="true"></i>{{ 'make_offer.success_updated' | translate }}
-        </span>
-      } @else { <span></span> }
-      <button type="button" class="btn-save" (click)="guardarOferta()" [disabled]="guardandoOf()">
-        @if (guardandoOf()) {
-          <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
-          {{ 'common.saving' | translate }}
-        } @else {
-          <i class="bi bi-floppy me-2" aria-hidden="true"></i>{{ 'admin_file_edit.save_constructor' | translate }}
-        }
-      </button>
-    </div>
-  }
+        <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorOf() | translate }}</p>
+      }
+    }
+  </section>
 </div>

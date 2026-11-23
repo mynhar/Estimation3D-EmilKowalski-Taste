@@ -1,6 +1,6 @@
 <div class="lg">
 
-  <!-- ── Panel de marca (escritorio): isla ardoise ─────────────────────────── -->
+  <!-- ── Panel de marca (escritorio): isla abeto ─────────────────────────── -->
   <aside class="lg-side" [attr.aria-label]="'auth.aria_platform_info' | translate">
     <a class="lg-brand lg-brand--dark" routerLink="/">
       <span class="lg-mark" aria-hidden="true"></span>
@@ -105,7 +105,7 @@
           }
 
           <!-- Activo aunque falten datos: al pulsarlo, el resumen dice cuáles. -->
-          <button mat-flat-button type="submit" class="lg-submit" [disabled]="loading()">
+          <button mat-flat-button type="submit" class="lg-submit ds-cta" [disabled]="loading()">
             @if (loading()) { <span class="lg-spinner" aria-hidden="true"></span> }
             {{ (loading() ? 'common.loading' : 'auth.sign_in') | translate }}
           </button>
@@ -205,7 +205,7 @@
             }
 
             <!-- Activo aunque falten datos: al pulsarlo, el resumen dice cuáles. -->
-            <button mat-flat-button type="submit" class="lg-submit" [disabled]="loading()">
+            <button mat-flat-button type="submit" class="lg-submit ds-cta" [disabled]="loading()">
               @if (loading()) { <span class="lg-spinner" aria-hidden="true"></span> }
               {{ (loading() ? 'auth.registering' : 'auth.create_account') | translate }}
             </button>

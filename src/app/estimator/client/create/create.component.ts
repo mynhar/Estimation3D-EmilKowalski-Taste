@@ -1,7 +1,14 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { LowerCasePipe, NgTemplateOutlet } from '@angular/common';
 import { Router } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { PROVINCIAS_CANADA, SERVICIOS_FALLBACK, Servicio } from '../../../models/servicio.model';
 import { AdminUserService, CrearUsuarioParams } from '../../../services/admin-user.service';
@@ -12,13 +19,18 @@ import { ToastService } from '../../../services/toast.service';
 import { RolUsuario } from '../../../types/supabase';
 import { especialidadesRequeridas } from '../../../shared/validators/especialidades.validator';
 import { CAMPOS_FALTANTES } from '../../../shared/ui/campos-faltantes/campos-faltantes.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
 
 @Component({
   selector: 'app-estimator-client-create',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, TranslatePipe, ...CAMPOS_FALTANTES],
+  imports: [
+    ReactiveFormsModule, TranslatePipe, LowerCasePipe, NgTemplateOutlet,
+    MatButtonModule, MatCheckboxModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSelectModule,
+    PageHeaderComponent, ...CAMPOS_FALTANTES,
+  ],
   templateUrl: './create.component.html',
-  styleUrl: './create.component.css',
+  styleUrls: ['../../../shared/ui/alta/alta.css', './create.component.css'],
 })
 export class EstimatorClientCreateComponent implements OnInit {
   private fb        = inject(FormBuilder);

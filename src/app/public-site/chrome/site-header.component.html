@@ -1,0 +1,96 @@
+<!-- Cabecera pública (Trait rouge): la de la landing, compartida por Le Journal y Entrepreneurs. -->
+<header class="hd" [class.is-scrolled]="scrolled()">
+  <div class="wrap hd__in">
+    <a routerLink="/" class="brand" (click)="inicio($event)"
+       [attr.aria-label]="'landing.nav.home_aria' | translate">
+      <span class="brand__mark" aria-hidden="true"></span>
+      <span class="brand__name">Estimation3D</span>
+    </a>
+
+    <nav class="hd__nav">
+      <ng-container [ngTemplateOutlet]="seccion" [ngTemplateOutletContext]="{ $implicit: 'processus', texto: 'landing.nav.process', clase: 'hd__link' }" />
+      <ng-container [ngTemplateOutlet]="seccion" [ngTemplateOutletContext]="{ $implicit: 'services', texto: 'landing.nav.specialties', clase: 'hd__link' }" />
+      <a class="hd__link" routerLink="/journal"
+         [attr.aria-current]="pagina() === 'journal' ? 'page' : null">{{ 'landing.nav.journal' | translate }}</a>
+      <a class="hd__link" routerLink="/entrepreneurs"
+         [attr.aria-current]="pagina() === 'entrepreneurs' ? 'page' : null">{{ 'landing.nav.contractors' | translate }}</a>
+    </nav>
+
+    <div class="hd__end">
+      <a class="hd__link hd__tel" href="tel:+15145108819" [attr.aria-label]="'landing.nav.phone_aria' | translate">
+        <mat-icon aria-hidden="true">call</mat-icon>
+        514&nbsp;510-8819
+      </a>
+      <app-lang-toggle class="hd__lang" />
+      <a class="hd__link hd__login" routerLink="/login">{{ 'landing.nav.login' | translate }}</a>
+      <ng-container [ngTemplateOutlet]="seccion"
+                    [ngTemplateOutletContext]="{ $implicit: 'dossier', texto: 'landing.nav.cta', clase: 'button hd__cta ' + (ctaTomate() ? 'button--cta' : 'button--outline') }" />
+
+      <!-- Móvil y tableta: idioma en menú (como la barra de la app) y navegación en hoja. -->
+      <button mat-button type="button" class="hd__langmenu" [matMenuTriggerFor]="langMenu"
+              [attr.title]="'lang.' + lang.current() | translate">
+        <mat-icon>language</mat-icon>
+        {{ lang.current().toUpperCase() }}
+      </button>
+      <mat-menu #langMenu="matMenu" xPosition="before">
+        @for (l of lang.langs; track l) {
+          <button mat-menu-item type="button" role="menuitemradio" (click)="lang.set(l)"
+                  [attr.aria-checked]="lang.current() === l">
+            <mat-icon [class.is-blank]="lang.current() !== l" aria-hidden="true">check</mat-icon>
+            <span>{{ 'lang.' + l | translate }}</span>
+          </button>
+        }
+      </mat-menu>
+
+      <button mat-icon-button #menuButton type="button" class="hd__menu" (click)="openMenu()"
+              aria-haspopup="dialog" [attr.aria-label]="'landing.nav.menu' | translate">
+        <mat-icon>menu</mat-icon>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ── Menú móvil ─────────────────────────────────────────────────────────── -->
+<dialog #menu class="mm" [attr.aria-label]="'landing.nav.menu' | translate"
+        (click)="onMenuClick($event)" (close)="onMenuClosed()">
+  <div class="mm__sheet">
+    <div class="mm__top">
+      <a routerLink="/" class="brand" (click)="inicio($event)" [attr.aria-label]="'landing.nav.home_aria' | translate">
+        <span class="brand__mark" aria-hidden="true"></span>
+        <span class="brand__name">Estimation3D</span>
+      </a>
+      <button mat-icon-button type="button" class="mm__close" autofocus (click)="closeMenu()"
+              [attr.aria-label]="'common.close' | translate">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <nav class="mm__nav">
+      <ng-container [ngTemplateOutlet]="seccion" [ngTemplateOutletContext]="{ $implicit: 'processus', texto: 'landing.nav.process', clase: '' }" />
+      <ng-container [ngTemplateOutlet]="seccion" [ngTemplateOutletContext]="{ $implicit: 'services', texto: 'landing.nav.specialties', clase: '' }" />
+      <a routerLink="/journal" (click)="closeMenu(false)"
+         [attr.aria-current]="pagina() === 'journal' ? 'page' : null">{{ 'landing.nav.journal' | translate }}</a>
+      <a routerLink="/entrepreneurs" (click)="closeMenu(false)"
+         [attr.aria-current]="pagina() === 'entrepreneurs' ? 'page' : null">{{ 'landing.nav.contractors' | translate }}</a>
+    </nav>
+
+    <div class="mm__foot">
+      <a class="mm__tel" href="tel:+15145108819" [attr.aria-label]="'landing.nav.phone_aria' | translate">
+        <mat-icon aria-hidden="true">call</mat-icon>
+        514&nbsp;510-8819
+      </a>
+      <a class="button button--lg button--outline" routerLink="/login" (click)="closeMenu(false)">{{ 'landing.nav.login' | translate }}</a>
+      <ng-container [ngTemplateOutlet]="seccion"
+                    [ngTemplateOutletContext]="{ $implicit: 'dossier', texto: 'landing.nav.cta', clase: 'button button--lg ' + (ctaTomate() ? 'button--cta' : 'button--outline') }" />
+    </div>
+  </div>
+</dialog>
+
+<!-- Enlace a una sección de la landing: ancla en ella, ruta con fragmento fuera. -->
+<ng-template #seccion let-id let-texto="texto" let-clase="clase">
+  @if (enInicio) {
+    <a [class]="clase" [href]="'#' + id" (click)="ir(id, $event)">{{ texto | translate }}</a>
+  } @else {
+    <a [class]="clase" routerLink="/" [fragment]="id" (click)="closeMenu(false)">{{ texto | translate }}</a>
+  }
+</ng-template>

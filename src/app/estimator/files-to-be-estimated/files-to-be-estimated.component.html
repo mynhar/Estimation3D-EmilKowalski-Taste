@@ -1,295 +1,218 @@
-<div class="ftbe-root">
+<div class="page-wrapper ls">
 
-  <!-- ── Header ──────────────────────────────────────────────────────────── -->
-  <header class="ftbe-header">
-    <div class="ftbe-header__content">
-      <p class="ftbe-header__eyebrow">
-        <i class="bi bi-inbox"></i>
-        {{ 'role.estimateur' | translate }}
-      </p>
-      <h1 class="ftbe-header__title">{{ 'files_to_estimate.title' | translate }}</h1>
-      <p class="ftbe-header__sub">{{ 'files_to_estimate.subtitle' | translate }}</p>
-    </div>
-    @if (!cargando() && expedientes().length > 0) {
-      <div class="ftbe-kpis">
-        <div class="ftbe-kpi">
-          <span class="ftbe-kpi__val">{{ expedientes().length }}</span>
-          <span class="ftbe-kpi__label">{{ 'files_to_estimate.count_available' | translate }}</span>
-        </div>
-        @if (urgentesCount() > 0) {
-          <div class="ftbe-kpi ftbe-kpi--urgente">
-            <span class="ftbe-kpi__val">{{ urgentesCount() }}</span>
-            <span class="ftbe-kpi__label">{{ 'files_to_estimate.count_urgent' | translate }}</span>
-          </div>
-        }
-      </div>
-    }
-  </header>
+  <app-page-header [titulo]="'files_to_estimate.title' | translate"
+                   [contexto]="'files_to_estimate.subtitle' | translate" />
 
-  <!-- ── Cargando ─────────────────────────────────────────────────────────── -->
+  <!-- ── Cargando ────────────────────────────────────────────────────────── -->
   @if (cargando()) {
-    <div class="ftbe-loading">
-      <span class="ftbe-spinner" role="status" aria-hidden="true"></span>
-      {{ 'common.loading' | translate }}
+    <div class="ls-grid" role="status">
+      <span class="cdk-visually-hidden">{{ 'common.loading' | translate }}</span>
+      @for (_ of [1, 2, 3]; track $index) {
+        <span class="skel" aria-hidden="true"></span>
+      }
     </div>
 
-  <!-- ── Sin expedientes ──────────────────────────────────────────────────── -->
+  <!-- ── Sin dossiers ────────────────────────────────────────────────────── -->
   } @else if (expedientes().length === 0) {
-    <div class="ftbe-empty">
-      <div class="ftbe-empty__icon"><i class="bi bi-inbox"></i></div>
-      <p class="ftbe-empty__title">{{ 'files_to_estimate.empty_title' | translate }}</p>
-      <p class="ftbe-empty__text">{{ 'files_to_estimate.empty_text' | translate }}</p>
-    </div>
+    <app-empty-state class="ls-empty"
+                     matIcon="inbox"
+                     [titulo]="'files_to_estimate.empty_title' | translate"
+                     [texto]="'files_to_estimate.empty_text' | translate" />
 
-  <!-- ── Con expedientes ──────────────────────────────────────────────────── -->
   } @else {
 
-    <!-- Toolbar -->
-    <div class="ftbe-toolbar">
-      <div class="ftbe-search">
-        <i class="bi bi-search ftbe-search__icon"></i>
-        <input type="text" class="ftbe-search__input"
+    <!-- ── Búsqueda, urgencia (con recuento) y vista ─────────────────────── -->
+    <div class="ls-tools">
+      <mat-form-field class="ls-search" appearance="outline" subscriptSizing="dynamic">
+        <mat-label>{{ 'common.search' | translate }}</mat-label>
+        <mat-icon matPrefix aria-hidden="true">search</mat-icon>
+        <input matInput type="search" autocomplete="off"
                [placeholder]="'files_to_estimate.search_placeholder' | translate"
-               [ngModel]="busqueda()"
-               (ngModelChange)="busqueda.set($event)" />
+               [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)" />
+      </mat-form-field>
+
+      <div class="ls-filter">
+        <span class="ls-filter__label" id="ftbe-urg-label">{{ 'files_to_estimate.col_visit' | translate }}</span>
+        <mat-button-toggle-group class="ls-toggle" hideSingleSelectionIndicator
+                                 aria-labelledby="ftbe-urg-label"
+                                 [value]="soloUrgentes()" (change)="soloUrgentes.set($event.value)">
+          <mat-button-toggle [value]="false">
+            {{ 'common.all' | translate }} <span class="ls-count">{{ expedientes().length }}</span>
+          </mat-button-toggle>
+          <mat-button-toggle [value]="true">
+            {{ 'files_to_estimate.urgent_only' | translate }} <span class="ls-count">{{ urgentesCount() }}</span>
+          </mat-button-toggle>
+        </mat-button-toggle-group>
       </div>
 
-      <button class="ftbe-chip"
-              [class.ftbe-chip--active]="soloUrgentes()"
-              (click)="soloUrgentes.set(!soloUrgentes())">
-        <i class="bi bi-clock"></i>
-        {{ 'files_to_estimate.urgent_only' | translate }}
-        @if (urgentesCount() > 0) {
-          <span class="ftbe-chip__badge">{{ urgentesCount() }}</span>
-        }
-      </button>
-
-      @if (busqueda() !== '' || soloUrgentes()) {
-        <button class="ftbe-clear" (click)="limpiarFiltros()">
-          <i class="bi bi-x-circle"></i>
-          {{ 'common.clear' | translate }}
-        </button>
-      }
-
-      <div class="ftbe-view-toggle d-none d-md-inline-flex ms-auto" role="group"
-           [attr.aria-label]="'files_to_estimate.view_cards' | translate">
-        <button type="button" class="ftbe-view-toggle__btn"
-                [class.ftbe-view-toggle__btn--active]="vista() === 'tabla'"
-                [attr.aria-pressed]="vista() === 'tabla'"
-                (click)="setVista('tabla')"
-                [title]="'files_to_estimate.view_table' | translate">
-          <i class="bi bi-table" aria-hidden="true"></i>
-        </button>
-        <button type="button" class="ftbe-view-toggle__btn"
-                [class.ftbe-view-toggle__btn--active]="vista() === 'tarjetas'"
-                [attr.aria-pressed]="vista() === 'tarjetas'"
-                (click)="setVista('tarjetas')"
-                [title]="'files_to_estimate.view_cards' | translate">
-          <i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>
-        </button>
-      </div>
+      <mat-button-toggle-group class="ls-toggle ls-view" hideSingleSelectionIndicator
+                               [value]="vista()" (change)="setVista($event.value)">
+        <mat-button-toggle value="tarjetas" [aria-label]="'files_to_estimate.view_cards' | translate"
+                           [matTooltip]="'files_to_estimate.view_cards' | translate">
+          <mat-icon>grid_view</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="tabla" [aria-label]="'files_to_estimate.view_table' | translate"
+                           [matTooltip]="'files_to_estimate.view_table' | translate">
+          <mat-icon>table_rows</mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
     </div>
 
-    <!-- Results bar -->
-    @if (busqueda() !== '' || soloUrgentes()) {
-      <p class="ftbe-results-bar">
-        {{ 'common.showing' | translate }}
-        <strong>{{ expedientesFiltrados().length }}</strong>
-        {{ 'common.of' | translate }} {{ expedientes().length }}
-        {{ 'files_to_estimate.files_count' | translate }}
-      </p>
-    }
-
-    <!-- Sin resultados con filtro -->
-    @if (expedientesFiltrados().length === 0) {
-      <div class="ftbe-empty-inline">
-        <i class="bi bi-search"></i>
-        <p class="ftbe-empty-inline__title">{{ 'common.no_results' | translate }}</p>
-        <p class="ftbe-empty-inline__text">{{ 'files_to_estimate.no_filter_text' | translate }}</p>
-        <button class="ftbe-btn-outline" (click)="limpiarFiltros()">
-          <i class="bi bi-x-circle"></i>
-          {{ 'common.clear_filters' | translate }}
+    @if (hayFiltros()) {
+      <div class="ls-status">
+        <p class="ls-showing" role="status">
+          {{ 'common.showing' | translate }} {{ expedientesFiltrados().length }}
+          {{ 'common.of' | translate }} {{ expedientes().length }} {{ 'files_to_estimate.files_count' | translate }}
+        </p>
+        <button mat-button type="button" class="ls-clear" (click)="limpiarFiltros()">
+          <mat-icon>close</mat-icon>
+          {{ 'common.clear' | translate }}
         </button>
       </div>
-
-    <!-- Tabla / tarjetas -->
-    } @else {
-
-      <!-- ── Vista tabla (escritorio) ───────────────────────────────────────── -->
-      <div class="ftbe-table-card d-none" [class.d-md-block]="vista() === 'tabla'">
-        <table class="ftbe-table">
-          <thead>
-            <tr>
-              <th class="ftbe-table__col-photo" aria-hidden="true"></th>
-              <th class="ftbe-table__col-num">{{ 'files_to_estimate.col_number' | translate }}</th>
-              <th>{{ 'files_to_estimate.col_service' | translate }}</th>
-              <th>{{ 'files_to_estimate.col_client' | translate }}</th>
-              <th>{{ 'files_to_estimate.col_location' | translate }}</th>
-              <th class="ftbe-table__col-date">{{ 'files_to_estimate.col_visit' | translate }}</th>
-              <th class="ftbe-table__col-action"></th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (exp of expedientesFiltrados(); track exp.id) {
-              <tr class="ftbe-table__row ftbe-table__row--clickable" (click)="estimar(exp.id)">
-                <td class="ftbe-table__col-photo">
-                  <div class="ftbe-thumb">
-                    @if (fotoExpediente(exp); as foto) {
-                      <img [src]="foto" loading="lazy" [alt]="exp.numero"
-                           (error)="onFotoError(exp.id)" />
-                    } @else {
-                      <i class="bi bi-badge-3d" aria-hidden="true"
-                         [title]="'files_to_estimate.photo_none' | translate"></i>
-                    }
-                  </div>
-                </td>
-
-                <td class="ftbe-table__col-num">
-                  <span class="ftbe-card__num">{{ exp.numero }}</span>
-                </td>
-
-                <td><span class="ftbe-table__service">{{ servicioNombre(exp) }}</span></td>
-
-                <td>{{ exp.cliente_nombre }}</td>
-
-                <td class="ftbe-table__addr" [title]="direccionCompleta(exp)">
-                  @if (direccionLinea1(exp)) {
-                    <span class="ftbe-table__addr-line">{{ direccionLinea1(exp) }}</span>
-                  }
-                  @if (direccionLinea2(exp)) {
-                    <span class="ftbe-table__addr-line ftbe-table__muted">{{ direccionLinea2(exp) }}</span>
-                  }
-                </td>
-
-                <td class="ftbe-table__col-date">
-                  <span class="ftbe-table__fecha"
-                        [class.ftbe-table__fecha--vencida]="urgencia(exp.fecha_visita) === 'vencida'"
-                        [class.ftbe-table__fecha--hoy]="urgencia(exp.fecha_visita) === 'hoy'">
-                    {{ formatFecha(exp.fecha_visita) }}
-                  </span>
-                  @if (urgencia(exp.fecha_visita) === 'vencida') {
-                    <span class="ftbe-badge ftbe-badge--danger">
-                      <i class="bi bi-exclamation-triangle"></i>
-                      {{ 'common.urgency_expired' | translate }}
-                    </span>
-                  } @else if (urgencia(exp.fecha_visita) === 'hoy') {
-                    <span class="ftbe-badge ftbe-badge--warning">
-                      <i class="bi bi-clock"></i>
-                      {{ 'common.urgency_today' | translate }}
-                    </span>
-                  } @else if (urgencia(exp.fecha_visita) === 'proxima') {
-                    <span class="ftbe-badge ftbe-badge--info">
-                      <i class="bi bi-calendar-event"></i>
-                      {{ 'common.urgency_upcoming' | translate }}
-                    </span>
-                  }
-                </td>
-
-                <td class="ftbe-table__col-action" (click)="$event.stopPropagation()">
-                  <button class="ftbe-btn-cta ftbe-btn-cta--row" (click)="estimar(exp.id)">
-                    <i class="bi bi-pencil-square"></i>
-                    {{ 'files_to_estimate.take_estimate' | translate }}
-                  </button>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-
-      <!-- ── Vista tarjetas (móvil siempre · escritorio por defecto) ────────── -->
-      <div class="ftbe-grid" [class.d-md-none]="vista() === 'tabla'">
-        @for (exp of expedientesFiltrados(); track exp.id; let idx = $index) {
-          <article class="ftbe-card" role="button" tabindex="0"
-                   (click)="estimar(exp.id)"
-                   (keydown.enter)="estimar(exp.id)"
-                   (keydown.space)="$event.preventDefault(); estimar(exp.id)"
-                   [class.ftbe-card--vencida]="urgencia(exp.fecha_visita) === 'vencida'"
-                   [class.ftbe-card--hoy]="urgencia(exp.fecha_visita) === 'hoy'"
-                   [class.ftbe-card--proxima]="urgencia(exp.fecha_visita) === 'proxima'"
-                   [class.ftbe-card--reciente]="idx === 0 && busqueda() === '' && !soloUrgentes()">
-
-            <!-- Foto del expediente (miniatura del tour 3D) -->
-            <div class="ftbe-card__photo">
-              @if (fotoExpediente(exp); as foto) {
-                <img class="ftbe-card__photo-img" [src]="foto" loading="lazy"
-                     [alt]="exp.numero" (error)="onFotoError(exp.id)" />
-              } @else {
-                <div class="ftbe-card__photo-empty"
-                     [title]="'files_to_estimate.photo_none' | translate">
-                  <i class="bi bi-badge-3d" aria-hidden="true"></i>
-                </div>
-              }
-            </div>
-
-            <div class="ftbe-card__head">
-              <span class="ftbe-card__num">{{ exp.numero }}</span>
-              <div class="ftbe-card__badges">
-                @if (urgencia(exp.fecha_visita) === 'vencida') {
-                  <span class="ftbe-badge ftbe-badge--danger">
-                    <i class="bi bi-exclamation-triangle"></i>
-                    {{ 'common.urgency_expired' | translate }}
-                  </span>
-                } @else if (urgencia(exp.fecha_visita) === 'hoy') {
-                  <span class="ftbe-badge ftbe-badge--warning">
-                    <i class="bi bi-clock"></i>
-                    {{ 'common.urgency_today' | translate }}
-                  </span>
-                } @else if (urgencia(exp.fecha_visita) === 'proxima') {
-                  <span class="ftbe-badge ftbe-badge--info">
-                    <i class="bi bi-calendar-event"></i>
-                    {{ 'common.urgency_upcoming' | translate }}
-                  </span>
-                }
-                @if (idx === 0 && busqueda() === '' && !soloUrgentes()) {
-                  <span class="ftbe-badge ftbe-badge--reciente">
-                    {{ 'common.recent' | translate }}
-                  </span>
-                }
-              </div>
-            </div>
-
-            <h2 class="ftbe-card__service">{{ servicioNombre(exp) }}</h2>
-
-            <div class="ftbe-card__meta">
-              <span class="ftbe-meta-item">
-                <i class="bi bi-person"></i>{{ exp.cliente_nombre }}
-              </span>
-              @if (direccionLinea1(exp) || direccionLinea2(exp)) {
-                <span class="ftbe-meta-item ftbe-addr" [title]="direccionCompleta(exp)">
-                  <i class="bi bi-geo-alt"></i>
-                  <span class="ftbe-addr__text">
-                    @if (direccionLinea1(exp)) {
-                      <span class="ftbe-addr__line">{{ direccionLinea1(exp) }}</span>
-                    }
-                    @if (direccionLinea2(exp)) {
-                      <span class="ftbe-addr__line ftbe-addr__line--muted">{{ direccionLinea2(exp) }}</span>
-                    }
-                  </span>
-                </span>
-              }
-            </div>
-
-            <div class="ftbe-card__fecha"
-                 [class.ftbe-card__fecha--vencida]="urgencia(exp.fecha_visita) === 'vencida'"
-                 [class.ftbe-card__fecha--hoy]="urgencia(exp.fecha_visita) === 'hoy'">
-              <i class="bi bi-calendar3"></i>
-              {{ 'files_to_estimate.visit_label' | translate }}
-              <strong>{{ formatFecha(exp.fecha_visita) }}</strong>
-            </div>
-
-            <button class="ftbe-btn-cta" (click)="$event.stopPropagation(); estimar(exp.id)"
-                    (keydown.enter)="$event.stopPropagation()"
-                    (keydown.space)="$event.stopPropagation()">
-              <i class="bi bi-pencil-square"></i>
-              {{ 'files_to_estimate.take_estimate' | translate }}
-            </button>
-
-          </article>
-        }
-      </div>
     }
 
-  }
+    @if (expedientesFiltrados().length === 0) {
+      <app-empty-state class="ls-empty"
+                       matIcon="filter_alt_off"
+                       [titulo]="'common.no_results' | translate"
+                       [texto]="'files_to_estimate.no_filter_text' | translate">
+        <button actions mat-stroked-button type="button" (click)="limpiarFiltros()">
+          {{ 'common.clear_filters' | translate }}
+        </button>
+      </app-empty-state>
 
+    } @else {
+
+      <!-- ── Tabla (escritorio, si se elige) ─────────────────────────────── -->
+      <!-- Tomar un dossier lo asigna al estimador: solo lo hace el botón, nunca la fila. -->
+      @if (vista() === 'tabla') {
+        <div class="ls-table-wrap">
+          <table class="ls-table">
+            <thead>
+              <tr>
+                <th scope="col">{{ 'files_to_estimate.col_service' | translate }}</th>
+                <th scope="col">{{ 'files_to_estimate.col_client' | translate }}</th>
+                <th scope="col">{{ 'files_to_estimate.col_location' | translate }}</th>
+                <th scope="col">{{ 'files_to_estimate.col_visit' | translate }}</th>
+                <th scope="col"><span class="cdk-visually-hidden">{{ 'files_to_estimate.take_estimate' | translate }}</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (exp of expedientesFiltrados(); track exp.id) {
+                <tr class="ls-table__row">
+                  <td>
+                    <div class="ls-table__main">
+                      <span class="ls-thumb">
+                        @if (fotoExpediente(exp); as foto) {
+                          <img [src]="foto" loading="lazy" alt="" (error)="onFotoError(exp.id)" />
+                        } @else {
+                          <mat-icon aria-hidden="true">view_in_ar</mat-icon>
+                        }
+                      </span>
+                      <span class="ls-table__text">
+                        <span class="ls-table__title" [id]="'ftbe-t-' + exp.id">{{ servicioNombre(exp) }}</span>
+                        <span class="ls-table__sub ls-fig">{{ exp.numero }}</span>
+                      </span>
+                    </div>
+                  </td>
+                  <td>{{ exp.cliente_nombre }}</td>
+                  <td class="is-addr" [title]="direccionCompleta(exp)">
+                    <span class="ls-table__text">
+                      @if (direccionLinea1(exp)) { <span>{{ direccionLinea1(exp) }}</span> }
+                      @if (direccionLinea2(exp)) { <span class="ls-table__sub">{{ direccionLinea2(exp) }}</span> }
+                    </span>
+                  </td>
+                  <td>
+                    <span class="ls-table__text">
+                      <span class="ls-fig ls-nowrap">{{ formatFecha(exp.fecha_visita) }}</span>
+                      <ng-container [ngTemplateOutlet]="urgenciaTag" [ngTemplateOutletContext]="{ $implicit: exp }" />
+                    </span>
+                  </td>
+                  <td class="ls-table__action">
+                    <button mat-flat-button type="button" [class.ds-cta]="ctaId() === exp.id"
+                            [attr.aria-describedby]="'ftbe-t-' + exp.id" (click)="estimar(exp.id)">
+                      {{ 'files_to_estimate.take_estimate' | translate }}
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <!-- ── Tarjetas (en móvil siempre; en escritorio, salvo vista tabla) ── -->
+      <ul class="ls-grid" [class.is-mobile-only]="vista() === 'tabla'">
+        @for (exp of expedientesFiltrados(); track exp.id; let idx = $index) {
+          <li class="ls-card">
+            <span class="ls-card__photo">
+              @if (fotoExpediente(exp); as foto) {
+                <img [src]="foto" loading="lazy" alt="" (error)="onFotoError(exp.id)" />
+              } @else {
+                <mat-icon aria-hidden="true">view_in_ar</mat-icon>
+                <span class="ls-card__nophoto">{{ 'files_to_estimate.photo_none' | translate }}</span>
+              }
+            </span>
+
+            <div class="ls-card__body">
+              @if (urgencia(exp.fecha_visita) || (idx === 0 && !hayFiltros())) {
+                <span class="ls-tags">
+                  <ng-container [ngTemplateOutlet]="urgenciaTag" [ngTemplateOutletContext]="{ $implicit: exp }" />
+                  @if (idx === 0 && !hayFiltros()) {
+                    <span class="ls-tag">{{ 'common.recent' | translate }}</span>
+                  }
+                </span>
+              }
+
+              <h2 class="ls-card__title" [id]="'ftbe-c-' + exp.id">{{ servicioNombre(exp) }}</h2>
+              <p class="ls-card__num">{{ exp.numero }}</p>
+
+              <p class="ls-card__line">
+                <mat-icon aria-hidden="true">person</mat-icon>
+                <span>{{ exp.cliente_nombre }}</span>
+              </p>
+              @if (direccionLinea1(exp) || direccionLinea2(exp)) {
+                <p class="ls-card__line" [title]="direccionCompleta(exp)">
+                  <mat-icon aria-hidden="true">location_on</mat-icon>
+                  <span>
+                    @if (direccionLinea1(exp)) { {{ direccionLinea1(exp) }} }
+                    @if (direccionLinea2(exp)) { <span class="ls-card__sub">{{ direccionLinea2(exp) }}</span> }
+                  </span>
+                </p>
+              }
+
+              <div class="ls-card__foot">
+                <span [class.is-late]="urgencia(exp.fecha_visita) === 'vencida'">
+                  <mat-icon aria-hidden="true">calendar_month</mat-icon>
+                  {{ 'files_to_estimate.visit_label' | translate }}
+                  <strong class="ls-fig">{{ formatFecha(exp.fecha_visita) }}</strong>
+                </span>
+              </div>
+
+              <button mat-flat-button type="button" class="ls-card__cta" [class.ds-cta]="ctaId() === exp.id"
+                      [attr.aria-describedby]="'ftbe-c-' + exp.id" (click)="estimar(exp.id)">
+                <mat-icon>edit_note</mat-icon>
+                {{ 'files_to_estimate.take_estimate' | translate }}
+              </button>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  }
 </div>
+
+<!-- Urgencia de la visita: icono y texto, nunca solo color. -->
+<ng-template #urgenciaTag let-exp>
+  @switch (urgencia(exp.fecha_visita)) {
+    @case ('vencida') {
+      <span class="ls-tag is-late"><mat-icon aria-hidden="true">error</mat-icon>{{ 'common.urgency_expired' | translate }}</span>
+    }
+    @case ('hoy') {
+      <span class="ls-tag is-warn"><mat-icon aria-hidden="true">schedule</mat-icon>{{ 'common.urgency_today' | translate }}</span>
+    }
+    @case ('proxima') {
+      <span class="ls-tag is-info"><mat-icon aria-hidden="true">event</mat-icon>{{ 'common.urgency_upcoming' | translate }}</span>
+    }
+  }
+</ng-template>

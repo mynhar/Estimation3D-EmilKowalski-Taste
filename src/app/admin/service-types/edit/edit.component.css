@@ -1,532 +1,173 @@
-/* ── Encabezado ──────────────────────────────────────────────────────────── */
-.stype-header {
+/* component: editar tipo de servicio (administración, Trait rouge)
+ * Base en shared/ui/alta/alta.css (identidad, tarjetas, campos, pie) y admin/_shared/catalogo-form.css
+ * (código, textos en columna, interruptor); aquí lo propio: las dos listas editables (fases y
+ * actividades), que se guardan una a una con su formulario en línea sobre banda kraft.
+ *
+ * states: cargando · error (volver) · formulario: default · inválido (mat-error) · guardando
+ *         fases / actividades: cargando · error (reintentar) · vacío · lista · inactiva (atenuada) ·
+ *         en edición (borde abeto) · formulario abierto · confirmar baja (ladrillo) · borrando
+ * contrast: nombres ink 13.6:1 · códigos y ayudas ink-muted 6.8:1 · baja danger-ink sobre vélin
+ * type: orden y códigos al 75 % con tabular-nums
+ * Sin tomate: configuración del catálogo, no una etapa del dossier.
+ */
+:host { display: block; }
+
+/* ── Fases y actividades ─────────────────────────────────────────────────── */
+.ase-sub-head {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
-  gap: var(--ds-space-3);
+  gap: var(--ds-space-3) var(--ds-space-4);
 }
-
-.stype-title {
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-2xl);
-  font-weight: var(--ds-weight-regular);
-  color: var(--ds-ink);
-  letter-spacing: var(--ds-tracking-tight);
-  line-height: var(--ds-leading-tight);
-  margin: var(--ds-space-1) 0 0;
-}
-
-.btn-back {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px; height: 36px;
-  border-radius: var(--ds-radius-md);
-  border: 1px solid var(--ds-border);
-  background: var(--ds-surface);
-  color: var(--ds-ink-muted);
-  flex-shrink: 0;
-  margin-top: 2px;
-  transition: var(--ds-transition-color),
-              box-shadow var(--ds-duration-fast) var(--ds-ease-out);
-}
-.btn-back:hover {
-  color: var(--ds-ink);
-  border-color: var(--ds-border-strong);
-  box-shadow: var(--ds-shadow-xs);
-}
-
-/* ════════════════════════════════════════════════════════════════════════════
-   SKELETON — shimmer
-════════════════════════════════════════════════════════════════════════════ */
-@keyframes shimmer {
-  from { background-position: 200% 0; }
-  to   { background-position: -200% 0; }
-}
-
-.skel {
-  background: linear-gradient(
-    90deg,
-    var(--ds-border) 25%,
-    var(--ds-border-subtle) 50%,
-    var(--ds-border) 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-  border-radius: var(--ds-radius-sm);
-  display: block;
-}
-
-.skel--icon         { width: 44px; height: 44px; border-radius: var(--ds-radius-md); flex-shrink: 0; }
-.skel--badge        { width: 72px; height: 22px; border-radius: var(--ds-radius-pill); }
-.skel--line         { height: 12px; }
-.skel--md           { width: 55%; }
-.skel--sm           { width: 35%; }
-.skel--section-hdr  { height: 10px; width: 28%; }
-.skel--field        { height: 42px; border-radius: var(--ds-radius-md); }
-
-.skel-panel {
-  background: var(--ds-surface);
-  border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-xl);
-  overflow: hidden;
-}
-.skel-panel--identity::before {
-  content: '';
-  display: block;
-  height: 3px;
-  background: var(--ds-border);
-}
-.skel-panel__body { padding: var(--ds-space-4) var(--ds-space-5); }
-
-/* ════════════════════════════════════════════════════════════════════════════
-   ERROR DE CARGA
-════════════════════════════════════════════════════════════════════════════ */
-.page-error {
-  background: var(--ds-surface);
-  border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-xl);
-  padding: var(--ds-space-5);
-  text-align: center;
-  box-shadow: var(--ds-shadow-xs);
-}
-.page-error__icon {
-  width: 52px; height: 52px;
-  border-radius: var(--ds-radius-circle);
-  background: var(--ds-danger-soft);
-  color: var(--ds-danger);
-  font-size: var(--ds-text-xl);
+.ase-sub-head .fc-card__titles { flex: 1 1 18rem; }
+.ase-sub-head .fc-h2 {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
-  margin: 0 auto var(--ds-space-3);
-}
-.page-error__msg {
-  font-size: var(--ds-text-sm);
-  color: var(--ds-ink-secondary);
-  margin-bottom: var(--ds-space-4);
-}
-
-/* ════════════════════════════════════════════════════════════════════════════
-   FICHA IDENTIFICATIVA
-════════════════════════════════════════════════════════════════════════════ */
-.identity-card {
-  background: var(--ds-surface);
-  border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-xl);
-  overflow: hidden;
-  box-shadow: var(--ds-shadow-xs);
-}
-.identity-card::before {
-  content: '';
-  display: block;
-  height: 3px;
-  background: var(--ds-gold);
-}
-.identity-card__body {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-3);
-  padding: var(--ds-space-3) var(--ds-space-4);
-}
-
-.identity-icon {
-  width: 44px; height: 44px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--ds-gold-faint);
-  color: var(--ds-gold-ink);
-  font-size: var(--ds-text-xl);
-  border-radius: var(--ds-radius-md);
-  border: 1px solid color-mix(in srgb, var(--ds-gold) 30%, transparent);
-}
-
-.identity-nombre {
-  font-weight: var(--ds-weight-semibold);
-  color: var(--ds-ink);
-  font-size: var(--ds-text-sm);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.identity-codigo {
-  font-size: var(--ds-text-xs);
-  color: var(--ds-ink-muted);
-  letter-spacing: 0.03em;
-}
-
-/* Estado activo/inactivo */
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-space-1);
-  font-size: var(--ds-text-xs);
-  font-weight: var(--ds-weight-semibold);
-  padding: 0.2em 0.65em;
-  border-radius: var(--ds-radius-pill);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-.status-badge--active   { background: var(--ds-success-soft); color: var(--ds-success-ink); }
-.status-badge--inactive { background: var(--ds-bg-alt); color: var(--ds-ink-secondary); border: 1px solid var(--ds-border); }
-
-/* ════════════════════════════════════════════════════════════════════════════
-   TARJETA DE FORMULARIO
-════════════════════════════════════════════════════════════════════════════ */
-.stype-card {
-  background: var(--ds-surface);
-  border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-xl);
-  overflow: hidden;
-  box-shadow: var(--ds-shadow-xs);
-}
-.stype-card::before {
-  content: '';
-  display: block;
-  height: 3px;
-  background: var(--ds-gold);
-}
-
-.stype-card__body { padding: var(--ds-space-5); }
-
-.stype-card__footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
   gap: var(--ds-space-2);
-  padding: var(--ds-space-4) var(--ds-space-5);
-  border-top: 1px solid var(--ds-border);
-  background: var(--ds-bg-alt);
 }
+.ase-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 var(--ds-space-2);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-band);
+  color: var(--ds-ink-secondary);
+  font-family: var(--ds-font-body);
+  font-size: var(--ds-text-sm);
+  font-weight: var(--ds-weight-semibold);
+  font-stretch: var(--ds-stretch-figure);
+  font-variant-numeric: tabular-nums;
+}
+.ase-add { min-height: 44px; }
 
-/* ── Secciones del formulario ────────────────────────────────────────────── */
-.form-section__header {
+.ase-skel { display: grid; gap: var(--ds-space-2); }
+.ase-skel__row {
+  height: 3.5rem;
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-band);
+  animation: ase-skel 1.2s var(--ds-ease-in-out) infinite alternate;
+}
+@keyframes ase-skel { to { opacity: 0.45; } }
+
+.ase-error { display: grid; justify-items: start; gap: var(--ds-space-3); }
+
+.ase-empty {
   display: flex;
   align-items: center;
   gap: var(--ds-space-2);
-  font-size: var(--ds-text-2xs);
-  font-weight: var(--ds-weight-bold);
-  text-transform: uppercase;
-  letter-spacing: var(--ds-tracking-widest);
-  color: var(--ds-ink-muted);
-  margin-bottom: var(--ds-space-4);
-}
-
-.section-divider {
-  height: 1px;
-  background: var(--ds-border);
-  margin: var(--ds-space-5) 0;
-}
-
-/* ── Lang badges ─────────────────────────────────────────────────────────── */
-.lang-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--ds-font-mono);
-  font-size: 0.65rem;
-  font-weight: var(--ds-weight-bold);
-  padding: 0.1em 0.45em;
-  border-radius: var(--ds-radius-sm);
-  letter-spacing: var(--ds-tracking-wide);
-  vertical-align: middle;
-}
-.lang-badge--fr { background: var(--ds-info-soft);    color: var(--ds-info-ink);        border: 1px solid rgba(74,107,122,.2); }
-.lang-badge--en { background: var(--ds-gold-faint);   color: var(--ds-gold-ink); border: 1px solid color-mix(in srgb, var(--ds-gold) 30%, transparent); }
-.lang-badge--es { background: var(--ds-success-soft); color: var(--ds-success-ink);     border: 1px solid rgba(91,122,79,.2); }
-
-/* ── Textarea ─────────────────────────────────────────────────────────────── */
-.form-textarea { resize: vertical; }
-
-/* ── Input readonly (código) ─────────────────────────────────────────────── */
-.code-readonly {
-  background: var(--ds-bg-alt);
-  color: var(--ds-ink-muted);
-  cursor: default;
-}
-
-/* ── Hints y marcas ──────────────────────────────────────────────────────── */
-.form-hint {
-  font-size: var(--ds-text-xs);
-  color: var(--ds-ink-muted);
-  margin-top: var(--ds-space-1);
-  margin-bottom: 0;
-}
-.req-mark { color: var(--ds-danger); margin-left: 2px; }
-
-/* ── Validación ──────────────────────────────────────────────────────────── */
-.field-error {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-1);
-  font-size: var(--ds-text-xs);
-  color: var(--ds-danger);
-  margin-top: var(--ds-space-1);
-  margin-bottom: 0;
-}
-
-/* ── Form switch ─────────────────────────────────────────────────────────── */
-.form-check-input:checked {
-  background-color: var(--ds-success);
-  border-color: var(--ds-success);
-}
-.form-check-label {
-  font-weight: var(--ds-weight-semibold);
-  color: var(--ds-ink);
-}
-.form-check-label small { color: var(--ds-ink-muted); }
-
-/* ════════════════════════════════════════════════════════════════════════════
-   FASES DEL SERVICIO
-════════════════════════════════════════════════════════════════════════════ */
-.fases-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--ds-space-3);
-  margin-bottom: var(--ds-space-2);
-}
-
-.fases-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 1.5em;
-  padding: 0 0.4em;
-  margin-left: var(--ds-space-1);
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-2xs);
-  font-weight: var(--ds-weight-bold);
-  color: var(--ds-ink-secondary);
-  background: var(--ds-bg-alt);
-  border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-pill);
-}
-
-/* ── Formulario de alta/edición ──────────────────────────────────────────── */
-.fase-form {
-  background: var(--ds-bg-alt);
-  border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-lg);
+  margin: 0;
   padding: var(--ds-space-4);
+  border: 1px dashed var(--ds-border-strong);
+  border-radius: var(--ds-radius-md);
+  color: var(--ds-ink-muted);
 }
+.ase-empty mat-icon { flex-shrink: 0; }
 
-.fase-form__title {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-semibold);
-  color: var(--ds-ink);
-  margin-bottom: var(--ds-space-3);
+/* Formulario en línea: banda kraft para separarlo de la lista. */
+.ase-subform {
+  display: grid;
+  gap: var(--ds-space-3);
+  min-width: 0;
+  padding: var(--ds-space-4);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-bg-alt);
 }
-.fase-form__title .bi { color: var(--ds-gold-ink); }
-
-.fase-form__actions {
+.ase-subform .fc-h3 { margin: 0; }
+.ase-code-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(6rem, 9rem);
+  gap: var(--ds-space-1) var(--ds-space-4);
+}
+.ase-code-row mat-form-field { width: 100%; }
+.ase-subform__actions {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: var(--ds-space-2);
-  margin-top: var(--ds-space-4);
-  padding-top: var(--ds-space-3);
-  border-top: 1px solid var(--ds-border);
 }
+.ase-subform__actions button { min-height: 44px; }
 
-/* ── Lista de fases ──────────────────────────────────────────────────────── */
-.fase-list {
-  list-style: none;
+.ase-list {
+  display: grid;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-2);
+  border-top: 1px solid var(--ds-border-subtle);
+  list-style: none;
 }
-
-.fase-item {
+.ase-item {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--ds-space-3);
-  padding: var(--ds-space-2) var(--ds-space-3);
-  background: var(--ds-surface);
-  border: 1px solid var(--ds-border);
+  gap: var(--ds-space-2) var(--ds-space-3);
+  padding: var(--ds-space-3) var(--ds-space-2);
+  border-bottom: 1px solid var(--ds-border-subtle);
+}
+.ase-item.is-off .ase-item__name { color: var(--ds-ink-muted); }
+.ase-item.is-editing {
   border-radius: var(--ds-radius-md);
-  transition: border-color var(--ds-duration-fast) var(--ds-ease-out),
-              box-shadow var(--ds-duration-fast) var(--ds-ease-out);
+  box-shadow: inset 0 0 0 2px var(--ds-action);
 }
-.fase-item:hover {
-  border-color: var(--ds-border-strong);
-  box-shadow: var(--ds-shadow-xs);
-}
-.fase-item--inactive { opacity: 0.6; }
-.fase-item--editing {
-  border-color: var(--ds-gold);
-  box-shadow: 0 0 0 1px var(--ds-gold);
-}
-.fase-item--skel:hover { border-color: var(--ds-border); box-shadow: none; }
-
-/* Número de orden */
-.fase-orden {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px; height: 30px;
+.ase-item__lead {
+  display: inline-grid;
   flex-shrink: 0;
-  font-family: var(--ds-font-mono);
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-bold);
-  color: var(--ds-gold-ink);
-  background: var(--ds-gold-faint);
-  border: 1px solid color-mix(in srgb, var(--ds-gold) 30%, transparent);
+  place-items: center;
+  width: 36px;
+  height: 36px;
   border-radius: var(--ds-radius-circle);
+  background: var(--ds-action-faint);
+  color: var(--ds-action-ink);
+  font-weight: var(--ds-weight-bold);
 }
-
-.fase-main { flex: 1 1 auto; }
-.fase-nombre {
-  font-size: var(--ds-text-sm);
+.ase-item__lead mat-icon { width: 20px; height: 20px; font-size: 20px; }
+.ase-item__main { display: grid; flex: 1 1 12rem; gap: 2px; min-width: 0; }
+.ase-item__name {
+  margin: 0;
   font-weight: var(--ds-weight-semibold);
   color: var(--ds-ink);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
 }
-.fase-codigo {
-  font-size: var(--ds-text-xs);
-  color: var(--ds-ink-muted);
-  letter-spacing: 0.03em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.fase-status { flex-shrink: 0; }
-
-/* Acciones (editar / eliminar / confirmar) */
-.fase-actions {
+.ase-item__sub {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-1) var(--ds-space-3);
+  margin: 0;
+  font-size: var(--ds-text-sm);
+  color: var(--ds-ink-muted);
+  overflow-wrap: anywhere;
+}
+.ase-item__phase { display: inline-flex; align-items: center; gap: var(--ds-space-1); }
+.ase-item__phase mat-icon { width: 16px; height: 16px; font-size: 16px; }
+.ase-item__actions {
+  display: inline-flex;
   align-items: center;
   gap: var(--ds-space-1);
-  flex-shrink: 0;
+  margin-left: auto;
 }
-.fase-confirm {
-  font-size: var(--ds-text-xs);
-  color: var(--ds-danger);
+.ase-confirm {
+  font-size: var(--ds-text-sm);
   font-weight: var(--ds-weight-semibold);
-  margin-right: var(--ds-space-1);
-}
-
-.icon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px; height: 32px;
-  border-radius: var(--ds-radius-md);
-  border: 1px solid var(--ds-border);
-  background: var(--ds-surface);
-  color: var(--ds-ink-muted);
-  transition: var(--ds-transition-color),
-              border-color var(--ds-duration-fast) var(--ds-ease-out),
-              background-color var(--ds-duration-fast) var(--ds-ease-out);
-}
-.icon-btn:hover:not(:disabled) {
-  color: var(--ds-ink);
-  border-color: var(--ds-border-strong);
-}
-.icon-btn--danger:hover:not(:disabled) {
-  color: var(--ds-danger);
-  border-color: var(--ds-danger);
-  background: var(--ds-danger-soft);
-}
-.icon-btn:disabled { opacity: 0.55; cursor: not-allowed; }
-
-/* ── Estado vacío ────────────────────────────────────────────────────────── */
-.fases-empty {
-  text-align: center;
-  padding: var(--ds-space-5) var(--ds-space-4);
-  color: var(--ds-ink-muted);
-  border: 1px dashed var(--ds-border-strong);
-  border-radius: var(--ds-radius-lg);
-  background: var(--ds-bg-alt);
-}
-.fases-empty .bi {
-  font-size: var(--ds-text-2xl);
-  color: var(--ds-ink-faint);
-  display: block;
-  margin-bottom: var(--ds-space-2);
-}
-.fases-empty p { font-size: var(--ds-text-sm); }
-
-/* ── Error de carga de fases ─────────────────────────────────────────────── */
-.fases-error {
-  padding: var(--ds-space-4);
-  text-align: center;
   color: var(--ds-danger-ink);
-  background: var(--ds-danger-soft);
-  border-radius: var(--ds-radius-lg);
-  font-size: var(--ds-text-sm);
+}
+/* Borrar: discreto en reposo (como .fi-del de las fichas), ladrillo al pasar y al confirmar. */
+.ase-del {
+  --mat-icon-button-icon-color: var(--ds-ink-muted);
+  --mat-icon-button-state-layer-color: var(--ds-danger);
+}
+@media (hover: hover) and (pointer: fine) {
+  .ase-del:hover { --mat-icon-button-icon-color: var(--ds-danger-ink); }
+}
+.ase-confirm ~ .ase-del { --mat-icon-button-icon-color: var(--ds-danger-ink); }
+
+@media (max-width: 575.98px) {
+  .ase-code-row { grid-template-columns: minmax(0, 1fr); }
+  /* Segunda fila: estado alineado con el texto y acciones a la derecha. */
+  .ase-item > .fc-state { margin-left: calc(36px + var(--ds-space-3)); }
 }
 
-/* ── Skeleton específico de fases ────────────────────────────────────────── */
-.skel--orden {
-  width: 30px; height: 30px;
-  border-radius: var(--ds-radius-circle);
-  flex-shrink: 0;
-}
-
-/* ════════════════════════════════════════════════════════════════════════════
-   ACTIVIDADES DEL SERVICIO
-   Reutilizan las clases de lista/formulario de las fases (.fase-list,
-   .fase-item, .fase-form, .fases-head, .fases-empty, .fases-error, .icon-btn).
-   Aquí solo lo específico de una actividad.
-════════════════════════════════════════════════════════════════════════════ */
-.acti-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px; height: 30px;
-  flex-shrink: 0;
-  font-size: var(--ds-text-sm);
-  color: var(--ds-ink-muted);
-  background: var(--ds-bg-alt);
-  border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
-}
-
-.acti-sub {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--ds-space-1) var(--ds-space-2);
-  margin-top: 2px;
-}
-
-/* Chip de la fase vinculada */
-.acti-fase-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3em;
-  font-size: var(--ds-text-2xs);
-  font-weight: var(--ds-weight-semibold);
-  color: var(--ds-info-ink);
-  background: var(--ds-info-soft);
-  border: 1px solid rgba(74, 107, 122, 0.2);
-  border-radius: var(--ds-radius-pill);
-  padding: 0.1em 0.6em;
-  max-width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.acti-fase-link .bi { flex-shrink: 0; }
-
-/* ── Responsive ──────────────────────────────────────────────────────────── */
-@media (max-width: 767.98px) {
-  .stype-title { font-size: var(--ds-text-xl); }
-  .stype-card__body { padding: var(--ds-space-4); }
-  .stype-card__footer { padding: var(--ds-space-3) var(--ds-space-4); }
-  .identity-card__body { flex-wrap: wrap; }
-  .status-badge { margin-left: 0; }
-
-  .fase-status { display: none; }
-  .fase-item { gap: var(--ds-space-2); }
+@media (prefers-reduced-motion: reduce) {
+  .ase-skel__row { animation: none; }
 }

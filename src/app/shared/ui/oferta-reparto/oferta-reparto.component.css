@@ -1,201 +1,94 @@
-/* Barra de reparto de ofertas. Compartida por admin/offer/edit y
-   admin/file/builder-bids; por eso el prefijo propio `rep-` en vez de heredar
-   el de ninguno de los dos. Sólo tokens --ds-*. */
+/* Reparto en bloque de ofertas (Trait rouge), compartido
+ * Lo usan admin/offer/edit y admin/file/builder-bids; por eso el prefijo propio `rp-`.
+ *
+ * states: bloqueado (contrato vivo) · sin marcar · algunas marcadas (indeterminado) · todas
+ *         confirmando · aplicando (spinner, aria-busy) · error (ladrillo, icono + texto)
+ *         botones y casilla: los de Material (hover, focus-visible, active, disabled)
+ * contrast: texto ink-secondary sobre band 8.0:1 · warning-ink sobre warning-soft 5.0:1
+ * Rechazar es reversible (se puede reactivar): botón con borde, sin ladrillo.
+ */
+:host { display: block; }
 
-:host {
-  display: block;
-}
+.rp { display: grid; gap: var(--ds-space-3); }
 
-.rep-bar {
+.rp-bar {
   display: flex;
-  align-items: center;
-  gap: var(--ds-space-3);
   flex-wrap: wrap;
-  padding: var(--ds-space-3) var(--ds-space-4);
-  background: var(--ds-bg-alt);
-  border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
-  margin-bottom: var(--ds-space-3);
-}
-
-.rep-bar__all {
-  display: inline-flex;
   align-items: center;
-  gap: var(--ds-space-2);
+  gap: var(--ds-space-2) var(--ds-space-4);
+  min-height: 52px;
+  padding: var(--ds-space-1) var(--ds-space-3);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-band);
+}
+.rp-bar__all { font-weight: var(--ds-weight-semibold); }
+.rp-bar__count {
   font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
+  font-stretch: var(--ds-stretch-figure);
+  font-variant-numeric: tabular-nums;
   color: var(--ds-ink-secondary);
-  cursor: pointer;
-  margin: 0;
 }
+.rp-bar__clear { min-height: 44px; margin-left: auto; }
 
-.rep-bar__count {
-  font-size: var(--ds-text-xs);
-  color: var(--ds-ink-muted);
-  margin-left: auto;
-}
-
-.rep-blocked {
+.rp-actions {
   display: flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-  padding: var(--ds-space-3) var(--ds-space-4);
-  background: var(--ds-bg-alt);
-  border: 1px dashed var(--ds-border-strong);
-  border-radius: var(--ds-radius-md);
-  font-size: var(--ds-text-xs);
-  color: var(--ds-ink-muted);
-  margin-bottom: var(--ds-space-3);
-}
-
-.rep-actions {
-  display: flex;
-  gap: var(--ds-space-2);
   flex-wrap: wrap;
-  margin-bottom: var(--ds-space-3);
-}
-
-.rep-confirm {
-  display: flex;
-  flex-direction: column;
   gap: var(--ds-space-2);
-  padding: var(--ds-space-4);
-  background: var(--ds-surface);
-  border: 1px solid var(--ds-gold-soft);
-  border-left: 3px solid var(--ds-gold);
-  border-radius: var(--ds-radius-md);
-  margin-bottom: var(--ds-space-3);
 }
+.rp-actions > button { min-height: 44px; }
 
-.rep-confirm__msg {
+.rp-confirm {
+  display: grid;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-4);
+  border: 1px solid color-mix(in srgb, var(--ds-warning) 45%, transparent);
+  border-radius: var(--ds-radius-lg);
+  background: var(--ds-warning-soft);
+}
+.rp-confirm__msg {
   display: flex;
   align-items: flex-start;
   gap: var(--ds-space-2);
-  font-size: var(--ds-text-sm);
-  color: var(--ds-ink);
   margin: 0;
+  font-weight: var(--ds-weight-semibold);
+  line-height: var(--ds-leading-normal);
+  color: var(--ds-warning-ink);
 }
+.rp-confirm__msg mat-icon { flex-shrink: 0; width: 20px; height: 20px; font-size: 20px; margin-top: 2px; }
+.rp-confirm__btns { display: flex; flex-wrap: wrap; gap: var(--ds-space-2); }
+.rp-confirm__btns > button { min-height: 44px; }
 
-.rep-confirm__btns {
+.rp-note,
+.rp-error {
   display: flex;
+  align-items: flex-start;
   gap: var(--ds-space-2);
-  flex-wrap: wrap;
+  margin: 0;
+  line-height: var(--ds-leading-normal);
 }
-
-.rep-error {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-  font-size: var(--ds-text-xs);
-  color: var(--ds-danger);
-  margin: 0 0 var(--ds-space-3);
-}
-
-/* Base de los botones; cada variante aporta sólo color y borde. */
-.rep-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ds-space-2);
-  padding: var(--ds-space-2) var(--ds-space-4);
+.rp-note mat-icon,
+.rp-error mat-icon { flex-shrink: 0; width: 20px; height: 20px; font-size: 20px; margin-top: 2px; }
+.rp-note { font-size: var(--ds-text-sm); color: var(--ds-ink-muted); }
+.rp-error {
+  padding: var(--ds-space-3) var(--ds-space-4);
   border-radius: var(--ds-radius-md);
-  border: 1px solid var(--ds-border-strong);
-  background: var(--ds-surface);
-  color: var(--ds-ink-secondary);
-  font-family: var(--ds-font-body);
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
-  cursor: pointer;
-  transition: all var(--ds-duration-fast) var(--ds-ease-out);
-}
-
-.rep-btn:hover:not(:disabled) {
-  border-color: var(--ds-ink-muted);
-  color: var(--ds-ink);
-}
-
-.rep-btn:focus-visible {
-  outline: none;
-  box-shadow: var(--ds-focus-ring);
-}
-
-.rep-btn:active:not(:disabled) {
-  transform: translateY(1px);
-}
-
-.rep-btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.rep-btn--reject:hover:not(:disabled) {
-  border-color: var(--ds-danger);
   background: var(--ds-danger-soft);
   color: var(--ds-danger-ink);
 }
 
-.rep-btn--primary {
-  background: var(--ds-gold);
-  border-color: var(--ds-gold);
-  color: var(--ds-ink-on-accent);
-  font-weight: var(--ds-weight-semibold);
-}
-
-.rep-btn--primary:hover:not(:disabled) {
-  background: var(--ds-gold-hover);
-  border-color: var(--ds-gold-hover);
-  color: var(--ds-ink-on-accent);
-  box-shadow: var(--ds-shadow-gold);
-}
-
-.rep-link {
-  border: none;
-  background: none;
-  padding: 0;
-  font-family: var(--ds-font-body);
-  font-size: var(--ds-text-xs);
-  color: var(--ds-gold-ink);
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.rep-link:focus-visible {
-  outline: none;
-  box-shadow: var(--ds-focus-ring);
-  border-radius: var(--ds-radius-sm);
-}
-
-/* 18px de casilla con 32px de área de pulsación: cómodo en táctil sin engordar
-   la fila. La clase la reutilizan los padres en la casilla de cada tarjeta, por
-   eso también se declara en sus hojas. */
-.rep-check {
+.rp-spinner {
+  display: inline-block;
   width: 18px;
   height: 18px;
-  accent-color: var(--ds-gold-active);
-  cursor: pointer;
-  margin: 0;
-  flex-shrink: 0;
-}
-
-.rep-check:focus-visible {
-  outline: none;
-  box-shadow: var(--ds-focus-ring);
-  border-radius: var(--ds-radius-sm);
-}
-
-.rep-spinner {
-  width: 14px;
-  height: 14px;
-  border: 2px solid var(--ds-border);
-  border-top-color: var(--ds-ink);
+  margin-right: var(--ds-space-2);
+  vertical-align: -3px;
+  border: 2px solid color-mix(in srgb, currentColor 35%, transparent);
+  border-top-color: currentColor;
   border-radius: var(--ds-radius-circle);
-  animation: rep-spin var(--ds-duration-slow) linear infinite;
+  animation: rp-spin 0.8s linear infinite;
 }
-
-@keyframes rep-spin {
-  to { transform: rotate(360deg); }
-}
+@keyframes rp-spin { to { transform: rotate(360deg); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .rep-spinner { animation-duration: 2s; }
-  .rep-btn { transition-duration: 0.01ms; }
+  .rp-spinner { animation-duration: 2s; }
 }

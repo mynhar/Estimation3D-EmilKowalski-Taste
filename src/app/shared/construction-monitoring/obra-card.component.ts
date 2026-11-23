@@ -8,9 +8,12 @@ import {
   input,
   signal,
 } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { RealtimeChannel } from '@supabase/supabase-js';
+import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../services/auth-supabase.service';
 import { ArchivoService, ReporteArchivoRow } from '../../services/archivo.service';
@@ -23,6 +26,8 @@ import {
 import { ObraVM, ParteDia, nombreServicio } from '../../models';
 import { ObraInspeccionesComponent } from './obra-inspecciones.component';
 import { AvisoArchivadoComponent } from '../ui/aviso-archivado/aviso-archivado.component';
+import { StatusChipComponent } from '../ui/status-chip/status-chip.component';
+import { abrirVisor } from '../ui/media-viewer/media-viewer.component';
 
 /** Un día del historial: todos sus partes (uno por servicio trabajado). */
 interface DiaObra {
@@ -37,15 +42,18 @@ interface DiaObra {
 @Component({
   selector: 'app-obra-card',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, ObraInspeccionesComponent, AvisoArchivadoComponent],
+  imports: [
+    TranslatePipe, NgTemplateOutlet, MatIconModule, ObraInspeccionesComponent, AvisoArchivadoComponent,
+    StatusChipComponent,
+  ],
   templateUrl: './obra-card.component.html',
   styleUrl: './obra-card.component.css',
-  host: { '(document:keydown.escape)': 'cerrarViewer()' },
 })
 export class ObraCardComponent implements OnDestroy {
   obra = input.required<ObraVM>();
 
   private auth           = inject(AuthSupabaseService);
+  private dialog         = inject(MatDialog);
   private archivoService = inject(ArchivoService);
   private obraVm         = inject(ObraVmService);
   private translate      = inject(TranslateService);
@@ -130,12 +138,10 @@ export class ObraCardComponent implements OnDestroy {
   /** Hay que rotular cada grupo con su servicio cuando el día tiene varios partes. */
   variosPartes = computed(() => this.partesDia().length > 1);
 
-  mediaViewer = signal<{ tipo: 'foto' | 'video'; url: string; nombre: string } | null>(null);
-
   readonly PASOS = [
-    { key: 'firmado',      icon: 'bi-pen'           },
-    { key: 'en_ejecucion', icon: 'bi-tools'         },
-    { key: 'completado',   icon: 'bi-check2-circle' },
+    { key: 'firmado',      matIcon: 'draw'         },
+    { key: 'en_ejecucion', matIcon: 'construction' },
+    { key: 'completado',   matIcon: 'task_alt'     },
   ];
 
   // Partes del último día ya sembrados; evita re-sembrar (y perder la
@@ -224,18 +230,13 @@ export class ObraCardComponent implements OnDestroy {
 
   // ── Media viewer ──────────────────────────────────────────────────────────
 
+  /** Fotos y vídeos en el visor compartido; los documentos se abren como enlace. */
   abrirMedia(archivo: ReporteArchivoRow): void {
     const url = this.archivoService.publicUrl(archivo.url_storage);
-    if (archivo.tipo === 'reporte_foto') {
-      this.mediaViewer.set({ tipo: 'foto', url, nombre: archivo.nombre_archivo });
-    } else if (archivo.tipo === 'reporte_video') {
-      this.mediaViewer.set({ tipo: 'video', url, nombre: archivo.nombre_archivo });
-    } else {
-      window.open(url, '_blank');
-    }
+    const tipo = archivo.tipo === 'reporte_foto' ? 'foto' : 'video';
+    abrirVisor(this.dialog, { tipo, url, titulo: archivo.nombre_archivo });
   }
 
-  cerrarViewer(): void { this.mediaViewer.set(null); }
   publicUrl(path: string): string { return this.archivoService.publicUrl(path); }
 
   // ── Helpers de presentación ───────────────────────────────────────────────
@@ -245,7 +246,7 @@ export class ObraCardComponent implements OnDestroy {
     const o = this.obra();
     const lang = this.currentLang();
     if (o.servicios?.length) {
-      return o.servicios.map(s => nombreServicio(s, lang)).join(' · ');
+      return o.servicios.map(s => nombreServicio(s, lang)).join(', ');
     }
     if (lang === 'en') return o.servicioNombreEn || o.servicioNombre;
     if (lang === 'fr') return o.servicioNombreFr || o.servicioNombre;
@@ -281,16 +282,6 @@ export class ObraCardComponent implements OnDestroy {
     return s ? nombreServicio(s, this.currentLang() ?? 'fr') : '';
   }
 
-  badgeContrato(estado: string): string {
-    return ({
-      firmado:      'cm-badge--firmado',
-      en_ejecucion: 'cm-badge--ejecucion',
-      completado:   'cm-badge--completado',
-      cancelado:    'cm-badge--cancelado',
-      archivado:    'badge-archivado',
-    } as Record<string, string>)[estado] ?? '';
-  }
-
   pasoActivo(key: string): boolean {
     const ord: Record<string, number> = { firmado: 1, en_ejecucion: 2, completado: 3 };
     return (ord[this.obra().estadoContrato] ?? 0) >= (ord[key] ?? 99);
@@ -313,9 +304,9 @@ export class ObraCardComponent implements OnDestroy {
 
   mesCorto(fecha: string): string {
     const raw = fecha.includes('T') ? fecha.split('T')[0] : fecha;
+    // Sentence case: sin mayúsculas forzadas.
     return new Intl.DateTimeFormat(this.langLocale(), { month: 'short' })
       .format(new Date(`${raw}T00:00:00`))
-      .toUpperCase()
       .replace('.', '');
   }
 

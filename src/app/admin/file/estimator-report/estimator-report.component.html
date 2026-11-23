@@ -1,526 +1,383 @@
-<!-- Informe del estimador — extraído de admin/file/edit (TARJETA 2).
-     Mismo lenguaje visual: detail-card + guardado por sección. -->
-<div class="detail-card">
-  <div class="detail-card__head">
-    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
-         fill="none" stroke="currentColor" stroke-width="1.5"
-         stroke-linecap="round" stroke-linejoin="round"
-         class="section-label__icon me-2" aria-hidden="true">
-      <rect width="8" height="4" x="8" y="2" rx="1" ry="1"/>
-      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
-      <path d="m9 14 2 2 4-4"/>
-    </svg>
-    <span class="section-label">{{ 'file.estimator_report' | translate }}</span>
-  </div>
-  <div class="detail-card__body">
+<!-- Informe del estimador (administración): pestaña de admin/file/edit.
+     Dos columnas desde 1100px: el informe y la invitación | los archivos (fotos, tours, documentos).
+     Fotos, tours y documentos se guardan al momento; el informe, con su botón. -->
+<div class="fi-layout">
 
-    <!-- Estimador asignado -->
-    <div class="mb-4">
-      <label class="form-label" for="estimador-sel">
-        {{ 'admin_estimate.estimador_label' | translate }} <span class="req-mark" aria-hidden="true">*</span>
-      </label>
-      <select id="estimador-sel" class="form-select" name="estimadorSel"
-              [ngModel]="estimadorSeleccionadoId()"
-              (ngModelChange)="estimadorSeleccionadoId.set($event)">
-        <option value="">{{ 'admin_estimate.select_estimador' | translate }}</option>
-        @for (e of estimadores(); track e.id) {
-          <option [value]="e.id">{{ e.nombre }} {{ e.apellido }}</option>
-        }
-      </select>
-    </div>
+  <div class="fi-col">
 
-    <div class="row g-3">
-      <div class="col-sm-6">
-        <label class="form-label" for="fecha-real">{{ 'file.real_visit_date' | translate }}</label>
-        <div class="input-group">
-          <span class="input-group-text" aria-hidden="true"><i class="bi bi-calendar-check"></i></span>
-          <input id="fecha-real" type="date" class="form-control"
-                 [(ngModel)]="fechaVisitaReal" name="fechaVisitaReal" />
+    <!-- ── Informe ───────────────────────────────────────────────────────── -->
+    <section class="fi-card fi-form" aria-labelledby="ert-form-title">
+      <h2 id="ert-form-title" class="fi-h2">{{ 'file.estimator_report' | translate }}</h2>
+
+      <div class="fi-fields">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>{{ 'admin_estimate.estimador_label' | translate }}</mat-label>
+          <mat-icon matPrefix aria-hidden="true">person_search</mat-icon>
+          <mat-select id="estimador-sel" required
+                      [placeholder]="'admin_estimate.select_estimador' | translate"
+                      [ngModel]="estimadorSeleccionadoId()"
+                      (ngModelChange)="estimadorSeleccionadoId.set($event)">
+            @for (e of estimadores(); track e.id) {
+              <mat-option [value]="e.id">{{ e.nombre }} {{ e.apellido }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <div class="fi-row2">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>{{ 'file.real_visit_date' | translate }}</mat-label>
+            <input matInput id="fecha-real" type="date" required [(ngModel)]="fechaVisitaReal" />
+          </mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>{{ 'file.hour' | translate }}</mat-label>
+            <input matInput id="hora-real" type="time" required [(ngModel)]="horaVisitaReal" />
+          </mat-form-field>
         </div>
-      </div>
-      <div class="col-sm-6">
-        <label class="form-label" for="hora-real">{{ 'file.hour' | translate }}</label>
-        <div class="input-group">
-          <span class="input-group-text" aria-hidden="true"><i class="bi bi-clock"></i></span>
-          <input id="hora-real" type="time" class="form-control"
-                 [(ngModel)]="horaVisitaReal" name="horaVisitaReal" />
-        </div>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>{{ 'file.situation' | translate }}</mat-label>
+          <textarea matInput id="descripcion-problema" rows="5" required [(ngModel)]="descripcionProblema"></textarea>
+        </mat-form-field>
+
+        <fieldset class="fi-fieldset">
+          <legend class="fi-label">{{ 'file.estimated_cost' | translate }}</legend>
+          <div class="fi-row2">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>{{ 'file.min' | translate }}</mat-label>
+              <span matTextPrefix>CA$&nbsp;</span>
+              <input matInput id="costo-min" type="number" inputmode="numeric" min="0" [(ngModel)]="costoMin" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>{{ 'file.max' | translate }}</mat-label>
+              <span matTextPrefix>CA$&nbsp;</span>
+              <input matInput id="costo-max" type="number" inputmode="numeric" min="0" [(ngModel)]="costoMax" />
+            </mat-form-field>
+          </div>
+          @if (!costoValido) {
+            <p class="fi-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ 'estimator_form.err_cost' | translate }}</p>
+          }
+        </fieldset>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>{{ 'admin_file_edit.notes_internal' | translate }} ({{ 'common.optional' | translate | lowercase }})</mat-label>
+          <mat-icon matSuffix aria-hidden="true">lock</mat-icon>
+          <textarea matInput id="notas-internas" rows="3" [(ngModel)]="notasInternas"></textarea>
+        </mat-form-field>
       </div>
 
-      <div class="col-12">
-        <label class="form-label" for="descripcion-problema">{{ 'file.situation' | translate }}</label>
-        <textarea id="descripcion-problema" class="form-control" rows="3"
-                  [(ngModel)]="descripcionProblema" name="descripcionProblema"></textarea>
-      </div>
+      <!-- El botón no se bloquea con el informe incompleto: al pulsarlo, este resumen dice qué falta. -->
+      <app-campos-faltantes [extra]="faltantesEst" [intento]="intentosEst()" />
 
-      <div class="col-sm-6">
-        <label class="form-label" for="costo-min">
-          {{ 'file.estimated_cost' | translate }} — {{ 'file.min' | translate }} (CAD)
-        </label>
-        <input id="costo-min" type="number" class="form-control" min="0"
-               [(ngModel)]="costoMin" name="costoMin" />
-      </div>
-      <div class="col-sm-6">
-        <label class="form-label" for="costo-max">
-          {{ 'file.estimated_cost' | translate }} — {{ 'file.max' | translate }} (CAD)
-        </label>
-        <input id="costo-max" type="number" class="form-control" min="0"
-               [(ngModel)]="costoMax" name="costoMax" />
-      </div>
-      @if (!costoValido) {
-        <div class="col-12">
-          <p class="field-error" role="alert">
-            <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
-            {{ 'estimator_form.err_cost' | translate }}
-          </p>
-        </div>
+      @if (errorEst()) {
+        <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorEst() | translate }}</p>
+      } @else if (exitoEst()) {
+        <p class="fi-feedback is-ok" role="status"><mat-icon aria-hidden="true">check_circle</mat-icon>{{ 'estimator_form.success_estimation' | translate }}</p>
       }
 
-      <div class="col-12">
-        <label class="form-label" for="notas-internas">
-          {{ 'admin_file_edit.notes_internal' | translate }}
-          <span class="opt-label">({{ 'common.optional' | translate }})</span>
-        </label>
-        <textarea id="notas-internas" class="form-control" rows="2"
-                  [(ngModel)]="notasInternas" name="notasInternas"></textarea>
+      <!-- Guardar el informe: abeto (la administración corrige; no es la siguiente etapa del dossier). -->
+      <div class="fi-actions">
+        <button mat-flat-button type="button" [disabled]="guardandoEst()" (click)="guardarEstimacion()">
+          @if (guardandoEst()) { <span class="fi-spinner" aria-hidden="true"></span> } @else { <mat-icon>save</mat-icon> }
+          {{ (guardandoEst() ? 'common.saving' : 'admin_file_edit.save_estimator') | translate }}
+        </button>
       </div>
+    </section>
 
-      <!-- ── Tours virtuales 3D ─────────────────────────────── -->
-      <div class="col-12">
-        <hr class="detail-divider mb-4" />
-        <div class="media-head">
-          <span class="section-label d-inline-flex align-items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="1.5"
-                 stroke-linecap="round" stroke-linejoin="round"
-                 class="section-label__icon me-1" aria-hidden="true">
-              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" x2="12" y1="22.08" y2="12"/>
-            </svg>
-            {{ 'admin_file_edit.tour_urls' | translate }}
-          </span>
-          <span class="archivo-count">{{ urlsTour().length }}</span>
-        </div>
+    <!-- ── Invitación a contratistas ──────────────────────────────────────
+         Solo los invitados por correo ven el dossier y pueden ofertar; el resto
+         de contratistas sigue viendo los demás dossiers. -->
+    <section class="fi-card" aria-labelledby="ert-invite-title">
+      <h2 id="ert-invite-title" class="fi-h2">
+        {{ 'admin_invite.title' | translate }}
+        @if (invitadosIds().size > 0) { <span class="fi-count">{{ invitadosIds().size }}</span> }
+      </h2>
 
-        <div class="input-group mb-3">
-          <span class="input-group-text" aria-hidden="true"><i class="bi bi-badge-3d"></i></span>
-          <input type="url" class="form-control" name="nuevoTourUrl" [(ngModel)]="nuevoTourUrl"
-                 [placeholder]="'admin_file_edit.tour_placeholder' | translate"
-                 (keydown.enter)="$event.preventDefault(); agregarTour()" />
-          <button type="button" class="btn btn-outline-primary" (click)="agregarTour()"
-                  [disabled]="guardandoTour() || !nuevoTourUrl.trim()">
-            @if (guardandoTour()) {
-              <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-            } @else {
-              <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>{{ 'admin_file_edit.tour_add' | translate }}
-            }
-          </button>
-        </div>
-        @if (errorTour()) {
-          <div class="pending-notice mb-3">
-            <i class="bi bi-exclamation-triangle me-2" aria-hidden="true"></i>{{ errorTour() | translate }}
-          </div>
-        }
-
-        @if (urlsTour().length > 0) {
-          <div class="tour-grid">
-            @for (url of urlsTour(); track $index) {
-              <div class="tour-tile">
-                <a [href]="url" target="_blank" rel="noopener" class="tour-tile__frame"
-                   [title]="'file.tour_title' | translate">
-                  @if (tourThumb(url); as thumb) {
-                    <img [src]="thumb" class="tour-tile__img" alt="" loading="lazy" />
-                  } @else {
-                    <span class="tour-tile__placeholder" aria-hidden="true">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24"
-                           fill="none" stroke="currentColor" stroke-width="1.5"
-                           stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" x2="12" y1="22.08" y2="12"/>
-                      </svg>
-                    </span>
-                  }
-                  <span class="tour-tile__badge">
-                    <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i> 3D
-                  </span>
-                </a>
-                <button type="button" class="thumb-delete" (click)="eliminarTour($index)"
-                        [disabled]="guardandoTour()" [title]="'common.delete' | translate">
-                  <i class="bi bi-trash" aria-hidden="true"></i>
-                </button>
-              </div>
-            }
-          </div>
-        }
-      </div>
-
-      <!-- ── Propiedad escaneada (Matterport) ────────────────── -->
-      <div class="col-12">
-        <app-matterport-info
-          [modelos]="matterportModelos()"
-          [puedeSincronizar]="true"
-          [sincronizando]="sincronizandoMp()"
-          [errorClave]="errorMpClave()"
-          [exitoClave]="exitoMpClave()"
-          (sincronizar)="sincronizarMatterport()" />
-      </div>
-
-      <!-- ── Fotos del sitio ────────────────────────────────── -->
-      <div class="col-12">
-        <hr class="detail-divider mb-4" />
-        <div class="media-head">
-          <span class="section-label d-inline-flex align-items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="1.5"
-                 stroke-linecap="round" stroke-linejoin="round"
-                 class="section-label__icon me-1" aria-hidden="true">
-              <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
-              <circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
-            </svg>
-            {{ 'file.site_photos' | translate }}
-          </span>
-          <span class="archivo-count">{{ fotos().length }}</span>
-        </div>
-
-        <label class="upload-btn upload-btn--drop mb-3"
-               [class.upload-btn--busy]="subiendoFoto()"
-               [class.upload-btn--drag]="dragFotos()"
-               (dragover)="onDragOverFotos($event)"
-               (dragleave)="onDragLeaveFotos()"
-               (drop)="onDropFotos($event)">
-          @if (subiendoFoto()) {
-            <span class="upload-spinner" aria-hidden="true"></span>
-            <span class="upload-btn__title">{{ 'file.uploading' | translate }}</span>
-          } @else {
-            <i class="bi bi-cloud-arrow-up" aria-hidden="true"></i>
-            <span class="upload-btn__title">{{ 'file.add_photos' | translate }}</span>
-            <span class="upload-btn__sub">{{ 'my_documents.add_drop' | translate }}</span>
-          }
-          <input type="file" accept="image/*" multiple class="visually-hidden"
-                 [disabled]="subiendoFoto()" (change)="subirFotos($event)" />
-        </label>
-        @if (errorFotos()) {
-          <div class="pending-notice mb-3">
-            <i class="bi bi-exclamation-triangle me-2" aria-hidden="true"></i>{{ errorFotos() | translate }}
-          </div>
-        }
-
-        @if (fotos().length > 0) {
-          <div class="photos-grid">
-            @for (foto of fotos(); track foto.id) {
-              <div class="photo-thumb">
-                <img [src]="publicUrl(foto.url_storage)" [alt]="foto.nombre_archivo"
-                     class="photo-thumb__img" loading="lazy" (click)="abrirFoto(foto)" />
-                <button type="button" class="thumb-delete" (click)="eliminarArchivo(foto, 'foto')"
-                        [disabled]="eliminandoArchivo() !== null" [title]="'common.delete' | translate">
-                  @if (eliminandoArchivo() === foto.id) {
-                    <span class="upload-spinner upload-spinner--xs" aria-hidden="true"></span>
-                  } @else {
-                    <i class="bi bi-trash" aria-hidden="true"></i>
-                  }
-                </button>
-              </div>
-            }
-          </div>
-        }
-      </div>
-
-      <!-- ── Documentos técnicos ────────────────────────────── -->
-      <div class="col-12">
-        <hr class="detail-divider mb-4" />
-        <div class="media-head">
-          <span class="section-label d-inline-flex align-items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="1.5"
-                 stroke-linecap="round" stroke-linejoin="round"
-                 class="section-label__icon me-1" aria-hidden="true">
-              <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
-              <path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>
-            </svg>
-            {{ 'file.technical_docs' | translate }}
-          </span>
-          <span class="archivo-count">{{ documentos().length }}</span>
-        </div>
-
-        <label class="upload-btn upload-btn--drop mb-3"
-               [class.upload-btn--busy]="subiendoDoc()"
-               [class.upload-btn--drag]="dragDocs()"
-               (dragover)="onDragOverDocs($event)"
-               (dragleave)="onDragLeaveDocs()"
-               (drop)="onDropDocs($event)">
-          @if (subiendoDoc()) {
-            <span class="upload-spinner" aria-hidden="true"></span>
-            <span class="upload-btn__title">{{ 'file.uploading' | translate }}</span>
-          } @else {
-            <i class="bi bi-cloud-arrow-up" aria-hidden="true"></i>
-            <span class="upload-btn__title">{{ 'file.add_docs' | translate }}</span>
-            <span class="upload-btn__sub">{{ 'my_documents.add_drop' | translate }}</span>
-          }
-          <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv" multiple
-                 class="visually-hidden" [disabled]="subiendoDoc()" (change)="subirDocumentos($event)" />
-        </label>
-        @if (errorDocs()) {
-          <div class="pending-notice mb-3">
-            <i class="bi bi-exclamation-triangle me-2" aria-hidden="true"></i>{{ errorDocs() | translate }}
-          </div>
-        }
-
-        @if (documentos().length > 0) {
-          <div class="doc-grid">
-            @for (doc of documentos(); track doc.id) {
-              <div class="doc-tile">
-                <div class="doc-tile__icon" aria-hidden="true">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                       fill="none" stroke="currentColor" stroke-width="1.5"
-                       stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
-                    <path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>
-                  </svg>
-                </div>
-                <div class="doc-tile__info">
-                  <p class="doc-tile__name">{{ doc.nombre_archivo }}</p>
-                  <p class="doc-tile__meta">{{ formatTamano(doc.tamano_bytes) }}</p>
-                </div>
-                <div class="doc-tile__actions">
-                  <button type="button" class="btn-file-open" (click)="verArchivo(doc)">
-                    <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>{{ 'common.open' | translate }}
-                  </button>
-                  <button type="button" class="btn-file-delete" (click)="eliminarArchivo(doc, 'documento')"
-                          [disabled]="eliminandoArchivo() !== null" [title]="'common.delete' | translate">
-                    @if (eliminandoArchivo() === doc.id) {
-                      <span class="upload-spinner upload-spinner--xs" aria-hidden="true"></span>
+      @if (!puedeInvitar) {
+        <p class="fi-empty"><mat-icon aria-hidden="true">schedule</mat-icon>{{ 'admin_invite.need_estimado' | translate }}</p>
+      } @else {
+        @if (constructores().length === 0) {
+          <p class="fi-empty"><mat-icon aria-hidden="true">group_off</mat-icon>{{ 'admin_invite.no_constructores' | translate }}</p>
+        } @else {
+          <p class="fi-muted">{{ 'admin_invite.hint' | translate }}</p>
+          <ul class="fi-pick">
+            @for (c of constructores(); track c.id) {
+              <li class="fi-pick__item" [class.is-selected]="seleccionInvitados().has(c.id)">
+                <div class="fi-pick__row">
+                  <mat-checkbox [checked]="seleccionInvitados().has(c.id)"
+                                (change)="toggleSeleccionInvitado(c.id)"
+                                [disabled]="!c.email || enviandoInvitacion() || guardandoEst()
+                                            || abriendoATodos() || bloqueadoPorOferta">
+                    <span class="fi-pick__name">{{ c.nombre }} {{ c.apellido }}</span>
+                    @if (c.email) {
+                      <span class="fi-pick__sub"><mat-icon aria-hidden="true">mail</mat-icon>{{ c.email }}</span>
                     } @else {
-                      <i class="bi bi-trash" aria-hidden="true"></i>
+                      <span class="fi-pick__sub"><mat-icon aria-hidden="true">unsubscribe</mat-icon>{{ 'admin_invite.no_email' | translate }}</span>
                     }
-                  </button>
+                  </mat-checkbox>
+                  @if (estaInvitado(c.id)) {
+                    <span class="fi-tag is-ok"><mat-icon aria-hidden="true">check_circle</mat-icon>{{ 'admin_invite.invited' | translate }}</span>
+                  }
                 </div>
-              </div>
+                <!-- La contraseña guardada está hasheada: mandar una implica fijarla.
+                     Se deja vacía para no tocar el acceso actual. -->
+                @if (seleccionInvitados().has(c.id)) {
+                  <div class="fi-pick__extra">
+                    @if (c.proveedor === 'email') {
+                      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                        <mat-label>{{ 'admin_invite.password_label' | translate }}</mat-label>
+                        <mat-icon matPrefix aria-hidden="true">key</mat-icon>
+                        <input matInput type="password" autocomplete="new-password"
+                               [id]="'invite-pass-' + c.id"
+                               [placeholder]="'admin_invite.password_ph' | translate"
+                               [ngModel]="passwordInvitado(c.id)"
+                               (ngModelChange)="setPasswordInvitado(c.id, $event)"
+                               [disabled]="enviandoInvitacion() || guardandoEst() || abriendoATodos()" />
+                      </mat-form-field>
+                      <p class="fi-hint">{{ 'admin_invite.password_hint' | translate }}</p>
+                    } @else {
+                      <p class="fi-hint"><mat-icon aria-hidden="true">shield_lock</mat-icon>{{ 'admin_invite.password_google' | translate }}</p>
+                    }
+                  </div>
+                }
+              </li>
             }
+          </ul>
+        }
+
+        <!-- Avisos: valen también sin contratistas en la lista, porque «Tous les
+             constructeurs» sigue disponible. -->
+        @if (errorInvitacionMsg()) {
+          <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorInvitacionMsg() | translate }}</p>
+        }
+        @if (exitoInvitacionMsg()) {
+          <p class="fi-feedback is-ok" role="status"><mat-icon aria-hidden="true">check_circle</mat-icon>{{ exitoInvitacionMsg() | translate:exitoInvitacionArgs() }}</p>
+        }
+
+        @if (bloqueadoPorOferta) {
+          <p class="fi-hint"><mat-icon aria-hidden="true">lock</mat-icon>{{ 'admin_invite.locked_en_oferta' | translate }}</p>
+        } @else {
+          <p class="fi-hint"><mat-icon aria-hidden="true">groups</mat-icon>{{ 'admin_invite.all_builders_hint' | translate }}</p>
+          @if (constructores().length > 0 && !formularioCompleto) {
+            <p class="fi-hint"><mat-icon aria-hidden="true">info</mat-icon>{{ 'admin_invite.send_and_estimate_hint' | translate }}</p>
+          }
+        }
+
+        <!-- Confirmación: abrir a todos borra la lista de invitados. -->
+        @if (confirmarAbrirATodos()) {
+          <div class="fi-confirm" role="alertdialog" aria-live="polite"
+               aria-labelledby="ert-invite-confirm-title" aria-describedby="ert-invite-confirm-body">
+            <p class="fi-confirm__title" id="ert-invite-confirm-title">
+              <mat-icon aria-hidden="true">warning</mat-icon>
+              {{ 'admin_invite.all_builders_confirm_title' | translate }}
+            </p>
+            <p id="ert-invite-confirm-body">{{ 'admin_invite.all_builders_confirm_body' | translate }}</p>
+            @if (invitadosIds().size > 0) {
+              <p>{{ 'admin_invite.all_builders_confirm_warning' | translate }}</p>
+            }
+            <div class="ert-inline-actions">
+              <button mat-flat-button type="button" [disabled]="abriendoATodos()" (click)="abrirATodosLosConstructores()">
+                @if (abriendoATodos()) { <span class="fi-spinner" aria-hidden="true"></span> } @else { <mat-icon>groups</mat-icon> }
+                {{ (abriendoATodos() ? 'common.saving' : 'admin_invite.all_builders_confirm_ok') | translate }}
+              </button>
+              <button mat-button type="button" [disabled]="abriendoATodos()" (click)="cancelarAbrirATodos()">
+                {{ 'common.cancel' | translate }}
+              </button>
+            </div>
           </div>
         }
-      </div>
-    </div>
-  </div>
 
-  <app-campos-faltantes class="mx-4 mb-3" [extra]="faltantesEst" [intento]="intentosEst()" />
-  <div class="detail-card__foot">
-    @if (errorEst()) {
-      <span class="save-msg save-msg--err">
-        <i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>{{ errorEst() | translate }}
-      </span>
-    } @else if (exitoEst()) {
-      <span class="save-msg save-msg--ok">
-        <i class="bi bi-check-circle me-1" aria-hidden="true"></i>{{ 'estimator_form.success_estimation' | translate }}
-      </span>
-    } @else { <span></span> }
-    <button type="button" class="btn-save" (click)="guardarEstimacion()" [disabled]="guardandoEst()">
-      @if (guardandoEst()) {
-        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
-        {{ 'common.saving' | translate }}
-      } @else {
-        <i class="bi bi-floppy me-2" aria-hidden="true"></i>{{ 'admin_file_edit.save_estimator' | translate }}
-      }
-    </button>
-  </div>
-</div>
-
-<!-- ── Invitación a constructores ────────────────────────────────────────
-     Solo los invitados por correo ven el expediente y pueden ofertar; el
-     resto de constructores sigue viendo los demás expedientes. -->
-<div class="detail-card invite-card">
-  <div class="detail-card__head">
-    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
-         fill="none" stroke="currentColor" stroke-width="1.5"
-         stroke-linecap="round" stroke-linejoin="round"
-         class="section-label__icon me-2" aria-hidden="true">
-      <path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8"/>
-      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-      <path d="m16 19 2 2 4-4"/>
-    </svg>
-    <span class="section-label">{{ 'admin_invite.title' | translate }}</span>
-    @if (invitadosIds().size > 0) {
-      <span class="archivo-count ms-2">{{ invitadosIds().size }}</span>
-    }
-  </div>
-
-  <div class="detail-card__body">
-    @if (!puedeInvitar) {
-      <div class="pending-notice">
-        <i class="bi bi-info-circle me-2" aria-hidden="true"></i>{{ 'admin_invite.need_estimado' | translate }}
-      </div>
-    } @else if (constructores().length === 0) {
-      <div class="pending-notice">
-        <i class="bi bi-people me-2" aria-hidden="true"></i>{{ 'admin_invite.no_constructores' | translate }}
-      </div>
-    } @else {
-      <p class="invite-hint">{{ 'admin_invite.hint' | translate }}</p>
-
-      <ul class="invite-list" role="list">
-        @for (c of constructores(); track c.id) {
-          <li>
-            <label class="invite-row"
-                   [class.invite-row--selected]="seleccionInvitados().has(c.id)"
-                   [class.invite-row--disabled]="!c.email">
-              <input type="checkbox" class="invite-check"
-                     [checked]="seleccionInvitados().has(c.id)"
-                     (change)="toggleSeleccionInvitado(c.id)"
-                     [disabled]="!c.email || enviandoInvitacion() || guardandoEst()
-                                 || abriendoATodos() || bloqueadoPorOferta" />
-              <span class="invite-row__info">
-                <span class="invite-row__name">{{ c.nombre }} {{ c.apellido }}</span>
-                <span class="invite-row__email">
-                  @if (c.email) {
-                    <i class="bi bi-envelope" aria-hidden="true"></i>{{ c.email }}
-                  } @else {
-                    <i class="bi bi-envelope-slash" aria-hidden="true"></i>{{ 'admin_invite.no_email' | translate }}
-                  }
-                </span>
-              </span>
-              @if (estaInvitado(c.id)) {
-                <span class="invite-badge">
-                  <i class="bi bi-check-circle" aria-hidden="true"></i>{{ 'admin_invite.invited' | translate }}
-                </span>
-              }
-            </label>
-
-            <!-- La contraseña guardada está hasheada: mandar una implica
-                 fijarla. Se deja vacía para no tocar el acceso actual. -->
-            @if (seleccionInvitados().has(c.id)) {
-              <div class="invite-pass">
-                @if (c.proveedor === 'email') {
-                  <label class="invite-pass__label" [attr.for]="'invite-pass-' + c.id">
-                    <i class="bi bi-key" aria-hidden="true"></i>{{ 'admin_invite.password_label' | translate }}
-                  </label>
-                  <input type="password" class="form-control invite-pass__input"
-                         [id]="'invite-pass-' + c.id"
-                         [name]="'invitePass' + c.id"
-                         autocomplete="new-password"
-                         [placeholder]="'admin_invite.password_ph' | translate"
-                         [ngModel]="passwordInvitado(c.id)"
-                         (ngModelChange)="setPasswordInvitado(c.id, $event)"
-                         [disabled]="enviandoInvitacion() || guardandoEst() || abriendoATodos()" />
-                  <p class="invite-pass__hint">{{ 'admin_invite.password_hint' | translate }}</p>
-                } @else {
-                  <p class="invite-pass__hint">
-                    <i class="bi bi-shield-lock" aria-hidden="true"></i>{{ 'admin_invite.password_google' | translate }}
-                  </p>
-                }
-              </div>
-            }
-          </li>
-        }
-      </ul>
-    }
-
-    <!-- Avisos comunes: valen también sin constructores en la lista, porque
-         «Todos los Constructores» sigue disponible. -->
-    @if (puedeInvitar) {
-      @if (errorInvitacionMsg()) {
-        <p class="invite-msg invite-msg--err" role="alert">
-          <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>{{ errorInvitacionMsg() | translate }}
-        </p>
-      }
-      @if (exitoInvitacionMsg()) {
-        <p class="invite-msg invite-msg--ok" role="status">
-          <i class="bi bi-check-circle" aria-hidden="true"></i>
-          {{ exitoInvitacionMsg() | translate:exitoInvitacionArgs() }}
-        </p>
-      }
-      @if (bloqueadoPorOferta) {
-        <p class="invite-msg">
-          <i class="bi bi-lock" aria-hidden="true"></i>{{ 'admin_invite.locked_en_oferta' | translate }}
-        </p>
-      } @else {
-        <p class="invite-msg">
-          <i class="bi bi-people" aria-hidden="true"></i>{{ 'admin_invite.all_builders_hint' | translate }}
-        </p>
-        @if (constructores().length > 0 && !formularioCompleto) {
-          <p class="invite-msg">
-            <i class="bi bi-info-circle" aria-hidden="true"></i>{{ 'admin_invite.send_and_estimate_hint' | translate }}
-          </p>
-        }
-      }
-
-      <!-- Confirmación: abrir a todos borra la lista de invitados. -->
-      @if (confirmarAbrirATodos()) {
-        <div class="invite-confirm" role="alertdialog" aria-live="polite"
-             aria-labelledby="invite-confirm-title" aria-describedby="invite-confirm-body">
-          <p class="invite-confirm__title" id="invite-confirm-title">
-            <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
-            {{ 'admin_invite.all_builders_confirm_title' | translate }}
-          </p>
-          <p class="invite-confirm__body" id="invite-confirm-body">
-            {{ 'admin_invite.all_builders_confirm_body' | translate }}
-          </p>
-          @if (invitadosIds().size > 0) {
-            <p class="invite-confirm__body">{{ 'admin_invite.all_builders_confirm_warning' | translate }}</p>
-          }
-          <div class="invite-confirm__actions">
-            <button type="button" class="btn-invite btn-invite--ghost"
-                    (click)="cancelarAbrirATodos()" [disabled]="abriendoATodos()">
-              {{ 'common.cancel' | translate }}
+        <div class="ert-invite-foot">
+          <span class="fi-hint">{{ 'admin_invite.selected_count' | translate:{ n: seleccionInvitados().size } }}</span>
+          <div class="ert-inline-actions">
+            <!-- Retira las invitaciones por correo: el dossier vuelve a ser público. -->
+            <button mat-stroked-button type="button" (click)="pedirAbrirATodos()"
+                    [disabled]="bloqueadoPorOferta || abriendoATodos() || confirmarAbrirATodos()
+                                || enviandoInvitacion() || guardandoEst()">
+              <mat-icon>groups</mat-icon>
+              {{ 'admin_invite.all_builders_btn' | translate }}
             </button>
-            <button type="button" class="btn-invite btn-invite--primary"
-                    (click)="abrirATodosLosConstructores()" [disabled]="abriendoATodos()">
-              @if (abriendoATodos()) {
-                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-                {{ 'common.saving' | translate }}
-              } @else {
-                <i class="bi bi-people" aria-hidden="true"></i>{{ 'admin_invite.all_builders_confirm_ok' | translate }}
-              }
+            <!-- Envía el correo y además guarda y envía la estimación. -->
+            <button mat-flat-button type="button" (click)="enviarInvitacionYEstimacion()"
+                    [disabled]="bloqueadoPorOferta || enviandoInvitacion() || guardandoEst() || abriendoATodos()
+                                || confirmarAbrirATodos() || seleccionInvitados().size === 0">
+              @if (enviandoInvitacion() || guardandoEst()) { <span class="fi-spinner" aria-hidden="true"></span> } @else { <mat-icon>forward_to_inbox</mat-icon> }
+              {{ (enviandoInvitacion() || guardandoEst() ? 'admin_invite.sending' : 'admin_invite.send_btn') | translate }}
             </button>
           </div>
         </div>
       }
-    }
+    </section>
   </div>
 
-  @if (puedeInvitar) {
-    <div class="detail-card__foot">
-      <span class="invite-count">
-        {{ 'admin_invite.selected_count' | translate:{ n: seleccionInvitados().size } }}
-      </span>
-      <div class="invite-buttons">
-        <!-- Retira las invitaciones por correo: el expediente vuelve a ser
-             público y lo ve cualquier constructor. -->
-        <button type="button" class="btn-invite btn-invite--ghost" (click)="pedirAbrirATodos()"
-                [disabled]="bloqueadoPorOferta || abriendoATodos() || confirmarAbrirATodos()
-                            || enviandoInvitacion() || guardandoEst()">
-          @if (abriendoATodos()) {
-            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-            {{ 'common.saving' | translate }}
-          } @else {
-            <i class="bi bi-people" aria-hidden="true"></i>{{ 'admin_invite.all_builders_btn' | translate }}
+  <div class="fi-col">
+
+    <!-- ── Fotos del sitio (se suben al momento) ──────────────────────────── -->
+    <section class="fi-card" aria-labelledby="ert-photos-title">
+      <h2 id="ert-photos-title" class="fi-h2">
+        {{ 'file.site_photos' | translate }}
+        @if (fotos().length > 0) { <span class="fi-count">{{ fotos().length }}</span> }
+      </h2>
+
+      <label class="fi-drop" [class.is-busy]="subiendoFoto()" [class.is-drag]="dragFotos()"
+             (dragover)="onDragOverFotos($event)" (dragleave)="onDragLeaveFotos()" (drop)="onDropFotos($event)">
+        @if (subiendoFoto()) {
+          <span class="fi-spinner" aria-hidden="true"></span>
+          <span class="fi-drop__title">{{ 'file.uploading' | translate }}</span>
+        } @else {
+          <mat-icon aria-hidden="true">add_photo_alternate</mat-icon>
+          <span class="fi-drop__title">{{ 'file.add_photos' | translate }}</span>
+          <span class="fi-drop__sub">{{ 'my_documents.add_drop' | translate }}</span>
+        }
+        <input type="file" accept="image/*" multiple class="cdk-visually-hidden"
+               [disabled]="subiendoFoto()" (change)="subirFotos($event)" />
+      </label>
+
+      @if (errorFotos()) {
+        <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorFotos() | translate }}</p>
+      }
+
+      @if (fotos().length > 0) {
+        <ul class="fi-photos">
+          @for (foto of fotos(); track foto.id) {
+            <li>
+              <button type="button" class="fi-photo" (click)="abrirFoto(foto)" [attr.aria-label]="foto.nombre_archivo">
+                <img [src]="publicUrl(foto.url_storage)" alt="" loading="lazy" />
+              </button>
+              <button mat-icon-button type="button" class="fi-photo__del"
+                      [disabled]="eliminandoArchivo() !== null"
+                      [attr.aria-label]="('common.delete' | translate) + ' ' + foto.nombre_archivo"
+                      [matTooltip]="'common.delete' | translate"
+                      (click)="eliminarArchivo(foto, 'foto')">
+                @if (eliminandoArchivo() === foto.id) { <span class="fi-spinner" aria-hidden="true"></span> } @else { <mat-icon>close</mat-icon> }
+              </button>
+            </li>
           }
-        </button>
-        <!-- Envía el correo y además guarda y envía la estimación. -->
-        <button type="button" class="btn-invite btn-invite--primary" (click)="enviarInvitacionYEstimacion()"
-                [disabled]="bloqueadoPorOferta || enviandoInvitacion() || guardandoEst() || abriendoATodos()
-                            || confirmarAbrirATodos()
-                            || seleccionInvitados().size === 0">
-          @if (enviandoInvitacion() || guardandoEst()) {
-            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-            {{ 'admin_invite.sending' | translate }}
-          } @else {
-            <i class="bi bi-envelope-arrow-up" aria-hidden="true"></i>{{ 'admin_invite.send_btn' | translate }}
-          }
+        </ul>
+      }
+    </section>
+
+    <!-- ── Tours virtuales 3D (se guardan al añadirlos o quitarlos) ──────── -->
+    <section class="fi-card" aria-labelledby="ert-tour-title">
+      <h2 id="ert-tour-title" class="fi-h2">
+        {{ 'admin_file_edit.tour_urls' | translate }}
+        @if (urlsTour().length > 0) { <span class="fi-count">{{ urlsTour().length }}</span> }
+      </h2>
+
+      <div class="ert-tour-add">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>{{ 'estimator_file.tour_url_label' | translate }}</mat-label>
+          <mat-icon matPrefix aria-hidden="true">link</mat-icon>
+          <input matInput type="url" inputmode="url"
+                 [placeholder]="'admin_file_edit.tour_placeholder' | translate"
+                 [(ngModel)]="nuevoTourUrl"
+                 (keydown.enter)="$event.preventDefault(); agregarTour()" />
+        </mat-form-field>
+        <button mat-stroked-button type="button" (click)="agregarTour()"
+                [disabled]="guardandoTour() || !nuevoTourUrl.trim()">
+          @if (guardandoTour()) { <span class="fi-spinner" aria-hidden="true"></span> } @else { <mat-icon>add</mat-icon> }
+          {{ 'admin_file_edit.tour_add' | translate }}
         </button>
       </div>
-    </div>
-  }
+
+      @if (errorTour()) {
+        <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorTour() | translate }}</p>
+      }
+
+      @if (urlsTour().length > 0) {
+        <ul class="fi-photos ert-tours">
+          @for (url of urlsTour(); track $index) {
+            <li>
+              <a class="fi-photo ert-tour" [href]="url" target="_blank" rel="noopener"
+                 [attr.aria-label]="('file.tour_title' | translate) + ' ' + ($index + 1)">
+                @if (tourThumb(url); as thumb) {
+                  <img [src]="thumb" alt="" loading="lazy" />
+                } @else {
+                  <mat-icon class="ert-tour__icon" aria-hidden="true">view_in_ar</mat-icon>
+                }
+                <span class="ert-tour__badge" aria-hidden="true"><mat-icon>open_in_new</mat-icon>3D</span>
+              </a>
+              <button mat-icon-button type="button" class="fi-photo__del"
+                      [disabled]="guardandoTour()"
+                      [attr.aria-label]="('common.delete' | translate) + ' ' + ('file.tour_title' | translate) + ' ' + ($index + 1)"
+                      [matTooltip]="'common.delete' | translate"
+                      (click)="eliminarTour($index)">
+                <mat-icon>close</mat-icon>
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <!-- ── Propiedad escaneada (Matterport) ───────────────────────────────── -->
+    <app-matterport-info
+      [modelos]="matterportModelos()"
+      [puedeSincronizar]="true"
+      [sincronizando]="sincronizandoMp()"
+      [errorClave]="errorMpClave()"
+      [exitoClave]="exitoMpClave()"
+      (sincronizar)="sincronizarMatterport()" />
+
+    <!-- ── Documentos técnicos (se suben al momento) ──────────────────────── -->
+    <section class="fi-card" aria-labelledby="ert-docs-title">
+      <h2 id="ert-docs-title" class="fi-h2">
+        {{ 'file.technical_docs' | translate }}
+        @if (documentos().length > 0) { <span class="fi-count">{{ documentos().length }}</span> }
+      </h2>
+
+      <label class="fi-drop" [class.is-busy]="subiendoDoc()" [class.is-drag]="dragDocs()"
+             (dragover)="onDragOverDocs($event)" (dragleave)="onDragLeaveDocs()" (drop)="onDropDocs($event)">
+        @if (subiendoDoc()) {
+          <span class="fi-spinner" aria-hidden="true"></span>
+          <span class="fi-drop__title">{{ 'file.uploading' | translate }}</span>
+        } @else {
+          <mat-icon aria-hidden="true">upload_file</mat-icon>
+          <span class="fi-drop__title">{{ 'file.add_docs' | translate }}</span>
+          <span class="fi-drop__sub">{{ 'my_documents.add_drop' | translate }}</span>
+        }
+        <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv" multiple
+               class="cdk-visually-hidden" [disabled]="subiendoDoc()" (change)="subirDocumentos($event)" />
+      </label>
+
+      @if (errorDocs()) {
+        <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorDocs() | translate }}</p>
+      }
+
+      @if (documentos().length > 0) {
+        <ul class="fi-files">
+          @for (doc of documentos(); track doc.id) {
+            <li class="fi-file">
+              <mat-icon class="fi-file__icon" aria-hidden="true">description</mat-icon>
+              <span class="fi-file__text">
+                <span class="fi-file__name">{{ doc.nombre_archivo }}</span>
+                <span class="fi-file__size">{{ formatTamano(doc.tamano_bytes) }}</span>
+              </span>
+              <button mat-button type="button" class="fi-file__open" (click)="verArchivo(doc)"
+                      [attr.aria-label]="('common.open' | translate) + ' ' + doc.nombre_archivo">
+                {{ 'common.open' | translate }}
+              </button>
+              <button mat-icon-button type="button" class="fi-del" (click)="eliminarArchivo(doc, 'documento')"
+                      [disabled]="eliminandoArchivo() !== null"
+                      [attr.aria-label]="('common.delete' | translate) + ' ' + doc.nombre_archivo">
+                @if (eliminandoArchivo() === doc.id) { <span class="fi-spinner" aria-hidden="true"></span> } @else { <mat-icon>delete</mat-icon> }
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </div>
 </div>
 
-<!-- ── Lightbox de fotos ─────────────────────────────────────────────── -->
-@if (fotoAmpliada()) {
-  <div class="lightbox-overlay" (click)="cerrarFoto()"
-       role="dialog" aria-modal="true" [attr.aria-label]="'file.photo_viewer' | translate">
-    <button class="lightbox-close" type="button" (click)="cerrarFoto()" [title]="'common.close' | translate">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-           fill="none" stroke="currentColor" stroke-width="1.5"
-           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
-      </svg>
+<!-- ── Visor de fotos ─────────────────────────────────────────────────────── -->
+@if (fotoAmpliada(); as foto) {
+  <div class="ert-viewer" role="dialog" aria-modal="true" [attr.aria-label]="'file.photo_viewer' | translate"
+       cdkTrapFocus [cdkTrapFocusAutoCapture]="true"
+       (click)="cerrarFoto()" (keydown.escape)="cerrarFoto()">
+    <button mat-icon-button type="button" class="ert-viewer__close" cdkFocusInitial
+            [attr.aria-label]="'common.close' | translate" (click)="cerrarFoto()">
+      <mat-icon>close</mat-icon>
     </button>
-    <img [src]="fotoAmpliada()!" class="lightbox-img" (click)="$event.stopPropagation()" alt="" />
+    <img class="ert-viewer__img" [src]="foto" alt="" (click)="$event.stopPropagation()" />
   </div>
 }

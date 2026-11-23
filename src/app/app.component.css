@@ -1,7 +1,7 @@
-/* component: armazón de la app (Clarté)
+/* component: armazón de la app (Trait rouge)
  * states: item default · hover · focus-visible · active (página actual) · colapsado
  *         móvil: barra superior · pestañas del cliente · cajón para roles internos
- * contrast: ítems ink-secondary (10.6:1) · activo action-ink sobre scan-soft (8.0:1)
+ * contrast: ítems ink-secondary (10.6:1) · activo action-ink sobre action-faint (8.4:1)
  *           secciones ink-muted (6.1:1) · pestaña activa action (6.5:1)
  */
 
@@ -44,21 +44,21 @@
 main:focus { outline: none; }
 
 /* ── Marca ──────────────────────────────────────────────────────────────── */
-/* Cuadro ardoise con una cota menthe en la esquina: la firma del escaneo. */
+/* Cuadro abeto con una cota vélin en la esquina: la firma del escaneo. */
 .brand-mark {
   position: relative;
   flex-shrink: 0;
   width: 28px;
   height: 28px;
   border-radius: var(--ds-radius-md);
-  background: var(--ds-ink);
+  background: var(--ds-action);
 }
 .brand-mark::after {
   content: '';
   position: absolute;
   inset: 7px 7px 7px 7px;
-  border-left: 2px solid var(--ds-scan);
-  border-bottom: 2px solid var(--ds-scan);
+  border-left: 2px solid var(--ds-ink-inverse);
+  border-bottom: 2px solid var(--ds-ink-inverse);
 }
 
 /* ── Avatar ─────────────────────────────────────────────────────────────── */
@@ -70,7 +70,7 @@ main:focus { outline: none; }
   height: 36px;
   overflow: hidden;
   border-radius: var(--ds-radius-circle);
-  background: var(--ds-stone);
+  background: var(--ds-band);
   color: var(--ds-ink);
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-sm);
@@ -112,6 +112,7 @@ main:focus { outline: none; }
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-black);
+  font-stretch: var(--ds-stretch-heading);
   text-decoration: none;
   white-space: nowrap;
 }
@@ -177,14 +178,14 @@ main:focus { outline: none; }
 @media (hover: hover) and (pointer: fine) {
   .sb__item:hover { background: var(--ds-bg-alt); color: var(--ds-ink); }
 }
-.sb__item:active { background: var(--ds-stone); }
+.sb__item:active { background: var(--ds-band); }
 
 .sb__item.is-active {
-  background: var(--ds-scan-soft);
+  background: var(--ds-action-faint);
   color: var(--ds-action-ink);
   font-weight: var(--ds-weight-bold);
 }
-/* Barra sapin: marca la página actual sin depender solo del color de fondo. */
+/* Barra abeto: marca la página actual sin depender solo del color de fondo. */
 .sb__item.is-active::before {
   content: '';
   position: absolute;
@@ -232,7 +233,7 @@ main:focus { outline: none; }
 @media (hover: hover) and (pointer: fine) {
   .sb__user:hover { background: var(--ds-bg-alt); }
 }
-.sb__user.is-active { background: var(--ds-scan-soft); }
+.sb__user.is-active { background: var(--ds-action-faint); }
 
 .sb__user-info {
   display: grid;
@@ -449,12 +450,12 @@ main:focus { outline: none; }
   .tabs__item:focus-visible mat-icon { box-shadow: var(--ds-focus-ring); }
   .tabs__item:active mat-icon { transform: scale(0.94); }
   .tabs__item.is-active { color: var(--ds-action); font-weight: var(--ds-weight-bold); }
-  .tabs__item.is-active mat-icon { background: var(--ds-scan-soft); }
+  .tabs__item.is-active mat-icon { background: var(--ds-action-faint); }
 }
 
 /* ── Hoja «Plus» (se pinta en el overlay; hereda el encapsulado de este componente) ── */
 .plus {
-  --mat-list-active-indicator-color: var(--ds-scan-soft);
+  --mat-list-active-indicator-color: var(--ds-action-faint);
   --mat-list-active-indicator-shape: var(--ds-radius-md);
   --mat-list-list-item-leading-icon-color: var(--ds-ink-muted);
   --mat-list-list-item-label-text-color: var(--ds-ink);
@@ -476,6 +477,7 @@ main:focus { outline: none; }
   margin: 0 0 var(--ds-space-2);
   padding: 0 var(--ds-space-4);
   font-family: var(--ds-font-display);
+  font-stretch: var(--ds-stretch-heading);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
   color: var(--ds-ink);

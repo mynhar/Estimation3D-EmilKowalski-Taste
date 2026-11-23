@@ -1,619 +1,377 @@
-<div class="container-fluid py-4 px-3 px-xl-4 create-wrap">
+<div class="page-wrapper fc">
 
-  <!-- ══════════════════════════════════════════════════════════════════════ -->
-  <!-- Encabezado · identidad + stepper (única representación del progreso)   -->
-  <!-- ══════════════════════════════════════════════════════════════════════ -->
-  <header class="create-header mb-4">
-
-    <div class="create-header__top">
-      <a routerLink="/admin/file" class="back-btn"
-         [title]="'common.back' | translate" [attr.aria-label]="'common.back' | translate">
-        <i class="bi bi-arrow-left" aria-hidden="true"></i>
-      </a>
-
-      <div class="create-header__id">
-        <span class="create-eyebrow">
-          <i class="bi bi-shield-check" aria-hidden="true"></i>
-          {{ 'role.administrateur' | translate }}
-        </span>
-        <h1 class="create-title">{{ 'admin_file_create.title' | translate }}</h1>
-        <p class="create-sub">{{ 'admin_file_create.subtitle' | translate }}</p>
-      </div>
-
-      <p class="step-count" aria-live="polite">
-        <span class="step-count__num">{{ completedSteps() }}</span><span class="step-count__den">/4</span>
-        <span class="step-count__lbl">{{ 'file_create.steps_label' | translate }}</span>
+  <!-- ── Cabecera ────────────────────────────────────────────────────────── -->
+  <header class="fc-head">
+    <button mat-button type="button" class="fc-back" (click)="onCancel()">
+      <mat-icon>arrow_back</mat-icon>
+      {{ 'common.back' | translate }}
+    </button>
+    <app-page-header [titulo]="'admin_file_create.title' | translate"
+                     [contexto]="'admin_file_create.subtitle' | translate">
+      <p actions class="fc-count" aria-live="polite">
+        <span class="fc-count__num">{{ completedSteps() }}/4</span>
+        {{ 'file_create.steps_label' | translate }}
       </p>
-    </div>
-
-    <!-- Stepper con etiquetas: sustituye a los dots + barra + lista del sidebar -->
-    <ol class="stepper" [attr.aria-label]="'file_create.steps_label' | translate">
-      @for (step of STEPS; let i = $index; let last = $last; track step) {
-        <li class="stepper__item" [class.stepper__item--done]="stepDone(i)">
-          <span class="stepper__dot">
-            @if (stepDone(i)) {
-              <i class="bi bi-check-lg" aria-hidden="true"></i>
-            } @else {
-              {{ i + 1 }}
-            }
-          </span>
-          <span class="stepper__lbl">{{ step | translate }}</span>
-          @if (!last) {
-            <span class="stepper__line" [class.stepper__line--done]="stepDone(i)" aria-hidden="true"></span>
-          }
-        </li>
-      }
-    </ol>
+    </app-page-header>
   </header>
 
-  <!-- ══════════════════════════════════════════════════════════════════════ -->
-  <!-- Cuerpo · lienzo de formulario a ancho completo + raíl de resumen       -->
-  <!-- ══════════════════════════════════════════════════════════════════════ -->
-  <div class="create-body">
+  <div class="fc-body">
 
-    <div class="form-canvas">
+    <div class="fc-canvas">
 
-      @if (error()) {
-        <div class="form-alert canvas-alert d-lg-none" role="alert">
-          <i class="bi bi-exclamation-triangle flex-shrink-0" aria-hidden="true"></i>
-          <span>{{ error() | translate }}</span>
-        </div>
-      }
-
-      <!-- Qué falta · en móvil, arriba del lienzo (el botón es la barra fija);
-           en escritorio la copia va en el raíl, bajo los botones. -->
-      <app-campos-faltantes class="canvas-alert d-lg-none"
-        [formulario]="[expedienteForm, localizacionForm]"
-        [extra]="extraFaltantes()"
-        [intento]="intentos()" />
-
-      <!-- ═══ PASO 1 · Cliente ═══════════════════════════════════════════════ -->
-      <section class="section-card section-card--pop area-cliente"
-               [class.section-card--done]="step1Complete()"
-               [attr.aria-label]="'admin_file_create.step2_title' | translate">
-
-        <div class="section-head">
-          <span class="section-num" [class.section-num--done]="step1Complete()" aria-hidden="true">
-            @if (step1Complete()) { <i class="bi bi-check-lg"></i> } @else { 1 }
+      <!-- ═══ 1 · Cliente ═══════════════════════════════════════════════════ -->
+      <section class="fc-card" [class.is-done]="step1Complete()" aria-labelledby="fc-client-title">
+        <div class="fc-card__head">
+          <span class="fc-num" aria-hidden="true">
+            @if (step1Complete()) { <mat-icon>check</mat-icon> } @else { 1 }
           </span>
-          <span class="section-head__text">
-            <span class="section-title">{{ 'admin_file_create.step2_title' | translate }}</span>
-            <small class="section-hint">{{ 'admin_file_create.step2_hint' | translate }}</small>
-          </span>
+          <div class="fc-card__titles">
+            <h2 class="fc-h2" id="fc-client-title">{{ 'admin_file_create.step2_title' | translate }}</h2>
+            <p class="fc-hint">{{ 'admin_file_create.step2_hint' | translate }}</p>
+          </div>
           @if (step1Complete()) {
-            <span class="done-pill">
-              <i class="bi bi-check-circle" aria-hidden="true"></i>
-              {{ 'file_create.done' | translate }}
-            </span>
+            <span class="fc-done">{{ 'file_create.done' | translate }}</span>
           }
         </div>
 
-        <div class="section-body">
-          @if (cargandoClientes()) {
-            <div class="loading-inline">
-              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-              {{ 'common.loading' | translate }}
-            </div>
-          } @else {
-            <div class="fgrid">
+        @if (cargandoClientes()) {
+          <p class="fc-loading" role="status">
+            <span class="fc-spinner" aria-hidden="true"></span>
+            {{ 'common.loading' | translate }}
+          </p>
+        } @else {
+          <div class="fc-grid">
+            <div class="fc-cli-search">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>{{ 'admin_file_create.client_label' | translate }}</mat-label>
+                <mat-icon matPrefix aria-hidden="true">search</mat-icon>
+                <input matInput id="client-search-input" type="text" autocomplete="off"
+                       [matAutocomplete]="clientesAuto"
+                       [value]="busquedaCliente()"
+                       [placeholder]="'admin_file_create.client_placeholder' | translate"
+                       [attr.aria-invalid]="clienteRequerido() || null"
+                       [attr.aria-describedby]="clienteRequerido() ? 'fc-client-error' : null"
+                       (input)="setBusquedaCliente($event)" />
+                @if (clienteId()) {
+                  <button mat-icon-button matSuffix type="button"
+                          [attr.aria-label]="'common.clear' | translate" (click)="limpiarCliente()">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                }
+              </mat-form-field>
 
-              <div class="c-6">
-                <label class="form-label" for="client-search-input">
-                  {{ 'admin_file_create.client_label' | translate }}
-                  <span class="req-mark" aria-hidden="true">*</span>
-                </label>
-
-                <div class="client-search">
-                  <div class="input-group">
-                    <span class="input-group-text" aria-hidden="true"><i class="bi bi-search"></i></span>
-                    <input id="client-search-input"
-                           type="text" class="form-control"
-                           [value]="busquedaCliente()"
-                           [placeholder]="'admin_file_create.client_placeholder' | translate"
-                           (input)="setBusquedaCliente($event)"
-                           (focus)="dropdownVisible.set(true)"
-                           (blur)="cerrarDropdown()"
-                           autocomplete="off"
-                           role="combobox"
-                           aria-haspopup="listbox"
-                           [attr.aria-expanded]="dropdownVisible()" />
-                    @if (clienteId()) {
-                      <button class="btn btn-outline-secondary" type="button"
-                              (click)="limpiarCliente()"
-                              [attr.aria-label]="'common.clear' | translate">
-                        <i class="bi bi-x-lg" aria-hidden="true"></i>
-                      </button>
-                    }
-                  </div>
-
-                  @if (dropdownVisible() && clientesFiltrados().length > 0) {
-                    <ul class="client-dropdown list-unstyled mb-0" role="listbox">
-                      @for (c of clientesFiltrados(); track c.id) {
-                        <li class="client-option" role="option" [attr.aria-selected]="clienteId() === c.id"
-                            (mousedown)="seleccionarCliente(c)">
-                          <span class="client-avatar">{{ iniciales(c.nombre, c.apellido) }}</span>
-                          <span class="client-option__text">
-                            <span class="client-option__name">{{ c.nombre }} {{ c.apellido }}</span>
-                            <span class="client-option__email">{{ c.email ?? '—' }}</span>
-                          </span>
-                          <i class="bi bi-chevron-right client-option__arrow" aria-hidden="true"></i>
-                        </li>
-                      }
-                    </ul>
-                  }
-
-                  @if (dropdownVisible() && clientesFiltrados().length === 0) {
-                    <div class="client-empty">
-                      <i class="bi bi-person-x" aria-hidden="true"></i>
+              <mat-autocomplete #clientesAuto="matAutocomplete" [displayWith]="nombreCliente"
+                                (optionSelected)="seleccionarCliente($event.option.value)">
+                @for (c of clientesFiltrados(); track c.id) {
+                  <mat-option [value]="c">
+                    <span class="fc-cli-opt">
+                      <span class="fc-avatar" aria-hidden="true">{{ iniciales(c.nombre, c.apellido) }}</span>
+                      <span class="fc-cli-opt__text">
+                        <span class="fc-cli-opt__name">{{ c.nombre }} {{ c.apellido }}</span>
+                        <span class="fc-cli-opt__email">{{ c.email ?? '—' }}</span>
+                      </span>
+                    </span>
+                  </mat-option>
+                } @empty {
+                  <mat-option disabled>
+                    <span class="fc-cli-opt is-empty">
+                      <mat-icon aria-hidden="true">person_off</mat-icon>
                       {{ 'admin_file_create.no_clients' | translate }}
-                    </div>
-                  }
-                </div>
+                    </span>
+                  </mat-option>
+                }
+              </mat-autocomplete>
 
-                @if (clienteRequerido()) {
-                  <p class="field-error mt-2" role="alert">
-                    <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
-                    {{ 'admin_file_create.client_required' | translate }}
+              @if (clienteRequerido()) {
+                <p class="fc-error" id="fc-client-error" role="alert">
+                  <mat-icon aria-hidden="true">error</mat-icon>{{ 'admin_file_create.client_required' | translate }}
+                </p>
+              }
+            </div>
+
+            <!-- Cliente elegido: ocupa la columna libre en vez de dejar hueco -->
+            @if (clienteSeleccionado(); as cli) {
+              <div class="fc-cli">
+                <span class="fc-avatar is-lg" aria-hidden="true">{{ iniciales(cli.nombre, cli.apellido) }}</span>
+                <span class="fc-cli__text">
+                  <span class="fc-cli__name">{{ cli.nombre }} {{ cli.apellido }}</span>
+                  <span class="fc-cli__meta">
+                    <mat-icon aria-hidden="true">mail</mat-icon>
+                    <!-- Corte preferente antes de la arroba: el correo no se parte a mitad de dominio. -->
+                    @if (cli.email; as email) {
+                      <span>{{ email.split('@')[0] }}<wbr>&#64;{{ email.split('@')[1] }}</span>
+                    } @else { — }
+                  </span>
+                  @if (cli.telefono) {
+                    <span class="fc-cli__meta">
+                      <mat-icon aria-hidden="true">call</mat-icon>{{ cli.telefono }}
+                    </span>
+                  }
+                </span>
+              </div>
+            } @else {
+              <p class="fc-cli is-empty">
+                <mat-icon aria-hidden="true">badge</mat-icon>
+                {{ 'admin_file_create.client_none' | translate }}
+              </p>
+            }
+          </div>
+        }
+      </section>
+
+      <!-- ═══ 2 · Servicio ══════════════════════════════════════════════════ -->
+      <section class="fc-card" [class.is-done]="step2Complete()" aria-labelledby="srv-title">
+        <div class="fc-card__head">
+          <span class="fc-num" aria-hidden="true">
+            @if (step2Complete()) { <mat-icon>check</mat-icon> } @else { 2 }
+          </span>
+          <div class="fc-card__titles">
+            <h2 class="fc-h2" id="srv-title">{{ 'file_create.step1_title' | translate }}</h2>
+            <p class="fc-hint" id="srv-hint">{{ 'service_selector.hint' | translate }}</p>
+          </div>
+          @if (step2Complete()) {
+            <span class="fc-done">{{ 'file_create.done' | translate }}</span>
+          }
+        </div>
+
+        @if (cargandoServicios()) {
+          <p class="fc-loading" role="status">
+            <span class="fc-spinner" aria-hidden="true"></span>
+            {{ 'file_create.loading_services' | translate }}
+          </p>
+        } @else {
+          <app-servicio-selector
+            [opciones]="opcionesServicio()"
+            [(seleccion)]="servicioIds"
+            [validar]="intentado()"
+            [disabled]="enviando()"
+            labelledBy="srv-title"
+            describedBy="srv-hint" />
+        }
+      </section>
+
+      <!-- ═══ 3 · Visita ════════════════════════════════════════════════════ -->
+      <section class="fc-card" [class.is-done]="step3Complete()" aria-labelledby="fc-visit-title">
+        <div class="fc-card__head">
+          <span class="fc-num" aria-hidden="true">
+            @if (step3Complete()) { <mat-icon>check</mat-icon> } @else { 3 }
+          </span>
+          <div class="fc-card__titles">
+            <h2 class="fc-h2" id="fc-visit-title">{{ 'file_create.step3_title' | translate }}</h2>
+            <p class="fc-hint">{{ 'file_create.step3_hint' | translate }}</p>
+          </div>
+          @if (step3Complete()) {
+            <span class="fc-done">{{ 'file_create.done' | translate }}</span>
+          }
+        </div>
+
+        <form [formGroup]="expedienteForm" class="fc-grid" novalidate>
+          <mat-form-field appearance="outline" hideRequiredMarker>
+            <mat-label>{{ 'file_create.desired_date' | translate }}</mat-label>
+            <input matInput id="fecha-visita" type="date" formControlName="fecha_visita">
+            <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'file_create.field_required' | translate }}</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" hideRequiredMarker>
+            <mat-label>{{ 'file_create.preferred_time' | translate }}</mat-label>
+            <input matInput id="hora-visita" type="time" formControlName="hora_visita">
+            <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'file_create.field_required' | translate }}</mat-error>
+          </mat-form-field>
+
+          <p class="fc-note fc-span">
+            <mat-icon aria-hidden="true">schedule</mat-icon>
+            <span>{{ 'file_create.schedule_before' | translate }}
+              <strong>{{ 'file_create.schedule_days' | translate }}</strong>.
+              {{ 'file_create.schedule_after' | translate }}</span>
+          </p>
+
+          <mat-form-field appearance="outline" class="fc-span" subscriptSizing="dynamic">
+            <mat-label>{{ 'file_create.problem_desc' | translate }} ({{ 'common.optional' | translate | lowercase }})</mat-label>
+            <textarea matInput id="descripcion" rows="4" formControlName="descripcion" maxlength="500"
+                      [placeholder]="'file_create.problem_placeholder' | translate"></textarea>
+            <mat-hint>{{ 'file_create.problem_hint' | translate }}</mat-hint>
+            <mat-hint align="end" class="fc-counter" [class.is-warn]="descripcionLen() > 450">{{ descripcionLen() }}/500</mat-hint>
+          </mat-form-field>
+        </form>
+      </section>
+
+      <!-- ═══ 4 · Localización ══════════════════════════════════════════════ -->
+      <section class="fc-card" [class.is-done]="step4Complete()" aria-labelledby="fc-place-title">
+        <div class="fc-card__head">
+          <span class="fc-num" aria-hidden="true">
+            @if (step4Complete()) { <mat-icon>check</mat-icon> } @else { 4 }
+          </span>
+          <div class="fc-card__titles">
+            <h2 class="fc-h2" id="fc-place-title">{{ 'file_create.step4_title' | translate }}</h2>
+            <p class="fc-hint">{{ 'file_create.step4_hint' | translate }}</p>
+          </div>
+          @if (step4Complete()) {
+            <span class="fc-done">{{ 'file_create.done' | translate }}</span>
+          }
+        </div>
+
+        <form [formGroup]="localizacionForm" class="fc-grid fc-grid--addr" novalidate>
+
+          <!-- Origen de la dirección: el perfil del cliente no se modifica -->
+          @if (clienteConDireccion()) {
+            <div class="fc-source fc-span">
+              <mat-icon aria-hidden="true">info</mat-icon>
+              <p class="fc-source__text">
+                {{ (direccionDesdeCliente() ? 'file_create.address_from_client' : 'file_create.address_from_client_off') | translate }}
+              </p>
+              @if (!direccionDesdeCliente()) {
+                <button mat-stroked-button type="button" (click)="aplicarDireccionCliente()">
+                  <mat-icon>sync</mat-icon>
+                  {{ 'file_create.use_client_address' | translate }}
+                </button>
+              }
+            </div>
+          }
+
+          <div class="fc-span fc-type-block">
+            <p class="fc-label" id="tipo-inmueble-label">{{ 'file_create.property_type' | translate }}</p>
+            <div class="fc-types" role="radiogroup" aria-labelledby="tipo-inmueble-label"
+                 [attr.aria-describedby]="invalid(localizacionForm, 'tipo_inmueble') ? 'tipo-error' : null">
+              @for (tipo of tiposInmueble; track tipo.value) {
+                <label class="fc-type">
+                  <input type="radio" class="cdk-visually-hidden" name="tipo_inmueble"
+                         formControlName="tipo_inmueble" [value]="tipo.value" />
+                  <mat-icon aria-hidden="true">{{ tipo.matIcon }}</mat-icon>
+                  <span class="fc-type__label">{{ tipo.label | translate }}</span>
+                </label>
+              }
+            </div>
+            @if (invalid(localizacionForm, 'tipo_inmueble')) {
+              <p class="fc-error" id="tipo-error">
+                <mat-icon aria-hidden="true">error</mat-icon>{{ 'file_create.type_required' | translate }}
+              </p>
+            }
+          </div>
+
+          <mat-form-field appearance="outline" class="fc-unit" subscriptSizing="dynamic">
+            <mat-label>{{ 'file_create.unit_number' | translate }} ({{ 'common.optional' | translate | lowercase }})</mat-label>
+            <input matInput id="numero-unidad" formControlName="numero_unidad" autocomplete="address-line2">
+            <mat-hint>{{ 'file_create.unit_hint' | translate }}</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="fc-street" hideRequiredMarker>
+            <mat-label>{{ 'file_create.street_address' | translate }}</mat-label>
+            <input matInput id="calle" formControlName="calle" autocomplete="address-line1">
+            <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'file_create.address_required' | translate }}</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" hideRequiredMarker>
+            <mat-label>{{ 'file_create.ca_city' | translate }}</mat-label>
+            <input matInput id="ciudad" formControlName="ciudad" autocomplete="address-level2">
+            <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'file_create.field_required' | translate }}</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" hideRequiredMarker>
+            <mat-label>{{ 'file_create.province_territory' | translate }}</mat-label>
+            <mat-select id="provincia" formControlName="provincia_ca">
+              @for (p of provinciasCanada; track p.code) {
+                <mat-option [value]="p.code">{{ p.nombre }} ({{ p.code }})</mat-option>
+              }
+            </mat-select>
+            <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'file_create.field_required' | translate }}</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" hideRequiredMarker>
+            <mat-label>{{ 'file_create.postal_code' | translate }}</mat-label>
+            <input matInput id="codigo-postal" class="fc-upper" formControlName="codigo_postal"
+                   autocomplete="postal-code" maxlength="7">
+            <mat-hint>{{ 'file_create.postal_hint' | translate }}</mat-hint>
+            <mat-error>
+              <mat-icon aria-hidden="true">error</mat-icon>
+              {{ (localizacionForm.get('codigo_postal')?.hasError('required') ? 'file_create.field_required' : 'file_create.postal_invalid') | translate }}
+            </mat-error>
+          </mat-form-field>
+
+          <!-- GPS: plegado por defecto -->
+          <div class="fc-span">
+            <button type="button" class="fc-gps-toggle"
+                    (click)="gpsVisible.set(!gpsVisible())"
+                    [attr.aria-expanded]="gpsVisible()" aria-controls="gps-panel">
+              <mat-icon aria-hidden="true">explore</mat-icon>
+              <span>{{ 'file_create.gps_coords' | translate }} <span class="fc-opt">({{ 'common.optional' | translate | lowercase }})</span></span>
+              <mat-icon class="fc-gps-toggle__caret" aria-hidden="true">expand_more</mat-icon>
+            </button>
+
+            @if (gpsVisible()) {
+              <div id="gps-panel" class="fc-gps">
+                <p class="fc-hint">{{ 'file_create.gps_hint' | translate }}</p>
+                <div class="fc-gps__fields">
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ 'file_create.latitude' | translate }}</mat-label>
+                    <input matInput id="latitud" type="number" step="any" formControlName="latitud" placeholder="45.5019">
+                  </mat-form-field>
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ 'file_create.longitude' | translate }}</mat-label>
+                    <input matInput id="longitud" type="number" step="any" formControlName="longitud" placeholder="-73.5674">
+                  </mat-form-field>
+                  <button mat-stroked-button type="button" class="fc-gps__btn"
+                          (click)="usarUbicacion()" [disabled]="ubicacionCargando()">
+                    @if (ubicacionCargando()) { <span class="fc-spinner" aria-hidden="true"></span> } @else { <mat-icon>my_location</mat-icon> }
+                    {{ (ubicacionCargando() ? 'file_create.getting_location' : 'file_create.use_location') | translate }}
+                  </button>
+                </div>
+                @if (ubicacionError()) {
+                  <p class="fc-error" role="alert">
+                    <mat-icon aria-hidden="true">error</mat-icon>{{ ubicacionError() | translate }}
                   </p>
                 }
               </div>
-
-              <!-- Panel del cliente elegido: ocupa la mitad libre en vez de dejar hueco -->
-              <div class="c-6">
-                @if (clienteSeleccionado(); as cli) {
-                  <div class="client-selected">
-                    <span class="client-avatar client-avatar--lg">
-                      {{ iniciales(cli.nombre, cli.apellido) }}
-                    </span>
-                    <span class="client-selected__text">
-                      <span class="client-selected__name">{{ cli.nombre }} {{ cli.apellido }}</span>
-                      <span class="client-selected__meta">
-                        <i class="bi bi-envelope" aria-hidden="true"></i>{{ cli.email ?? '—' }}
-                      </span>
-                      @if (cli.telefono) {
-                        <span class="client-selected__meta">
-                          <i class="bi bi-telephone" aria-hidden="true"></i>{{ cli.telefono }}
-                        </span>
-                      }
-                    </span>
-                    <i class="bi bi-check-circle selected-check" aria-hidden="true"></i>
-                  </div>
-                } @else {
-                  <div class="client-placeholder">
-                    <i class="bi bi-person-badge" aria-hidden="true"></i>
-                    {{ 'admin_file_create.client_none' | translate }}
-                  </div>
-                }
-              </div>
-
-            </div>
-          }
-        </div>
-      </section>
-
-      <!-- ═══ PASO 2 · Servicio ══════════════════════════════════════════════ -->
-      <section class="section-card area-servicio" [class.section-card--done]="step2Complete()"
-               [attr.aria-label]="'file_create.step1_title' | translate">
-
-        <div class="section-head">
-          <span class="section-num" [class.section-num--done]="step2Complete()" aria-hidden="true">
-            @if (step2Complete()) { <i class="bi bi-check-lg"></i> } @else { 2 }
-          </span>
-          <span class="section-head__text">
-            <span class="section-title" id="srv-title">{{ 'file_create.step1_title' | translate }}</span>
-            <small class="section-hint" id="srv-hint">{{ 'service_selector.hint' | translate }}</small>
-          </span>
-          @if (step2Complete()) {
-            <span class="done-pill">
-              <i class="bi bi-check-circle" aria-hidden="true"></i>
-              {{ 'file_create.done' | translate }}
-            </span>
-          }
-        </div>
-
-        <div class="section-body">
-          @if (cargandoServicios()) {
-            <div class="loading-inline">
-              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-              {{ 'file_create.loading_services' | translate }}
-            </div>
-          } @else {
-            <app-servicio-selector
-              [opciones]="opcionesServicio()"
-              [(seleccion)]="servicioIds"
-              [validar]="intentado()"
-              [disabled]="enviando()"
-              labelledBy="srv-title"
-              describedBy="srv-hint" />
-          }
-        </div>
-      </section>
-
-      <!-- ═══ PASO 3 · Visita ════════════════════════════════════════════════ -->
-      <section class="section-card area-visita" [class.section-card--done]="step3Complete()"
-               [attr.aria-label]="'file_create.step3_title' | translate">
-
-        <div class="section-head">
-          <span class="section-num" [class.section-num--done]="step3Complete()" aria-hidden="true">
-            @if (step3Complete()) { <i class="bi bi-check-lg"></i> } @else { 3 }
-          </span>
-          <span class="section-head__text">
-            <span class="section-title">{{ 'file_create.step3_title' | translate }}</span>
-            <small class="section-hint">{{ 'file_create.step3_hint' | translate }}</small>
-          </span>
-          @if (step3Complete()) {
-            <span class="done-pill">
-              <i class="bi bi-check-circle" aria-hidden="true"></i>
-              {{ 'file_create.done' | translate }}
-            </span>
-          }
-        </div>
-
-        <div class="section-body">
-          <form [formGroup]="expedienteForm" class="fgrid">
-
-            <div class="c-3">
-              <label class="form-label" for="fecha-visita">
-                {{ 'file_create.desired_date' | translate }}
-                <span class="req-mark" aria-hidden="true">*</span>
-              </label>
-              <div class="input-group">
-                <span class="input-group-text" aria-hidden="true"><i class="bi bi-calendar3"></i></span>
-                <input id="fecha-visita" type="date" class="form-control" formControlName="fecha_visita" />
-              </div>
-              @if (invalid(expedienteForm, 'fecha_visita')) {
-                <p class="field-error" role="alert">
-                  <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
-                  {{ 'file_create.field_required' | translate }}
-                </p>
-              }
-            </div>
-
-            <div class="c-3">
-              <label class="form-label" for="hora-visita">
-                {{ 'file_create.preferred_time' | translate }}
-                <span class="req-mark" aria-hidden="true">*</span>
-              </label>
-              <div class="input-group">
-                <span class="input-group-text" aria-hidden="true"><i class="bi bi-clock"></i></span>
-                <input id="hora-visita" type="time" class="form-control" formControlName="hora_visita" />
-              </div>
-              @if (invalid(expedienteForm, 'hora_visita')) {
-                <p class="field-error" role="alert">
-                  <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
-                  {{ 'file_create.field_required' | translate }}
-                </p>
-              }
-            </div>
-
-            <div class="c-6">
-              <div class="info-note">
-                <i class="bi bi-info-circle flex-shrink-0" aria-hidden="true"></i>
-                <span>{{ 'file_create.schedule_before' | translate }}
-                  <strong>{{ 'file_create.schedule_days' | translate }}</strong>.
-                  {{ 'file_create.schedule_after' | translate }}
-                </span>
-              </div>
-            </div>
-
-            <div class="c-12">
-              <label class="form-label" for="descripcion">
-                {{ 'file_create.problem_desc' | translate }}
-                <span class="opt-label">({{ 'common.optional' | translate }})</span>
-              </label>
-              <textarea id="descripcion" class="form-control" rows="3"
-                        formControlName="descripcion"
-                        maxlength="500"
-                        [placeholder]="'file_create.problem_placeholder' | translate"></textarea>
-              <div class="field-foot">
-                <small class="text-ink-muted">{{ 'file_create.problem_hint' | translate }}</small>
-                <span class="char-counter" [class.char-counter--warn]="descripcionLen() > 450">
-                  {{ descripcionLen() }}/500
-                </span>
-              </div>
-            </div>
-
-          </form>
-        </div>
-      </section>
-
-      <!-- ═══ PASO 4 · Localización ══════════════════════════════════════════ -->
-      <section class="section-card area-ubicacion" [class.section-card--done]="step4Complete()"
-               [attr.aria-label]="'file_create.step4_title' | translate">
-
-        <div class="section-head">
-          <span class="section-num" [class.section-num--done]="step4Complete()" aria-hidden="true">
-            @if (step4Complete()) { <i class="bi bi-check-lg"></i> } @else { 4 }
-          </span>
-          <span class="section-head__text">
-            <span class="section-title">{{ 'file_create.step4_title' | translate }}</span>
-            <small class="section-hint">{{ 'file_create.step4_hint' | translate }}</small>
-          </span>
-          <span class="country-badge">
-            <i class="bi bi-geo-alt" aria-hidden="true"></i>
-            {{ 'file_create.country_ca' | translate }}
-          </span>
-          @if (step4Complete()) {
-            <span class="done-pill">
-              <i class="bi bi-check-circle" aria-hidden="true"></i>
-              {{ 'file_create.done' | translate }}
-            </span>
-          }
-        </div>
-
-        <div class="section-body">
-          <form [formGroup]="localizacionForm" class="fgrid">
-
-            <!-- Origen de la dirección · el perfil del cliente no se modifica -->
-            @if (clienteConDireccion()) {
-              <div class="c-12">
-                <div class="addr-source">
-                  <i class="bi bi-info-circle flex-shrink-0" aria-hidden="true"></i>
-                  <span class="addr-source__text">
-                    @if (direccionDesdeCliente()) {
-                      {{ 'file_create.address_from_client' | translate }}
-                    } @else {
-                      {{ 'file_create.address_from_client_off' | translate }}
-                    }
-                  </span>
-                  <button type="button" class="addr-source__btn" (click)="aplicarDireccionCliente()">
-                    <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
-                    {{ 'file_create.use_client_address' | translate }}
-                  </button>
-                </div>
-              </div>
             }
-
-            <!-- Tipo de inmueble -->
-            <div class="c-12">
-              <label class="form-label">
-                {{ 'file_create.property_type' | translate }}
-                <span class="req-mark" aria-hidden="true">*</span>
-              </label>
-              <div class="tipo-group" role="radiogroup"
-                   [attr.aria-label]="'file_create.property_type' | translate">
-                @for (tipo of tiposInmueble; track tipo.value) {
-                  <div class="tipo-cell">
-                    <input type="radio" class="btn-check"
-                           [id]="'tipo-' + tipo.value"
-                           name="tipo_inmueble"
-                           autocomplete="off"
-                           [value]="tipo.value"
-                           [checked]="localizacionForm.get('tipo_inmueble')?.value === tipo.value"
-                           (change)="localizacionForm.get('tipo_inmueble')?.setValue(tipo.value)" />
-                    <label class="tipo-btn" [for]="'tipo-' + tipo.value">
-                      <i class="bi {{ tipo.icon }} tipo-btn__icon" aria-hidden="true"></i>
-                      <span class="tipo-btn__label">{{ tipo.label | translate }}</span>
-                    </label>
-                  </div>
-                }
-              </div>
-              @if (invalid(localizacionForm, 'tipo_inmueble')) {
-                <p class="field-error mt-2" role="alert">
-                  <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
-                  {{ 'file_create.type_required' | translate }}
-                </p>
-              }
-            </div>
-
-            <!-- ── Dirección canadiense · las 5 casillas caben en una sola fila ── -->
-            <div class="c-2">
-              <label class="form-label" for="numero-unidad">
-                {{ 'file_create.unit_number' | translate }}
-                <span class="opt-label">({{ 'common.optional' | translate }})</span>
-              </label>
-              <input id="numero-unidad" type="text" class="form-control"
-                     formControlName="numero_unidad"
-                     [placeholder]="'file_create.unit_placeholder' | translate" />
-              <small class="form-text">{{ 'file_create.unit_hint' | translate }}</small>
-            </div>
-            <div class="c-4">
-              <label class="form-label" for="calle">
-                {{ 'file_create.street_address' | translate }}
-                <span class="req-mark" aria-hidden="true">*</span>
-              </label>
-              <div class="input-group">
-                <span class="input-group-text" aria-hidden="true"><i class="bi bi-signpost"></i></span>
-                <input id="calle" type="text" class="form-control"
-                       formControlName="calle"
-                       [placeholder]="'file_create.street_placeholder' | translate"
-                       autocomplete="street-address" />
-              </div>
-              @if (invalid(localizacionForm, 'calle')) {
-                <p class="field-error" role="alert">
-                  <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
-                  {{ 'file_create.address_required' | translate }}
-                </p>
-              }
-            </div>
-            <div class="c-2">
-              <label class="form-label" for="ciudad">
-                {{ 'file_create.ca_city' | translate }}
-                <span class="req-mark" aria-hidden="true">*</span>
-              </label>
-              <input id="ciudad" type="text" class="form-control"
-                     formControlName="ciudad" placeholder="Montréal"
-                     autocomplete="address-level2" />
-              @if (invalid(localizacionForm, 'ciudad')) {
-                <p class="field-error" role="alert">
-                  <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
-                  {{ 'file_create.field_required' | translate }}
-                </p>
-              }
-            </div>
-            <div class="c-2">
-              <label class="form-label" for="provincia-ca">
-                {{ 'file_create.province_territory' | translate }}
-                <span class="req-mark" aria-hidden="true">*</span>
-              </label>
-              <select id="provincia-ca" class="form-select"
-                      formControlName="provincia_ca" autocomplete="address-level1">
-                <option value="">{{ 'file_create.select_placeholder' | translate }}</option>
-                @for (p of provinciasCanada; track p.code) {
-                  <option [value]="p.code">{{ p.code }} — {{ p.nombre }}</option>
-                }
-              </select>
-              @if (invalid(localizacionForm, 'provincia_ca')) {
-                <p class="field-error" role="alert">
-                  <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
-                  {{ 'file_create.field_required' | translate }}
-                </p>
-              }
-            </div>
-            <div class="c-2">
-              <label class="form-label" for="codigo-postal">
-                {{ 'file_create.postal_code' | translate }}
-                <span class="req-mark" aria-hidden="true">*</span>
-              </label>
-              <input id="codigo-postal" type="text" class="form-control text-uppercase"
-                     formControlName="codigo_postal"
-                     [placeholder]="'file_create.postal_placeholder' | translate"
-                     autocomplete="postal-code" maxlength="7" />
-              @if (invalid(localizacionForm, 'codigo_postal')) {
-                <p class="field-error" role="alert">
-                  <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
-                  @if (localizacionForm.get('codigo_postal')?.errors?.['required']) {
-                    {{ 'file_create.field_required' | translate }}
-                  } @else {
-                    {{ 'file_create.postal_invalid' | translate }}
-                  }
-                </p>
-              }
-            </div>
-
-            <!-- GPS -->
-            <div class="c-12">
-              <button type="button" class="gps-toggle"
-                      (click)="gpsVisible.set(!gpsVisible())"
-                      [attr.aria-expanded]="gpsVisible()"
-                      aria-controls="gps-panel">
-                <i class="bi bi-compass" aria-hidden="true"></i>
-                <span>{{ 'file_create.gps_coords' | translate }}</span>
-                <span class="opt-label">({{ 'common.optional' | translate }})</span>
-                <i class="bi gps-toggle__caret"
-                   [class.bi-chevron-down]="!gpsVisible()"
-                   [class.bi-chevron-up]="gpsVisible()"
-                   aria-hidden="true"></i>
-              </button>
-
-              @if (gpsVisible()) {
-                <div id="gps-panel" class="gps-panel">
-                  <p class="gps-panel__hint">{{ 'file_create.gps_hint' | translate }}</p>
-
-                  <div class="gps-panel__fields">
-                    <div>
-                      <label class="form-label" for="latitud">{{ 'file_create.latitude' | translate }}</label>
-                      <input id="latitud" type="number" class="form-control"
-                             formControlName="latitud" step="any" placeholder="45.5019" />
-                    </div>
-                    <div>
-                      <label class="form-label" for="longitud">{{ 'file_create.longitude' | translate }}</label>
-                      <input id="longitud" type="number" class="form-control"
-                             formControlName="longitud" step="any" placeholder="-73.5674" />
-                    </div>
-                    <button type="button" class="btn btn-outline-primary gps-panel__btn"
-                            (click)="usarUbicacion()" [disabled]="ubicacionCargando()">
-                      @if (ubicacionCargando()) {
-                        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
-                        {{ 'file_create.getting_location' | translate }}
-                      } @else {
-                        <i class="bi bi-crosshair2 me-2" aria-hidden="true"></i>
-                        {{ 'file_create.use_location' | translate }}
-                      }
-                    </button>
-                  </div>
-
-                  @if (ubicacionError()) {
-                    <p class="field-error mt-3" role="alert">
-                      <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
-                      {{ ubicacionError() | translate }}
-                    </p>
-                  }
-                </div>
-              }
-            </div>
-
-          </form>
-        </div>
+          </div>
+        </form>
       </section>
-
-      <div class="pb-mobile-bar d-lg-none"></div>
     </div>
 
-    <!-- ══ Raíl · resumen en vivo + acciones ════════════════════════════════ -->
-    <aside class="create-rail d-none d-lg-block" [attr.aria-label]="'admin_file_create.summary_title' | translate">
-      <div class="rail-sticky">
-
-        <div class="rail-card">
-          <p class="rail-label">{{ 'admin_file_create.summary_title' | translate }}</p>
-
-          <ul class="rail-list list-unstyled mb-0">
-            @for (row of resumen(); track row.label) {
-              <li class="rail-row" [class.rail-row--done]="row.done">
-                <i class="bi {{ row.icon }} rail-row__icon" aria-hidden="true"></i>
-                <span class="rail-row__text">
-                  <span class="rail-row__lbl">{{ row.label | translate }}</span>
-                  <span class="rail-row__val" [class.rail-row__val--empty]="!row.value">
-                    {{ row.value ?? ('admin_file_create.summary_pending' | translate) }}
-                  </span>
+    <!-- ── Raíl: resumen y crear ────────────────────────────────────────────
+         Desde 992px, columna fija al hacer scroll; por debajo, al final del flujo. -->
+    <aside class="fc-rail" [attr.aria-label]="'admin_file_create.summary_title' | translate">
+      <section class="fc-card fc-summary" aria-labelledby="fc-summary-title">
+        <h2 class="fc-h3" id="fc-summary-title">{{ 'admin_file_create.summary_title' | translate }}</h2>
+        <ul class="fc-summary__list">
+          @for (row of resumen(); track row.label) {
+            <li class="fc-summary__row" [class.is-done]="row.done">
+              <mat-icon class="fc-summary__icon" aria-hidden="true">{{ row.matIcon }}</mat-icon>
+              <span class="fc-summary__text">
+                <span class="fc-summary__label">{{ row.label | translate }}</span>
+                <span class="fc-summary__value" [class.is-empty]="!row.value">
+                  {{ row.value ?? ('admin_file_create.summary_pending' | translate) }}
                 </span>
-                @if (row.done) {
-                  <i class="bi bi-check-circle rail-row__check" aria-hidden="true"></i>
-                }
-              </li>
-            }
-          </ul>
-        </div>
-
-        <div class="rail-card rail-card--actions">
-          @if (error()) {
-            <div class="form-alert mb-3" role="alert">
-              <i class="bi bi-exclamation-triangle flex-shrink-0" aria-hidden="true"></i>
-              <span>{{ error() | translate }}</span>
-            </div>
+              </span>
+              @if (row.done) {
+                <mat-icon class="fc-summary__check" aria-hidden="true">check_circle</mat-icon>
+              }
+            </li>
           }
-          <button type="button" class="btn btn-primary w-100 fw-semibold mb-2"
-                  (click)="onSubmit()" [disabled]="enviando()">
-            @if (enviando()) {
-              <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
-              {{ 'admin_file_create.sending' | translate }}
-            } @else {
-              <i class="bi bi-folder-plus me-2" aria-hidden="true"></i>
-              {{ 'admin_file_create.submit_btn' | translate }}
-            }
+        </ul>
+
+        @if (error()) {
+          <p class="fc-alert" role="alert">
+            <mat-icon aria-hidden="true">error</mat-icon>
+            {{ error() | translate }}
+          </p>
+        }
+
+        <!-- Activo aunque falten datos: al pulsarlo, el resumen de abajo dice cuáles. -->
+        <div class="fc-actions">
+          <button mat-flat-button type="button" class="ds-cta fc-submit" (click)="onSubmit()" [disabled]="enviando()">
+            @if (enviando()) { <span class="fc-spinner" aria-hidden="true"></span> } @else { <mat-icon>create_new_folder</mat-icon> }
+            {{ (enviando() ? 'admin_file_create.sending' : 'admin_file_create.submit_btn') | translate }}
           </button>
-          <button type="button" class="btn btn-outline-secondary w-100"
-                  (click)="onCancel()" [disabled]="enviando()">
+          <button mat-button type="button" class="fc-cancel" (click)="onCancel()" [disabled]="enviando()">
             {{ 'common.cancel' | translate }}
           </button>
-          <!-- Debajo de los botones: el que se acaba de pulsar no se mueve. -->
-          <app-campos-faltantes class="mt-3"
-            [formulario]="[expedienteForm, localizacionForm]"
-            [extra]="extraFaltantes()"
-            [intento]="intentos()" />
         </div>
-
-      </div>
+        <!-- Debajo del botón: el que se acaba de pulsar no se mueve. -->
+        <app-campos-faltantes
+          [formulario]="[expedienteForm, localizacionForm]"
+          [extra]="extraFaltantes()"
+          [intento]="intentos()" />
+      </section>
     </aside>
-
   </div>
-
-  <!-- ══ Barra móvil ═══════════════════════════════════════════════════════ -->
-  <div class="form-actions-mobile d-lg-none">
-    <button type="button" class="btn btn-outline-secondary"
-            (click)="onCancel()" [disabled]="enviando()">
-      {{ 'common.cancel' | translate }}
-    </button>
-    <button type="button" class="btn btn-primary fw-semibold flex-grow-1"
-            (click)="onSubmit()" [disabled]="enviando()">
-      @if (enviando()) {
-        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
-        {{ 'admin_file_create.sending' | translate }}
-      } @else {
-        <i class="bi bi-folder-plus me-2" aria-hidden="true"></i>
-        {{ 'admin_file_create.submit_btn' | translate }}
-      }
-    </button>
-  </div>
-
 </div>

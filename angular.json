@@ -31,10 +31,8 @@
             ],
             "styles": [
               "src/styles/material-theme.scss",
-              "src/styles/ui-base.css",
-              "node_modules/bootstrap-icons/font/bootstrap-icons.css",
+              "src/styles/base.css",
               "src/styles/tokens.css",
-              "src/styles/bootstrap-overrides.css",
               "src/styles/components.css",
               "src/styles.css"
             ],
@@ -98,10 +96,8 @@
             ],
             "styles": [
               "src/styles/material-theme.scss",
-              "src/styles/ui-base.css",
-              "node_modules/bootstrap-icons/font/bootstrap-icons.css",
+              "src/styles/base.css",
               "src/styles/tokens.css",
-              "src/styles/bootstrap-overrides.css",
               "src/styles/components.css",
               "src/styles.css"
             ],

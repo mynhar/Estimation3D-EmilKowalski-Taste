@@ -298,15 +298,6 @@ export function debeAvanzarEstado(actual: string | null | undefined, destino: Es
   return i >= 0 && j >= 0 && i < j;
 }
 
-/** Mapa estado → { texto, clase } para la vista de mis expedientes (cliente). */
-export const ESTADO_BADGE_CLIENTE: Record<string, { texto: string; clase: string }> = {
-  nuevo:      { texto: 'Nuevo',      clase: 'bg-primary' },
-  asignado:   { texto: 'Asignado',   clase: 'bg-warning text-dark' },
-  en_proceso: { texto: 'En proceso', clase: 'bg-info text-dark' },
-  completado: { texto: 'Completado', clase: 'bg-success' },
-  cancelado:  { texto: 'Cancelado',  clase: 'bg-secondary' },
-};
-
 /** Oferta resumida para mostrar dentro de un expediente (vista cliente). */
 export interface OfertaResumen {
   id:                 string;
@@ -338,28 +329,6 @@ export interface ExpedienteConOfertas {
   ofertas: OfertaResumen[];
   url_tour: string | null;
 }
-
-/**
- * Mapa estado → clase CSS de badge para la vista de ofertas recibidas (cliente).
- * La etiqueta visible es la clave i18n `state.<estado>`, resuelta en la plantilla.
- */
-export const ESTADO_BADGE_OFERTA_RECIBIDA: Record<string, string> = {
-  en_oferta:  'bg-primary',
-  adjudicado: 'bg-warning text-dark',
-  contratado: 'bg-success',
-  cancelado:  'bg-secondary',
-  archivado:  'badge-archivado',
-};
-
-/** Mapa estado → clase CSS de badge para la lista de expedientes estimados. */
-export const ESTADO_BADGE_ESTIMADOR: Record<string, string> = {
-  estimado:   'bg-success-subtle text-success-emphasis',
-  en_oferta:  'bg-primary-subtle text-primary-emphasis',
-  adjudicado: 'bg-warning-subtle text-warning-emphasis',
-  contratado: 'bg-info-subtle text-info-emphasis',
-  cancelado:  'bg-secondary-subtle text-secondary',
-  archivado:  'badge-archivado',
-};
 
 /** Mapa estado → etiqueta legible para la lista de expedientes estimados. */
 export const ESTADO_LABEL_ESTIMADOR: Record<string, string> = {

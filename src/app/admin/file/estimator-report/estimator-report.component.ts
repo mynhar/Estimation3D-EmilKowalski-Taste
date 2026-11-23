@@ -1,6 +1,15 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { LowerCasePipe } from '@angular/common';
+import { A11yModule } from '@angular/cdk/a11y';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../../services/auth-supabase.service';
 import { ExpedienteService } from '../../../services/expediente.service';
@@ -25,9 +34,14 @@ import { CampoExtra, CamposFaltantesComponent, listaEstable } from '../../../sha
 @Component({
   selector: 'app-admin-file-estimator-report',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, TranslatePipe, MatterportInfoComponent, CamposFaltantesComponent],
+  imports: [
+    FormsModule, TranslatePipe, LowerCasePipe, A11yModule,
+    MatButtonModule, MatCheckboxModule, MatFormFieldModule, MatIconModule, MatInputModule,
+    MatSelectModule, MatTooltipModule,
+    MatterportInfoComponent, CamposFaltantesComponent,
+  ],
   templateUrl: './estimator-report.component.html',
-  styleUrl: './estimator-report.component.css',
+  styleUrls: ['../../../shared/ui/ficha/ficha.css', './estimator-report.component.css'],
 })
 export class AdminFileEstimatorReportComponent implements OnInit {
   private auth              = inject(AuthSupabaseService);

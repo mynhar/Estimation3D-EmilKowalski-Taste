@@ -19,7 +19,6 @@ export interface EventoHistorialVM {
   categoria: CategoriaEvento;
   titulo:    string;            // clave i18n
   detalle:   string | null;
-  icono:     string;
 }
 
 export interface ExpedienteHistorialVM {
@@ -72,7 +71,7 @@ export class HistorialClienteService {
       const eventos: EventoHistorialVM[] = [];
       const push = (
         fecha: string | null, categoria: CategoriaEvento, titulo: string,
-        detalle: string | null, icono: string, sufijo: string,
+        detalle: string | null, sufijo: string,
       ) => {
         if (!fecha) return;
         const ts = Date.parse(fecha);
@@ -80,44 +79,44 @@ export class HistorialClienteService {
           id: `${e.id}:${sufijo}`,
           fecha,
           ts: isNaN(ts) ? 0 : ts,
-          categoria, titulo, detalle, icono,
+          categoria, titulo, detalle,
         });
       };
 
       // ── Expediente ──
-      push(e.creado_en, 'expediente', 'history.exp_creado', null, 'bi-folder-plus', 'exp_creado');
-      push(e.fecha_visita, 'expediente', 'history.visita_programada', null, 'bi-calendar-event', 'visita_prog');
-      push(visitaRealPorExp.get(e.id) ?? null, 'expediente', 'history.visita_realizada', null, 'bi-clipboard-check', 'visita_real');
+      push(e.creado_en, 'expediente', 'history.exp_creado', null, 'exp_creado');
+      push(e.fecha_visita, 'expediente', 'history.visita_programada', null, 'visita_prog');
+      push(visitaRealPorExp.get(e.id) ?? null, 'expediente', 'history.visita_realizada', null, 'visita_real');
       if (e.estado === 'cancelado') {
-        push(e.actualizado_en, 'expediente', 'history.exp_cancelado', null, 'bi-x-circle', 'exp_cancel');
+        push(e.actualizado_en, 'expediente', 'history.exp_cancelado', null, 'exp_cancel');
       }
 
       // ── Ofertas ──
       for (const o of ofertasPorExp.get(e.id) ?? []) {
-        const detalle = `${nombrePorId.get(o.constructor_id) ?? '—'} · ${fmtPrecio.format(o.precio)}`;
-        push(o.creado_en, 'oferta', 'history.oferta_recibida', detalle, 'bi-cash-coin', `oferta_${o.id}`);
+        const detalle = `${nombrePorId.get(o.constructor_id) ?? '—'}, ${fmtPrecio.format(o.precio)}`;
+        push(o.creado_en, 'oferta', 'history.oferta_recibida', detalle, `oferta_${o.id}`);
       }
 
       // ── Contrato ──
       const c = contratoPorExp.get(e.id);
       if (c) {
-        push(c.generado_en, 'contrato', 'history.contrato_generado', null, 'bi-file-earmark-text', 'ctr_gen');
-        push(c.firmado_en, 'contrato', 'history.contrato_firmado', null, 'bi-pen', 'ctr_firma');
+        push(c.generado_en, 'contrato', 'history.contrato_generado', null, 'ctr_gen');
+        push(c.firmado_en, 'contrato', 'history.contrato_firmado', null, 'ctr_firma');
         if (c.estado === 'cancelado') {
-          push(c.actualizado_en, 'contrato', 'history.contrato_cancelado', null, 'bi-x-circle', 'ctr_cancel');
+          push(c.actualizado_en, 'contrato', 'history.contrato_cancelado', null, 'ctr_cancel');
         }
       }
 
       // ── Seguimiento de obra ──
       const s = seguimientoPorExp.get(e.id);
       if (s) {
-        push(s.fecha_inicio_real, 'obra', 'history.obra_iniciada', null, 'bi-play-circle', 'obra_ini');
+        push(s.fecha_inicio_real, 'obra', 'history.obra_iniciada', null, 'obra_ini');
         for (const r of reportesPorExp.get(e.id) ?? []) {
           const pct = r.porcentaje_acumulado ?? r.porcentaje_avance_dia;
           const detalle = pct != null ? `${Math.round(pct)} %` : null;
-          push(r.fecha, 'obra', 'history.parte_obra', detalle, 'bi-clipboard-data', `parte_${r.id}`);
+          push(r.fecha, 'obra', 'history.parte_obra', detalle, `parte_${r.id}`);
         }
-        push(s.fecha_fin_real, 'obra', 'history.obra_finalizada', null, 'bi-flag', 'obra_fin');
+        push(s.fecha_fin_real, 'obra', 'history.obra_finalizada', null, 'obra_fin');
       }
 
       eventos.sort((a, b) => b.ts - a.ts);

@@ -8,10 +8,19 @@ import {
   signal,
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ContratoService } from '../../../services/contrato.service';
 import { ContratoAdminListItem, nombreServicio } from '../../../models';
 import { PaginationComponent } from '../../../shared/pagination/pagination.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
+import { StatusChipComponent } from '../../../shared/ui/status-chip/status-chip.component';
 import {
   coincideBusqueda, direccionLinea1, direccionLinea2, direccionCompleta,
 } from '../../../shared/util/busqueda';
@@ -19,9 +28,13 @@ import {
 @Component({
   selector: 'app-admin-contract-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, TranslatePipe, PaginationComponent],
+  imports: [
+    RouterLink, TranslatePipe,
+    MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTooltipModule,
+    PaginationComponent, PageHeaderComponent, EmptyStateComponent, StatusChipComponent,
+  ],
   templateUrl: './list.component.html',
-  styleUrl: './list.component.css',
+  styleUrls: ['../../../shared/ui/lista/lista.css', './list.component.css'],
 })
 export class AdminContractListComponent implements OnInit {
   private contratoService = inject(ContratoService);
@@ -126,33 +139,16 @@ export class AdminContractListComponent implements OnInit {
   serviciosTexto(c: ContratoAdminListItem): string {
     const lang = this.translate.currentLang;
     if (c.servicios?.length) {
-      return c.servicios.map(s => nombreServicio(s, lang)).join(' · ');
+      return c.servicios.map(s => nombreServicio(s, lang)).join(', ');
     }
     if (lang === 'en') return c.servicio_nombre_en || c.servicio_nombre;
     if (lang === 'fr') return c.servicio_nombre_fr || c.servicio_nombre;
     return c.servicio_nombre;
   }
 
-  badgeExpediente(estado: string): string {
-    const map: Record<string, string> = {
-      adjudicado: 'badge-adjudicado',
-      contratado: 'badge-contratado',
-      en_oferta:  'badge-en-oferta',
-      estimado:   'badge-estimado',
-    };
-    return map[estado] ?? 'badge-en-oferta';
-  }
-
-  badgeContrato(estado: string): string {
-    const map: Record<string, string> = {
-      generado:     'badge-contrato-generado',
-      firmado:      'badge-contrato-firmado',
-      en_ejecucion: 'badge-contrato-en-ejecucion',
-      completado:   'badge-contrato-completado',
-      cancelado:    'badge-contrato-cancelado',
-      archivado:    'badge-archivado',
-    };
-    return map[estado] ?? '';
+  /** Fecha del contrato: la de firma si ya está firmado; si no, la de generación. */
+  fechaContrato(c: ContratoAdminListItem): string {
+    return this.formatFecha(c.firmado_en && c.contrato_estado !== 'generado' ? c.firmado_en : c.generado_en);
   }
 
   formatFecha(valor: string | null): string {

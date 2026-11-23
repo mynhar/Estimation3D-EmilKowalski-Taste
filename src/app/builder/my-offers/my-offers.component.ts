@@ -2,25 +2,34 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, effect, inject, s
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../services/auth-supabase.service';
 import { OfertaService } from '../../services/oferta.service';
 import { OfertaRow } from '../../models';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
+import { PageHeaderComponent } from '../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../shared/ui/empty-state/empty-state.component';
+import { StatusChipComponent } from '../../shared/ui/status-chip/status-chip.component';
 
-const ESTADO_ICON: Record<string, string> = {
-  pendiente: 'bi-hourglass',
-  aceptada:  'bi-check-circle',
-  rechazada: 'bi-x-circle',
-  archivado: 'bi-archive',
-};
+/** El servicio rellena con «—» lo que el constructor ya no puede ver (dossier archivado). */
+const SIN_DATO = '—';
 
 type VistaOfertas = 'tabla' | 'tarjetas';
 
 @Component({
   selector: 'app-my-offers',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, FormsModule, TranslatePipe, PaginationComponent],
+  imports: [
+    RouterLink, FormsModule, TranslatePipe, PaginationComponent,
+    PageHeaderComponent, EmptyStateComponent, StatusChipComponent,
+    MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTooltipModule,
+  ],
   templateUrl: './my-offers.component.html',
   styleUrl: './my-offers.component.css',
 })
@@ -116,7 +125,12 @@ export class MyOffersComponent implements OnInit {
     return o.servicio_nombre;
   }
 
-  estadoIcon(estado: string):  string { return ESTADO_ICON[estado]  ?? 'bi-circle'; }
+  readonly SIN_DATO = SIN_DATO;
+
+  /** Dossier oculto para el constructor (archivado): sin número ni servicio. */
+  sinDossier(o: OfertaRow): boolean {
+    return o.expediente_numero === SIN_DATO && o.servicio_nombre === SIN_DATO;
+  }
 
   setVista(v: VistaOfertas) {
     this.vista.set(v);
@@ -157,10 +171,10 @@ export class MyOffersComponent implements OnInit {
     return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric' }).format(d);
   }
 
+  /** «1–5» o «3»; las semanas las pone la plantilla en el idioma activo. */
   formatPlazo(min: number | null, max: number | null): string {
-    if (!min && !max) return '—';
-    if (min === max)  return `${min} sem.`;
-    return `${min ?? '?'} – ${max ?? '?'} sem.`;
+    if (min && max && min !== max) return `${min}–${max}`;
+    return String(min || max || '');
   }
 
   limpiarFiltros() {

@@ -1,389 +1,136 @@
-<!-- LIGHTBOX -->
-@if (fotoAmpliada()) {
-  <div class="lightbox-overlay" (click)="cerrarFoto()">
-    <button class="lightbox-close" type="button" (click)="cerrarFoto()"
-            [title]="'common.close' | translate">
-      <i class="bi bi-x-lg"></i>
-    </button>
-    <div class="lightbox-container" (click)="$event.stopPropagation()">
-      <img [src]="fotoAmpliada()!" class="lightbox-img" alt="" />
-    </div>
-  </div>
-}
+<div class="page-wrapper fi">
 
-<div class="fued-root">
-
+  <!-- ── Cargando ────────────────────────────────────────────────────────── -->
   @if (cargando()) {
-    <div class="fued-loading">
-      <span class="fued-spinner" role="status"></span>
-      {{ 'common.loading' | translate }}
+    <div class="fi-skel" role="status">
+      <span class="cdk-visually-hidden">{{ 'common.loading' | translate }}</span>
+      <span class="skel skel--title" aria-hidden="true"></span>
+      <span class="fi-skel__cols" aria-hidden="true">
+        <span class="skel skel--card"></span>
+        <span class="skel skel--form"></span>
+      </span>
     </div>
 
+  <!-- ── No encontrado ───────────────────────────────────────────────────── -->
   } @else if (!detalle()) {
-    <div class="fued-not-found">
-      <div class="fued-not-found__icon"><i class="bi bi-exclamation-triangle"></i></div>
-      <p class="fued-not-found__title">{{ 'file.not_found' | translate }}</p>
-      @if (errorMsg()) {
-        <p class="fued-not-found__error">{{ errorMsg() | translate }}</p>
-      }
-      <button class="fued-btn-back-outline" type="button" (click)="volver()">
-        <i class="bi bi-arrow-left"></i>{{ 'common.back' | translate }}
+    <app-empty-state class="fi-missing"
+                     matIcon="folder_off"
+                     [titulo]="'file.not_found' | translate"
+                     [texto]="errorMsg() ? (errorMsg() | translate) : ''">
+      <button actions mat-stroked-button type="button" (click)="volver()">
+        <mat-icon>arrow_back</mat-icon>
+        {{ 'common.back' | translate }}
       </button>
-    </div>
+    </app-empty-state>
 
   } @else {
+    @let d = detalle()!;
 
-    <!-- PAGE HEADER -->
-    <header class="fued-header">
-      <div class="fued-header__top">
-        <button class="fued-btn-back" type="button" (click)="volver()"
-                [title]="'common.back' | translate">
-          <i class="bi bi-arrow-left"></i>
-        </button>
-        <span class="fued-header__eyebrow">
-          <i class="bi bi-shield-check"></i>
-          {{ 'role.administrateur' | translate }} · {{ 'admin_offer.title' | translate }}
-        </span>
-        <!-- Archivar: arriba a la derecha. Desaparece una vez archivado. -->
+    <!-- ── Cabecera ────────────────────────────────────────────────────── -->
+    <header class="fi-head">
+      <button mat-button type="button" class="fi-back" (click)="volver()">
+        <mat-icon>arrow_back</mat-icon>
+        {{ 'common.back' | translate }}
+      </button>
+      <app-page-header [titulo]="servicioNombre()">
+        <!-- Archivar: desaparece una vez archivado. -->
         @if (!archivado()) {
-          <div class="fued-header__acciones">
-            <app-boton-archivar [control]="archivo" />
-          </div>
+          <app-boton-archivar actions [control]="archivo" />
         }
-      </div>
-      <div class="fued-header__body">
-        <div class="fued-header__info">
-          <p class="fued-header__num">{{ detalle()!.numero }}</p>
-          <h1 class="fued-header__title">{{ servicioNombre() }}</h1>
-          <div class="fued-header__meta">
-            <span class="fued-meta-chip">
-              <i class="bi bi-person"></i>{{ detalle()!.cliente_nombre }}
-            </span>
-            <span class="fued-meta-chip">
-              <i class="bi bi-geo-alt"></i>{{ detalle()!.canton }}, {{ detalle()!.provincia }}
-            </span>
-            @if (servicios().length > 1) {
-              <span class="fued-meta-chip">
-                <i class="bi bi-tools"></i>
-                {{ (servicios().length === 2 ? 'admin_file_edit.more_services_one' : 'admin_file_edit.more_services_other') | translate: { n: servicios().length - 1 } }}
-              </span>
-            }
-            @if (ofertasActivas().length > 0) {
-              <span class="fued-meta-chip fued-meta-chip--gold">
-                <i class="bi bi-people"></i>{{ ofertasActivas().length }}/5 {{ 'available_files.offers_label' | translate }}
-              </span>
-            }
-          </div>
-        </div>
-        <div class="fued-header__badges">
-          @if (ofertaId()) {
-            <span class="fued-badge fued-badge--warning">
-              <i class="bi bi-pencil"></i>{{ 'make_offer.editing_badge' | translate }}
-            </span>
-          } @else {
-            <span class="fued-badge fued-badge--info">
-              <i class="bi bi-plus-circle"></i>{{ 'make_offer.new_badge' | translate }}
-            </span>
-          }
-        </div>
+      </app-page-header>
+      <div class="fi-meta">
+        <span class="fi-fig">{{ d.numero }}</span>
+        <span class="fi-meta__item">
+          <mat-icon aria-hidden="true">person</mat-icon>{{ d.cliente_nombre }}
+        </span>
+        <span class="fi-meta__item">
+          <mat-icon aria-hidden="true">location_on</mat-icon>{{ d.canton }}, {{ d.provincia }}
+        </span>
+        @if (servicios().length > 1) {
+          <span class="fi-meta__item">
+            <mat-icon aria-hidden="true">construction</mat-icon>
+            {{ (servicios().length === 2 ? 'admin_file_edit.more_services_one' : 'admin_file_edit.more_services_other') | translate: { n: servicios().length - 1 } }}
+          </span>
+        }
+        @if (ofertasActivas().length > 0) {
+          <span class="fi-meta__item">
+            <mat-icon aria-hidden="true">groups</mat-icon>
+            <span><span class="fi-fig">{{ ofertasActivas().length }}/5</span> {{ 'available_files.offers_label' | translate }}</span>
+          </span>
+        }
       </div>
     </header>
 
-    <!-- Confirmación de archivo (estado y llamada viven en el componente). -->
-    <app-archivar-expediente #archivo [expedienteId]="expedienteId"
+    <app-archivar-expediente #archivo [expedienteId]="expedienteId" [separado]="false"
                              [despues]="recargarTrasArchivar" />
 
     @if (archivado()) {
-      <app-aviso-archivado class="mb-4" ambito="admin" />
+      <app-aviso-archivado ambito="admin" />
     }
 
-    <!-- 3-COLUMN WORKSPACE -->
-    <div class="fued-workspace">
+    <!-- Escritorio: ofertas y dossier a la izquierda, formulario a la derecha.
+         Móvil: ofertas, formulario y dossier, en ese orden. -->
+    <div class="aoe-layout">
 
-      <!-- COL 1: Expedition context -->
-      <div class="fued-col-context">
-
-        <section class="fued-card">
-          <div class="fued-card__header">
-            <i class="bi bi-clipboard2-data"></i>
-            {{ 'make_offer.case_summary' | translate }}
-          </div>
-          <div class="fued-card__body">
-
-            <div class="fued-fact-strip">
-              <div class="fued-fact">
-                <div class="fued-fact__icon-wrap"><i class="bi bi-tools" aria-hidden="true"></i></div>
-                <div class="fued-fact__body">
-                  @let srvs = serviciosNombres();
-                  @if (srvs.length > 1) {
-                    <!-- Varios: uno por línea, el principal primero. Sin
-                         descripciones: con varias, el resumen dejaría de serlo. -->
-                    <p class="fued-fact__label" id="fact-servicios">{{ 'service_selector.name' | translate }}</p>
-                    <ul class="fued-fact__list" aria-labelledby="fact-servicios">
-                      @for (s of srvs; track s.id; let first = $first) {
-                        <li class="fued-fact__item">
-                          <span>{{ s.nombre }}</span>
-                          @if (first) {
-                            <span class="fued-fact__tag">{{ 'service_selector.principal' | translate }}</span>
-                          }
-                        </li>
-                      }
-                    </ul>
-                  } @else {
-                    <p class="fued-fact__label">{{ 'make_offer.service_label' | translate }}</p>
-                    <p class="fued-fact__value">{{ servicioNombre() }}</p>
-                    @if (servicioDescripcion()) {
-                      <p class="fued-fact__sub">{{ servicioDescripcion() }}</p>
-                    }
-                  }
-                </div>
-              </div>
-
-              <div class="fued-fact">
-                <div class="fued-fact__icon-wrap"><i class="bi bi-geo-alt" aria-hidden="true"></i></div>
-                <div class="fued-fact__body">
-                  <p class="fued-fact__label">{{ 'common.address' | translate }}</p>
-                  <p class="fued-fact__value">{{ detalle()!.direccion }}</p>
-                  <p class="fued-fact__sub">{{ detalle()!.canton }}, {{ detalle()!.provincia }}</p>
-                </div>
-              </div>
-
-              <div class="fued-fact">
-                <div class="fued-fact__icon-wrap"><i class="bi bi-calendar-event" aria-hidden="true"></i></div>
-                <div class="fued-fact__body">
-                  <p class="fued-fact__label">{{ 'make_offer.scheduled_visit' | translate }}</p>
-                  <p class="fued-fact__value">{{ formatFecha(detalle()!.fecha_visita) }}</p>
-                  <p class="fued-fact__sub">{{ formatHora(detalle()!.fecha_visita) }}</p>
-                </div>
-              </div>
-
-              <div class="fued-fact">
-                <div class="fued-fact__icon-wrap"><i class="bi bi-clipboard2-check" aria-hidden="true"></i></div>
-                <div class="fued-fact__body">
-                  <p class="fued-fact__label">{{ 'make_offer.estimator_visit' | translate }}</p>
-                  <p class="fued-fact__value">{{ formatFecha(detalle()!.fecha_visita_real) }}</p>
-                  <p class="fued-fact__sub">{{ formatHora(detalle()!.fecha_visita_real) }}</p>
-                </div>
-              </div>
-
-              @if (detalle()!.referencia) {
-                <div class="fued-fact fued-fact--full">
-                  <div class="fued-fact__icon-wrap"><i class="bi bi-tag" aria-hidden="true"></i></div>
-                  <div class="fued-fact__body">
-                    <p class="fued-fact__label">{{ 'file.reference' | translate }}</p>
-                    <p class="fued-fact__value">{{ detalle()!.referencia }}</p>
-                  </div>
-                </div>
+      <!-- ══ Ofertas recibidas ════════════════════════════════════════════ -->
+      <section class="fi-card aoe-offers" aria-labelledby="aoe-offers-title">
+        <div class="aoe-head">
+          <h2 id="aoe-offers-title" class="fi-h2">{{ 'admin_offer.offers_section_title' | translate }}</h2>
+          <!-- Cupo de cinco ofertas vivas: la barra es solo visual, la cifra lo dice. -->
+          <span class="aoe-slots">
+            <span class="aoe-slots__bar" aria-hidden="true">
+              @for (s of CUPO; track s) {
+                <span [class.is-used]="s <= ofertasActivas().length"></span>
               }
-            </div>
-
-            @if (detalle()!.descripcion_problemas) {
-              <div class="fued-divider"></div>
-              <div class="fued-prob-block">
-                <i class="bi bi-exclamation-circle fued-prob-block__icon" aria-hidden="true"></i>
-                <p class="fued-prob-block__text">{{ detalle()!.descripcion_problemas }}</p>
-              </div>
-            }
-
-            @if (detalle()!.costo_estimado) {
-              <div class="fued-divider"></div>
-              <div class="fued-cost-banner">
-                <p class="fued-cost-banner__label">{{ 'make_offer.estimated_range' | translate }}</p>
-                <p class="fued-cost-banner__value">
-                  @if (detalle()!.costo_estimado_max && detalle()!.costo_estimado_max !== detalle()!.costo_estimado) {
-                    {{ detalle()!.costo_estimado | number:'1.0-0' }} – {{ detalle()!.costo_estimado_max | number:'1.0-0' }} CAD
-                  } @else {
-                    {{ detalle()!.costo_estimado | number:'1.0-0' }} CAD
-                  }
-                </p>
-              </div>
-            }
-
-          </div>
-        </section>
-
-        <section class="fued-card fued-card--grow">
-          <div class="fued-card__header">
-            <i class="bi bi-collection-play"></i>
-            Multimedia
-          </div>
-
-          <div class="fued-media-tabs">
-            <button class="fued-media-tab" type="button"
-                    [class.fued-media-tab--active]="tabMedia() === 'tour'"
-                    (click)="tabMedia.set('tour')">
-              <i class="bi bi-camera-video"></i>{{ 'make_offer.tab_tour' | translate }}
-              @if (urlsTour.length > 0) {
-                <span class="fued-count-badge">{{ urlsTour.length }}</span>
-              }
-            </button>
-            <button class="fued-media-tab" type="button"
-                    [class.fued-media-tab--active]="tabMedia() === 'fotos'"
-                    (click)="tabMedia.set('fotos')">
-              <i class="bi bi-images"></i>{{ 'make_offer.tab_photos' | translate }}
-              @if (fotos().length > 0) {
-                <span class="fued-count-badge">{{ fotos().length }}</span>
-              }
-            </button>
-            <button class="fued-media-tab" type="button"
-                    [class.fued-media-tab--active]="tabMedia() === 'docs'"
-                    (click)="tabMedia.set('docs')">
-              <i class="bi bi-file-earmark-text"></i>{{ 'make_offer.tab_docs' | translate }}
-              @if (documentos().length > 0) {
-                <span class="fued-count-badge">{{ documentos().length }}</span>
-              }
-            </button>
-          </div>
-
-          @if (tabMedia() === 'tour') {
-            <div class="fued-card__body">
-              @if (urlsTour.length > 0) {
-                <div class="fued-tour-grid">
-                  @for (url of urlsTour; track $index) {
-                    <div class="fued-tour-item">
-                      @if (urlsTour.length > 1) {
-                        <p class="fued-tour-label">
-                          <i class="bi bi-camera-video me-1" aria-hidden="true"></i>
-                          {{ 'estimator_file.tour_video_n' | translate:{ n: $index + 1 } }}
-                        </p>
-                      }
-                      <div class="fued-tour-embed">
-                        <iframe [src]="getSafeUrl(url)" allowfullscreen allow="xr-spatial-tracking"
-                                [title]="'Video ' + ($index + 1)"></iframe>
-                      </div>
-                    </div>
-                  }
-                </div>
-              } @else {
-                <div class="fued-empty-inline">
-                  <i class="bi bi-camera-video" aria-hidden="true"></i>
-                  <p>{{ 'make_offer.no_tour' | translate }}</p>
-                </div>
-              }
-            </div>
-          }
-
-          @if (tabMedia() === 'fotos') {
-            <div class="fued-card__body">
-              @if (fotos().length === 0) {
-                <div class="fued-empty-inline">
-                  <i class="bi bi-image"></i>
-                  <p>{{ 'make_offer.no_photos' | translate }}</p>
-                </div>
-              } @else {
-                <div class="fued-photo-grid">
-                  @for (f of fotos(); track f.id) {
-                    <div class="fued-photo-thumb fued-photo-thumb--zoom"
-                         (click)="abrirFoto(f)" [title]="f.nombre_archivo">
-                      <img [src]="publicUrl(f.url_storage)"
-                           class="fued-photo-thumb__img" [alt]="f.nombre_archivo" />
-                    </div>
-                  }
-                </div>
-              }
-            </div>
-          }
-
-          @if (tabMedia() === 'docs') {
-            <div class="fued-card__body">
-              @if (documentos().length === 0) {
-                <div class="fued-empty-inline">
-                  <i class="bi bi-file-earmark"></i>
-                  <p>{{ 'make_offer.no_docs' | translate }}</p>
-                </div>
-              } @else {
-                @for (doc of documentos(); track doc.id) {
-                  <div class="fued-file-row">
-                    <div class="fued-file-row__icon"><i class="bi bi-file-earmark-text"></i></div>
-                    <div class="fued-file-row__info">
-                      <p class="fued-file-row__name">{{ doc.nombre_archivo }}</p>
-                      <p class="fued-file-row__meta">{{ formatTamano(doc.tamano_bytes) }}</p>
-                    </div>
-                    <div class="fued-file-row__actions">
-                      <button class="fued-btn-icon" type="button"
-                              (click)="verArchivo(doc)" [title]="'common.view' | translate">
-                        <i class="bi bi-eye"></i>
-                      </button>
-                    </div>
-                  </div>
-                }
-              }
-            </div>
-          }
-        </section>
-
-      </div><!-- /fued-col-context -->
-
-      <!-- COL 2: Offers list -->
-      <div class="fued-col-offers">
-
-        <div class="fued-offers-header">
-          <div class="fued-offers-header__left">
-            <h2 class="fued-offers-title">
-              <i class="bi bi-people" aria-hidden="true"></i>
-              {{ 'admin_offer.offers_section_title' | translate }}
-            </h2>
-            <div class="fued-slots-row" [title]="ofertasActivas().length + '/5'">
-              @for (s of [1,2,3,4,5]; track s) {
-                <div class="fued-slot" [class.fued-slot--used]="s <= ofertasActivas().length"></div>
-              }
-            </div>
-          </div>
-          <button class="fued-btn-nueva" type="button"
-                  (click)="nuevaOferta()"
-                  [class.fued-btn-nueva--active]="!ofertaId()"
-                  [disabled]="ofertasActivas().length >= 5 || archivado()">
-            <i class="bi bi-plus" aria-hidden="true"></i>
+            </span>
+            <span class="fi-fig">{{ ofertasActivas().length }}/5</span>
+          </span>
+          <button mat-stroked-button type="button" class="aoe-new"
+                  [class.is-on]="!ofertaId()"
+                  [attr.aria-pressed]="!ofertaId()"
+                  [disabled]="ofertasActivas().length >= 5 || archivado()"
+                  (click)="nuevaOferta()">
+            <mat-icon>add</mat-icon>
             {{ 'make_offer.new_badge' | translate }}
           </button>
         </div>
 
+        <!-- Rechazar / reactivar en bloque. Mismo componente que en admin/file/builder-bids. -->
         <app-oferta-reparto
           [expedienteId]="expedienteId"
           [ofertas]="todasLasOfertas()"
-          [estadoExpediente]="detalle()!.estado"
+          [estadoExpediente]="d.estado"
           [(seleccion)]="seleccion"
           (aplicado)="onRepartoAplicado()" />
 
-        <!-- Adjudicar. A diferencia de las acciones de la barra, esto SÍ crea
-             contratos: uno por cada oferta marcada, cada uno con su PDF. Vive
-             aquí y no en el componente compartido porque el PDF se arma con
-             datos del expediente que sólo esta pantalla tiene cargados. -->
+        <!-- Adjudicar las marcadas. A diferencia de la barra, esto SÍ crea contratos: uno por
+             oferta marcada, cada uno con su PDF, que se arma con datos de esta pantalla. -->
         @if (seleccionadasParaAdjudicar().length > 0) {
           @if (!confirmandoAdjudicarSeleccion()) {
-            <button class="fued-btn-adjudicar" type="button"
+            <button mat-stroked-button type="button" class="aoe-award"
                     (click)="confirmandoAdjudicarSeleccion.set(true)"
                     [disabled]="adjudicando() || !puedeAdjudicarSeleccion">
-              <i class="bi bi-trophy" aria-hidden="true"></i>
+              <mat-icon>emoji_events</mat-icon>
               {{ 'admin_offer.adjudicar_seleccion' | translate:{ n: seleccionadasParaAdjudicar().length } }}
             </button>
           } @else {
-            <div class="fued-adjudicar-confirm">
-              <p class="fued-offer-card__confirm-msg">
-                <i class="bi bi-trophy" aria-hidden="true"></i>
+            <div class="fi-confirm" role="alertdialog" aria-labelledby="aoe-award-title">
+              <p class="fi-confirm__title" id="aoe-award-title">
+                <mat-icon aria-hidden="true">emoji_events</mat-icon>
                 {{ 'admin_offer.adjudicar_confirm_n' | translate:{ n: seleccionadasParaAdjudicar().length } }}
               </p>
-              <ul class="fued-adjudicar-list">
+              <ul class="aoe-award-list">
                 @for (o of seleccionadasParaAdjudicar(); track o.id) {
-                  <li>{{ o.constructor_nombre }} — CA$ {{ o.precio | number:'1.0-0' }}</li>
+                  <li><span>{{ o.constructor_nombre }}</span><span class="fi-fig">{{ formatCosto(o.precio) }}</span></li>
                 }
               </ul>
-              <p class="fued-offer-card__confirm-note">
-                <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
-                {{ 'admin_offer.adjudicar_reemplaza' | translate }}
-              </p>
-              <div class="fued-offer-card__confirm-btns">
-                <button class="fued-btn-award-confirm" type="button"
-                        (click)="adjudicarSeleccion()" [disabled]="adjudicando()">
-                  @if (adjudicando()) {
-                    <span class="fued-spinner-sm"></span>
-                  } @else {
-                    <i class="bi bi-check-lg" aria-hidden="true"></i>
-                  }
+              <p>{{ 'admin_offer.adjudicar_reemplaza' | translate }}</p>
+              <div class="aoe-inline-actions">
+                <button mat-flat-button type="button" (click)="adjudicarSeleccion()" [disabled]="adjudicando()">
+                  @if (adjudicando()) { <span class="fi-spinner" aria-hidden="true"></span> } @else { <mat-icon>check</mat-icon> }
                   {{ 'common.confirm' | translate }}
                 </button>
-                <button class="fued-btn-cancel" type="button"
-                        (click)="confirmandoAdjudicarSeleccion.set(false)" [disabled]="adjudicando()">
+                <button mat-button type="button" (click)="confirmandoAdjudicarSeleccion.set(false)" [disabled]="adjudicando()">
                   {{ 'common.cancel' | translate }}
                 </button>
               </div>
@@ -392,632 +139,632 @@
         }
 
         @if (exitoAdjudicar()) {
-          <div class="fued-alert fued-alert--success">
-            <i class="bi bi-check-circle" aria-hidden="true"></i>
-            {{ exitoAdjudicar() }}
-          </div>
+          <p class="fi-feedback is-ok" role="status"><mat-icon aria-hidden="true">check_circle</mat-icon>{{ exitoAdjudicar() }}</p>
         }
         @if (errorAdjudicar() && !confirmandoAdjudicarId()) {
-          <div class="fued-alert fued-alert--danger">
-            <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
-            {{ errorAdjudicar() }}
-          </div>
+          <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorAdjudicar() }}</p>
         }
 
         @if (errorOfertas()) {
-          <!-- Un fallo de lectura no puede disfrazarse de «no hay ofertas»:
-               el expediente puede tener ofertas que no hemos podido traer. -->
-          <div class="fued-alert fued-alert--danger">
-            <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
-            {{ errorOfertas() | translate }}
-          </div>
+          <!-- Un fallo de lectura no puede disfrazarse de «no hay ofertas». -->
+          <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorOfertas() | translate }}</p>
         } @else if (todasLasOfertas().length === 0) {
-          <div class="fued-offers-empty">
-            <i class="bi bi-inbox" aria-hidden="true"></i>
-            <p>{{ 'admin_offer.offers_empty' | translate }}</p>
-          </div>
+          <p class="fi-empty"><mat-icon aria-hidden="true">inbox</mat-icon>{{ 'admin_offer.offers_empty' | translate }}</p>
         } @else {
-          <!-- Suma de precios (solo con varios servicios): cada oferta tiene un
-               precio para sus servicios y el cliente puede contratar varias. -->
+
+          <!-- Suma de precios (solo con varios servicios): el cliente puede contratar varias. -->
           @if (multiServicio() && ofertasActivas().length > 0) {
-            <div class="fued-offers-sum" aria-live="polite">
-              <div class="fued-offers-sum__row">
-                <span>{{ (ofertasActivas().length === 1 ? 'offer_services.sum_all_one' : 'offer_services.sum_all_other') | translate: { n: ofertasActivas().length } }}</span>
-                <strong>CA$ {{ sumaOfertas() | number:'1.0-0' }}</strong>
-              </div>
-              @if (seleccionadasParaAdjudicar().length > 0) {
-                <div class="fued-offers-sum__row fued-offers-sum__row--sel">
-                  <span>{{ (seleccionadasParaAdjudicar().length === 1 ? 'offer_services.sum_selected_one' : 'offer_services.sum_selected_other') | translate: { n: seleccionadasParaAdjudicar().length } }}</span>
-                  <strong>CA$ {{ sumaSeleccionadas() | number:'1.0-0' }}</strong>
+            <div class="aoe-sum" aria-live="polite">
+              <dl class="aoe-sum__list">
+                <div class="aoe-sum__row">
+                  <dt>{{ (ofertasActivas().length === 1 ? 'offer_services.sum_all_one' : 'offer_services.sum_all_other') | translate: { n: ofertasActivas().length } }}</dt>
+                  <dd class="fi-fig">{{ formatCosto(sumaOfertas()) }}</dd>
                 </div>
-                @if (serviciosSinCubrir().length) {
-                  <p class="fued-offers-sum__note">
-                    <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
-                    {{ 'offer_services.uncovered' | translate: { lista: serviciosSinCubrir().join(', ') } }}
-                  </p>
+                @if (seleccionadasParaAdjudicar().length > 0) {
+                  <div class="aoe-sum__row is-sel">
+                    <dt>{{ (seleccionadasParaAdjudicar().length === 1 ? 'offer_services.sum_selected_one' : 'offer_services.sum_selected_other') | translate: { n: seleccionadasParaAdjudicar().length } }}</dt>
+                    <dd class="fi-fig">{{ formatCosto(sumaSeleccionadas()) }}</dd>
+                  </div>
                 }
+              </dl>
+              @if (seleccionadasParaAdjudicar().length > 0 && serviciosSinCubrir().length) {
+                <p class="fi-feedback is-warn">
+                  <mat-icon aria-hidden="true">warning</mat-icon>
+                  {{ 'offer_services.uncovered' | translate: { lista: serviciosSinCubrir().join(', ') } }}
+                </p>
               }
             </div>
           }
 
-          <div class="fued-offers-list">
+          <ul class="aoe-cards">
             @for (oferta of todasLasOfertas(); track oferta.id) {
-              <div class="fued-offer-card"
-                   [class.fued-offer-card--active]="oferta.id === ofertaId()"
-                   [class.fued-offer-card--awarded]="oferta.estado === 'aceptada' && !esEliminada(oferta)"
-                   [class.fued-offer-card--removed]="esEliminada(oferta)"
-                   [class.fued-offer-card--picked]="estaSeleccionada(oferta)"
-                   [attr.role]="esEliminada(oferta) ? null : 'button'"
-                   [attr.tabindex]="esEliminada(oferta) ? null : 0"
-                   (click)="seleccionarOferta(oferta)"
-                   (keydown.enter)="seleccionarOferta(oferta)">
+              @let fuera = esEliminada(oferta);
+              @let abierta = oferta.id === ofertaId();
+              <!-- Pulsar la tarjeta la abre en el formulario; «Modifier» hace lo mismo con teclado. -->
+              <li class="aoe-card"
+                  [class.is-open]="abierta && !fuera"
+                  [class.is-marked]="estaSeleccionada(oferta) && !fuera"
+                  [class.is-out]="fuera"
+                  (click)="seleccionarOferta(oferta)">
 
-                <!-- Marca la oferta para el reparto en bloque. No abre el
-                     formulario: por eso detiene la propagación. -->
-                @if (puedeSeleccionar && !esEliminada(oferta)) {
-                  <label class="fued-offer-card__pick" (click)="$event.stopPropagation()">
-                    <input type="checkbox" class="fued-check"
-                           [checked]="estaSeleccionada(oferta)"
-                           (change)="alternarSeleccion(oferta)"
-                           [attr.aria-label]="('admin_offer.reparto_marcar' | translate) + ' ' + oferta.constructor_nombre">
-                  </label>
-                }
-
-                <div class="fued-offer-card__avatar"
-                     [class.fued-offer-card__avatar--active]="oferta.id === ofertaId()"
-                     [class.fued-offer-card__avatar--awarded]="oferta.estado === 'aceptada' && !esEliminada(oferta)">
-                  {{ initiales(oferta.constructor_nombre) }}
-                </div>
-
-                <div class="fued-offer-card__content">
-                  <div class="fued-offer-card__row1">
-                    <p class="fued-offer-card__name">{{ oferta.constructor_nombre }}</p>
-                    <p class="fued-offer-card__price">CA$ {{ oferta.precio | number:'1.0-0' }}</p>
-                  </div>
-                  @if (multiServicio()) {
-                    <p class="fued-offer-card__services">
-                      <i class="bi bi-tools" aria-hidden="true"></i>
-                      <span class="visually-hidden">{{ 'offer_services.label' | translate }}:</span>
-                      {{ serviciosDeOfertaTexto(oferta) ?? '—' }}
-                    </p>
+                <div class="aoe-card__top">
+                  <!-- Marca la oferta para el reparto. No abre nada: no propaga el clic. -->
+                  @if (puedeSeleccionar && !fuera) {
+                    <mat-checkbox class="aoe-card__pick" (click)="$event.stopPropagation()"
+                                  [checked]="estaSeleccionada(oferta)"
+                                  (change)="alternarSeleccion(oferta)"
+                                  [aria-label]="('admin_offer.reparto_marcar' | translate) + ' ' + oferta.constructor_nombre" />
                   }
-                  <div class="fued-offer-card__row2">
-                    <!-- El estado se conserva aunque la oferta esté dada de
-                         baja: el badge de baja se añade al lado, no lo tapa. -->
-                    <span class="fued-badge fued-badge--sm"
-                          [class.fued-badge--success]="oferta.estado === 'aceptada' && !esEliminada(oferta)"
-                          [class.fued-badge--warning]="oferta.estado === 'pendiente' && !esEliminada(oferta)"
-                          [class.fued-badge--danger]="oferta.estado === 'rechazada' && !esEliminada(oferta)">
-                      {{ estadoOfertaKey(oferta.estado) | translate }}
-                    </span>
-                    @if (esEliminada(oferta)) {
-                      <span class="fued-badge fued-badge--sm fued-badge--removed"
-                            [title]="oferta.eliminada_en">
-                        <i class="bi bi-archive" aria-hidden="true"></i>
-                        {{ 'admin_offer.oferta_eliminada' | translate }}
+                  <span class="aoe-card__tags">
+                    <!-- El estado se conserva aunque esté retirada: la etiqueta de baja va al lado. -->
+                    @if (estadoConocido(oferta.estado)) {
+                      <app-status-chip [estado]="oferta.estado" prefijo="admin_offer.oferta_" />
+                    } @else {
+                      <span class="fi-tag">{{ oferta.estado }}</span>
+                    }
+                    @if (fuera) {
+                      <span class="fi-tag" [title]="oferta.eliminada_en ?? ''">
+                        <mat-icon aria-hidden="true">archive</mat-icon>{{ 'admin_offer.oferta_eliminada' | translate }}
+                      </span>
+                    } @else if (abierta) {
+                      <span class="fi-tag is-info">
+                        <mat-icon aria-hidden="true">edit</mat-icon>{{ 'make_offer.editing_badge' | translate }}
                       </span>
                     }
-                    @if (oferta.plazo_semanas_min) {
-                      <span class="fued-offer-card__meta">
-                        <i class="bi bi-hourglass" aria-hidden="true"></i>
-                        {{ oferta.plazo_semanas_min }}–{{ oferta.plazo_semanas_max }} sem
-                      </span>
-                    }
-                    @if (oferta.garantia_anos) {
-                      <span class="fued-offer-card__meta">
-                        <i class="bi bi-shield-check" aria-hidden="true"></i>
-                        {{ oferta.garantia_anos }} {{ 'offer.years' | translate }}
-                      </span>
-                    }
-                    @if (oferta.id === ofertaId()) {
-                      <span class="fued-offer-card__editing-tag">
-                        <i class="bi bi-pencil-square" aria-hidden="true"></i>
-                        {{ 'make_offer.editing_badge' | translate }}
-                      </span>
-                    }
-                  </div>
+                  </span>
                 </div>
 
-                <!-- Award action -->
-                @if (puedeAdjudicar && !esEliminada(oferta)) {
-                  <div class="fued-offer-card__award" (click)="$event.stopPropagation()">
-                    @if (oferta.estado === 'aceptada') {
-                      <span class="fued-award-badge"
-                            [title]="'admin_offer.oferta_aceptada' | translate">
-                        <i class="bi bi-trophy-fill" aria-hidden="true"></i>
-                      </span>
-                    } @else {
-                      <button class="fued-btn-award" type="button"
-                              (click)="confirmandoAdjudicarId.set(oferta.id)"
-                              [disabled]="adjudicando()"
-                              [title]="(detalle()!.estado === 'adjudicado' ? 'admin_offer.reasignar_btn' : 'admin_offer.adjudicar_btn') | translate">
-                        <i class="bi bi-trophy" aria-hidden="true"></i>
-                      </button>
-                    }
-                  </div>
+                <h3 class="aoe-card__name" [id]="'aoe-name-' + oferta.id">{{ oferta.constructor_nombre }}</h3>
+                <p class="aoe-card__amount fi-fig">{{ formatCosto(oferta.precio) }}</p>
+
+                @if (multiServicio()) {
+                  <p class="aoe-card__line">
+                    <mat-icon aria-hidden="true">construction</mat-icon>
+                    <span><span class="cdk-visually-hidden">{{ 'offer_services.label' | translate }} : </span>{{ serviciosDeOfertaTexto(oferta) ?? '—' }}</span>
+                  </p>
                 }
 
-                <!-- Restore action (sólo en ofertas dadas de baja) -->
-                @if (esEliminada(oferta)) {
-                  <div class="fued-offer-card__actions" (click)="$event.stopPropagation()">
-                    <button class="fued-btn-restore" type="button"
-                            (click)="restaurarOferta(oferta)"
-                            [disabled]="!!restaurando() || archivado()"
-                            [title]="'admin_offer.restaurar_btn' | translate">
-                      @if (restaurando() === oferta.id) {
-                        <span class="fued-spinner-sm"></span>
-                      } @else {
-                        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
-                      }
-                      <span class="fued-btn-restore__label">{{ 'admin_offer.restaurar_btn' | translate }}</span>
-                    </button>
+                <dl class="fi-facts aoe-card__facts">
+                  <div class="fi-fact">
+                    <dt>{{ 'offers_received.deadline' | translate }}</dt>
+                    <dd class="fi-fig">{{ formatPlazo(oferta.plazo_semanas_min, oferta.plazo_semanas_max) }}</dd>
                   </div>
-                }
-
-                <!-- Delete action.
-                     La papelera sólo ARMA la confirmación; el botón que borra de
-                     verdad vive en la fila de ancho completo de más abajo. Antes
-                     el confirmar aparecía en este mismo hueco de 30×30, así que
-                     un doble clic sobre la papelera daba de baja la oferta sin
-                     que nadie leyera nada. -->
-                @if (puedeEliminarOfertas && !esEliminada(oferta)) {
-                  <div class="fued-offer-card__actions" (click)="$event.stopPropagation()">
-                    <button class="fued-btn-del" type="button"
-                            [class.fued-btn-del--armed]="confirmandoEliminarId() === oferta.id"
-                            (click)="confirmandoEliminarId.set(confirmandoEliminarId() === oferta.id ? null : oferta.id)"
-                            [attr.aria-expanded]="confirmandoEliminarId() === oferta.id"
-                            [title]="'admin_offer.delete_btn' | translate"
-                            [disabled]="eliminando()">
-                      <i class="bi bi-trash3" aria-hidden="true"></i>
-                    </button>
-                  </div>
-                }
-
-                <!-- Delete confirm row (mismo patrón de fila completa que la
-                     adjudicación: lejos del cursor y con el nombre delante). -->
-                @if (puedeEliminarOfertas && !esEliminada(oferta) && confirmandoEliminarId() === oferta.id) {
-                  <div class="fued-offer-card__confirm-row" (click)="$event.stopPropagation()">
-                    <p class="fued-offer-card__confirm-msg">
-                      <i class="bi bi-trash3" aria-hidden="true"></i>
-                      {{ 'admin_offer.delete_confirm' | translate:{ nombre: oferta.constructor_nombre } }}
-                    </p>
-                    <p class="fued-offer-card__confirm-note">
-                      <i class="bi bi-archive" aria-hidden="true"></i>
-                      {{ 'admin_offer.delete_reversible' | translate }}
-                    </p>
-                    @if (errorEliminarLista()) {
-                      <p class="fued-offer-card__confirm-error">{{ errorEliminarLista() }}</p>
-                    }
-                    <div class="fued-offer-card__confirm-btns">
-                      <button class="fued-btn-del-confirm" type="button"
-                              (click)="eliminarOfertaLista(oferta)" [disabled]="eliminando()">
-                        @if (eliminando()) {
-                          <span class="fued-spinner-sm"></span>
-                        } @else {
-                          <i class="bi bi-trash3" aria-hidden="true"></i>
-                        }
-                        {{ 'admin_offer.delete_btn' | translate }}
-                      </button>
-                      <button class="fued-btn-cancel" type="button"
-                              (click)="confirmandoEliminarId.set(null)" [disabled]="eliminando()">
-                        {{ 'common.cancel' | translate }}
-                      </button>
+                  @if (oferta.garantia_anos) {
+                    <div class="fi-fact">
+                      <dt>{{ 'offer.warranty' | translate }}</dt>
+                      <dd><span class="fi-fig">{{ oferta.garantia_anos }}</span> {{ 'offer.years' | translate }}</dd>
                     </div>
-                  </div>
-                }
+                  }
+                </dl>
 
-                <!-- Award confirm row (full-width second row inside card) -->
-                @if (puedeAdjudicar && !esEliminada(oferta) && confirmandoAdjudicarId() === oferta.id) {
-                  <div class="fued-offer-card__confirm-row" (click)="$event.stopPropagation()">
-                    <p class="fued-offer-card__confirm-msg">
-                      @if (detalle()!.estado === 'adjudicado') {
-                        <i class="bi bi-arrow-left-right" aria-hidden="true"></i>
-                        {{ 'admin_offer.reasignar_confirm' | translate }}
-                      } @else {
-                        <i class="bi bi-trophy" aria-hidden="true"></i>
-                        {{ 'admin_offer.adjudicar_confirm' | translate }}
-                      }
+                <div class="aoe-card__foot" (click)="$event.stopPropagation()">
+                  @if (fuera) {
+                    <button mat-stroked-button type="button"
+                            [attr.aria-describedby]="'aoe-name-' + oferta.id"
+                            [disabled]="!!restaurando() || archivado()"
+                            (click)="restaurarOferta(oferta)">
+                      @if (restaurando() === oferta.id) { <span class="fi-spinner" aria-hidden="true"></span> } @else { <mat-icon>restore</mat-icon> }
+                      {{ 'admin_offer.restaurar_btn' | translate }}
+                    </button>
+                  } @else {
+                    @if (!abierta) {
+                      <button mat-stroked-button type="button"
+                              [attr.aria-describedby]="'aoe-name-' + oferta.id"
+                              (click)="seleccionarOferta(oferta)">
+                        <mat-icon>edit</mat-icon>
+                        {{ 'common.edit' | translate }}
+                      </button>
+                    }
+                    @if (puedeAdjudicar && oferta.estado !== 'aceptada') {
+                      <button mat-button type="button" class="aoe-card__award"
+                              [attr.aria-describedby]="'aoe-name-' + oferta.id"
+                              [attr.aria-expanded]="confirmandoAdjudicarId() === oferta.id"
+                              [disabled]="adjudicando()"
+                              (click)="confirmandoAdjudicarId.set(oferta.id)">
+                        @if (d.estado === 'adjudicado') { <mat-icon>swap_horiz</mat-icon> } @else { <mat-icon>emoji_events</mat-icon> }
+                        {{ (d.estado === 'adjudicado' ? 'admin_offer.reasignar_btn' : 'admin_offer.adjudicar_btn') | translate }}
+                      </button>
+                    }
+                    <!-- La papelera solo abre la confirmación; el botón que da de baja va dentro. -->
+                    @if (puedeEliminarOfertas) {
+                      <button mat-icon-button type="button" class="fi-del aoe-card__del"
+                              [attr.aria-label]="('admin_offer.delete_btn' | translate) + ' ' + oferta.constructor_nombre"
+                              [attr.aria-expanded]="confirmandoEliminarId() === oferta.id"
+                              [matTooltip]="'admin_offer.delete_btn' | translate"
+                              [disabled]="eliminando()"
+                              (click)="confirmandoEliminarId.set(confirmandoEliminarId() === oferta.id ? null : oferta.id)">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    }
+                  }
+                </div>
+
+                <!-- Confirmar la adjudicación de esta oferta -->
+                @if (!fuera && puedeAdjudicar && confirmandoAdjudicarId() === oferta.id) {
+                  <div class="fi-confirm" role="alertdialog" [attr.aria-labelledby]="'aoe-adj-' + oferta.id"
+                       (click)="$event.stopPropagation()">
+                    <p class="fi-confirm__title" [id]="'aoe-adj-' + oferta.id">
+                      @if (d.estado === 'adjudicado') { <mat-icon aria-hidden="true">swap_horiz</mat-icon> } @else { <mat-icon aria-hidden="true">emoji_events</mat-icon> }
+                      {{ (d.estado === 'adjudicado' ? 'admin_offer.reasignar_confirm' : 'admin_offer.adjudicar_confirm') | translate }}
                     </p>
                     @if (errorAdjudicar()) {
-                      <p class="fued-offer-card__confirm-error">{{ errorAdjudicar() }}</p>
+                      <p class="fi-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorAdjudicar() }}</p>
                     }
-                    <div class="fued-offer-card__confirm-btns">
-                      <button class="fued-btn-award-confirm" type="button"
-                              (click)="adjudicarOferta(oferta)" [disabled]="adjudicando()">
-                        @if (adjudicando()) {
-                          <span class="fued-spinner-sm"></span>
-                        } @else {
-                          <i class="bi bi-check-lg" aria-hidden="true"></i>
-                        }
+                    <div class="aoe-inline-actions">
+                      <button mat-flat-button type="button" (click)="adjudicarOferta(oferta)" [disabled]="adjudicando()">
+                        @if (adjudicando()) { <span class="fi-spinner" aria-hidden="true"></span> } @else { <mat-icon>check</mat-icon> }
                         {{ 'common.confirm' | translate }}
                       </button>
-                      <button class="fued-btn-cancel" type="button"
-                              (click)="cancelarAdjudicar()" [disabled]="adjudicando()">
+                      <button mat-button type="button" (click)="cancelarAdjudicar()" [disabled]="adjudicando()">
                         {{ 'common.cancel' | translate }}
                       </button>
                     </div>
                   </div>
                 }
 
-              </div>
+                <!-- Confirmar la baja (reversible: queda retirada y se puede restaurar) -->
+                @if (!fuera && puedeEliminarOfertas && confirmandoEliminarId() === oferta.id) {
+                  <div class="aoe-danger" role="alertdialog" [attr.aria-labelledby]="'aoe-del-' + oferta.id"
+                       (click)="$event.stopPropagation()">
+                    <p class="aoe-danger__title" [id]="'aoe-del-' + oferta.id">
+                      <mat-icon aria-hidden="true">delete</mat-icon>
+                      {{ 'admin_offer.delete_confirm' | translate:{ nombre: oferta.constructor_nombre } }}
+                    </p>
+                    <p>{{ 'admin_offer.delete_reversible' | translate }}</p>
+                    <div class="aoe-inline-actions">
+                      <button mat-flat-button type="button" class="aoe-danger__ok"
+                              [disabled]="eliminando()" [attr.aria-busy]="eliminando()"
+                              (click)="eliminarOfertaLista(oferta)">
+                        @if (eliminando()) { <span class="fi-spinner" aria-hidden="true"></span> } @else { <mat-icon>delete</mat-icon> }
+                        {{ 'admin_offer.delete_btn' | translate }}
+                      </button>
+                      <button mat-button type="button" (click)="confirmandoEliminarId.set(null)" [disabled]="eliminando()">
+                        {{ 'common.cancel' | translate }}
+                      </button>
+                    </div>
+                  </div>
+                }
+              </li>
             }
-          </div>
+          </ul>
         }
 
         @if (errorEliminarLista()) {
-          <div class="fued-alert fued-alert--danger">
-            <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
-            {{ errorEliminarLista() }}
-          </div>
+          <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorEliminarLista() }}</p>
         }
-
         @if (errorRestaurar()) {
-          <div class="fued-alert fued-alert--danger">
-            <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
-            {{ errorRestaurar() }}
-          </div>
+          <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorRestaurar() }}</p>
         }
+      </section>
 
-      </div><!-- /fued-col-offers -->
+      <!-- ══ El dossier: resumen y medios ═════════════════════════════════ -->
+      <div class="fi-col aoe-context">
 
-      <!-- COL 3: Form panel (sticky) -->
-      <aside class="fued-col-form">
-        <div class="fued-form-panel">
-
-          <!-- Mode header -->
-          <div class="fued-form-panel__head">
-            <div class="fued-form-panel__mode">
-              @if (ofertaId()) {
-                <i class="bi bi-pencil-square" aria-hidden="true"></i>
-                {{ 'make_offer.update_title' | translate }}
-              } @else {
-                <i class="bi bi-plus-circle" aria-hidden="true"></i>
-                {{ 'make_offer.form_title' | translate }}
-              }
+        <section class="fi-card" aria-labelledby="aoe-summary-title">
+          <h2 id="aoe-summary-title" class="fi-h2">{{ 'make_offer.case_summary' | translate }}</h2>
+          <dl class="fi-facts">
+            @let srvs = serviciosNombres();
+            @if (srvs.length > 1) {
+              <!-- Varios: uno por línea, el principal primero; sin descripciones. -->
+              <div class="fi-fact is-wide">
+                <dt>{{ 'service_selector.name' | translate }}</dt>
+                <dd>
+                  <ul class="aoe-services">
+                    @for (s of srvs; track s.id; let first = $first) {
+                      <li>
+                        {{ s.nombre }}
+                        @if (first) { <span class="fi-tag">{{ 'service_selector.principal' | translate }}</span> }
+                      </li>
+                    }
+                  </ul>
+                </dd>
+              </div>
+            } @else {
+              <div class="fi-fact is-wide">
+                <dt>{{ 'make_offer.service_label' | translate }}</dt>
+                <dd>
+                  {{ servicioNombre() }}
+                  @if (servicioDescripcion()) { <span class="fi-fact__sub">{{ servicioDescripcion() }}</span> }
+                </dd>
+              </div>
+            }
+            <div class="fi-fact is-wide">
+              <dt>{{ 'common.address' | translate }}</dt>
+              <dd>
+                {{ d.direccion }}
+                <span class="fi-fact__sub">{{ d.canton }}, {{ d.provincia }}</span>
+              </dd>
             </div>
-            @if (constructorSeleccionadoNombre) {
-              <p class="fued-form-panel__subtitle">{{ constructorSeleccionadoNombre }}</p>
+            <div class="fi-fact">
+              <dt>{{ 'make_offer.scheduled_visit' | translate }}</dt>
+              <dd class="fi-fig">
+                {{ formatFecha(d.fecha_visita) }}
+                @if (formatHora(d.fecha_visita) !== '—') { <span class="fi-fact__sub">{{ formatHora(d.fecha_visita) }}</span> }
+              </dd>
+            </div>
+            <div class="fi-fact">
+              <dt>{{ 'make_offer.estimator_visit' | translate }}</dt>
+              <dd class="fi-fig">
+                {{ formatFecha(d.fecha_visita_real) }}
+                @if (formatHora(d.fecha_visita_real) !== '—') { <span class="fi-fact__sub">{{ formatHora(d.fecha_visita_real) }}</span> }
+              </dd>
+            </div>
+            @if (d.costo_estimado) {
+              <div class="fi-fact">
+                <dt>{{ 'make_offer.estimated_range' | translate }}</dt>
+                <dd class="fi-fig">
+                  {{ formatCosto(d.costo_estimado) }}
+                  @if (d.costo_estimado_max && d.costo_estimado_max !== d.costo_estimado) {
+                    – {{ formatCosto(d.costo_estimado_max) }}
+                  }
+                </dd>
+              </div>
+            }
+            @if (d.referencia) {
+              <div class="fi-fact is-wide">
+                <dt>{{ 'file.reference' | translate }}</dt>
+                <dd class="fi-notes">{{ d.referencia }}</dd>
+              </div>
+            }
+            @if (d.descripcion_problemas) {
+              <div class="fi-fact is-wide">
+                <dt>{{ 'make_offer.problems_noted' | translate }}</dt>
+                <dd class="fi-notes">{{ d.descripcion_problemas }}</dd>
+              </div>
+            }
+          </dl>
+        </section>
+
+        <!-- Medios del dossier: tour, fotos y documentos, en pestañas -->
+        <section class="fi-card aoe-media">
+          <nav mat-tab-nav-bar class="fi-tabs" [tabPanel]="tplMedia" mat-stretch-tabs="false" mat-align-tabs="start">
+            <button mat-tab-link type="button" [active]="tabMedia() === 'tour'" (click)="tabMedia.set('tour')">
+              <mat-icon class="fi-tabs__icon" aria-hidden="true">view_in_ar</mat-icon>
+              {{ 'make_offer.tab_tour' | translate }}
+              @if (urlsTour.length > 0) { <span class="fi-count">{{ urlsTour.length }}</span> }
+            </button>
+            <button mat-tab-link type="button" [active]="tabMedia() === 'fotos'" (click)="tabMedia.set('fotos')">
+              <mat-icon class="fi-tabs__icon" aria-hidden="true">photo_library</mat-icon>
+              {{ 'make_offer.tab_photos' | translate }}
+              @if (fotos().length > 0) { <span class="fi-count">{{ fotos().length }}</span> }
+            </button>
+            <button mat-tab-link type="button" [active]="tabMedia() === 'docs'" (click)="tabMedia.set('docs')">
+              <mat-icon class="fi-tabs__icon" aria-hidden="true">description</mat-icon>
+              {{ 'make_offer.tab_docs' | translate }}
+              @if (documentos().length > 0) { <span class="fi-count">{{ documentos().length }}</span> }
+            </button>
+          </nav>
+
+          <mat-tab-nav-panel #tplMedia class="aoe-media__panel">
+            @switch (tabMedia()) {
+              @case ('tour') {
+                @if (urlsTour.length > 0) {
+                  <div class="aoe-tours">
+                    @for (url of urlsTour; track $index) {
+                      <app-tour-poster [url]="url" [titulo]="tituloTour($index)" />
+                    }
+                  </div>
+                } @else {
+                  <p class="fi-empty"><mat-icon aria-hidden="true">view_in_ar</mat-icon>{{ 'make_offer.no_tour' | translate }}</p>
+                }
+              }
+              @case ('fotos') {
+                @if (fotos().length > 0) {
+                  <ul class="fi-photos">
+                    @for (f of fotos(); track f.id) {
+                      <li>
+                        <button type="button" class="fi-photo" (click)="abrirFoto(f)" [attr.aria-label]="f.nombre_archivo">
+                          <img [src]="publicUrl(f.url_storage)" alt="" loading="lazy" />
+                        </button>
+                      </li>
+                    }
+                  </ul>
+                } @else {
+                  <p class="fi-empty"><mat-icon aria-hidden="true">photo_library</mat-icon>{{ 'make_offer.no_photos' | translate }}</p>
+                }
+              }
+              @case ('docs') {
+                @if (documentos().length > 0) {
+                  <ul class="fi-files">
+                    @for (doc of documentos(); track doc.id) {
+                      <li class="fi-file">
+                        <mat-icon class="fi-file__icon" aria-hidden="true">description</mat-icon>
+                        <span class="fi-file__text">
+                          <span class="fi-file__name" [title]="doc.nombre_archivo">{{ doc.nombre_archivo }}</span>
+                          <span class="fi-file__size">{{ formatTamano(doc.tamano_bytes) }}</span>
+                        </span>
+                        <button mat-button type="button" class="fi-file__open" (click)="verArchivo(doc)"
+                                [attr.aria-label]="('common.view' | translate) + ' ' + doc.nombre_archivo">
+                          {{ 'common.view' | translate }}
+                        </button>
+                      </li>
+                    }
+                  </ul>
+                } @else {
+                  <p class="fi-empty"><mat-icon aria-hidden="true">description</mat-icon>{{ 'make_offer.no_docs' | translate }}</p>
+                }
+              }
+            }
+          </mat-tab-nav-panel>
+        </section>
+      </div>
+
+      <!-- ══ Formulario de la oferta ══════════════════════════════════════ -->
+      <section class="fi-card fi-form aoe-form" aria-labelledby="aoe-form-title">
+        <div class="aoe-form__head">
+          <h2 id="aoe-form-title" class="fi-h2">
+            {{ (ofertaId() ? 'make_offer.update_title' : 'make_offer.form_title') | translate }}
+          </h2>
+          @if (constructorSeleccionadoNombre) {
+            <p class="aoe-form__who">{{ constructorSeleccionadoNombre }}</p>
+          }
+        </div>
+
+        <div class="fi-fields">
+          @if (constructores().length === 0) {
+            <p class="fi-hint"><mat-icon aria-hidden="true">info</mat-icon>{{ 'admin_offer.no_constructores' | translate }}</p>
+          } @else {
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" hideRequiredMarker>
+              <mat-label>{{ 'admin_offer.constructor_label' | translate }}</mat-label>
+              <mat-select id="constructor-select" required
+                          [value]="constructorSeleccionadoId()"
+                          (selectionChange)="onConstructorChange($event.value)">
+                <mat-option value="">{{ 'admin_offer.select_constructor' | translate }}</mat-option>
+                @for (c of constructores(); track c.id) {
+                  <mat-option [value]="c.id">{{ c.nombre }} {{ c.apellido }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          }
+
+          <!-- Servicios de la oferta (solo con varios en el dossier) -->
+          @if (multiServicio()) {
+            <div class="fi-field-group">
+              <p class="fi-label" id="oferta-servicios-label">{{ 'offer_services.label' | translate }}</p>
+              <p class="fi-hint" id="oferta-servicios-hint">{{ 'offer_services.hint' | translate }}</p>
+              <app-servicio-selector
+                [opciones]="opcionesServicio()"
+                [(seleccion)]="servicioIdsOferta"
+                [validar]="intentado()"
+                [disabled]="enviando()"
+                [mostrarPrincipal]="false"
+                [compacto]="true"
+                labelledBy="oferta-servicios-label"
+                describedBy="oferta-servicios-hint" />
+            </div>
+          }
+
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" hideRequiredMarker floatLabel="always">
+            <mat-label>{{ 'make_offer.total_price' | translate }}</mat-label>
+            <span matTextPrefix>CA$&nbsp;</span>
+            <input matInput id="ao-precio" type="number" inputmode="numeric" required min="1" step="1000"
+                   [(ngModel)]="precio" />
+            @if (multiServicio()) {
+              <mat-hint>{{ 'offer_services.price_hint' | translate }}</mat-hint>
+            }
+            <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'make_offer.err_price' | translate }}</mat-error>
+          </mat-form-field>
+
+          <div class="fi-row2">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" hideRequiredMarker>
+              <mat-label>{{ 'make_offer.min_deadline' | translate }}</mat-label>
+              <input matInput id="ao-plazo-min" type="number" inputmode="numeric" required min="1" step="1"
+                     [(ngModel)]="plazoMin" />
+              <span matTextSuffix>{{ 'offer.weeks' | translate }}</span>
+              <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'make_offer.err_plazo_min' | translate }}</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" hideRequiredMarker>
+              <mat-label>{{ 'make_offer.max_deadline' | translate }}</mat-label>
+              <input matInput id="ao-plazo-max" type="number" inputmode="numeric" required min="1" step="1"
+                     [(ngModel)]="plazoMax" />
+              <span matTextSuffix>{{ 'offer.weeks' | translate }}</span>
+              <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'make_offer.err_plazo_max' | translate }}</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="fi-row2">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>{{ 'offer.warranty' | translate }}</mat-label>
+              <input matInput id="ao-garantia" type="number" inputmode="numeric" min="0" step="1"
+                     [(ngModel)]="garantiaAnos" />
+              <span matTextSuffix>{{ 'offer.years' | translate }}</span>
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" hideRequiredMarker>
+              <mat-label>{{ 'make_offer.start_date' | translate }}</mat-label>
+              <input matInput id="ao-fecha-inicio" type="date" required [(ngModel)]="fechaInicio" />
+              <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'make_offer.err_date' | translate }}</mat-error>
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" hideRequiredMarker>
+            <mat-label>{{ 'make_offer.approach_desc' | translate }}</mat-label>
+            <textarea matInput id="ao-descripcion" rows="5" required
+                      [placeholder]="'make_offer.approach_placeholder' | translate"
+                      [(ngModel)]="descripcion"></textarea>
+            <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'make_offer.err_desc' | translate }}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- ── Adjuntos ─────────────────────────────────────────────────── -->
+        <div class="fi-section">
+          <h3 class="fi-label">{{ 'make_offer.attachments' | translate }}</h3>
+
+          <!-- Documento PDF: obligatorio al crear la oferta. Clic o arrastre. -->
+          <div class="aoe-attach">
+            <p class="aoe-attach__name" id="ao-docs-label">
+              {{ 'make_offer.pdf_doc' | translate }}
+              @if (ofertaId()) { <span class="fi-opt">({{ 'common.optional' | translate }})</span> }
+            </p>
+
+            @if (documentosActuales().length || documentosOferta().length) {
+              <ul class="fi-files">
+                @for (doc of documentosActuales(); track doc.id) {
+                  <li class="fi-file">
+                    <mat-icon class="fi-file__icon aoe-ok" aria-hidden="true">check_circle</mat-icon>
+                    <span class="fi-file__text">
+                      <span class="fi-file__name" [title]="doc.nombre_archivo">{{ doc.nombre_archivo }}</span>
+                      <span class="fi-file__size">{{ formatTamano(doc.tamano_bytes) }}</span>
+                    </span>
+                    <button mat-button type="button" class="fi-file__open" (click)="verArchivo(doc)"
+                            [attr.aria-label]="('make_offer.view' | translate) + ' ' + doc.nombre_archivo">
+                      {{ 'make_offer.view' | translate }}
+                    </button>
+                    <button mat-icon-button type="button" class="fi-del"
+                            [disabled]="eliminandoDoc() !== null"
+                            [attr.aria-label]="('common.delete' | translate) + ' ' + doc.nombre_archivo"
+                            [matTooltip]="'common.delete' | translate"
+                            (click)="eliminarDocumentoGuardado(doc)">
+                      @if (eliminandoDoc() === doc.id) { <span class="fi-spinner" aria-hidden="true"></span> } @else { <mat-icon>delete</mat-icon> }
+                    </button>
+                  </li>
+                }
+                @for (file of documentosOferta(); track file.name + file.size; let i = $index) {
+                  <li class="fi-file">
+                    <mat-icon class="fi-file__icon" aria-hidden="true">picture_as_pdf</mat-icon>
+                    <span class="fi-file__text">
+                      <span class="fi-file__name" [title]="file.name">{{ file.name }}</span>
+                      <span class="fi-file__size">{{ formatTamano(file.size) }}</span>
+                    </span>
+                    <button mat-icon-button type="button" class="fi-del"
+                            [attr.aria-label]="('common.delete' | translate) + ' ' + file.name"
+                            [matTooltip]="'common.delete' | translate"
+                            (click)="quitarDocumentoPendiente(i)">
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
+
+            <label id="ao-docs" class="fi-drop" [class.is-drag]="dragDocs()"
+                   [class.is-error]="intentado() && documentoInvalido"
+                   (dragover)="onDragOverDocs($event)" (dragleave)="onDragLeaveDocs()" (drop)="onDropDocs($event)">
+              <mat-icon aria-hidden="true">upload_file</mat-icon>
+              <span class="fi-drop__title">{{ 'make_offer.attach' | translate }}</span>
+              <span class="fi-drop__sub">{{ 'my_documents.add_drop' | translate }}</span>
+              <input type="file" accept=".pdf,application/pdf" multiple class="cdk-visually-hidden"
+                     aria-labelledby="ao-docs-label" (change)="onDocumentos($event)" />
+            </label>
+            @if (intentado() && documentoInvalido) {
+              <p class="fi-error"><mat-icon aria-hidden="true">error</mat-icon>{{ 'make_offer.err_doc' | translate }}</p>
             }
           </div>
 
-          <!-- Form body -->
-          <div class="fued-form-panel__body">
-
-            <!-- Constructor -->
-            <div class="fued-field">
-              <label class="fued-label" for="constructor-select">
-                <i class="bi bi-person-gear"></i>{{ 'admin_offer.constructor_label' | translate }}
-                <span class="fued-req">*</span>
-              </label>
-              @if (constructores().length === 0) {
-                <p class="fued-field-hint">{{ 'admin_offer.no_constructores' | translate }}</p>
-              } @else {
-                <select id="constructor-select" class="fued-input fued-select"
-                        [class.fued-input--invalid]="constructorInvalido"
-                        [ngModel]="constructorSeleccionadoId()"
-                        (ngModelChange)="onConstructorChange($event)">
-                  <option value="">{{ 'admin_offer.select_constructor' | translate }}</option>
-                  @for (c of constructores(); track c.id) {
-                    <option [value]="c.id">{{ c.nombre }} {{ c.apellido }}</option>
-                  }
-                </select>
-              }
-            </div>
-
-            <!-- Servicios de la oferta (solo con varios en el expediente) -->
-            @if (multiServicio()) {
-              <div class="fued-field">
-                <p class="fued-label mb-0" id="oferta-servicios-label">
-                  <i class="bi bi-tools"></i>{{ 'offer_services.label' | translate }}
-                  <span class="fued-req">*</span>
-                </p>
-                <p class="fued-field-hint" id="oferta-servicios-hint">{{ 'offer_services.hint' | translate }}</p>
-                <app-servicio-selector
-                  [opciones]="opcionesServicio()"
-                  [(seleccion)]="servicioIdsOferta"
-                  [validar]="intentado()"
-                  [disabled]="enviando()"
-                  [mostrarPrincipal]="false"
-                  [compacto]="true"
-                  labelledBy="oferta-servicios-label"
-                  describedBy="oferta-servicios-hint" />
-              </div>
-            }
-
-            <!-- Precio -->
-            <div class="fued-field">
-              <label class="fued-label" for="ao-precio">
-                <i class="bi bi-coin"></i>{{ 'make_offer.total_price' | translate }}
-                <span class="fued-req">*</span>
-              </label>
-              @if (multiServicio()) {
-                <p class="fued-field-hint">{{ 'offer_services.price_hint' | translate }}</p>
-              }
-              <div class="fued-input-group">
-                <span class="fued-input-prefix">CA$</span>
-                <input id="ao-precio" type="number" class="fued-input" placeholder="0" min="1" step="1000"
-                       [class.fued-input--invalid]="precioInvalido"
-                       [(ngModel)]="precio" />
-              </div>
-            </div>
-
-            <!-- Plazos -->
-            <div class="fued-field-row">
-              <div class="fued-field">
-                <label class="fued-label" for="ao-plazo-min">
-                  {{ 'make_offer.min_deadline' | translate }}
-                  <small class="fued-opt">({{ 'offer.weeks' | translate }})</small>
-                  <span class="fued-req">*</span>
-                </label>
-                <input id="ao-plazo-min" type="number" class="fued-input" placeholder="1" min="1" step="1"
-                       [class.fued-input--invalid]="plazoMinInvalido"
-                       [(ngModel)]="plazoMin" />
-              </div>
-              <div class="fued-field">
-                <label class="fued-label" for="ao-plazo-max">
-                  {{ 'make_offer.max_deadline' | translate }}
-                  <small class="fued-opt">({{ 'offer.weeks' | translate }})</small>
-                  <span class="fued-req">*</span>
-                </label>
-                <input id="ao-plazo-max" type="number" class="fued-input" placeholder="4" min="1" step="1"
-                       [class.fued-input--invalid]="plazoMaxInvalido"
-                       [(ngModel)]="plazoMax" />
-              </div>
-            </div>
-
-            <!-- Garantia + Fecha -->
-            <div class="fued-field-row">
-              <div class="fued-field">
-                <label class="fued-label">
-                  <i class="bi bi-shield-check"></i>{{ 'offer.warranty' | translate }}
-                  <span class="fued-opt">({{ 'offer.years' | translate }})</span>
-                </label>
-                <input type="number" class="fued-input" placeholder="1" min="0" step="1"
-                       [(ngModel)]="garantiaAnos" />
-              </div>
-              <div class="fued-field">
-                <label class="fued-label" for="ao-fecha-inicio">
-                  <i class="bi bi-calendar-event"></i>{{ 'make_offer.start_date' | translate }}
-                  <span class="fued-req">*</span>
-                </label>
-                <input id="ao-fecha-inicio" type="date" class="fued-input"
-                       [class.fued-input--invalid]="fechaInicioInvalida"
-                       [(ngModel)]="fechaInicio" />
-              </div>
-            </div>
-
-            <!-- Descripcion -->
-            <div class="fued-field">
-              <label class="fued-label" for="ao-descripcion">
-                <i class="bi bi-text-paragraph"></i>{{ 'make_offer.approach_desc' | translate }}
-                <span class="fued-req">*</span>
-              </label>
-              <textarea id="ao-descripcion" class="fued-input fued-textarea" rows="3"
-                        [class.fued-input--invalid]="descripcionInvalida"
-                        [placeholder]="'make_offer.approach_placeholder' | translate"
-                        [(ngModel)]="descripcion"></textarea>
-            </div>
-
-            <!-- Adjuntos -->
-            <div class="fued-field">
-              <label class="fued-label">
-                <i class="bi bi-paperclip"></i>{{ 'make_offer.attachments' | translate }}
-              </label>
-
-              <div id="ao-docs" class="fued-attach-row fued-attach-row--docs"
-                   [class.fued-attach-row--invalid]="documentoInvalido"
-                   [class.fued-attach-row--drag]="dragDocs()"
-                   (dragover)="onDragOverDocs($event)"
-                   (dragleave)="onDragLeaveDocs()"
-                   (drop)="onDropDocs($event)">
-                <div class="fued-attach-icon fued-attach-icon--pdf">
-                  <i class="bi bi-file-earmark-pdf"></i>
-                </div>
-                <div class="fued-attach-info">
-                  <p class="fued-attach-name">
-                    {{ 'make_offer.pdf_doc' | translate }}
-                    @if (!ofertaId()) { <span class="fued-req">*</span> }
-                  </p>
-
-                  @if (!documentosActuales().length && !documentosOferta().length) {
-                    <p class="fued-attach-empty">{{ 'make_offer.no_document' | translate }}</p>
-                  }
-
-                  <!-- Ya guardados -->
-                  @for (doc of documentosActuales(); track doc.id) {
-                    <p class="fued-attach-status fued-attach-status--saved">
-                      <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
-                      <span class="fued-attach-fname" [title]="doc.nombre_archivo">{{ doc.nombre_archivo }}</span>
-                      <button class="fued-view-link" type="button" (click)="verArchivo(doc)">
-                        {{ 'make_offer.view' | translate }}
-                      </button>
-                      <button class="fued-doc-remove" type="button"
-                              [disabled]="eliminandoDoc() !== null"
-                              [title]="'common.delete' | translate"
-                              (click)="eliminarDocumentoGuardado(doc)">
-                        @if (eliminandoDoc() === doc.id) {
-                          <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-                        } @else {
-                          <i class="bi bi-trash" aria-hidden="true"></i>
-                        }
-                      </button>
-                    </p>
-                  }
-
-                  <!-- Pendientes de subir -->
-                  @for (file of documentosOferta(); track file.name + file.size; let i = $index) {
-                    <p class="fued-attach-status fued-attach-status--new">
-                      <i class="bi bi-check-circle" aria-hidden="true"></i>
-                      <span class="fued-attach-fname" [title]="file.name">{{ file.name }}</span>
-                      <button class="fued-doc-remove" type="button"
-                              [title]="'common.delete' | translate"
-                              (click)="quitarDocumentoPendiente(i)">
-                        <i class="bi bi-x-lg" aria-hidden="true"></i>
-                      </button>
-                    </p>
-                  }
-
-                  <p class="fued-attach-hint">{{ 'my_documents.add_drop' | translate }}</p>
-                </div>
-                <label class="fued-btn-upload mb-0 flex-shrink-0">
-                  <i class="bi bi-upload"></i>
-                  {{ 'make_offer.attach' | translate }}
-                  <input type="file" accept=".pdf" multiple class="fued-file-input"
-                         (change)="onDocumentos($event)" />
-                </label>
-              </div>
-
-              <div class="fued-attach-row">
-                <div class="fued-attach-icon fued-attach-icon--video">
-                  <i class="bi bi-camera-video"></i>
-                </div>
-                <div class="fued-attach-info">
-                  <p class="fued-attach-name">
-                    {{ 'make_offer.video_opt' | translate }}
-                    <span class="fued-opt">({{ 'common.optional' | translate }})</span>
-                  </p>
-                  @if (videoOferta()) {
-                    <p class="fued-attach-status fued-attach-status--new">
-                      <i class="bi bi-check-circle" aria-hidden="true"></i>
-                      <span class="fued-attach-fname" [title]="videoOferta()!.name">{{ videoOferta()!.name }}</span>
-                    </p>
-                  } @else if (videoActual()) {
-                    <p class="fued-attach-status fued-attach-status--saved">
-                      <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
-                      <span class="fued-attach-fname" [title]="videoActual()!.nombre_archivo">{{ videoActual()!.nombre_archivo }}</span>
-                      <button class="fued-view-link" type="button"
-                              (click)="verArchivo(videoActual()!)">
-                        {{ 'make_offer.view' | translate }}
-                      </button>
-                    </p>
-                  } @else {
-                    <p class="fued-attach-empty">{{ 'make_offer.no_video' | translate }}</p>
-                  }
-                </div>
-                <label class="fued-btn-upload mb-0 flex-shrink-0">
-                  <i class="bi bi-upload"></i>
-                  {{ (videoActual() && !videoOferta()) ? ('make_offer.replace' | translate) : ('make_offer.attach' | translate) }}
-                  <input type="file" accept="video/*" class="fued-file-input" (change)="onVideo($event)" />
-                </label>
-              </div>
-            </div>
-
-            <!-- Progress strip -->
-            <div class="fued-progress-strip">
-              <div class="fued-prog-dot" [class.fued-prog-dot--done]="!!constructorSeleccionadoId()"
-                   [title]="'admin_offer.constructor_label' | translate">
-                <i class="bi" [class.bi-check-lg]="!!constructorSeleccionadoId()"
-                              [class.bi-person-gear]="!constructorSeleccionadoId()"></i>
-              </div>
-              <div class="fued-prog-dot" [class.fued-prog-dot--done]="!!precio && precio > 0"
-                   [title]="'make_offer.checklist_price' | translate">
-                <i class="bi" [class.bi-check-lg]="!!precio && precio > 0"
-                              [class.bi-coin]="!precio || precio <= 0"></i>
-              </div>
-              <div class="fued-prog-dot"
-                   [class.fued-prog-dot--done]="!!plazoMin && plazoMin > 0 && !!plazoMax && plazoMax >= plazoMin"
-                   [title]="'make_offer.checklist_deadline' | translate">
-                <i class="bi"
-                   [class.bi-check-lg]="!!plazoMin && plazoMin > 0 && !!plazoMax && plazoMax >= plazoMin"
-                   [class.bi-hourglass]="!plazoMin || plazoMin <= 0 || !plazoMax || plazoMax < plazoMin"></i>
-              </div>
-              <div class="fued-prog-dot" [class.fued-prog-dot--done]="!!fechaInicio"
-                   [title]="'make_offer.checklist_start' | translate">
-                <i class="bi" [class.bi-check-lg]="!!fechaInicio"
-                              [class.bi-calendar-event]="!fechaInicio"></i>
-              </div>
-              <div class="fued-prog-dot" [class.fued-prog-dot--done]="!!descripcion.trim()"
-                   [title]="'make_offer.checklist_desc' | translate">
-                <i class="bi" [class.bi-check-lg]="!!descripcion.trim()"
-                              [class.bi-text-paragraph]="!descripcion.trim()"></i>
-              </div>
-              @if (!ofertaId()) {
-                <div class="fued-prog-dot" [class.fued-prog-dot--done]="documentosOferta().length > 0"
-                     title="PDF">
-                  <i class="bi" [class.bi-check-lg]="documentosOferta().length > 0"
-                                [class.bi-file-earmark-pdf]="documentosOferta().length === 0"></i>
-                </div>
-              }
-            </div>
-
-            @if (errorEnvio()) {
-              <div class="fued-alert fued-alert--danger">{{ errorEnvio() | translate }}</div>
-            }
-            @if (exitoMsg()) {
-              <div class="fued-alert fued-alert--success">{{ exitoMsg() | translate }}</div>
-            }
-
-            <!-- Actions -->
-            <div class="fued-form-actions">
-              <button class="fued-btn-submit" type="button"
-                      (click)="enviarOferta()"
-                      [disabled]="enviando() || (archivado() && !ofertaId())">
-                @if (enviando()) {
-                  <span class="fued-spinner-sm"></span>
-                  {{ ofertaId() ? ('make_offer.updating' | translate) : ('make_offer.sending' | translate) }}
-                } @else {
-                  <i class="bi" [class.bi-send-check]="!ofertaId()"
-                                [class.bi-arrow-repeat]="!!ofertaId()"></i>
-                  {{ ofertaId() ? ('make_offer.update_offer' | translate) : ('make_offer.send_offer' | translate) }}
-                }
-              </button>
-              <button class="fued-btn-draft" type="button" (click)="volver()">
-                <i class="bi bi-arrow-left"></i>{{ 'admin_offer.back_btn' | translate }}
-              </button>
-            </div>
-            <!-- El botón ya no se bloquea con el formulario incompleto: al pulsarlo,
-                 este resumen dice qué falta. -->
-            <app-campos-faltantes class="mt-3" [extra]="faltantes" [intento]="intentos()" />
-
-          </div><!-- /fued-form-panel__body -->
-
-          <!-- Danger zone -->
-          @if (ofertaId()) {
-            <div class="fued-danger-zone">
-              @if (!puedeEliminar) {
-                <p class="fued-danger-zone__blocked">
-                  <i class="bi bi-lock"></i>{{ (archivado() ? 'admin_offer.delete_blocked_archivado' : 'admin_offer.delete_blocked') | translate }}
-                </p>
-              } @else if (!confirmandoEliminar()) {
-                <button class="fued-btn-danger" type="button"
-                        (click)="eliminarOferta()" [disabled]="eliminando()">
-                  <i class="bi bi-trash3"></i>{{ 'admin_offer.delete_btn' | translate }}
+          <!-- Vídeo: uno por oferta, opcional -->
+          <div class="aoe-attach">
+            <p class="aoe-attach__name">
+              {{ 'make_offer.video_opt' | translate }}
+              <span class="fi-opt">({{ 'common.optional' | translate }})</span>
+            </p>
+            <div class="aoe-video">
+              @if (videoOferta(); as v) {
+                <span class="aoe-video__file">
+                  <mat-icon class="aoe-video__icon" aria-hidden="true">videocam</mat-icon>
+                  <span class="fi-file__name" [title]="v.name">{{ v.name }}</span>
+                </span>
+              } @else if (videoActual(); as v) {
+                <span class="aoe-video__file">
+                  <mat-icon class="aoe-video__icon aoe-ok" aria-hidden="true">check_circle</mat-icon>
+                  <span class="fi-file__name" [title]="v.nombre_archivo">{{ v.nombre_archivo }}</span>
+                </span>
+                <button mat-button type="button" (click)="verArchivo(v)"
+                        [attr.aria-label]="('make_offer.view' | translate) + ' ' + v.nombre_archivo">
+                  {{ 'make_offer.view' | translate }}
                 </button>
               } @else {
-                <p class="fued-danger-zone__confirm-msg">
-                  <i class="bi bi-exclamation-triangle"></i>
+                <span class="fi-muted">{{ 'make_offer.no_video' | translate }}</span>
+              }
+              <button mat-stroked-button type="button" class="aoe-video__pick" (click)="tplVideo.click()">
+                <mat-icon>videocam</mat-icon>
+                {{ ((videoActual() && !videoOferta()) ? 'make_offer.replace' : 'make_offer.attach') | translate }}
+              </button>
+              <input #tplVideo type="file" accept="video/*" hidden (change)="onVideo($event)" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Lo que falta, de un vistazo. Solo visual: el resumen de faltantes lo dice en texto. -->
+        <ul class="fi-check" aria-hidden="true">
+          @for (c of checklist; track c.label) {
+            <li [class.is-done]="c.ok">
+              @if (c.ok) { <mat-icon>check_circle</mat-icon> } @else { <mat-icon>radio_button_unchecked</mat-icon> }
+              {{ c.label | translate }}
+            </li>
+          }
+        </ul>
+
+        @if (errorEnvio()) {
+          <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorEnvio() | translate }}</p>
+        }
+        @if (exitoMsg()) {
+          <p class="fi-feedback is-ok" role="status"><mat-icon aria-hidden="true">check_circle</mat-icon>{{ exitoMsg() | translate }}</p>
+        }
+
+        <!-- El botón no se bloquea con el formulario incompleto: al pulsarlo, el resumen dice qué falta. -->
+        <div class="fi-actions">
+          <button mat-flat-button type="button"
+                  [disabled]="enviando() || (archivado() && !ofertaId())"
+                  (click)="enviarOferta()">
+            @if (enviando()) {
+              <span class="fi-spinner" aria-hidden="true"></span>
+            } @else if (ofertaId()) {
+              <mat-icon>sync</mat-icon>
+            } @else {
+              <mat-icon>send</mat-icon>
+            }
+            @if (enviando()) {
+              {{ (ofertaId() ? 'make_offer.updating' : 'make_offer.sending') | translate }}
+            } @else {
+              {{ (ofertaId() ? 'make_offer.update_offer' : 'make_offer.send_offer') | translate }}
+            }
+          </button>
+          <button mat-stroked-button type="button" (click)="volver()">
+            <mat-icon>arrow_back</mat-icon>
+            {{ 'admin_offer.back_btn' | translate }}
+          </button>
+        </div>
+
+        <app-campos-faltantes [extra]="faltantes" [intento]="intentos()" />
+
+        <!-- ── Dar de baja la oferta abierta ──────────────────────────────── -->
+        @if (ofertaId()) {
+          <div class="aoe-delete">
+            @if (!puedeEliminar) {
+              <p class="fi-hint">
+                <mat-icon aria-hidden="true">lock</mat-icon>
+                {{ (archivado() ? 'admin_offer.delete_blocked_archivado' : 'admin_offer.delete_blocked') | translate }}
+              </p>
+            } @else if (!confirmandoEliminar()) {
+              <button mat-button type="button" class="aoe-delete__btn" [disabled]="eliminando()" (click)="eliminarOferta()">
+                <mat-icon>delete</mat-icon>
+                {{ 'admin_offer.delete_btn' | translate }}
+              </button>
+            } @else {
+              <div class="aoe-danger" role="alertdialog" aria-labelledby="aoe-delete-title">
+                <p class="aoe-danger__title" id="aoe-delete-title">
+                  <mat-icon aria-hidden="true">warning</mat-icon>
                   {{ 'admin_offer.delete_confirm' | translate:{ nombre: constructorSeleccionadoNombre } }}
                 </p>
-                <p class="fued-offer-card__confirm-note">
-                  <i class="bi bi-archive" aria-hidden="true"></i>
-                  {{ 'admin_offer.delete_reversible' | translate }}
-                </p>
-                <div class="fued-danger-zone__actions">
-                  <button class="fued-btn-danger-confirm" type="button"
-                          (click)="eliminarOferta()" [disabled]="eliminando()">
-                    @if (eliminando()) {
-                      <span class="fued-spinner-sm"></span>{{ 'admin_offer.deleting' | translate }}
-                    } @else {
-                      <i class="bi bi-trash3"></i>{{ 'admin_offer.delete_confirm_btn' | translate }}
-                    }
+                <p>{{ 'admin_offer.delete_reversible' | translate }}</p>
+                <div class="aoe-inline-actions">
+                  <button mat-flat-button type="button" class="aoe-danger__ok"
+                          [disabled]="eliminando()" [attr.aria-busy]="eliminando()"
+                          (click)="eliminarOferta()">
+                    @if (eliminando()) { <span class="fi-spinner" aria-hidden="true"></span> } @else { <mat-icon>delete</mat-icon> }
+                    {{ (eliminando() ? 'admin_offer.deleting' : 'admin_offer.delete_confirm_btn') | translate }}
                   </button>
-                  <button class="fued-btn-cancel" type="button"
-                          (click)="cancelarEliminar()" [disabled]="eliminando()">
+                  <button mat-button type="button" (click)="cancelarEliminar()" [disabled]="eliminando()">
                     {{ 'common.cancel' | translate }}
                   </button>
                 </div>
                 @if (errorEliminar()) {
-                  <div class="fued-alert fued-alert--danger">{{ errorEliminar() }}</div>
+                  <p class="fi-feedback is-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ errorEliminar() }}</p>
                 }
-              }
-            </div>
-          }
-
-        </div><!-- /fued-form-panel -->
-      </aside><!-- /fued-col-form -->
-
-    </div><!-- /fued-workspace -->
-
+              </div>
+            }
+          </div>
+        }
+      </section>
+    </div>
   }
-
-</div><!-- /fued-root -->
+</div>

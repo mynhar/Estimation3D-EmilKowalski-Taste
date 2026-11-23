@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Tema de Angular Material 22 (M3) — Clarté
+   Tema de Angular Material 22 (M3) — Trait rouge
    --------------------------------------------------------------------------
    ÚNICO archivo SCSS del proyecto. Existe porque Material solo genera su
    tema con Sass. No pongas aquí estilos de componentes ni crees otros .scss:
@@ -16,8 +16,11 @@
      ven son los de $roles-color.
    - Formas: 6 px controles (botones, campos, menús), 12 px tarjetas,
      20 px hojas y diálogos. Elevaciones: las de Material por defecto.
+   - El botón de la siguiente etapa (tomate) es la clase `.ds-cta`, definida
+     al final: un solo sitio para todo el proyecto.
    ========================================================================== */
 @use '@angular/material' as mat;
+@use '@angular/cdk' as cdk;
 
 $tema: mat.define-theme((
   color: (
@@ -41,31 +44,33 @@ $tema: mat.define-theme((
 ));
 
 /* Roles de color M3 → tokens del sistema.
-   - `primary` es el único color de acción (sapin). En M3 también es color de
-     TEXTO (botón de texto, etiqueta en foco, checkbox): 6.5:1 sobre blanco.
-   - `primary-container` es menthe, la firma del escaneo, siempre con tinta
-     encima (9.9:1). `inverse-primary` también es menthe: es el acento sobre
-     superficies oscuras (acción del snack-bar).
-   - `secondary-container` (botón tonal, chip seleccionado) es action-soft con
-     action-ink encima (7.0:1).
-   - `outline` es el borde de los campos: --ds-ink-faint (3.6:1, AA no-texto). */
+   - `primary` es el abeto: la acción por defecto. En M3 también es color de
+     TEXTO (botón de texto, etiqueta en foco, checkbox): 8.4:1 sobre crema,
+     9.7 sobre vélin. El tomate NO es un rol: solo existe en `.ds-cta`.
+   - `primary-container` y `secondary-container` (chip seleccionado, elemento
+     activo de listas y navegación, botón tonal) son action-faint con abeto
+     encima (8.4:1).
+   - `inverse-surface` es el abeto (snack-bar); encima, texto vélin y acción
+     en action-faint.
+   - `outline` es el borde de los campos: liquen --ds-ink-faint (4.0:1 sobre
+     vélin, AA no-texto). */
 $roles-color: (
   primary: var(--ds-action),
   on-primary: var(--ds-on-action),
-  primary-container: var(--ds-scan),
-  on-primary-container: var(--ds-ink),
-  inverse-primary: var(--ds-scan),
-  primary-fixed: var(--ds-scan-soft),
-  primary-fixed-dim: var(--ds-scan),
+  primary-container: var(--ds-action-faint),
+  on-primary-container: var(--ds-action-ink),
+  inverse-primary: var(--ds-action-faint),
+  primary-fixed: var(--ds-action-faint),
+  primary-fixed-dim: var(--ds-action-soft),
   on-primary-fixed: var(--ds-ink),
   on-primary-fixed-variant: var(--ds-action-ink),
   surface-tint: var(--ds-action),
 
   secondary: var(--ds-ink-secondary),
   on-secondary: var(--ds-ink-inverse),
-  secondary-container: var(--ds-action-soft),
+  secondary-container: var(--ds-action-faint),
   on-secondary-container: var(--ds-action-ink),
-  secondary-fixed: var(--ds-scan-soft),
+  secondary-fixed: var(--ds-action-faint),
   secondary-fixed-dim: var(--ds-action-soft),
   on-secondary-fixed: var(--ds-ink),
   on-secondary-fixed-variant: var(--ds-action-ink),
@@ -90,7 +95,7 @@ $roles-color: (
   on-surface: var(--ds-ink),
   surface-variant: var(--ds-bg-alt),
   on-surface-variant: var(--ds-ink-muted),
-  surface-dim: var(--ds-stone),
+  surface-dim: var(--ds-band),
   surface-bright: var(--ds-surface-elevated),
   surface-container-lowest: var(--ds-surface-elevated),
   surface-container-low: var(--ds-surface),
@@ -113,6 +118,11 @@ $roles-color: (
 @include mat.elevation-classes();
 @include mat.app-background();
 
+/* `.cdk-visually-hidden` siempre disponible: las plantillas la usan para texto
+   solo para lectores de pantalla y casillas nativas ocultas, también en vistas
+   donde ningún componente de Material la carga. */
+@include cdk.a11y-visually-hidden();
+
 /* Tokens de cada componente (leen --mat-sys-*). */
 html {
   @include mat.all-component-themes($tema);
@@ -120,8 +130,8 @@ html {
 
 /* :root gana a html por especificidad, sin depender del orden. */
 :root {
-  /* Formas Clarté. Las declaraciones van antes de los @include: Sass
-     desaconseja declaraciones detrás de reglas anidadas (mixed-decls). */
+  /* Formas. Las declaraciones van antes de los @include: Sass desaconseja
+     declaraciones detrás de reglas anidadas (mixed-decls). */
   /* Controles: 6 px */
   --mat-button-filled-container-shape: var(--ds-radius-md);
   --mat-button-outlined-container-shape: var(--ds-radius-md);
@@ -144,10 +154,25 @@ html {
   --mat-dialog-container-shape: var(--ds-radius-xl);
   --mat-bottom-sheet-container-shape: var(--ds-radius-xl);
   --mat-datepicker-calendar-container-touch-shape: var(--ds-radius-xl);
-  /* Ayudas y errores de los campos: mínimo Clarté de 14 px (M3 usa 12 px). */
+  /* Ayudas y errores de los campos: mínimo de 14 px (M3 usa 12 px).
+     Excepción conocida: la etiqueta flotante de los campos se escala al 75 %
+     (12 px) y Material no ofrece token oficial para cambiarlo. */
   --mat-form-field-subscript-text-size: var(--ds-text-sm);
   --mat-form-field-subscript-text-line-height: 1.25rem;
 
   @include mat.system-level-colors($tema, $roles-color);
   @include mat.system-level-typography($tema);
+}
+
+/* Siguiente etapa: el único botón tomate de la vista.
+   Uso: <a mat-flat-button class="ds-cta">…</a>. Texto blanco sobre
+   --ds-cta (4.8:1); al pasar o pulsar, la capa de estado en abeto noche lo
+   oscurece, así que el contraste solo sube. */
+.ds-cta {
+  @include mat.button-overrides((
+    filled-container-color: var(--ds-cta),
+    filled-label-text-color: var(--ds-on-cta),
+    filled-state-layer-color: var(--ds-ink),
+    filled-ripple-color: color-mix(in srgb, var(--ds-ink) 16%, transparent),
+  ));
 }

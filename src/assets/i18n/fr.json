@@ -160,13 +160,13 @@
   "ai_assistant": {
     "eyebrow": "Espace client",
     "title": "Assistant IA",
-    "tagline": "Posez n'importe quelle question sur votre dossier · réponses en quelques secondes.",
+    "tagline": "Posez n'importe quelle question sur votre dossier et obtenez une réponse en quelques secondes.",
     "expediente": "Dossier",
     "dossier": "Dossier",
     "no_files_title": "Vous n'avez pas encore de dossier",
     "no_files_hint": "Créez un dossier pour que l'assistant puisse vous aider avec vos offres et votre chantier.",
     "intro_title": "Assistant Estimation3D",
-    "intro_lead": "Alimenté par votre dossier · réponses contextuelles. Posez-moi des questions sur vos offres, délais, garanties ou risques du chantier.",
+    "intro_lead": "Je réponds à partir des données de votre dossier. Posez-moi des questions sur vos offres, délais, garanties ou risques du chantier.",
     "cap_analiza_title": "Analyse le dossier",
     "cap_analiza_desc": "Examine offres, délais, coûts et données du dossier.",
     "cap_jargon_title": "Explique le jargon",
@@ -175,44 +175,47 @@
     "cap_riesgos_desc": "Identifie les points de vigilance.",
     "cap_decide_title": "Prépare les prochaines étapes",
     "cap_decide_desc": "Résume les enjeux à chaque étape.",
-    "tagline_cliente": "Posez toute question sur votre dossier · réponses en quelques secondes.",
+    "tagline_cliente": "Posez toute question sur votre dossier et obtenez une réponse en quelques secondes.",
     "tagline_estimador": "Appui technique pour diagnostiquer et estimer ce dossier.",
     "tagline_constructor": "Appui pour comprendre l'étendue des travaux et préparer votre offre.",
     "tagline_administrador": "Appui opérationnel pour superviser le dossier.",
-    "intro_lead_cliente": "Alimenté par votre dossier · réponses contextuelles. Posez-moi des questions sur vos offres, délais, garanties ou risques du chantier.",
+    "intro_lead_cliente": "Je réponds à partir des données de votre dossier. Posez-moi des questions sur vos offres, délais, garanties ou risques du chantier.",
     "intro_lead_estimador": "Alimenté par les données du dossier. Posez-moi des questions sur le diagnostic, les postes à considérer, les risques techniques ou comment dimensionner l'estimation.",
     "intro_lead_constructor": "Alimenté par les données du dossier. Posez-moi des questions sur l'étendue des travaux, comment préparer votre offre, des délais raisonnables ou les risques à prévoir.",
     "intro_lead_administrador": "Alimenté par les données du dossier. Posez-moi des questions sur le statut, la comparaison des offres, les goulots d'étranglement ou un résumé exécutif.",
     "caps_title": "Ce que je peux faire",
     "faq_label": "Questions fréquentes",
-    "faq_recomienda": "Quelle offre me recommandez-vous ?",
-    "faq_riesgos": "Quels sont les principaux risques du chantier ?",
-    "faq_fin": "Quand puis-je espérer la fin des travaux ?",
-    "faq_ahorro": "Combien vais-je économiser au total ?",
-    "faq_rechazo": "Que se passe-t-il si je refuse toutes les offres ?",
-    "faq_garantia": "Comment fonctionne la garantie de 5 ans ?",
+    "faq_recomienda": "Quelle offre me recommandez-vous ?",
+    "faq_riesgos": "Quels sont les principaux risques du chantier ?",
+    "faq_fin": "Quand puis-je espérer la fin des travaux ?",
+    "faq_ahorro": "Combien vais-je économiser au total ?",
+    "faq_rechazo": "Que se passe-t-il si je refuse toutes les offres ?",
+    "faq_garantia": "Comment fonctionne la garantie de 5 ans ?",
     "faq_est_diagnostico": "Résume le diagnostic et les données du dossier",
-    "faq_est_partidas": "Quels postes dois-je considérer pour ce service ?",
-    "faq_est_medicion": "Comment dimensionner les travaux avec les infos disponibles ?",
-    "faq_est_riesgos": "Quels risques techniques dois-je documenter ?",
-    "faq_est_adjuntos": "Quelles photos, vidéos ou documents sont joints ?",
-    "faq_con_alcance": "Quelle est l'étendue des travaux ?",
+    "faq_est_partidas": "Quels postes dois-je considérer pour ce service ?",
+    "faq_est_medicion": "Comment dimensionner les travaux avec les infos disponibles ?",
+    "faq_est_riesgos": "Quels risques techniques dois-je documenter ?",
+    "faq_est_adjuntos": "Quelles photos, vidéos ou documents sont joints ?",
+    "faq_con_alcance": "Quelle est l'étendue des travaux ?",
     "faq_con_oferta": "Aidez-moi à dimensionner mon offre",
-    "faq_con_plazo": "Quel délai est raisonnable pour ces travaux ?",
-    "faq_con_riesgos": "Quels risques dois-je prévoir ?",
-    "faq_con_adjuntos": "Que montrent les pièces jointes du dossier ?",
+    "faq_con_plazo": "Quel délai est raisonnable pour ces travaux ?",
+    "faq_con_riesgos": "Quels risques dois-je prévoir ?",
+    "faq_con_adjuntos": "Que montrent les pièces jointes du dossier ?",
     "faq_adm_resumen": "Donne-moi un résumé exécutif du dossier",
-    "faq_adm_estado": "Dans quel statut se trouve le dossier ?",
+    "faq_adm_estado": "Dans quel statut se trouve le dossier ?",
     "faq_adm_ofertas": "Compare les offres reçues",
-    "faq_adm_cuellos": "Y a-t-il des goulots d'étranglement ou des étapes en attente ?",
-    "faq_adm_contrato": "Quel est le statut du contrat et du chantier ?",
+    "faq_adm_cuellos": "Y a-t-il des goulots d'étranglement ou des étapes en attente ?",
+    "faq_adm_contrato": "Quel est le statut du contrat et du chantier ?",
     "placeholder": "Écrivez votre question…",
     "send": "Envoyer",
-    "disclaimer": "L'assistant peut faire des erreurs. Ce n'est pas un avis juridique ; confirmez toujours avec votre entrepreneur.",
+    "disclaimer": "L'assistant peut faire des erreurs. Ce n'est pas un avis juridique ; confirmez toujours avec votre entrepreneur.",
     "refusal": "Désolé, je ne peux pas vous aider avec cette demande.",
     "empty_reply": "Je n'ai pas de réponse à cela pour le moment.",
     "error": "Impossible d'obtenir une réponse. Réessayez dans un instant.",
-    "clear": "Effacer la conversation"
+    "clear": "Effacer la conversation",
+    "you": "Vous",
+    "assistant": "Assistant",
+    "typing": "L'assistant rédige une réponse…"
   },
   "history": {
     "eyebrow": "Espace client",
@@ -309,6 +312,7 @@
     "administrador": "Administrateur"
   },
   "common": {
+    "chars": "caractères",
     "loading": "Chargement…",
     "retry": "Réessayer",
     "save": "Enregistrer",
@@ -701,7 +705,7 @@
     "rejected": "Offre non retenue",
     "not_selected": "Non sélectionné par le client",
     "no_offers": "Aucune offre envoyée",
-    "accepted_note": "Votre offre a été sélectionnée !",
+    "accepted_note": "Votre offre a été sélectionnée !",
     "rejected_note": "Le client a choisi une autre offre.",
     "selected_builders": "Constructeurs sélectionnés",
     "proposal_and_files": "Proposition et fichiers"
@@ -790,7 +794,7 @@
     "view_offer": "Voir mon offre",
     "full": "Complet",
     "make_offer": "Faire une offre",
-    "legend_title": "Niveau de compétition :",
+    "legend_title": "Niveau de compétition :",
     "legend_low": "Basse (0–1 offres)",
     "legend_mid": "Moyenne (2–3 offres)",
     "legend_high": "Élevée (4–5 offres)",
@@ -862,7 +866,8 @@
     "presentation_video": "Vidéo de présentation",
     "estimator_video": "Vidéo de l'estimateur",
     "estimator_video_hint": "L'estimateur qui a préparé votre estimation se présente dans cette vidéo.",
-    "videos_error": "Impossible de charger les vidéos de présentation."
+    "videos_error": "Impossible de charger les vidéos de présentation.",
+    "choose": "Choisir cette offre"
   },
   "make_offer": {
     "editing_badge": "Modification de l'offre",
@@ -1117,7 +1122,8 @@
     "street_name_placeholder": "rue Saint-Denis",
     "ca_city": "Ville",
     "province_territory": "Province / Territoire",
-    "postal_code": "Code Postal",
+    "postal_code": "Code postal",
+    "postal_hint": "Format : A1A 1A1",
     "postal_placeholder": "A1A 1A1",
     "postal_invalid": "Format invalide. Ex : A1A 1A1"
   },
@@ -1137,6 +1143,7 @@
     "status_filter": "Statut",
     "col_name": "Prénom",
     "col_lastname": "Nom",
+    "col_fullname": "Prénom et nom",
     "col_phone": "Téléphone",
     "col_email": "Courriel",
     "col_role": "Rôle",
@@ -1317,7 +1324,7 @@
     "photo": "Photo de profil",
     "change_photo": "Changer la photo",
     "uploading": "Téléversement…",
-    "photo_hint": "JPG, PNG ou WebP · Max. 2 Mo",
+    "photo_hint": "JPG, PNG ou WebP, 2 Mo maximum.",
     "save_changes": "Enregistrer les modifications",
     "no_changes": "Aucune modification en attente",
     "pending_changes": "Modifications en attente",
@@ -1434,14 +1441,13 @@
       "title_a": "Créez votre dossier.",
       "title_b": "À une visite près.",
       "sub": "Parlez-nous de votre propriété. Nous revenons vers vous sous 24 heures pour planifier l'unique visite de documentation.",
+      "step_contact": "Vos coordonnées",
+      "step_property": "La propriété",
+      "step_need": "Votre demande",
       "firstname": "Prénom",
-      "firstname_ph": "Camille",
       "lastname": "Nom",
-      "lastname_ph": "Tremblay",
       "phone": "Téléphone",
-      "phone_ph": "514 555 0123",
       "email": "Courriel",
-      "email_ph": "vous@exemple.ca",
       "type": "Type de propriété",
       "type_choose": "Choisir…",
       "type_house": "Maison",
@@ -1453,15 +1459,12 @@
       "optional": "optionnel",
       "required": "Champ requis",
       "addr_unit": "Numéro d'unité",
-      "addr_unit_ph": "5",
       "addr_street": "Numéro et nom de rue",
-      "addr_street_ph": "1660 av. Ducharme",
       "addr_city": "Ville",
-      "addr_city_ph": "Outremont",
       "addr_prov": "Province / Territoire",
       "addr_prov_choose": "Choisir…",
       "addr_postal": "Code postal",
-      "addr_postal_ph": "A1A 1A1",
+      "addr_postal_hint": "Format : A1A 1A1",
       "addr_postal_invalid": "Format invalide. Ex : A1A 1A1",
       "service_type": "Type de service",
       "services_loading": "Chargement des services…",
@@ -1480,12 +1483,6 @@
       "explore": "Explorer",
       "apply": "Postuler",
       "contact": "Contact"
-    },
-    "controls": {
-      "language": "Langue",
-      "theme": "Ambiance visuelle",
-      "dark": "Sombre",
-      "light": "Clair"
     }
   },
   "auth": {
@@ -1533,7 +1530,7 @@
     "select": "Langue"
   },
   "admin_file_create": {
-    "title": "Nouveau Dossier",
+    "title": "Nouveau dossier",
     "subtitle": "Créer un dossier au nom d'un client",
     "step2_name": "Client",
     "step2_title": "Sélection du client",
@@ -1572,7 +1569,7 @@
     "uncovered": "Non couverts par les offres sélectionnées : {{lista}}"
   },
   "admin_file_edit": {
-    "title": "Modifier le Dossier",
+    "title": "Modifier le dossier",
     "subtitle": "Mettre à jour les informations du dossier",
     "submit_btn": "Enregistrer les modifications",
     "sending": "Enregistrement…",
@@ -1592,7 +1589,7 @@
     "select_offer": "Offre à modifier",
     "constructor_no_offers": "Aucune offre reçue pour ce dossier.",
     "contract_note": "Le contrat est en lecture seule. Gérez-le depuis la section Contrats.",
-    "contract_prev_state": "À l’archivage :",
+    "contract_prev_state": "À l’archivage :",
     "more_services_one": "+{{n}} service",
     "more_services_other": "+{{n}} services"
   },
@@ -1618,7 +1615,7 @@
     "address_scope": "Cette adresse appartient au dossier. La modifier ne change jamais la fiche du client."
   },
   "to_estimate": {
-    "title": "À Estimer",
+    "title": "À estimer",
     "subtitle": "Dossiers en état nouveau, en estimation ou estimé",
     "count": "dossier(s)",
     "search_placeholder": "Rechercher par numéro, client, service, estimateur, adresse…",
@@ -1929,7 +1926,8 @@
   "pagination": {
     "of": "sur",
     "prev": "Page précédente",
-    "next": "Page suivante"
+    "next": "Page suivante",
+    "label": "Pagination"
   },
   "validation": {
     "password_hint": "Min. 8 car., majuscule, chiffre et symbole",
@@ -2179,29 +2177,29 @@
     "reporte_title": "Rapport du jour",
     "hora_inicio": "Heure de début",
     "horas_trabajadas": "Heures travaillées",
-    "horas_hint": "(normal : 8h)",
+    "horas_hint": "Normal : 8 h",
     "avance_dia": "% d'avancement du jour",
-    "avance_dia_hint": "— déplacez le curseur",
+    "avance_dia_hint": "Déplacez le curseur.",
     "avance_acumulado": "Cumulé après aujourd'hui",
     "avance_restante": "Restant disponible",
-    "avance_dia_servicio_hint": "— de {{servicio}}",
+    "avance_dia_servicio_hint": "Pour {{servicio}}.",
     "avance_acumulado_servicio": "{{servicio}} après aujourd'hui",
     "avance_global_tras_hoy": "Avancement global du chantier après aujourd'hui",
     "avance_por_servicio": "Avancement par service",
     "servicio_label": "Service",
-    "servicio_hint": "— celui sur lequel on a travaillé ce jour-là",
+    "servicio_hint": "Celui sur lequel on a travaillé ce jour-là.",
     "servicio_requerido": "Choisissez le service sur lequel on a travaillé ce jour-là.",
     "servicio_con_parte": "a déjà un rapport ce jour-là",
     "servicio_parte_hint": "Chaque service travaillé ce jour-là a son propre rapport.",
     "fase_label": "Phase / étape actuelle",
-    "fase_hint": "— spécifique au service",
+    "fase_hint": "Spécifique au service.",
     "fase_1": "Préparation et protection du site",
     "fase_2": "Travaux en zone principale",
     "fase_3": "Travaux en zone secondaire",
     "fase_4": "Nettoyage et restauration",
     "fase_5": "Inspection et réception finale",
     "actividades_label": "Activités effectuées aujourd'hui",
-    "actividades_hint": "— sélectionnez dans la liste",
+    "actividades_hint": "Sélectionnez dans la liste.",
     "act_1": "Arrivée sur site",
     "act_2": "Déchargement du matériel",
     "act_3": "Zone A terminée",
@@ -2220,8 +2218,8 @@
     "media_videos": "Vidéos",
     "media_docs": "Documents",
     "guardar_btn": "Enregistrer le rapport du jour",
-    "guardado_msg": "Rapport enregistré · contrat en statut «en exécution»",
-    "nota_inicio": "En enregistrant le premier rapport, le contrat passe automatiquement à en_exécution et la date de début réel est fixée.",
+    "guardado_msg": "Rapport enregistré. Le contrat est maintenant « En cours ».",
+    "nota_inicio": "En enregistrant le premier rapport, le contrat passe automatiquement à « En cours » et la date de début réelle est fixée.",
     "kpi_title": "Résumé",
     "kpi_dias": "jours travaillés",
     "kpi_horas": "heures",
@@ -2369,14 +2367,14 @@
     "codigo_required": "Le code est requis.",
     "codigo_note": "Identifiant stable, ex. IICRC_S520.",
     "section_titles": "Titres",
-    "titulo_fr": "Titre",
-    "titulo_en": "Titre",
-    "titulo_es": "Titre",
+    "titulo_fr": "Titre en français",
+    "titulo_en": "Titre en anglais",
+    "titulo_es": "Titre en espagnol",
     "field_required": "Ce champ est requis.",
     "section_summaries": "Résumés",
-    "resumen_fr": "Résumé",
-    "resumen_en": "Résumé",
-    "resumen_es": "Résumé",
+    "resumen_fr": "Résumé en français",
+    "resumen_en": "Résumé en anglais",
+    "resumen_es": "Résumé en espagnol",
     "keywords_label": "Mots-clés",
     "keywords_note": "Séparés par des virgules. Aident l'assistant à repérer la pertinence.",
     "orden_label": "Ordre",
@@ -2425,6 +2423,15 @@
     "field_profile": "Profil",
     "section_protocol": "Protocole",
     "field_protocol": "Protocole",
+    "titulo_fr": "Titre en français",
+    "titulo_en": "Titre en anglais",
+    "titulo_es": "Titre en espagnol",
+    "perfil_fr": "Profil en français",
+    "perfil_en": "Profil en anglais",
+    "perfil_es": "Profil en espagnol",
+    "protocolo_fr": "Protocole en français",
+    "protocolo_en": "Protocole en anglais",
+    "protocolo_es": "Protocole en espagnol",
     "ficha_label": "Fiche normative liée",
     "ficha_none": "Aucune",
     "ficha_note": "Norme de référence associée à cet imprévu.",
@@ -2450,12 +2457,12 @@
   "journal": {
     "crumbs": {
       "home": "Accueil",
-      "current": "Le Journal"
+      "current": "Le Journal",
+      "aria": "Fil d’Ariane"
     },
     "hero": {
-      "title_gold": "Comprendre",
-      "title_rest": " ce qui se passe chez soi.",
-      "lede": "Articles, guides et histoires pour mieux décider lorsqu'un problème touche votre propriété."
+      "lede": "Articles, guides et histoires pour mieux décider lorsqu'un problème touche votre propriété.",
+      "title": "Comprendre ce qui se passe chez soi."
     },
     "filter": {
       "aria": "Filtrer par catégorie"
@@ -2473,59 +2480,56 @@
       "moisissure-danger": {
         "title": "Comment savoir si la moisissure dans votre maison est dangereuse",
         "sum": "Tâches, odeurs, espèces : ce qu'il faut regarder, ce qu'il faut faire, et ce qu'il ne faut jamais faire.",
-        "meta": "12 février 2026 · 6 min"
+        "meta": "12 février 2026, 6 min"
       },
       "degat-eau-48h": {
         "title": "Dégât d'eau : les 48 premières heures qui changent tout",
         "sum": "Pourquoi les deux premiers jours déterminent l'ampleur des dégâts — et la facture finale.",
-        "meta": "5 février 2026 · 5 min"
+        "meta": "5 février 2026, 5 min"
       },
       "comparer-soum": {
         "title": "Comparer trois soumissions : ce qui compte vraiment au-delà du prix",
         "sum": "Une grille de lecture simple pour ne pas se laisser piéger par le plus bas prix.",
-        "meta": "29 janvier 2026 · 7 min"
+        "meta": "29 janvier 2026, 7 min"
       },
       "avant-1980": {
         "title": "Maisons construites avant 1980 : ce que tout propriétaire doit savoir",
         "sum": "Où se cache l'amiante, comment le repérer, et pourquoi il ne faut jamais y toucher soi-même.",
-        "meta": "22 janvier 2026 · 8 min"
+        "meta": "22 janvier 2026, 8 min"
       },
       "cave-rosemont": {
         "title": "Une cave humide à Rosemont : du diagnostic à la solution",
         "sum": "Le cas d'une propriétaire qui pensait avoir un simple problème d'humidité.",
-        "meta": "15 janvier 2026 · 6 min"
+        "meta": "15 janvier 2026, 6 min"
       },
       "fissures-fond": {
         "title": "Fissures dans la fondation : structurelles ou cosmétiques ?",
         "sum": "Les signes qui changent tout, et ceux qui peuvent attendre.",
-        "meta": "8 janvier 2026 · 6 min"
+        "meta": "8 janvier 2026, 6 min"
       },
       "une-visite": {
         "title": "Pourquoi une seule visite suffit (et pourquoi trois c'est trop)",
         "sum": "Le calcul économique et humain derrière la documentation unique.",
-        "meta": "18 décembre 2025 · 5 min"
+        "meta": "18 décembre 2025, 5 min"
       },
       "vermiculite": {
         "title": "Vermiculite dans l'entretoit : pourquoi c'est si délicat",
         "sum": "Un isolant fréquent dans les vieilles maisons québécoises — et un piège à manier avec soin.",
-        "meta": "11 décembre 2025 · 7 min"
+        "meta": "11 décembre 2025, 7 min"
       },
       "assechement": {
         "title": "L'assèchement après dégât d'eau : combien de temps, et pourquoi",
         "sum": "Pourquoi un mur a l'air sec en surface mais ne l'est pas vraiment.",
-        "meta": "4 décembre 2025 · 5 min"
+        "meta": "4 décembre 2025, 5 min"
       }
     },
     "featured": {
       "label": "En vedette",
-      "sub": "lecture du mois",
+      "sub": "Lecture du mois",
       "title": "Comprendre votre dossier : ce que chaque section vous dit vraiment.",
       "text": "Mesures, classifications, plans, garanties : un dossier Estimation3D ressemble à un livre de bord. Voici comment le lire — et ce qu'il faut regarder en premier.",
-      "meta": "19 mars 2026 · 9 min",
+      "meta": "19 mars 2026, 9 min",
       "img_alt": "Plan 3D documenté d'une propriété"
-    },
-    "footer": {
-      "sign": "JOURNAL"
     }
   },
   "entrepreneurs": {
@@ -2534,7 +2538,7 @@
       "current": "Entrepreneurs"
     },
     "hero": {
-      "kicker": "Phase pilote — 15 entrepreneurs partenaires sélectionnés en 2026",
+      "kicker": "Phase pilote : 15 entrepreneurs partenaires sélectionnés en 2026",
       "title_1": "Recevez des dossiers complets.",
       "title_2": "Soumissionnez sans visite.",
       "lede": "Estimation3D vous envoie des projets pré-documentés à Montréal. Vous analysez le dossier, vous soumissionnez. Pas de déplacement à l'estimation. Pas de course à la cote la plus basse.",
@@ -2693,23 +2697,23 @@
       "title": "Avant de postuler.",
       "items": {
         "cout": {
-          "q": "Combien ça coûte de rejoindre la plateforme ?",
+          "q": "Combien ça coûte de rejoindre la plateforme ?",
           "a": "Aucun frais d'inscription. Nous prélevons une commission de service sur les projets exécutés, alignée sur les standards du marché. Détails complets lors de la qualification."
         },
         "attribution": {
-          "q": "Comment sont attribués les projets ?",
+          "q": "Comment sont attribués les projets ?",
           "a": "Chaque projet est ouvert à un maximum de 3 entrepreneurs qualifiés pour le service concerné, dans la zone géographique du client. Le client choisit en toute autonomie."
         },
         "obligation": {
-          "q": "Suis-je obligé de soumissionner sur tous les projets reçus ?",
+          "q": "Suis-je obligé de soumissionner sur tous les projets reçus ?",
           "a": "Non. Vous voyez chaque dossier complet et décidez librement. Aucune pénalité à décliner."
         },
         "paiement": {
-          "q": "Comment fonctionne le paiement ?",
+          "q": "Comment fonctionne le paiement ?",
           "a": "Le contrat définit les modalités. Le suivi documenté de la plateforme déclenche les libérations de paiement selon les étapes convenues avec le client."
         },
         "imprevu": {
-          "q": "Que se passe-t-il si un imprévu survient pendant l'exécution ?",
+          "q": "Que se passe-t-il si un imprévu survient pendant l'exécution ?",
           "a": "Chaque service a ses protocoles d'imprévus pré-documentés. Vous notifiez via la plateforme, soumettez un devis additionnel, le client approuve. Aucune zone grise."
         }
       }
@@ -2718,28 +2722,20 @@
       "title": "Présentez-nous votre entreprise.",
       "sub": "Quelques informations suffisent pour démarrer la conversation.",
       "company": "Nom de l'entreprise",
-      "company_ph": "Atelier Boréal Construction inc.",
-      "contact": "Personne contact",
-      "contact_ph": "Marie-Claude Lavoie",
       "phone": "Téléphone",
-      "phone_ph": "514 555 0123",
       "email": "Courriel",
-      "email_ph": "contact@exemple.ca",
       "rbq": "Numéro de licence RBQ",
-      "rbq_ph": "0000-0000-00",
+      "rbq_hint": "Dix chiffres, au format 0000-0000-00.",
       "specialties": "Spécialités",
       "years": "Années d'expérience",
       "area": "Zone desservie",
-      "area_ph": "Montréal et couronne nord",
       "message": "Message (optionnel)",
       "message_ph": "Quelques mots sur votre approche, vos chantiers récents, ou vos questions.",
       "note": "Nous étudions chaque candidature individuellement. Réponse sous 5 jours ouvrables.",
       "submit": "Soumettre ma candidature",
       "success": "Candidature reçue",
       "contact_first": "Prénom de la personne contact",
-      "contact_first_ph": "Marie-Claude",
       "contact_last": "Nom de la personne contact",
-      "contact_last_ph": "Lavoie",
       "specialties_all": "Tous les services",
       "err_required": "Champ requis.",
       "err_email": "Courriel invalide.",
@@ -2753,9 +2749,6 @@
       "manifesto_1": "La construction mérite mieux que des estimations gratuites",
       "manifesto_2": "en série.",
       "lede": "Rejoignez les entrepreneurs qui choisissent la clarté."
-    },
-    "footer": {
-      "sign": "ENTREPRENEURS"
     }
   },
   "archivo": {
@@ -2773,7 +2766,7 @@
     "desarchivando": "Désarchivage…",
     "titulo_expediente": "Dossier archivé",
     "titulo_contrato": "Dossier et contrat archivés",
-    "titulo_obra": "Dossier et contrat archivés · chantier en pause",
+    "titulo_obra": "Dossier et contrat archivés, chantier en pause",
     "texto_expediente": "Les travaux de ce dossier ne seront pas réalisés. Seul un administrateur peut le modifier.",
     "texto_oferta": "Votre offre est archivée : les travaux de ce dossier ne seront pas réalisés. Seul un administrateur peut la modifier.",
     "texto_contrato": "Les travaux de ce contrat ne seront pas réalisés. Seul un administrateur peut le modifier.",

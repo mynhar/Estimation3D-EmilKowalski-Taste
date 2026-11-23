@@ -1,6 +1,7 @@
 /* component: status chip
  * states: info · accion · atencion · ok · neutro · error
- * contrast: texto -ink sobre su -soft (≥ 6.2:1); neutro ink-secondary sobre bg-alt (9.0:1)
+ * contrast: texto -ink sobre su -soft (≥ 5.8:1); neutro ink-secondary sobre band (7.7:1)
+ *           nunca tomate: el chip informa, no es una acción
  */
 :host {
   display: inline-flex;
@@ -13,12 +14,12 @@
   font-weight: var(--ds-weight-medium);
   line-height: 1.2;
   white-space: nowrap;
-  background: var(--ds-bg-alt);
+  background: var(--ds-band);
   color: var(--ds-ink-secondary);
 }
 
 :host([data-tono='info'])     { background: var(--ds-info-soft);    color: var(--ds-info-ink); }
-:host([data-tono='accion'])   { background: var(--ds-scan-soft);    color: var(--ds-action-ink); }
+:host([data-tono='accion'])   { background: var(--ds-action-faint);    color: var(--ds-action-ink); }
 :host([data-tono='atencion']) { background: var(--ds-warning-soft); color: var(--ds-warning-ink); }
 :host([data-tono='ok'])       { background: var(--ds-success-soft); color: var(--ds-success-ink); }
 :host([data-tono='error'])    { background: var(--ds-danger-soft);  color: var(--ds-danger-ink); }

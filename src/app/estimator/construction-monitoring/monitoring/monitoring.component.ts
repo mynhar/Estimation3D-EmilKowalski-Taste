@@ -10,16 +10,23 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { TranslatePipe } from '@ngx-translate/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { AuthSupabaseService } from '../../../services/auth-supabase.service';
 import { ContratoService } from '../../../services/contrato.service';
 import { ObraVmService } from '../../../services/obra-vm.service';
 import { ObraVM } from '../../../models';
 import { ObraCardComponent } from '../../../shared/construction-monitoring/obra-card.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-estimator-construction-monitoring',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, RouterLink, ObraCardComponent],
+  imports: [
+    TranslatePipe, RouterLink, MatButtonModule, MatIconModule,
+    PageHeaderComponent, EmptyStateComponent, ObraCardComponent,
+  ],
   templateUrl: './monitoring.component.html',
   styleUrl: './monitoring.component.css',
 })

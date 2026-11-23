@@ -2,6 +2,8 @@ import {
   ChangeDetectionStrategy, Component, ElementRef, Injector,
   afterNextRender, computed, inject, input, output, signal, viewChild,
 } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ExpedienteService } from '../../../services/expediente.service';
 
@@ -48,7 +50,7 @@ const TEXTOS: Record<AccionArchivo, {
 @Component({
   selector: 'app-archivar-expediente',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, MatButtonModule, MatIconModule],
   templateUrl: './archivar-expediente.component.html',
   styleUrl: './archivar-expediente.component.css',
   host: { '[class.archivar--separado]': 'separado()' },
@@ -90,7 +92,11 @@ export class ArchivarExpedienteComponent {
   /** Textos del panel: los de la acción que se está confirmando. */
   textos      = computed(() => TEXTOS[this.enCurso()]);
 
-  private botonNo = viewChild<ElementRef<HTMLButtonElement>>('botonNo');
+  /** Icono del panel: el de la acción que se está confirmando. */
+  enCursoDesarchivar = computed(() => this.enCurso() === 'desarchivar');
+
+  // `read: ElementRef`: con mat-button, la referencia sin `read` sería el componente.
+  private botonNo = viewChild('botonNo', { read: ElementRef<HTMLButtonElement> });
 
   iniciar(): void {
     this.enCurso.set(this.accion());

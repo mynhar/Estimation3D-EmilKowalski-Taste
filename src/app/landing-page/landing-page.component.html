@@ -1,54 +1,9 @@
-<!-- Landing pública, dirección Clarté. Seis secciones; el texto vive en i18n bajo `landing.*`. -->
+<!-- Landing pública, dirección Trait rouge. Seis secciones; el texto vive en i18n bajo `landing.*`. -->
 <a class="skip" href="#contenu" (click)="goTo('contenu', $event)">{{ 'nav.skip' | translate }}</a>
 
-<!-- ── Cabecera ──────────────────────────────────────────────────────────── -->
-<header class="hd" [class.is-scrolled]="scrolled()">
-  <div class="wrap hd__in">
-    <a routerLink="/" class="brand" (click)="goTop($event)"
-       [attr.aria-label]="'landing.nav.home_aria' | translate">
-      <span class="brand__mark" aria-hidden="true"></span>
-      <span class="brand__name">Estimation3D</span>
-    </a>
-
-    <nav class="hd__nav">
-      <a class="hd__link" href="#processus" (click)="goTo('processus', $event)">{{ 'landing.nav.process' | translate }}</a>
-      <a class="hd__link" href="#services" (click)="goTo('services', $event)">{{ 'landing.nav.specialties' | translate }}</a>
-      <a class="hd__link" routerLink="/journal">{{ 'landing.nav.journal' | translate }}</a>
-      <a class="hd__link" routerLink="/entrepreneurs">{{ 'landing.nav.contractors' | translate }}</a>
-    </nav>
-
-    <div class="hd__end">
-      <a class="hd__link hd__tel" href="tel:+15145108819" [attr.aria-label]="'landing.nav.phone_aria' | translate">
-        <mat-icon aria-hidden="true">call</mat-icon>
-        514&nbsp;510-8819
-      </a>
-      <app-lang-toggle class="hd__lang" />
-      <a class="hd__link hd__login" routerLink="/login">{{ 'landing.nav.login' | translate }}</a>
-      <a class="button hd__cta" href="#dossier" (click)="goTo('dossier', $event)">{{ 'landing.nav.cta' | translate }}</a>
-
-      <!-- Móvil y tableta: idioma en menú (como la barra de la app) y navegación en hoja. -->
-      <button mat-button type="button" class="hd__langmenu" [matMenuTriggerFor]="langMenu"
-              [attr.title]="'lang.' + lang.current() | translate">
-        <mat-icon>language</mat-icon>
-        {{ lang.current().toUpperCase() }}
-      </button>
-      <mat-menu #langMenu="matMenu" xPosition="before">
-        @for (l of lang.langs; track l) {
-          <button mat-menu-item type="button" role="menuitemradio" (click)="lang.set(l)"
-                  [attr.aria-checked]="lang.current() === l">
-            <mat-icon [class.is-blank]="lang.current() !== l" aria-hidden="true">check</mat-icon>
-            <span>{{ 'lang.' + l | translate }}</span>
-          </button>
-        }
-      </mat-menu>
-
-      <button mat-icon-button #menuButton type="button" class="hd__menu" (click)="openMenu()"
-              aria-haspopup="dialog" [attr.aria-label]="'landing.nav.menu' | translate">
-        <mat-icon>menu</mat-icon>
-      </button>
-    </div>
-  </div>
-</header>
+<!-- ── Cabecera (compartida con Le Journal y Entrepreneurs) ─────────────── -->
+<!-- El botón de la cabecera es tomate solo cuando el del hero ya no se ve. -->
+<app-site-header pagina="inicio" [ctaTomate]="ctaBar()" (irA)="goTo($event)" (arriba)="goTop()" />
 
 <main id="contenu" tabindex="-1">
 
@@ -61,13 +16,13 @@
         </h1>
         <p class="hero__lede">{{ 'landing.hero.lede' | translate }}</p>
         <div class="hero__actions">
-          <a class="button button--lg" href="#dossier" (click)="goTo('dossier', $event)">{{ 'landing.nav.cta' | translate }}</a>
+          <a class="button button--lg button--cta" href="#dossier" (click)="goTo('dossier', $event)">{{ 'landing.nav.cta' | translate }}</a>
           <a class="link" href="#processus" (click)="goTo('processus', $event)">{{ 'landing.hero.cta_secondary' | translate }}</a>
         </div>
         <p class="hero__price">{{ 'landing.hero.price' | translate }}</p>
       </div>
 
-      <!-- El momento de la página: el barrido menthe recorre el escaneo una vez y deja las cotas. -->
+      <!-- El momento de la página: el barrido tomate recorre el escaneo una vez y deja las cotas. -->
       <figure class="scan" [class.is-ready]="scanReady()">
         <img class="scan__img" [ngSrc]="media.scan" width="900" height="920" priority
              [alt]="'landing.hero.scan_alt' | translate"
@@ -101,7 +56,7 @@
   </section>
 
   <!-- ── 2. Problema frente a solución ─────────────────────────────────── -->
-  <section class="sec sec--stone" id="probleme" tabindex="-1" aria-labelledby="probleme-title">
+  <section class="sec sec--band" id="probleme" tabindex="-1" aria-labelledby="probleme-title">
     <div class="wrap">
       <header class="sec__head">
         <h2 class="sec__title" id="probleme-title">
@@ -184,7 +139,7 @@
     </div>
   </section>
 
-  <!-- ── 5. Tour 3D (isla ardoise) ─────────────────────────────────────── -->
+  <!-- ── 5. Tour 3D (isla abeto noche) ─────────────────────────────────────── -->
   <section class="sec sec--dark" id="tour" tabindex="-1" aria-labelledby="tour-title">
     <div class="wrap tour">
       <h2 class="sec__title tour__title" id="tour-title">
@@ -217,170 +172,201 @@
         </ul>
       </header>
 
-      <form class="fm" [formGroup]="form" (ngSubmit)="submit()" novalidate>
-        <div class="fm__grid">
-          <div class="fld">
-            <label class="fld__label" for="f-prenom">{{ 'landing.form.firstname' | translate }}</label>
-            <input class="fld__input" id="f-prenom" type="text" formControlName="prenom" autocomplete="given-name"
-                   [attr.aria-invalid]="invalid('prenom')" [attr.aria-describedby]="invalid('prenom') ? 'e-prenom' : null"
-                   [placeholder]="'landing.form.firstname_ph' | translate" />
-            @if (invalid('prenom')) {
-              <p class="fld__error" id="e-prenom"><mat-icon aria-hidden="true">error</mat-icon>{{ 'landing.form.required' | translate }}</p>
+      <!-- En teléfono, tres pasos (datos, propiedad, demanda); desde 768 px, todo a la vez.
+           Los tres bloques siempre están en el DOM: el resumen de campos faltantes lee sus etiquetas. -->
+      <form class="fm" #fm [class.is-steps]="pasos()" [attr.data-dir]="sentido()"
+            [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        @if (pasos()) {
+          <ol class="fm__track" aria-hidden="true">
+            @for (n of pasoLista; track n) {
+              <li [class.is-done]="n < paso()" [class.is-current]="n === paso()"></li>
             }
-          </div>
+          </ol>
+        }
 
-          <div class="fld">
-            <label class="fld__label" for="f-nom">{{ 'landing.form.lastname' | translate }}</label>
-            <input class="fld__input" id="f-nom" type="text" formControlName="nom" autocomplete="family-name"
-                   [attr.aria-invalid]="invalid('nom')" [attr.aria-describedby]="invalid('nom') ? 'e-nom' : null"
-                   [placeholder]="'landing.form.lastname_ph' | translate" />
-            @if (invalid('nom')) {
-              <p class="fld__error" id="e-nom"><mat-icon aria-hidden="true">error</mat-icon>{{ 'landing.form.required' | translate }}</p>
-            }
-          </div>
-
-          <div class="fld">
-            <label class="fld__label" for="f-tel">{{ 'landing.form.phone' | translate }}</label>
-            <input class="fld__input" id="f-tel" type="tel" formControlName="telephone" autocomplete="tel" inputmode="tel"
-                   [attr.aria-invalid]="invalid('telephone')" [attr.aria-describedby]="invalid('telephone') ? 'e-tel' : null"
-                   [placeholder]="'landing.form.phone_ph' | translate" />
-            @if (invalid('telephone')) {
-              <p class="fld__error" id="e-tel"><mat-icon aria-hidden="true">error</mat-icon>{{ 'landing.form.required' | translate }}</p>
-            }
-          </div>
-
-          <div class="fld">
-            <label class="fld__label" for="f-mail">{{ 'landing.form.email' | translate }}</label>
-            <input class="fld__input" id="f-mail" type="email" formControlName="courriel" autocomplete="email" inputmode="email"
-                   [attr.aria-invalid]="invalid('courriel')" [attr.aria-describedby]="invalid('courriel') ? 'e-mail' : null"
-                   [placeholder]="'landing.form.email_ph' | translate" />
-            @if (invalid('courriel')) {
-              <p class="fld__error" id="e-mail">
-                <mat-icon aria-hidden="true">error</mat-icon>
-                @if (form.controls.courriel.hasError('required')) {
-                  {{ 'landing.form.required' | translate }}
-                } @else {
-                  {{ 'admin_users.email_invalid' | translate }}
-                }
-              </p>
-            }
-          </div>
-
-          <div class="fld fld--full">
-            <label class="fld__label" for="f-type">{{ 'landing.form.type' | translate }}</label>
-            <div class="fld__select">
-              <select class="fld__input" id="f-type" formControlName="typePropriete"
-                      [attr.aria-invalid]="invalid('typePropriete')" [attr.aria-describedby]="invalid('typePropriete') ? 'e-type' : null">
-                <option value="">{{ 'landing.form.type_choose' | translate }}</option>
-                @for (t of propertyTypes; track t) {
-                  <option [value]="t">{{ 'landing.form.type_' + t | translate }}</option>
-                }
-              </select>
-              <mat-icon aria-hidden="true">expand_more</mat-icon>
-            </div>
-            @if (invalid('typePropriete')) {
-              <p class="fld__error" id="e-type"><mat-icon aria-hidden="true">error</mat-icon>{{ 'landing.form.required' | translate }}</p>
-            }
-          </div>
-
-          <fieldset class="fld fld--full" formGroupName="adresse">
-            <legend class="fld__label">{{ 'landing.form.address' | translate }}</legend>
-
-            <div class="addr">
-              <div class="fld addr__unit">
-                <label class="fld__sub" for="f-adr-unit">
-                  {{ 'landing.form.addr_unit' | translate }}
-                  <span class="fld__opt">({{ 'landing.form.optional' | translate }})</span>
-                </label>
-                <input class="fld__input" id="f-adr-unit" type="text" formControlName="numero_unidad"
-                       [placeholder]="'landing.form.addr_unit_ph' | translate" />
-              </div>
-
-              <div class="fld addr__street">
-                <label class="fld__sub" for="f-adr-rue">{{ 'landing.form.addr_street' | translate }}</label>
-                <input class="fld__input" id="f-adr-rue" type="text" formControlName="calle" autocomplete="address-line1"
-                       [attr.aria-invalid]="invalidAddr('calle')" [attr.aria-describedby]="invalidAddr('calle') ? 'e-rue' : null"
-                       [placeholder]="'landing.form.addr_street_ph' | translate" />
-                @if (invalidAddr('calle')) {
-                  <p class="fld__error" id="e-rue"><mat-icon aria-hidden="true">error</mat-icon>{{ 'landing.form.required' | translate }}</p>
-                }
-              </div>
-
-              <div class="fld addr__city">
-                <label class="fld__sub" for="f-adr-ville">{{ 'landing.form.addr_city' | translate }}</label>
-                <input class="fld__input" id="f-adr-ville" type="text" formControlName="ciudad" autocomplete="address-level2"
-                       [attr.aria-invalid]="invalidAddr('ciudad')" [attr.aria-describedby]="invalidAddr('ciudad') ? 'e-ville' : null"
-                       [placeholder]="'landing.form.addr_city_ph' | translate" />
-                @if (invalidAddr('ciudad')) {
-                  <p class="fld__error" id="e-ville"><mat-icon aria-hidden="true">error</mat-icon>{{ 'landing.form.required' | translate }}</p>
-                }
-              </div>
-
-              <div class="fld addr__prov">
-                <label class="fld__sub" for="f-adr-prov">{{ 'landing.form.addr_prov' | translate }}</label>
-                <div class="fld__select">
-                  <select class="fld__input" id="f-adr-prov" formControlName="provincia_ca" autocomplete="address-level1"
-                          [attr.aria-invalid]="invalidAddr('provincia_ca')" [attr.aria-describedby]="invalidAddr('provincia_ca') ? 'e-prov' : null">
-                    <option value="">{{ 'landing.form.addr_prov_choose' | translate }}</option>
-                    @for (p of provincesCanada; track p.code) {
-                      <option [value]="p.code">{{ p.code }} — {{ p.nombre }}</option>
-                    }
-                  </select>
-                  <mat-icon aria-hidden="true">expand_more</mat-icon>
-                </div>
-                @if (invalidAddr('provincia_ca')) {
-                  <p class="fld__error" id="e-prov"><mat-icon aria-hidden="true">error</mat-icon>{{ 'landing.form.required' | translate }}</p>
-                }
-              </div>
-
-              <div class="fld addr__postal">
-                <label class="fld__sub" for="f-adr-cp">{{ 'landing.form.addr_postal' | translate }}</label>
-                <input class="fld__input fld__input--upper" id="f-adr-cp" type="text" formControlName="codigo_postal"
-                       autocomplete="postal-code" maxlength="7"
-                       [attr.aria-invalid]="invalidAddr('codigo_postal')" [attr.aria-describedby]="invalidAddr('codigo_postal') ? 'e-cp' : null"
-                       [placeholder]="'landing.form.addr_postal_ph' | translate" />
-                @if (invalidAddr('codigo_postal')) {
-                  <p class="fld__error" id="e-cp">
-                    <mat-icon aria-hidden="true">error</mat-icon>
-                    @if (form.controls.adresse.controls.codigo_postal.hasError('required')) {
-                      {{ 'landing.form.required' | translate }}
-                    } @else {
-                      {{ 'landing.form.addr_postal_invalid' | translate }}
-                    }
-                  </p>
-                }
-              </div>
-            </div>
-          </fieldset>
-
-          <fieldset class="fld fld--full" [attr.aria-describedby]="invalid('servicioId') ? 'e-service' : null">
-            <legend class="fld__label">{{ 'landing.form.service_type' | translate }}</legend>
-            @if (loadingServices()) {
-              <p class="fld__note">{{ 'landing.form.services_loading' | translate }}</p>
-            } @else {
-              <div class="chips" [class.is-invalid]="invalid('servicioId')">
-                @for (s of services(); track s.id) {
-                  <label class="chip">
-                    <input class="chip__input" type="radio" formControlName="servicioId" [value]="s.id" />
-                    <span class="chip__box">
-                      <mat-icon class="chip__check" aria-hidden="true">check</mat-icon>
-                      {{ s.nombre }}
-                    </span>
-                  </label>
-                }
-              </div>
-              @if (invalid('servicioId')) {
-                <p class="fld__error" id="e-service"><mat-icon aria-hidden="true">error</mat-icon>{{ 'landing.form.required' | translate }}</p>
+        <!-- ── Paso 1: datos de contacto ── -->
+        <section class="fm__step" data-paso="1" [hidden]="pasos() && paso() !== 1" aria-labelledby="fm-s1">
+          <h3 class="fm__step-title" id="fm-s1" tabindex="-1">
+            <span class="fm__count">{{ 'stage.step_of' | translate: { n: 1, total: 3 } }}</span>
+            {{ 'landing.form.step_contact' | translate }}
+          </h3>
+          <div class="fm__grid">
+            <div class="fld">
+              <label class="fld__label" for="f-prenom">{{ 'landing.form.firstname' | translate }}</label>
+              <input class="fld__input" id="f-prenom" type="text" formControlName="prenom" autocomplete="given-name"
+                     [attr.aria-invalid]="invalid('prenom')" [attr.aria-describedby]="invalid('prenom') ? 'e-prenom' : null" />
+              @if (invalid('prenom')) {
+                <p class="fld__error" id="e-prenom"><mat-icon aria-hidden="true">error</mat-icon>{{ 'landing.form.required' | translate }}</p>
               }
-            }
-          </fieldset>
+            </div>
 
-          <div class="fld fld--full">
-            <label class="fld__label" for="f-desc">{{ 'landing.form.desc' | translate }}</label>
-            <textarea class="fld__input fld__input--area" id="f-desc" formControlName="description" rows="4"
-                      [placeholder]="'landing.form.desc_ph' | translate"></textarea>
+            <div class="fld">
+              <label class="fld__label" for="f-nom">{{ 'landing.form.lastname' | translate }}</label>
+              <input class="fld__input" id="f-nom" type="text" formControlName="nom" autocomplete="family-name"
+                     [attr.aria-invalid]="invalid('nom')" [attr.aria-describedby]="invalid('nom') ? 'e-nom' : null" />
+              @if (invalid('nom')) {
+                <p class="fld__error" id="e-nom"><mat-icon aria-hidden="true">error</mat-icon>{{ 'landing.form.required' | translate }}</p>
+              }
+            </div>
+
+            <div class="fld">
+              <label class="fld__label" for="f-tel">{{ 'landing.form.phone' | translate }}</label>
+              <input class="fld__input" id="f-tel" type="tel" formControlName="telephone" autocomplete="tel" inputmode="tel"
+                     [attr.aria-invalid]="invalid('telephone')" [attr.aria-describedby]="invalid('telephone') ? 'e-tel' : null" />
+              @if (invalid('telephone')) {
+                <p class="fld__error" id="e-tel"><mat-icon aria-hidden="true">error</mat-icon>{{ 'landing.form.required' | translate }}</p>
+              }
+            </div>
+
+            <div class="fld">
+              <label class="fld__label" for="f-mail">{{ 'landing.form.email' | translate }}</label>
+              <input class="fld__input" id="f-mail" type="email" formControlName="courriel" autocomplete="email" inputmode="email"
+                     [attr.aria-invalid]="invalid('courriel')" [attr.aria-describedby]="invalid('courriel') ? 'e-mail' : null" />
+              @if (invalid('courriel')) {
+                <p class="fld__error" id="e-mail">
+                  <mat-icon aria-hidden="true">error</mat-icon>
+                  @if (form.controls.courriel.hasError('required')) {
+                    {{ 'landing.form.required' | translate }}
+                  } @else {
+                    {{ 'admin_users.email_invalid' | translate }}
+                  }
+                </p>
+              }
+            </div>
           </div>
-        </div>
+        </section>
+
+        <!-- ── Paso 2: la propiedad ── -->
+        <section class="fm__step" data-paso="2" [hidden]="pasos() && paso() !== 2" aria-labelledby="fm-s2">
+          <h3 class="fm__step-title" id="fm-s2" tabindex="-1">
+            <span class="fm__count">{{ 'stage.step_of' | translate: { n: 2, total: 3 } }}</span>
+            {{ 'landing.form.step_property' | translate }}
+          </h3>
+          <div class="fm__grid">
+            <div class="fld fld--full">
+              <label class="fld__label" for="f-type">{{ 'landing.form.type' | translate }}</label>
+              <div class="fld__select">
+                <select class="fld__input" id="f-type" formControlName="typePropriete"
+                        [attr.aria-invalid]="invalid('typePropriete')" [attr.aria-describedby]="invalid('typePropriete') ? 'e-type' : null">
+                  <option value="">{{ 'landing.form.type_choose' | translate }}</option>
+                  @for (t of propertyTypes; track t) {
+                    <option [value]="t">{{ 'landing.form.type_' + t | translate }}</option>
+                  }
+                </select>
+                <mat-icon aria-hidden="true">expand_more</mat-icon>
+              </div>
+              @if (invalid('typePropriete')) {
+                <p class="fld__error" id="e-type"><mat-icon aria-hidden="true">error</mat-icon>{{ 'landing.form.required' | translate }}</p>
+              }
+            </div>
+
+            <fieldset class="fld fld--full" formGroupName="adresse">
+              <legend class="fld__label">{{ 'landing.form.address' | translate }}</legend>
+
+              <div class="addr">
+                <div class="fld addr__unit">
+                  <label class="fld__sub" for="f-adr-unit">
+                    {{ 'landing.form.addr_unit' | translate }}
+                    <span class="fld__opt">({{ 'landing.form.optional' | translate }})</span>
+                  </label>
+                  <input class="fld__input" id="f-adr-unit" type="text" formControlName="numero_unidad" />
+                </div>
+
+                <div class="fld addr__street">
+                  <label class="fld__sub" for="f-adr-rue">{{ 'landing.form.addr_street' | translate }}</label>
+                  <input class="fld__input" id="f-adr-rue" type="text" formControlName="calle" autocomplete="address-line1"
+                         [attr.aria-invalid]="invalidAddr('calle')" [attr.aria-describedby]="invalidAddr('calle') ? 'e-rue' : null" />
+                  @if (invalidAddr('calle')) {
+                    <p class="fld__error" id="e-rue"><mat-icon aria-hidden="true">error</mat-icon>{{ 'landing.form.required' | translate }}</p>
+                  }
+                </div>
+
+                <div class="fld addr__city">
+                  <label class="fld__sub" for="f-adr-ville">{{ 'landing.form.addr_city' | translate }}</label>
+                  <input class="fld__input" id="f-adr-ville" type="text" formControlName="ciudad" autocomplete="address-level2"
+                         [attr.aria-invalid]="invalidAddr('ciudad')" [attr.aria-describedby]="invalidAddr('ciudad') ? 'e-ville' : null" />
+                  @if (invalidAddr('ciudad')) {
+                    <p class="fld__error" id="e-ville"><mat-icon aria-hidden="true">error</mat-icon>{{ 'landing.form.required' | translate }}</p>
+                  }
+                </div>
+
+                <div class="fld addr__prov">
+                  <label class="fld__sub" for="f-adr-prov">{{ 'landing.form.addr_prov' | translate }}</label>
+                  <div class="fld__select">
+                    <select class="fld__input" id="f-adr-prov" formControlName="provincia_ca" autocomplete="address-level1"
+                            [attr.aria-invalid]="invalidAddr('provincia_ca')" [attr.aria-describedby]="invalidAddr('provincia_ca') ? 'e-prov' : null">
+                      <option value="">{{ 'landing.form.addr_prov_choose' | translate }}</option>
+                      @for (p of provincesCanada; track p.code) {
+                        <option [value]="p.code">{{ p.code }} — {{ p.nombre }}</option>
+                      }
+                    </select>
+                    <mat-icon aria-hidden="true">expand_more</mat-icon>
+                  </div>
+                  @if (invalidAddr('provincia_ca')) {
+                    <p class="fld__error" id="e-prov"><mat-icon aria-hidden="true">error</mat-icon>{{ 'landing.form.required' | translate }}</p>
+                  }
+                </div>
+
+                <div class="fld addr__postal">
+                  <label class="fld__sub" for="f-adr-cp">{{ 'landing.form.addr_postal' | translate }}</label>
+                  <input class="fld__input fld__input--upper" id="f-adr-cp" type="text" formControlName="codigo_postal"
+                         autocomplete="postal-code" maxlength="7"
+                         [attr.aria-invalid]="invalidAddr('codigo_postal')" [attr.aria-describedby]="invalidAddr('codigo_postal') ? 'e-cp' : 'h-cp'" />
+                  @if (invalidAddr('codigo_postal')) {
+                    <p class="fld__error" id="e-cp">
+                      <mat-icon aria-hidden="true">error</mat-icon>
+                      @if (form.controls.adresse.controls.codigo_postal.hasError('required')) {
+                        {{ 'landing.form.required' | translate }}
+                      } @else {
+                        {{ 'landing.form.addr_postal_invalid' | translate }}
+                      }
+                    </p>
+                  } @else {
+                    <!-- El formato va en una ayuda, no en un placeholder que parezca un valor ya escrito. -->
+                    <p class="fld__hint" id="h-cp">{{ 'landing.form.addr_postal_hint' | translate }}</p>
+                  }
+                </div>
+              </div>
+            </fieldset>
+          </div>
+        </section>
+
+        <!-- ── Paso 3: la demanda ── -->
+        <section class="fm__step" data-paso="3" [hidden]="pasos() && paso() !== 3" aria-labelledby="fm-s3">
+          <h3 class="fm__step-title" id="fm-s3" tabindex="-1">
+            <span class="fm__count">{{ 'stage.step_of' | translate: { n: 3, total: 3 } }}</span>
+            {{ 'landing.form.step_need' | translate }}
+          </h3>
+          <div class="fm__grid">
+            <fieldset class="fld fld--full" [attr.aria-describedby]="invalid('servicioId') ? 'e-service' : null">
+              <legend class="fld__label">{{ 'landing.form.service_type' | translate }}</legend>
+              @if (loadingServices()) {
+                <p class="fld__note">{{ 'landing.form.services_loading' | translate }}</p>
+              } @else {
+                <div class="chips" [class.is-invalid]="invalid('servicioId')">
+                  @for (s of services(); track s.id) {
+                    <label class="chip">
+                      <input class="chip__input" type="radio" formControlName="servicioId" [value]="s.id" />
+                      <span class="chip__box">
+                        <mat-icon class="chip__check" aria-hidden="true">check</mat-icon>
+                        {{ s.nombre }}
+                      </span>
+                    </label>
+                  }
+                </div>
+                @if (invalid('servicioId')) {
+                  <p class="fld__error" id="e-service"><mat-icon aria-hidden="true">error</mat-icon>{{ 'landing.form.required' | translate }}</p>
+                }
+              }
+            </fieldset>
+
+            <div class="fld fld--full">
+              <label class="fld__label" for="f-desc">{{ 'landing.form.desc' | translate }}</label>
+              <textarea class="fld__input fld__input--area" id="f-desc" formControlName="description" rows="4"
+                        [placeholder]="'landing.form.desc_ph' | translate"></textarea>
+            </div>
+          </div>
+        </section>
 
         <div class="fm__foot">
           @if (sent()) {
@@ -389,11 +375,23 @@
               {{ 'landing.form.success' | translate }}
             </p>
           } @else {
-            <!-- Activo aunque falten datos: al pulsarlo, el resumen dice cuáles. -->
-            <button type="submit" class="button button--lg fm__submit" [disabled]="sending()">
-              @if (sending()) { <span class="spinner" aria-hidden="true"></span> }
-              {{ (sending() ? 'landing.form.sending' : 'landing.nav.cta') | translate }}
-            </button>
+            <div class="fm__actions">
+              @if (pasos() && paso() > 1) {
+                <button type="button" class="fm__back" (click)="retroceder()">
+                  <mat-icon aria-hidden="true">arrow_back</mat-icon>
+                  {{ 'common.back' | translate }}
+                </button>
+              }
+              <!-- Activo aunque falten datos: al pulsarlo, el paso o el resumen dicen qué falta. -->
+              <button type="submit" class="button button--lg button--cta fm__submit" [disabled]="sending()">
+                @if (sending()) { <span class="spinner" aria-hidden="true"></span> }
+                @if (pasos() && paso() < 3) {
+                  {{ 'common.continue' | translate }}
+                } @else {
+                  {{ (sending() ? 'landing.form.sending' : 'landing.nav.cta') | translate }}
+                }
+              </button>
+            </div>
           }
           <p class="fm__note">{{ 'landing.form.note' | translate }}</p>
         </div>
@@ -411,86 +409,10 @@
   </section>
 </main>
 
-<!-- ── Pie ────────────────────────────────────────────────────────────────── -->
-<footer class="ft">
-  <div class="wrap ft__in">
-    <div class="ft__brand">
-      <a routerLink="/" class="brand" (click)="goTop($event)" [attr.aria-label]="'landing.nav.home_aria' | translate">
-        <span class="brand__mark" aria-hidden="true"></span>
-        <span class="brand__name">Estimation3D</span>
-      </a>
-      <p class="ft__tagline">{{ 'landing.footer.tagline' | translate }}</p>
-    </div>
-
-    <div class="ft__col">
-      <h2 class="ft__h">{{ 'landing.footer.platform' | translate }}</h2>
-      <ul class="ft__list">
-        <li><a href="#processus" (click)="goTo('processus', $event)">{{ 'landing.nav.process' | translate }}</a></li>
-        <li><a href="#services" (click)="goTo('services', $event)">{{ 'landing.nav.specialties' | translate }}</a></li>
-        <li><a href="#dossier" (click)="goTo('dossier', $event)">{{ 'landing.nav.cta' | translate }}</a></li>
-      </ul>
-    </div>
-
-    <div class="ft__col">
-      <h2 class="ft__h">{{ 'landing.footer.explore' | translate }}</h2>
-      <ul class="ft__list">
-        <li><a routerLink="/journal">{{ 'landing.nav.journal' | translate }}</a></li>
-        <li><a routerLink="/entrepreneurs">{{ 'landing.nav.contractors' | translate }}</a></li>
-        <li><a routerLink="/entrepreneurs" fragment="form">{{ 'landing.footer.apply' | translate }}</a></li>
-        <li><a routerLink="/login">{{ 'landing.nav.login' | translate }}</a></li>
-      </ul>
-    </div>
-
-    <div class="ft__col">
-      <h2 class="ft__h">{{ 'landing.footer.contact' | translate }}</h2>
-      <ul class="ft__list">
-        <li><span>{{ 'landing.footer.city' | translate }}</span></li>
-        <li><a href="tel:+15145108819">514&nbsp;510-8819</a></li>
-        <li><a href="mailto:info@estimation3d.com">info&#64;estimation3d.com</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="wrap ft__bottom">
-    <span>© {{ year }} Hygienaction, Montréal</span>
-    <span>{{ 'landing.footer.pilot' | translate }}</span>
-  </div>
-</footer>
+<!-- ── Pie (compartido) ───────────────────────────────────────────────────── -->
+<app-site-footer [enInicio]="true" (irA)="goTo($event)" (arriba)="goTop()" />
 
 <!-- ── Botón fijo (móvil): aparece al salir del hero, se va al llegar al formulario ── -->
 <div class="ctabar" [class.is-on]="ctaBar()">
-  <a class="button button--lg ctabar__btn" href="#dossier" (click)="goTo('dossier', $event)">{{ 'landing.nav.cta' | translate }}</a>
+  <a class="button button--lg button--cta ctabar__btn" href="#dossier" (click)="goTo('dossier', $event)">{{ 'landing.nav.cta' | translate }}</a>
 </div>
-
-<!-- ── Menú móvil ─────────────────────────────────────────────────────────── -->
-<dialog #menu class="mm" [attr.aria-label]="'landing.nav.menu' | translate"
-        (click)="onMenuClick($event)" (close)="onMenuClosed()">
-  <div class="mm__sheet">
-    <div class="mm__top">
-      <a routerLink="/" class="brand" (click)="goTop($event)" [attr.aria-label]="'landing.nav.home_aria' | translate">
-        <span class="brand__mark" aria-hidden="true"></span>
-        <span class="brand__name">Estimation3D</span>
-      </a>
-      <button mat-icon-button type="button" class="mm__close" autofocus (click)="closeMenu()"
-              [attr.aria-label]="'common.close' | translate">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-
-    <nav class="mm__nav">
-      <a href="#processus" (click)="goTo('processus', $event)">{{ 'landing.nav.process' | translate }}</a>
-      <a href="#services" (click)="goTo('services', $event)">{{ 'landing.nav.specialties' | translate }}</a>
-      <a routerLink="/journal" (click)="closeMenu(false)">{{ 'landing.nav.journal' | translate }}</a>
-      <a routerLink="/entrepreneurs" (click)="closeMenu(false)">{{ 'landing.nav.contractors' | translate }}</a>
-    </nav>
-
-    <div class="mm__foot">
-      <a class="mm__tel" href="tel:+15145108819" [attr.aria-label]="'landing.nav.phone_aria' | translate">
-        <mat-icon aria-hidden="true">call</mat-icon>
-        514&nbsp;510-8819
-      </a>
-      <a class="button button--lg button--outline" routerLink="/login" (click)="closeMenu(false)">{{ 'landing.nav.login' | translate }}</a>
-      <a class="button button--lg" href="#dossier" (click)="goTo('dossier', $event)">{{ 'landing.nav.cta' | translate }}</a>
-    </div>
-  </div>
-</dialog>

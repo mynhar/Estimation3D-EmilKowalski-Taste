@@ -7,25 +7,39 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ContratoService } from '../../../services/contrato.service';
 import { AuthSupabaseService } from '../../../services/auth-supabase.service';
 import { ContratoConstructorListItem, nombreServicio } from '../../../models';
 import { PaginationComponent } from '../../../shared/pagination/pagination.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
+import { StatusChipComponent } from '../../../shared/ui/status-chip/status-chip.component';
 import {
   direccionLinea1, direccionLinea2, direccionCompleta,
 } from '../../../shared/util/busqueda';
 
 type VistaContratos = 'tabla' | 'tarjetas';
 
+/** Lo que el servicio devuelve cuando falta un dato. */
+const SIN_DATO = '—';
+
 @Component({
   selector: 'app-construction-monitoring-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, PaginationComponent],
+  imports: [
+    RouterLink, TranslatePipe, PaginationComponent,
+    PageHeaderComponent, EmptyStateComponent, StatusChipComponent,
+    MatButtonModule, MatButtonToggleModule, MatIconModule, MatTooltipModule,
+  ],
   templateUrl: './list.component.html',
-  styleUrl: './list.component.css',
+  styleUrls: ['../../../shared/construction-monitoring/obras-lista.css', './list.component.css'],
 })
 export class ConstructionMonitoringListComponent implements OnInit {
   private contratoService = inject(ContratoService);
@@ -45,7 +59,7 @@ export class ConstructionMonitoringListComponent implements OnInit {
   /** Ids cuya miniatura 3D falló al cargar → se muestra el marcador de posición. */
   private fotosFallidas = signal<Set<string>>(new Set<string>());
 
-  readonly estados    = ['todos', 'firmado', 'en_ejecucion', 'completado', 'cancelado'];
+  readonly estados    = ['todos', 'firmado', 'en_ejecucion', 'completado', 'cancelado', 'archivado'];
   readonly POR_PAGINA = 15;
   paginaActual = signal(1);
 
@@ -103,6 +117,11 @@ export class ConstructionMonitoringListComponent implements OnInit {
   direccionLinea2   = direccionLinea2;
   direccionCompleta = direccionCompleta;
 
+  /** Un dato que el servicio no pudo dar llega como «—». */
+  hay(valor: string | null | undefined): boolean {
+    return !!valor && valor.trim() !== '' && valor !== SIN_DATO;
+  }
+
   /**
    * Todos los servicios del contrato en el idioma activo. Si no se pudieron
    * leer, el principal del expediente, como antes.
@@ -110,47 +129,25 @@ export class ConstructionMonitoringListComponent implements OnInit {
   serviciosTexto(c: ContratoConstructorListItem): string {
     const lang = this.translate.currentLang;
     if (c.servicios?.length) {
-      return c.servicios.map(s => nombreServicio(s, lang)).join(' · ');
+      return c.servicios.map(s => nombreServicio(s, lang)).join(', ');
     }
     if (lang === 'en') return c.servicio_nombre_en || c.servicio_nombre;
     if (lang === 'fr') return c.servicio_nombre_fr || c.servicio_nombre;
     return c.servicio_nombre;
   }
 
-  badgeContrato(estado: string): string {
-    const map: Record<string, string> = {
-      firmado:      'badge-firmado',
-      en_ejecucion: 'badge-en-ejecucion',
-      completado:   'badge-completado',
-      cancelado:    'badge-cancelado',
-      archivado:    'badge-archivado',
-    };
-    return map[estado] ?? '';
-  }
-
-  iconoEstado(estado: string): string {
-    const map: Record<string, string> = {
-      firmado:      'bi-pen',
-      en_ejecucion: 'bi-tools',
-      completado:   'bi-check2-circle',
-      cancelado:    'bi-x-circle',
-      archivado:    'bi-archive',
-    };
-    return map[estado] ?? 'bi-circle';
-  }
-
   formatFecha(valor: string | null): string {
-    if (!valor) return '—';
+    if (!valor) return SIN_DATO;
     const raw = valor.includes('T') ? valor.split('T')[0] : valor;
     const d   = new Date(`${raw}T00:00:00`);
-    if (isNaN(d.getTime())) return '—';
+    if (isNaN(d.getTime())) return SIN_DATO;
     const localeMap: Record<string, string> = { es: 'es-CA', en: 'en-US', fr: 'fr-CA' };
     const locale = localeMap[this.translate.currentLang] ?? 'fr-CA';
-    return new Intl.DateTimeFormat(locale, { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d);
+    return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric' }).format(d);
   }
 
   formatPrecio(precio: number | null): string {
-    if (precio == null) return '—';
+    if (precio == null) return SIN_DATO;
     return new Intl.NumberFormat('fr-CA', {
       style: 'currency', currency: 'CAD', maximumFractionDigits: 0,
     }).format(precio);
@@ -176,9 +173,10 @@ export class ConstructionMonitoringListComponent implements OnInit {
     this.router.navigate(['/builder/construction-monitoring/monitoring', id]);
   }
 
-  plazoLabel(c: ContratoConstructorListItem): string {
-    if (c.plazo_semanas_min == null && c.plazo_semanas_max == null) return '—';
-    if (c.plazo_semanas_min === c.plazo_semanas_max) return `${c.plazo_semanas_min} sem`;
-    return `${c.plazo_semanas_min ?? '?'}–${c.plazo_semanas_max ?? '?'} sem`;
+  /** «1–5» semanas; la unidad la pone la plantilla con `offer.weeks`. */
+  plazo(c: ContratoConstructorListItem): string {
+    if (c.plazo_semanas_min == null && c.plazo_semanas_max == null) return '';
+    if (c.plazo_semanas_min === c.plazo_semanas_max) return `${c.plazo_semanas_min}`;
+    return `${c.plazo_semanas_min ?? '?'}–${c.plazo_semanas_max ?? '?'}`;
   }
 }

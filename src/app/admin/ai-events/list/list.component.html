@@ -1,179 +1,163 @@
-<div class="container-fluid py-4 px-3 px-xl-4">
+<div class="page-wrapper ls">
 
-  <!-- ── Encabezado ─────────────────────────────────────────────────────────── -->
-  <header class="page-header mb-4">
-    <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
-      <div>
-        <span class="eyebrow">{{ 'role.administrateur' | translate }}</span>
-        <h1 class="page-header__title">{{ 'admin_ai_events.title' | translate }}</h1>
-        <p class="page-header__lead">{{ 'admin_ai_events.subtitle' | translate }}</p>
-      </div>
-      @if (!cargando() && !error()) {
-        <span class="kpi-pill">
-          <i class="bi bi-flag" aria-hidden="true"></i>
-          {{ pendientes() }} {{ 'admin_ai_events.pending' | translate }}
-        </span>
+  <app-page-header [titulo]="'admin_ai_events.title' | translate"
+                   [contexto]="'admin_ai_events.subtitle' | translate" />
+
+  <!-- ── Cargando ────────────────────────────────────────────────────────── -->
+  @if (cargando()) {
+    <div class="ls-people-skel" role="status">
+      <span class="cdk-visually-hidden">{{ 'common.loading' | translate }}</span>
+      @for (_ of [1, 2, 3, 4, 5, 6]; track $index) {
+        <span class="skel skel--row" aria-hidden="true"></span>
       }
     </div>
-  </header>
 
-  @if (cargando()) {
-    <div class="filter-bar mb-3" aria-hidden="true">
-      <div class="d-flex gap-2 flex-wrap">
-        <div class="skel skel--chip"></div>
-        <div class="skel skel--chip"></div>
-        <div class="skel skel--chip"></div>
+  <!-- ── Error ───────────────────────────────────────────────────────────── -->
+  } @else if (error()) {
+    <p class="ls-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ error() }}</p>
+
+  } @else {
+
+    <!-- ── Filtros: tipo (lista) y estado (con el recuento de pendientes) ── -->
+    <div class="ls-tools">
+      <mat-form-field class="aev-type" appearance="outline" subscriptSizing="dynamic">
+        <mat-label>{{ 'admin_ai_events.filter_type' | translate }}</mat-label>
+        <mat-select [value]="filtroTipo()" (selectionChange)="filtroTipo.set($event.value)">
+          @for (t of TIPOS; track t) {
+            <mat-option [value]="t">{{ t === 'todos' ? ('common.all' | translate) : tipoLabel(t) }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <div class="ls-filter">
+        <span class="ls-filter__label" id="aev-res-label">{{ 'admin_ai_events.filter_status' | translate }}</span>
+        <mat-button-toggle-group class="ls-toggle" hideSingleSelectionIndicator aria-labelledby="aev-res-label"
+                                 [value]="filtroResuelto()" (change)="filtroResuelto.set($event.value)">
+          @for (r of RESUELTOS; track r) {
+            <mat-button-toggle [value]="r">
+              @switch (r) {
+                @case ('todos') { {{ 'common.all' | translate }} }
+                @case ('pendiente') {
+                  {{ 'admin_ai_events.status_pending' | translate }}<span class="ls-count">{{ pendientes() }}</span>
+                }
+                @default { {{ 'admin_ai_events.status_resolved' | translate }} }
+              }
+            </mat-button-toggle>
+          }
+        </mat-button-toggle-group>
       </div>
+
+      @if (hayFiltros()) {
+        <button mat-button type="button" class="ls-clear" (click)="limpiarFiltros()">
+          <mat-icon>close</mat-icon>
+          {{ 'common.clear_filters' | translate }}
+        </button>
+      }
     </div>
-    <div class="card table-card">
-      <div class="table-responsive">
-        <table class="table table-admin mb-0">
+
+    @if (eventosFiltrados().length === 0) {
+      @if (hayFiltros()) {
+        <app-empty-state class="ls-empty" matIcon="filter_alt_off"
+                         [titulo]="'common.no_results' | translate"
+                         [texto]="'admin_ai_events.no_results' | translate">
+          <button actions mat-stroked-button type="button" (click)="limpiarFiltros()">
+            {{ 'common.clear_filters' | translate }}
+          </button>
+        </app-empty-state>
+      } @else {
+        <app-empty-state class="ls-empty" matIcon="verified_user" [titulo]="'admin_ai_events.no_data' | translate" />
+      }
+
+    } @else {
+
+      <!-- ── Tabla (desde 1400px) ────────────────────────────────────────── -->
+      <div class="ls-table-wrap">
+        <table class="ls-table">
+          <thead>
+            <tr>
+              <th scope="col">{{ 'admin_ai_events.col_type' | translate }}</th>
+              <th scope="col">{{ 'admin_ai_events.col_summary' | translate }}</th>
+              <th scope="col">{{ 'admin_ai_events.col_context' | translate }}</th>
+              <th scope="col">{{ 'admin_ai_events.col_date' | translate }}</th>
+              <th scope="col"><span class="cdk-visually-hidden">{{ 'admin_ai_events.col_action' | translate }}</span></th>
+            </tr>
+          </thead>
           <tbody>
-            @for (_ of [1,2,3,4,5,6]; track $index) {
-              <tr>
-                <td><div class="skel skel--td skel--td-sm"></div></td>
-                <td><div class="skel skel--td skel--td-lg"></div></td>
-                <td><div class="skel skel--td skel--td-md"></div></td>
-                <td><div class="skel skel--td skel--td-btn mx-auto"></div></td>
+            @for (ev of eventosPaginados(); track ev.id) {
+              <tr class="ls-table__row aev-row" [class.is-done]="ev.resuelto">
+                <td><ng-container [ngTemplateOutlet]="tplTipo" [ngTemplateOutletContext]="{ $implicit: ev.tipo }" /></td>
+                <td class="aev-summary">{{ ev.resumen }}</td>
+                <td>
+                  <span class="ls-table__text">
+                    <span class="aev-dossier">{{ 'admin_ai_events.dossier' | translate }} <span class="ls-fig">{{ ev.expediente?.numero ?? '—' }}</span></span>
+                    <span class="ls-table__sub">{{ usuarioNombre(ev) }}</span>
+                    <span class="ls-table__sub">{{ rolLabel(ev.rol) }}</span>
+                  </span>
+                </td>
+                <td class="ls-fig ls-nowrap"><time [attr.datetime]="ev.creado_en">{{ fecha(ev.creado_en) }}</time></td>
+                <td class="ls-table__action">
+                  <ng-container [ngTemplateOutlet]="tplResolver" [ngTemplateOutletContext]="{ $implicit: ev }" />
+                </td>
               </tr>
             }
           </tbody>
         </table>
       </div>
-    </div>
 
-  } @else if (error()) {
-    <div class="error-alert" role="alert">
-      <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
-      <span>{{ error() }}</span>
-    </div>
-
-  } @else {
-
-    <!-- Filtros -->
-    <div class="filter-bar mb-3">
-      <div class="d-flex align-items-center gap-2 flex-wrap mb-3">
-        <span class="filter-bar__label">{{ 'admin_ai_events.filter_type' | translate }}</span>
-        <div class="filter-chips" role="group">
-          @for (t of TIPOS; track t) {
-            <button type="button" class="filter-chip"
-                    [class.filter-chip--active-todos]="filtroTipo() === t"
-                    (click)="filtroTipo.set(t)">
-              {{ t === 'todos' ? ('common.all' | translate) : tipoLabel(t) }}
-            </button>
-          }
-        </div>
-      </div>
-      <div class="d-flex align-items-center gap-2 flex-wrap">
-        <span class="filter-bar__label">{{ 'admin_ai_events.filter_status' | translate }}</span>
-        <div class="filter-chips" role="group">
-          @for (r of RESUELTOS; track r) {
-            <button type="button" class="filter-chip"
-                    [class.filter-chip--active-todos]="filtroResuelto() === r && r === 'todos'"
-                    [class.filter-chip--active-no]="filtroResuelto() === r && r === 'pendiente'"
-                    [class.filter-chip--active-yes]="filtroResuelto() === r && r === 'resuelto'"
-                    (click)="filtroResuelto.set(r)">
-              {{ r === 'todos'     ? ('common.all' | translate) :
-                 r === 'pendiente' ? ('admin_ai_events.status_pending'  | translate) :
-                                     ('admin_ai_events.status_resolved' | translate) }}
-            </button>
-          }
-        </div>
-        @if (hayFiltros()) {
-          <button class="filter-bar__reset" type="button" (click)="limpiarFiltros()">
-            <i class="bi bi-x-circle me-1" aria-hidden="true"></i>{{ 'common.clear_filters' | translate }}
-          </button>
-        }
-      </div>
-    </div>
-
-    <div class="card table-card">
-      @if (eventosFiltrados().length === 0) {
-        <div class="empty-state">
-          <i class="bi bi-shield-check empty-state__icon" aria-hidden="true"></i>
-          <p class="empty-state__msg">
-            {{ (hayFiltros() ? 'admin_ai_events.no_results' : 'admin_ai_events.no_data') | translate }}
-          </p>
-        </div>
-
-      } @else {
-
-        <!-- Escritorio -->
-        <div class="table-responsive d-none d-lg-block">
-          <table class="table table-admin align-middle mb-0">
-            <thead>
-              <tr>
-                <th style="width:190px">{{ 'admin_ai_events.col_type'    | translate }}</th>
-                <th>                    {{ 'admin_ai_events.col_summary' | translate }}</th>
-                <th style="width:210px">{{ 'admin_ai_events.col_context' | translate }}</th>
-                <th style="width:160px">{{ 'admin_ai_events.col_date'    | translate }}</th>
-                <th class="text-center" style="width:130px">{{ 'admin_ai_events.col_action' | translate }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (ev of eventosPaginados(); track ev.id) {
-                <tr [class.opacity-75]="ev.resuelto">
-                  <td><span class="tipo-badge {{ tipoClase(ev.tipo) }}">{{ tipoLabel(ev.tipo) }}</span></td>
-                  <td class="resumen-cell">{{ ev.resumen }}</td>
-                  <td class="meta-cell">
-                    <strong>{{ 'admin_ai_events.dossier' | translate }} {{ ev.expediente?.numero ?? '—' }}</strong><br>
-                    {{ usuarioNombre(ev) }} · {{ rolLabel(ev.rol) }}
-                  </td>
-                  <td class="meta-cell">{{ fecha(ev.creado_en) }}</td>
-                  <td class="text-center">
-                    <button type="button"
-                            class="btn-resolver"
-                            [class.btn-resolver--resuelto]="ev.resuelto"
-                            [disabled]="actualizando() === ev.id"
-                            (click)="alternarResuelto(ev)">
-                      <i class="bi" [class.bi-check-circle]="ev.resuelto" [class.bi-circle]="!ev.resuelto" aria-hidden="true"></i>
-                      {{ (ev.resuelto ? 'admin_ai_events.status_resolved' : 'admin_ai_events.mark_resolved') | translate }}
-                    </button>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Móvil -->
-        <div class="cm-cards d-lg-none">
-          @for (ev of eventosPaginados(); track ev.id) {
-            <div class="cm-card" [class.opacity-75]="ev.resuelto" style="cursor:default">
-              <div class="cm-card__top">
-                <span class="tipo-badge {{ tipoClase(ev.tipo) }}">{{ tipoLabel(ev.tipo) }}</span>
-                <span class="meta-cell">{{ fecha(ev.creado_en) }}</span>
+      <!-- ── Tarjetas (hasta 1399px) ─────────────────────────────────────── -->
+      <ul class="ls-grid is-mobile-only">
+        @for (ev of eventosPaginados(); track ev.id) {
+          <li class="ls-card is-plain" [class.is-off]="ev.resuelto">
+            <div class="ls-card__body">
+              <span class="ls-tags">
+                <ng-container [ngTemplateOutlet]="tplTipo" [ngTemplateOutletContext]="{ $implicit: ev.tipo }" />
+              </span>
+              <p class="aev-card-summary">{{ ev.resumen }}</p>
+              <p class="ls-card__line">
+                <mat-icon aria-hidden="true">folder</mat-icon>
+                <span>{{ 'admin_ai_events.dossier' | translate }} <span class="ls-fig">{{ ev.expediente?.numero ?? '—' }}</span></span>
+              </p>
+              <p class="ls-card__line">
+                <mat-icon aria-hidden="true">person</mat-icon>
+                <span>{{ usuarioNombre(ev) }}<span class="ls-card__sub">{{ rolLabel(ev.rol) }}</span></span>
+              </p>
+              <div class="ls-card__foot">
+                <time class="ls-fig" [attr.datetime]="ev.creado_en">{{ fecha(ev.creado_en) }}</time>
+                <ng-container [ngTemplateOutlet]="tplResolver" [ngTemplateOutletContext]="{ $implicit: ev }" />
               </div>
-              <div class="cm-card__body">
-                <span class="resumen-cell">{{ ev.resumen }}</span>
-                <span class="meta-cell mt-1">
-                  <strong>{{ 'admin_ai_events.dossier' | translate }} {{ ev.expediente?.numero ?? '—' }}</strong>
-                  · {{ usuarioNombre(ev) }} · {{ rolLabel(ev.rol) }}
-                </span>
-              </div>
-              <button type="button"
-                      class="btn-resolver align-self-start"
-                      [class.btn-resolver--resuelto]="ev.resuelto"
-                      [disabled]="actualizando() === ev.id"
-                      (click)="alternarResuelto(ev)">
-                <i class="bi" [class.bi-check-circle]="ev.resuelto" [class.bi-circle]="!ev.resuelto" aria-hidden="true"></i>
-                {{ (ev.resuelto ? 'admin_ai_events.status_resolved' : 'admin_ai_events.mark_resolved') | translate }}
-              </button>
             </div>
-          }
-        </div>
-      }
+          </li>
+        }
+      </ul>
 
-      <div class="table-card__footer">
-        <app-pagination
-          [total]="eventosFiltrados().length"
-          [page]="paginaActual()"
-          [pageSize]="POR_PAGINA"
-          (pageChange)="paginaActual.set($event)">
-        </app-pagination>
-      </div>
-    </div>
-
+      <app-pagination [total]="eventosFiltrados().length" [page]="paginaActual()" [pageSize]="POR_PAGINA"
+                      (pageChange)="paginaActual.set($event)" />
+    }
   }
-
 </div>
+
+<!-- Tipo de evento: icono y tono del mapa TIPO_ESTILO (atención humana en ámbar, el resto informativo). -->
+<ng-template #tplTipo let-tipo>
+  <span class="ls-tag" [class]="tipoEstilo(tipo).tono">
+    <mat-icon aria-hidden="true">{{ tipoEstilo(tipo).matIcon }}</mat-icon>{{ tipoLabel(tipo) }}
+  </span>
+</ng-template>
+
+<!-- Resolver / reabrir: alterna el estado del evento. -->
+<ng-template #tplResolver let-ev>
+  @if (ev.resuelto) {
+    <button mat-button type="button" class="aev-resolved"
+            [disabled]="actualizando() === ev.id" [attr.aria-busy]="actualizando() === ev.id"
+            (click)="alternarResuelto(ev)">
+      @if (actualizando() === ev.id) { <span class="ls-spinner" aria-hidden="true"></span> } @else { <mat-icon>check_circle</mat-icon> }
+      {{ 'admin_ai_events.status_resolved' | translate }}
+    </button>
+  } @else {
+    <button mat-stroked-button type="button" class="aev-resolve"
+            [disabled]="actualizando() === ev.id" [attr.aria-busy]="actualizando() === ev.id"
+            (click)="alternarResuelto(ev)">
+      @if (actualizando() === ev.id) { <span class="ls-spinner" aria-hidden="true"></span> } @else { <mat-icon>check</mat-icon> }
+      {{ 'admin_ai_events.mark_resolved' | translate }}
+    </button>
+  }
+</ng-template>

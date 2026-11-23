@@ -1,4 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, model, signal } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe } from '@ngx-translate/core';
 
 /** Un tipo de servicio ya traducido al idioma activo. */
@@ -30,6 +32,24 @@ export function resumirServicios(
   return ids.map(id => porId.get(id)).filter(Boolean).join(', ') || null;
 }
 
+/** Icono de Material Symbols por palabra clave del código del servicio (el primero que encaje). */
+const ICONOS: readonly { claves: readonly string[]; matIcon: string }[] = [
+  { claves: ['moho'],               matIcon: 'humidity_high' },
+  { claves: ['agua', 'dano'],       matIcon: 'water_drop' },
+  { claves: ['desamian'],           matIcon: 'layers' },
+  { claves: ['demolic'],            matIcon: 'domain' },
+  { claves: ['aisla'],              matIcon: 'layers' },
+  { claves: ['fund', 'dren'],       matIcon: 'water' },
+  { claves: ['elect'],              matIcon: 'bolt' },
+  { claves: ['pint'],               matIcon: 'format_paint' },
+  { claves: ['techo', 'teja'],      matIcon: 'roofing' },
+  { claves: ['piso', 'cer'],        matIcon: 'grid_on' },
+  { claves: ['carpint', 'mad'],     matIcon: 'carpenter' },
+  { claves: ['alumin', 'vidri'],    matIcon: 'window' },
+  { claves: ['jardin', 'plant'],    matIcon: 'park' },
+];
+const ICONO_GENERICO = { matIcon: 'construction' };
+
 let secuencia = 0;
 
 /**
@@ -49,7 +69,7 @@ let secuencia = 0;
 @Component({
   selector: 'app-servicio-selector',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe],
+  imports: [MatButtonModule, MatIconModule, TranslatePipe],
   templateUrl: './servicio-selector.component.html',
   styleUrl: './servicio-selector.component.css',
   host: { '[class.srv-compacto]': 'compacto()' },
@@ -126,19 +146,6 @@ export class ServicioSelectorComponent {
 
   icono(codigo: string): string {
     const c = codigo.toLowerCase();
-    if (c.includes('moho'))                          return 'bi-biohazard';
-    if (c.includes('agua') || c.includes('dano'))    return 'bi-droplet';
-    if (c.includes('desamian'))                      return 'bi-layers';
-    if (c.includes('demolic'))                       return 'bi-buildings';
-    if (c.includes('aisla'))                         return 'bi-layers';
-    if (c.includes('fund') || c.includes('dren'))    return 'bi-water';
-    if (c.includes('elect'))                         return 'bi-lightning-charge';
-    if (c.includes('pint'))                          return 'bi-brush';
-    if (c.includes('techo') || c.includes('teja'))   return 'bi-house';
-    if (c.includes('piso')  || c.includes('cer'))    return 'bi-grid-3x3';
-    if (c.includes('carpint') || c.includes('mad'))  return 'bi-hammer';
-    if (c.includes('alumin') || c.includes('vidri')) return 'bi-window';
-    if (c.includes('jardin') || c.includes('plant')) return 'bi-tree';
-    return 'bi-tools';
+    return (ICONOS.find(i => i.claves.some(k => c.includes(k))) ?? ICONO_GENERICO).matIcon;
   }
 }

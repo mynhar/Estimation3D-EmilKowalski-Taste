@@ -1,0 +1,97 @@
+/* Catálogos de administración: alta y edición (prefijo cf-)
+ * Tipos de servicio, fichas normativas e imprevistos: un código, textos en los tres idiomas y el
+ * interruptor de activo. Complemento de shared/ui/alta/alta.css:
+ *   styleUrls: ['…/shared/ui/alta/alta.css', '…/admin/_shared/catalogo-form.css']
+ *
+ * states: default · campo inválido (mat-error con icono) · qué falta (campos-faltantes) ·
+ *         guardando · código en solo lectura (candado) · borrar: reposo (texto ladrillo) ·
+ *         confirmar (recuadro ladrillo) · borrando
+ * contrast: etiquetas y ayudas ink-muted 6.8:1 · interruptor abeto (tema) ·
+ *           danger-ink sobre danger-soft 5.8:1 · vélin sobre danger 7.5:1
+ * type: códigos y orden al 75 % con tabular-nums, sin monoespaciada
+ * Sin tomate: configuración del catálogo, no una etapa del dossier (botón relleno abeto).
+ */
+:host { display: block; }
+
+/* Volver, cuando la carga falla. */
+.cf-back { justify-self: start; min-height: 44px; }
+
+/* Códigos y cifras: ancho de cifras. */
+.cf-fig {
+  font-stretch: var(--ds-stretch-figure);
+  font-variant-numeric: tabular-nums;
+}
+
+/* El código es corto: un campo estrecho, no a todo el ancho. */
+.cf-code { width: 100%; max-width: 32rem; }
+
+/* Textos largos (descripciones, contenido): uno debajo de otro, a todo el ancho. */
+.cf-stack { display: grid; gap: var(--ds-space-1); }
+.cf-stack mat-form-field { width: 100%; }
+
+/* Palabras clave a lo ancho y el orden, que es una cifra corta, a su lado. */
+.cf-config {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(7rem, 10rem);
+  align-items: start;
+  gap: var(--ds-space-1) var(--ds-space-4);
+}
+.cf-config mat-form-field { width: 100%; min-width: 0; }
+/* La ayuda de las palabras clave ocupa dos líneas en móvil: subíndice dinámico y aire debajo. */
+.cf-config mat-form-field[subscriptSizing='dynamic'] { margin-bottom: var(--ds-space-4); }
+@media (max-width: 575.98px) {
+  .cf-config { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Interruptor de activo: etiqueta a tamaño de cuerpo, con su ayuda debajo. */
+.cf-toggle {
+  --mat-slide-toggle-label-text-size: var(--ds-text-base);
+  --mat-slide-toggle-label-text-weight: var(--ds-weight-semibold);
+  --mat-slide-toggle-label-text-color: var(--ds-ink);
+}
+.cf-toggle-block { display: grid; gap: var(--ds-space-2); }
+.cf-toggles { display: grid; gap: var(--ds-space-5); }
+
+/* ── Borrar ─────────────────────────────────────────────────────────────── */
+/* En reposo: botón de texto ladrillo, apartado a la izquierda del pie (abajo del todo en móvil). */
+.cf-del {
+  --mat-button-text-label-text-color: var(--ds-danger-ink);
+  --mat-button-text-state-layer-color: var(--ds-danger);
+  min-height: 44px;
+  margin-right: auto;
+}
+
+/* Confirmación en línea: recuadro ladrillo con la pregunta y las dos salidas. */
+.cf-danger {
+  display: grid;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-4);
+  border: 1px solid var(--ds-danger);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-danger-soft);
+  color: var(--ds-danger-ink);
+}
+.cf-danger__title {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ds-space-2);
+  margin: 0;
+  font-weight: var(--ds-weight-bold);
+}
+.cf-danger__title mat-icon { flex-shrink: 0; }
+.cf-danger__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--ds-space-2);
+}
+.cf-danger__actions button { min-height: 44px; }
+.cf-danger__ok {
+  --mat-button-filled-container-color: var(--ds-danger);
+  --mat-button-filled-label-text-color: var(--ds-surface);
+  --mat-button-filled-state-layer-color: var(--ds-surface);
+}
+@media (max-width: 575.98px) {
+  .cf-danger__actions { flex-direction: column-reverse; }
+  .cf-danger__actions button { width: 100%; }
+}

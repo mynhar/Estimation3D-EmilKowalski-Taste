@@ -1,501 +1,337 @@
-<div class="container-fluid py-4 px-3 px-xl-4">
+<div class="page-wrapper fc fc--narrow">
 
-  <!-- ── Encabezado ─────────────────────────────────────────────────────────── -->
-  <div class="form-page-header mb-4">
-    <button class="btn-back" type="button"
-            (click)="cancelar()" [title]="'common.back' | translate">
-      <i class="bi bi-arrow-left" aria-hidden="true"></i>
+  <!-- ── Cabecera ────────────────────────────────────────────────────────── -->
+  <header class="fc-head">
+    <button mat-button type="button" class="fc-back" (click)="cancelar()">
+      <mat-icon>arrow_back</mat-icon>
+      {{ 'common.back' | translate }}
     </button>
-    <div>
-      <span class="eyebrow">
-        <i class="bi bi-pencil-square" aria-hidden="true"></i>
-        {{ 'role.estimador' | translate }}
-      </span>
-      <h1 class="form-page-header__title">{{ tituloClave() | translate }}</h1>
-    </div>
-  </div>
+    <app-page-header [titulo]="tituloClave() | translate" />
+  </header>
 
-  <div class="row justify-content-center">
-    <div class="col-12 col-lg-9 col-xl-8">
-      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
-        <div class="card form-card">
-          <div class="card-body p-4 p-lg-5">
+  <form class="fc-canvas" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
 
-            <!-- ── Credenciales ───────────────────────────────────────────── -->
-            <div class="form-section mb-5">
-              <div class="form-section__header">
-                <i class="bi bi-key" aria-hidden="true"></i>
-                {{ 'admin_users.credentials' | translate }}
-              </div>
-              <div class="row g-3">
+    <!-- ═══ Credenciales ══════════════════════════════════════════════════ -->
+    <section class="fc-card" aria-labelledby="pf-cred-title">
+      <h2 class="fc-h2" id="pf-cred-title">{{ 'admin_users.credentials' | translate }}</h2>
 
-                <div class="col-12 col-md-7">
-                  <label class="form-label">
-                    {{ 'common.email' | translate }}
-                    <span class="req-star" aria-hidden="true">*</span>
-                  </label>
-                  <input type="email" class="form-control"
-                         formControlName="email"
-                         placeholder="usuario@ejemplo.com"
-                         [class.is-invalid]="f['email'].invalid && f['email'].touched">
-                  <div class="invalid-feedback">
-                    @if (f['email'].errors?.['required']) {
-                      {{ 'admin_users.email_required' | translate }}
-                    } @else if (f['email'].errors?.['email']) {
-                      {{ 'admin_users.email_invalid' | translate }}
-                    }
-                  </div>
-                </div>
+      <div class="fc-grid">
+        <mat-form-field appearance="outline" hideRequiredMarker>
+          <mat-label>{{ 'common.email' | translate }}</mat-label>
+          <input matInput type="email" formControlName="email" autocomplete="off">
+          <mat-error>
+            <mat-icon aria-hidden="true">error</mat-icon>
+            {{ (f['email'].hasError('required') ? 'admin_users.email_required' : 'admin_users.email_invalid') | translate }}
+          </mat-error>
+        </mat-form-field>
 
-                <div class="col-12 col-md-5">
-                  <label class="form-label">
-                    {{ 'admin_users.temp_password' | translate }}
-                    <span class="req-star" aria-hidden="true">*</span>
-                  </label>
-                  <div class="input-group">
-                    <input [type]="mostrarPassword() ? 'text' : 'password'"
-                           class="form-control"
-                           formControlName="password"
-                           [placeholder]="'admin_users.min_chars_hint' | translate"
-                           [class.is-invalid]="f['password'].invalid && f['password'].touched">
-                    <button class="btn btn-outline-secondary" type="button"
-                            (click)="mostrarPassword.set(!mostrarPassword())">
-                      <i class="bi" aria-hidden="true"
-                         [class.bi-eye]="!mostrarPassword()"
-                         [class.bi-eye-slash]="mostrarPassword()"></i>
-                    </button>
-                    <div class="invalid-feedback">
-                      @if (f['password'].errors?.['required']) {
-                        {{ 'admin_users.password_required' | translate }}
-                      } @else if (f['password'].errors?.['minlength']) {
-                        {{ 'admin_users.min_chars' | translate }}
-                      }
-                    </div>
-                  </div>
-                </div>
+        <mat-form-field appearance="outline" hideRequiredMarker>
+          <mat-label>{{ 'admin_users.temp_password' | translate }}</mat-label>
+          <input matInput formControlName="password" autocomplete="new-password"
+                 [type]="mostrarPassword() ? 'text' : 'password'">
+          <button mat-icon-button matSuffix type="button"
+                  [attr.aria-label]="(mostrarPassword() ? 'auth.hide_password' : 'auth.show_password') | translate"
+                  [attr.aria-pressed]="mostrarPassword()"
+                  (click)="mostrarPassword.set(!mostrarPassword())">
+            @if (mostrarPassword()) { <mat-icon>visibility_off</mat-icon> } @else { <mat-icon>visibility</mat-icon> }
+          </button>
+          <mat-hint>{{ 'admin_users.min_chars_hint' | translate }}</mat-hint>
+          <mat-error>
+            <mat-icon aria-hidden="true">error</mat-icon>
+            {{ (f['password'].hasError('required') ? 'admin_users.password_required' : 'admin_users.min_chars') | translate }}
+          </mat-error>
+        </mat-form-field>
+      </div>
 
-                <!-- ── Invitación por correo ──────────────────────────────── -->
-                <div class="col-12">
-                  <div class="invite-block">
-                    <div class="invite-block__head">
-                      <div class="invite-block__text">
-                        <p class="invite-block__title">
-                          <i class="bi bi-envelope-paper" aria-hidden="true"></i>
-                          {{ 'admin_users.invite_title' | translate }}
-                        </p>
-                        <p class="invite-block__hint">{{ 'admin_users.invite_create_hint' | translate }}</p>
-                        <p class="invite-block__lang">
-                          {{ 'admin_users.invite_lang' | translate:{ idioma: ('lang.' + idiomaInvitacion()) | translate } }}
-                        </p>
-                      </div>
-                      <button type="button" class="btn btn-outline-secondary flex-shrink-0"
-                              (click)="crearEInvitar()" [disabled]="ocupado()">
-                        @if (enviandoInvitacion()) {
-                          <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                          {{ 'admin_users.invite_sending' | translate }}
-                        } @else {
-                          <i class="bi bi-send me-1" aria-hidden="true"></i>
-                          {{ 'admin_users.invite_send' | translate }}
-                        }
-                      </button>
-                    </div>
-                    <app-campos-faltantes class="mt-3" [formulario]="form" [intento]="intentosInvitar()" />
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
-            <div class="form-section-divider"></div>
-
-            <!-- ── Datos personales ──────────────────────────────────────── -->
-            <div class="form-section mb-5">
-              <div class="form-section__header">
-                <i class="bi bi-person" aria-hidden="true"></i>
-                {{ 'admin_users.personal_data' | translate }}
-              </div>
-              <div class="row g-3">
-
-                <div class="col-12 col-md-6">
-                  <label class="form-label">
-                    {{ 'common.name' | translate }}
-                    <span class="req-star" aria-hidden="true">*</span>
-                  </label>
-                  <input type="text" class="form-control"
-                         formControlName="nombre"
-                         [class.is-invalid]="f['nombre'].invalid && f['nombre'].touched">
-                  <div class="invalid-feedback">{{ 'admin_users.name_required' | translate }}</div>
-                </div>
-
-                <div class="col-12 col-md-6">
-                  <label class="form-label">
-                    {{ 'common.lastname' | translate }}
-                    <span class="req-star" aria-hidden="true">*</span>
-                  </label>
-                  <input type="text" class="form-control"
-                         formControlName="apellido"
-                         [class.is-invalid]="f['apellido'].invalid && f['apellido'].touched">
-                  <div class="invalid-feedback">{{ 'admin_users.lastname_required' | translate }}</div>
-                </div>
-
-                <div class="col-12 col-md-6">
-                  <label class="form-label">{{ 'common.phone' | translate }}</label>
-                  <input type="tel" class="form-control"
-                         formControlName="telefono"
-                         placeholder="+1 514-000-0000">
-                </div>
-
-                <!-- Avatar -->
-                <div class="col-12 col-md-6">
-                  <label class="form-label">{{ 'profile.photo' | translate }}</label>
-                  <div class="avatar-upload-row">
-                    <div class="avatar-upload-wrap position-relative"
-                         (click)="!subiendoAvatar() && fileInput.click()"
-                         [class.uploading]="subiendoAvatar()">
-                      @if (previewUrl()) {
-                        <img [src]="previewUrl()!" class="avatar-img rounded-circle"
-                             width="64" height="64" alt="">
-                      } @else {
-                        <div class="avatar-placeholder rounded-circle d-flex align-items-center justify-content-center">
-                          <i class="bi bi-camera" aria-hidden="true"></i>
-                        </div>
-                      }
-                      @if (subiendoAvatar()) {
-                        <div class="avatar-overlay rounded-circle d-flex align-items-center justify-content-center">
-                          <div class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true"></div>
-                        </div>
-                      }
-                    </div>
-                    <div>
-                      <button type="button" class="btn btn-sm btn-outline-secondary d-block mb-1"
-                              (click)="fileInput.click()" [disabled]="subiendoAvatar()">
-                        <i class="bi bi-upload me-1" aria-hidden="true"></i>
-                        {{ subiendoAvatar() ? ('profile.uploading' | translate) : ('admin_users.select_photo' | translate) }}
-                      </button>
-                      <small class="text-ink-muted">{{ 'profile.photo_hint' | translate }}</small>
-                    </div>
-                  </div>
-                  <input #fileInput type="file" accept="image/jpeg,image/png,image/webp"
-                         class="d-none" (change)="onAvatarChange($event)">
-                  <input type="hidden" formControlName="avatar_url">
-                </div>
-
-                <!-- ── Dirección (opcional) ─────────────────────────────── -->
-                <div class="col-12">
-                  <p class="form-subhead">
-                    <span class="form-subhead__label">{{ 'admin_users.address_data' | translate }}</span>
-                    <span class="form-subhead__note">{{ 'admin_users.address_hint' | translate }}</span>
-                  </p>
-                </div>
-
-                <div class="col-12 col-md-3">
-                  <label class="form-label" for="dirUnidad">
-                    {{ 'admin_users.unit_number' | translate }}
-                    <span class="opt-label">({{ 'common.optional' | translate }})</span>
-                  </label>
-                  <input id="dirUnidad" type="text" class="form-control"
-                         formControlName="direccion_unidad" placeholder="5" autocomplete="address-line2">
-                </div>
-
-                <div class="col-12 col-md-9">
-                  <label class="form-label" for="dirCalle">
-                    {{ 'admin_users.street_address' | translate }}
-                    <span class="opt-label">({{ 'common.optional' | translate }})</span>
-                  </label>
-                  <input id="dirCalle" type="text" class="form-control"
-                         formControlName="direccion_calle" placeholder="123 Rue Saint-Denis"
-                         autocomplete="address-line1">
-                </div>
-
-                <div class="col-12 col-md-5">
-                  <label class="form-label" for="dirCiudad">
-                    {{ 'admin_users.city' | translate }}
-                    <span class="opt-label">({{ 'common.optional' | translate }})</span>
-                  </label>
-                  <input id="dirCiudad" type="text" class="form-control"
-                         formControlName="direccion_ciudad" placeholder="Montréal"
-                         autocomplete="address-level2">
-                </div>
-
-                <div class="col-12 col-md-4">
-                  <label class="form-label" for="dirProvincia">
-                    {{ 'admin_users.province_territory' | translate }}
-                    <span class="opt-label">({{ 'common.optional' | translate }})</span>
-                  </label>
-                  <select id="dirProvincia" class="form-select"
-                          formControlName="direccion_provincia" autocomplete="address-level1">
-                    <option value="">{{ 'admin_users.province_none' | translate }}</option>
-                    @for (p of provinciasCanada; track p.code) {
-                      <option [value]="p.code">{{ p.nombre }}</option>
-                    }
-                  </select>
-                </div>
-
-                <div class="col-12 col-md-3">
-                  <label class="form-label" for="dirPostal">
-                    {{ 'admin_users.postal_code' | translate }}
-                    <span class="opt-label">({{ 'common.optional' | translate }})</span>
-                  </label>
-                  <input id="dirPostal" type="text" class="form-control"
-                         formControlName="direccion_codigo_postal" placeholder="A1A 1A1"
-                         autocomplete="postal-code"
-                         [class.is-invalid]="f['direccion_codigo_postal'].invalid && f['direccion_codigo_postal'].touched">
-                  <div class="invalid-feedback">{{ 'admin_users.postal_invalid' | translate }}</div>
-                </div>
-
-              </div>
-            </div>
-
-            <div class="form-section-divider"></div>
-
-            <!-- ── Configuración de cuenta ────────────────────────────────── -->
-            <div class="form-section">
-              <div class="form-section__header">
-                <i class="bi bi-sliders" aria-hidden="true"></i>
-                {{ 'admin_users.account_config' | translate }}
-              </div>
-              <div class="row g-3">
-
-                <div class="col-12 col-md-6">
-                  <label class="form-label" for="rol">
-                    {{ 'common.role' | translate }}
-                    <span class="req-star" aria-hidden="true">*</span>
-                  </label>
-                  <select id="rol" class="form-select" formControlName="rol"
-                          [class.is-invalid]="f['rol'].invalid && f['rol'].touched">
-                    @for (r of roles; track r) {
-                      <option [value]="r">{{ ('role.' + r) | translate }}</option>
-                    }
-                  </select>
-                  <div class="invalid-feedback">{{ 'admin_users.role_required' | translate }}</div>
-                </div>
-
-                <div class="col-12 col-md-6">
-                  <label class="form-label">
-                    {{ 'common.status' | translate }}
-                    <span class="req-star" aria-hidden="true">*</span>
-                  </label>
-                  <select class="form-select" formControlName="activo"
-                          [class.is-invalid]="f['activo'].invalid && f['activo'].touched">
-                    <option [ngValue]="true">{{ 'common.active' | translate }}</option>
-                    <option [ngValue]="false">{{ 'common.inactive' | translate }}</option>
-                  </select>
-                  <div class="invalid-feedback">{{ 'admin_users.status_required' | translate }}</div>
-                </div>
-
-                <div class="col-12 col-md-6">
-                  <label class="form-label" for="idioma">
-                    {{ 'admin_users.language' | translate }}
-                    <span class="req-star" aria-hidden="true">*</span>
-                  </label>
-                  <select id="idioma" class="form-select" formControlName="idioma">
-                    @for (l of idiomas; track l) {
-                      <option [value]="l">{{ ('lang.' + l) | translate }}</option>
-                    }
-                  </select>
-                  <div class="form-text">{{ 'admin_users.language_hint' | translate }}</div>
-                </div>
-
-                <div class="col-12 col-md-6">
-                  <label class="form-label">{{ 'admin_users.provider_label' | translate }}</label>
-                  <input type="text" class="form-control form-control-readonly" value="email" readonly>
-                  <div class="form-text">{{ 'admin_users.provider_note' | translate }}</div>
-                </div>
-
-                <div class="col-12 col-md-6 d-flex align-items-center pt-2">
-                  <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="chkCompleto" disabled
-                           [checked]="f['nombre'].value && f['apellido'].value && f['telefono'].value && f['avatar_url'].value">
-                    <label class="form-check-label text-ink-muted" for="chkCompleto">
-                      {{ 'admin_users.complete_profile' | translate }}
-                      <small class="d-block fw-normal">{{ 'admin_users.complete_profile_hint' | translate }}</small>
-                    </label>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
-            <!-- ── Datos del constructor ────────────────────────────────── -->
-            @if (esConstructor()) {
-              <!-- ── Perfil profesional (sólo constructor) ───────────────── -->
-              <div class="form-section-divider"></div>
-
-              <div class="form-section mt-5">
-                <div class="form-section__header">
-                  <i class="bi bi-tools" aria-hidden="true"></i>
-                  {{ 'admin_users.builder_data' | translate }}
-                </div>
-                <p class="form-text mb-3">{{ 'admin_users.builder_hint' | translate }}</p>
-                <div class="row g-3">
-
-                  <div class="col-12 col-md-6">
-                    <label class="form-label" for="bRbq">{{ 'admin_users.rbq' | translate }}</label>
-                    <input id="bRbq" type="text" class="form-control" formControlName="rbq"
-                           inputmode="numeric" maxlength="12" placeholder="0000-0000-00"
-                           (input)="formatearRbq($event)"
-                           [class.is-invalid]="f['rbq'].invalid && f['rbq'].touched"
-                           [attr.aria-invalid]="f['rbq'].invalid && f['rbq'].touched">
-                    <div class="invalid-feedback">
-                      @if (f['rbq'].errors?.['required']) {
-                        {{ 'admin_users.rbq_required' | translate }}
-                      } @else {
-                        {{ 'admin_users.rbq_invalid' | translate }}
-                      }
-                    </div>
-                  </div>
-
-                  <div class="col-12 col-md-6">
-                    <label class="form-label" for="bAnios">{{ 'admin_users.years_experience' | translate }}</label>
-                    <input id="bAnios" type="number" class="form-control" formControlName="anios_experiencia"
-                           min="0" max="80" step="1" placeholder="12"
-                           [class.is-invalid]="f['anios_experiencia'].invalid && f['anios_experiencia'].touched"
-                           [attr.aria-invalid]="f['anios_experiencia'].invalid && f['anios_experiencia'].touched">
-                    <div class="invalid-feedback">
-                      @if (f['anios_experiencia'].errors?.['required']) {
-                        {{ 'admin_users.years_required' | translate }}
-                      } @else {
-                        {{ 'admin_users.years_range' | translate }}
-                      }
-                    </div>
-                  </div>
-
-                  <div class="col-12">
-                    <label class="form-label" for="bZona">{{ 'admin_users.service_zone' | translate }}</label>
-                    <input id="bZona" type="text" class="form-control" formControlName="zona_servicio"
-                           [placeholder]="'admin_users.service_zone_ph' | translate"
-                           [class.is-invalid]="f['zona_servicio'].invalid && f['zona_servicio'].touched"
-                           [attr.aria-invalid]="f['zona_servicio'].invalid && f['zona_servicio'].touched">
-                    <div class="invalid-feedback">{{ 'admin_users.service_zone_required' | translate }}</div>
-                  </div>
-
-                  <!-- Especialidades: «Todos los servicios» y las casillas sueltas
-                       son excluyentes. Al marcarlo, las de abajo quedan inertes en
-                       vez de desaparecer, para que se siga viendo qué cubre. -->
-                  <div class="col-12">
-                    <fieldset class="spec-field" data-campo="especialidad_ids">
-                      <legend class="form-label spec-field__legend">
-                        {{ 'admin_users.specialties' | translate }}
-                      </legend>
-                      <p class="form-text mt-0 mb-2">{{ 'admin_users.specialties_hint' | translate }}</p>
-
-                      @if (cargandoServicios()) {
-                        <p class="form-text">{{ 'common.loading' | translate }}</p>
-                      } @else {
-                        <div class="spec-grid"
-                             [class.spec-grid--invalid]="f['especialidad_ids'].invalid && f['especialidad_ids'].touched">
-                          <label class="form-check spec-check spec-check--all">
-                            <input class="form-check-input" type="checkbox"
-                                   [checked]="todosLosServicios"
-                                   (change)="alternarTodosLosServicios($any($event.target).checked)">
-                            <span class="form-check-label">{{ 'admin_users.specialty_all' | translate }}</span>
-                          </label>
-                          @for (e of especialidades(); track e.id) {
-                            <label class="form-check spec-check">
-                              <input class="form-check-input" type="checkbox"
-                                     [checked]="tieneEspecialidad(e.id)"
-                                     [disabled]="todosLosServicios"
-                                     (change)="alternarEspecialidad(e.id, $any($event.target).checked)">
-                              <span class="form-check-label">{{ e.nombre }}</span>
-                            </label>
-                          }
-                        </div>
-                      }
-
-                      @if (f['especialidad_ids'].invalid && f['especialidad_ids'].touched) {
-                        <p class="spec-error" role="alert">
-                          {{ 'admin_users.specialties_required' | translate }}
-                        </p>
-                      }
-                    </fieldset>
-                  </div>
-
-                  <div class="col-12">
-                    <label class="form-label" for="bMensaje">
-                      {{ 'admin_users.builder_message' | translate }}
-                      <span class="opt-label">({{ 'common.optional' | translate }})</span>
-                    </label>
-                    <textarea id="bMensaje" class="form-control" rows="4" formControlName="mensaje"
-                              [placeholder]="'admin_users.builder_message_ph' | translate"></textarea>
-                    <div class="form-text">{{ 'admin_users.builder_message_hint' | translate }}</div>
-                  </div>
-
-                </div>
-              </div>
-
-              <!-- ── Compañía (sólo constructor) ─────────────────────── -->
-              <div class="form-section-divider"></div>
-
-              <div class="form-section mt-5">
-                <div class="form-section__header">
-                  <i class="bi bi-building" aria-hidden="true"></i>
-                  {{ 'admin_users.company_data' | translate }}
-                </div>
-                <p class="form-text mb-3">{{ 'admin_users.company_hint' | translate }}</p>
-                <div class="row g-3">
-
-                  <div class="col-12 col-md-6">
-                    <label class="form-label">
-                      {{ 'admin_users.company_name' | translate }}
-                      <span class="opt-label">({{ 'common.optional' | translate }})</span>
-                    </label>
-                    <input type="text" class="form-control" formControlName="compania_nombre">
-                  </div>
-
-                  <div class="col-12 col-md-6">
-                    <label class="form-label">
-                      {{ 'admin_users.company_phone' | translate }}
-                      <span class="opt-label">({{ 'common.optional' | translate }})</span>
-                    </label>
-                    <input type="tel" class="form-control" formControlName="compania_telefono"
-                           placeholder="+1 514-555-0100">
-                  </div>
-
-                  <div class="col-12 col-md-6">
-                    <label class="form-label">
-                      {{ 'admin_users.company_email' | translate }}
-                      <span class="opt-label">({{ 'common.optional' | translate }})</span>
-                    </label>
-                    <input type="email" class="form-control" formControlName="compania_email"
-                           [class.is-invalid]="f['compania_email'].invalid && f['compania_email'].touched">
-                    <div class="invalid-feedback">{{ 'admin_users.company_email_invalid' | translate }}</div>
-                  </div>
-
-                  <div class="col-12 col-md-6">
-                    <label class="form-label">
-                      {{ 'admin_users.company_address' | translate }}
-                      <span class="opt-label">({{ 'common.optional' | translate }})</span>
-                    </label>
-                    <input type="text" class="form-control" formControlName="compania_direccion">
-                  </div>
-
-                </div>
-              </div>
-            }
-
-            <app-campos-faltantes class="mt-4" [formulario]="form" [intento]="intentos()" />
+      <!-- Invitación por correo: crea la cuenta y envía el acceso de una vez -->
+      <div class="fc-invite">
+        <div class="fc-invite__head">
+          <div class="fc-invite__text">
+            <h3 class="fc-invite__title">
+              <mat-icon aria-hidden="true">forward_to_inbox</mat-icon>
+              {{ 'admin_users.invite_title' | translate }}
+            </h3>
+            <p class="fc-hint">{{ 'admin_users.invite_create_hint' | translate }}</p>
+            <p class="fc-invite__lang">
+              {{ 'admin_users.invite_lang' | translate:{ idioma: ('lang.' + idiomaInvitacion()) | translate } }}
+            </p>
           </div>
-
-          <!-- ── Footer acciones ─────────────────────────────────────────── -->
-          <div class="form-card__footer">
-            <button type="button" class="btn btn-outline-secondary"
-                    (click)="cancelar()" [disabled]="ocupado()">
-              <i class="bi bi-x-lg me-1" aria-hidden="true"></i>{{ 'common.cancel' | translate }}
-            </button>
-            <button type="submit" class="btn btn-primary" [disabled]="ocupado()">
-              @if (guardando()) {
-                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                {{ 'admin_users.creating' | translate }}
-              } @else {
-                <i class="bi bi-person-check me-1" aria-hidden="true"></i>
-                {{ botonClave() | translate }}
-              }
-            </button>
-          </div>
-
+          <button mat-stroked-button type="button" class="fc-invite__btn" (click)="crearEInvitar()" [disabled]="ocupado()">
+            @if (enviandoInvitacion()) { <span class="fc-spinner" aria-hidden="true"></span> } @else { <mat-icon>send</mat-icon> }
+            {{ (enviandoInvitacion() ? 'admin_users.invite_sending' : 'admin_users.invite_send') | translate }}
+          </button>
         </div>
-      </form>
-    </div>
-  </div>
+        <app-campos-faltantes [formulario]="form" [intento]="intentosInvitar()" />
+      </div>
+    </section>
 
+    <!-- ═══ Datos personales ══════════════════════════════════════════════ -->
+    <section class="fc-card" aria-labelledby="pf-personal-title">
+      <h2 class="fc-h2" id="pf-personal-title">{{ 'admin_users.personal_data' | translate }}</h2>
+
+      <div class="fc-grid">
+        <mat-form-field appearance="outline" hideRequiredMarker>
+          <mat-label>{{ 'common.name' | translate }}</mat-label>
+          <input matInput formControlName="nombre" autocomplete="off">
+          <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'admin_users.name_required' | translate }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" hideRequiredMarker>
+          <mat-label>{{ 'common.lastname' | translate }}</mat-label>
+          <input matInput formControlName="apellido" autocomplete="off">
+          <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'admin_users.lastname_required' | translate }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'common.phone' | translate }}</mat-label>
+          <input matInput type="tel" formControlName="telefono" inputmode="tel" placeholder="+1 514-000-0000">
+        </mat-form-field>
+      </div>
+
+      <!-- Foto -->
+      <div class="fc-photo">
+        <p class="fc-label" id="pf-photo-label">{{ 'profile.photo' | translate }}</p>
+        <div class="fc-photo__row">
+          <button type="button" class="fc-photo__preview" [class.is-busy]="subiendoAvatar()"
+                  aria-labelledby="pf-photo-label" [disabled]="subiendoAvatar()" (click)="fileInput.click()">
+            @if (previewUrl()) {
+              <img [src]="previewUrl()!" width="64" height="64" alt="">
+            } @else {
+              <mat-icon aria-hidden="true">photo_camera</mat-icon>
+            }
+            @if (subiendoAvatar()) { <span class="fc-photo__busy"><span class="fc-spinner" aria-hidden="true"></span></span> }
+          </button>
+          <div class="fc-photo__text">
+            <button mat-stroked-button type="button" (click)="fileInput.click()" [disabled]="subiendoAvatar()">
+              <mat-icon>upload</mat-icon>
+              {{ (subiendoAvatar() ? 'profile.uploading' : 'admin_users.select_photo') | translate }}
+            </button>
+            <p class="fc-hint">{{ 'profile.photo_hint' | translate }}</p>
+          </div>
+        </div>
+        <input #fileInput type="file" accept="image/jpeg,image/png,image/webp" class="cdk-visually-hidden"
+               tabindex="-1" aria-hidden="true" (change)="onAvatarChange($event)">
+        <input type="hidden" formControlName="avatar_url">
+      </div>
+
+      <!-- Dirección (opcional) -->
+      <div class="fc-subhead">
+        <h3 class="fc-h3">{{ 'admin_users.address_data' | translate }}</h3>
+        <p class="fc-hint">{{ 'admin_users.address_hint' | translate }}</p>
+      </div>
+      <div class="fc-grid fc-grid--addr">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'admin_users.unit_number' | translate }} ({{ 'common.optional' | translate | lowercase }})</mat-label>
+          <input matInput formControlName="direccion_unidad" placeholder="5" autocomplete="address-line2">
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="fc-street">
+          <mat-label>{{ 'admin_users.street_address' | translate }} ({{ 'common.optional' | translate | lowercase }})</mat-label>
+          <input matInput formControlName="direccion_calle" placeholder="123 Rue Saint-Denis" autocomplete="address-line1">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'admin_users.city' | translate }} ({{ 'common.optional' | translate | lowercase }})</mat-label>
+          <input matInput formControlName="direccion_ciudad" placeholder="Montréal" autocomplete="address-level2">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'admin_users.province_territory' | translate }} ({{ 'common.optional' | translate | lowercase }})</mat-label>
+          <mat-select formControlName="direccion_provincia">
+            <mat-option value="">{{ 'admin_users.province_none' | translate }}</mat-option>
+            @for (p of provinciasCanada; track p.code) {
+              <mat-option [value]="p.code">{{ p.nombre }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'admin_users.postal_code' | translate }} ({{ 'common.optional' | translate | lowercase }})</mat-label>
+          <input matInput class="fc-upper" formControlName="direccion_codigo_postal" placeholder="A1A 1A1"
+                 autocomplete="postal-code" maxlength="7">
+          <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'admin_users.postal_invalid' | translate }}</mat-error>
+        </mat-form-field>
+      </div>
+    </section>
+
+    <!-- ═══ Configuración de la cuenta ════════════════════════════════════ -->
+    <section class="fc-card" aria-labelledby="pf-account-title">
+      <h2 class="fc-h2" id="pf-account-title">{{ 'admin_users.account_config' | translate }}</h2>
+
+      <div class="fc-grid">
+        <mat-form-field appearance="outline" hideRequiredMarker>
+          <mat-label>{{ 'common.role' | translate }}</mat-label>
+          <mat-select formControlName="rol">
+            @for (r of roles; track r) {
+              <mat-option [value]="r">{{ ('role.' + r) | translate }}</mat-option>
+            }
+          </mat-select>
+          <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'admin_users.role_required' | translate }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" hideRequiredMarker>
+          <mat-label>{{ 'common.status' | translate }}</mat-label>
+          <mat-select formControlName="activo">
+            <mat-option [value]="true">{{ 'common.active' | translate }}</mat-option>
+            <mat-option [value]="false">{{ 'common.inactive' | translate }}</mat-option>
+          </mat-select>
+          <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'admin_users.status_required' | translate }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" hideRequiredMarker subscriptSizing="dynamic">
+          <mat-label>{{ 'admin_users.language' | translate }}</mat-label>
+          <mat-select formControlName="idioma">
+            @for (l of idiomas; track l) {
+              <mat-option [value]="l">{{ ('lang.' + l) | translate }}</mat-option>
+            }
+          </mat-select>
+          <mat-hint>{{ 'admin_users.language_hint' | translate }}</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>{{ 'admin_users.provider_label' | translate }}</mat-label>
+          <input matInput value="email" readonly>
+          <mat-icon matIconSuffix aria-hidden="true">lock</mat-icon>
+          <mat-hint>{{ 'admin_users.provider_note' | translate }}</mat-hint>
+        </mat-form-field>
+      </div>
+
+      <ng-container [ngTemplateOutlet]="tplPerfilCompleto" />
+    </section>
+
+    @if (esConstructor()) {
+      <!-- ═══ Perfil profesional (solo constructor) ═══════════════════════ -->
+      <section class="fc-card" aria-labelledby="pf-builder-title">
+        <div class="fc-card__titles">
+          <h2 class="fc-h2" id="pf-builder-title">{{ 'admin_users.builder_data' | translate }}</h2>
+          <p class="fc-hint">{{ 'admin_users.builder_hint' | translate }}</p>
+        </div>
+        <ng-container [ngTemplateOutlet]="tplConstructor" />
+      </section>
+
+      <!-- ═══ Compañía (solo constructor) ═════════════════════════════════ -->
+      <section class="fc-card" aria-labelledby="pf-company-title">
+        <div class="fc-card__titles">
+          <h2 class="fc-h2" id="pf-company-title">{{ 'admin_users.company_data' | translate }}</h2>
+          <p class="fc-hint">{{ 'admin_users.company_hint' | translate }}</p>
+        </div>
+        <ng-container [ngTemplateOutlet]="tplCompania" />
+      </section>
+    }
+
+    <!-- ── Acciones ─────────────────────────────────────────────────────── -->
+    <div class="fc-foot">
+      <app-campos-faltantes [formulario]="form" [intento]="intentos()" />
+      <div class="fc-foot__actions">
+        <button mat-button type="button" class="fc-cancel" (click)="cancelar()" [disabled]="ocupado()">
+          {{ 'common.cancel' | translate }}
+        </button>
+        <!-- Crear una persona no es una etapa del dossier: abeto, no tomate. -->
+        <button mat-flat-button type="submit" class="fc-save" [disabled]="ocupado()">
+          @if (guardando()) { <span class="fc-spinner" aria-hidden="true"></span> } @else { <mat-icon>person_add</mat-icon> }
+          {{ (guardando() ? 'admin_users.creating' : botonClave()) | translate }}
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Piezas ────────────────────────────────────────────────────────── -->
+    <ng-template #tplPerfilCompleto>
+      @if (f['nombre'].value && f['apellido'].value && f['telefono'].value && f['avatar_url'].value) {
+        <p class="fc-complete is-done">
+          <mat-icon aria-hidden="true">check_circle</mat-icon>
+          <span><strong>{{ 'admin_users.complete_profile' | translate }}</strong>
+            <span class="fc-complete__hint">{{ 'admin_users.complete_profile_hint' | translate }}</span></span>
+        </p>
+      } @else {
+        <p class="fc-complete">
+          <mat-icon aria-hidden="true">radio_button_unchecked</mat-icon>
+          <span><strong>{{ 'admin_users.complete_profile' | translate }}</strong>
+            <span class="fc-complete__hint">{{ 'admin_users.complete_profile_hint' | translate }}</span></span>
+        </p>
+      }
+    </ng-template>
+
+    <ng-template #tplConstructor>
+      <div class="fc-grid">
+        <mat-form-field appearance="outline" hideRequiredMarker>
+          <mat-label>{{ 'admin_users.rbq' | translate }}</mat-label>
+          <input matInput formControlName="rbq" inputmode="numeric" maxlength="12" placeholder="0000-0000-00"
+                 (input)="formatearRbq($event)">
+          <mat-error>
+            <mat-icon aria-hidden="true">error</mat-icon>
+            {{ (f['rbq'].hasError('required') ? 'admin_users.rbq_required' : 'admin_users.rbq_invalid') | translate }}
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" hideRequiredMarker subscriptSizing="dynamic">
+          <mat-label>{{ 'admin_users.years_experience' | translate }}</mat-label>
+          <input matInput type="number" formControlName="anios_experiencia" min="0" max="80" step="1" placeholder="12">
+          <mat-error>
+            <mat-icon aria-hidden="true">error</mat-icon>
+            {{ (f['anios_experiencia'].hasError('required') ? 'admin_users.years_required' : 'admin_users.years_range') | translate }}
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="fc-span" hideRequiredMarker>
+          <mat-label>{{ 'admin_users.service_zone' | translate }}</mat-label>
+          <input matInput formControlName="zona_servicio" [placeholder]="'admin_users.service_zone_ph' | translate">
+          <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'admin_users.service_zone_required' | translate }}</mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Especialidades: «Todos los servicios» y las casillas sueltas son
+           excluyentes. Al marcarlo, las de abajo quedan inertes en vez de
+           desaparecer, para que se siga viendo qué cubre. -->
+      <fieldset class="fc-fieldset" data-campo="especialidad_ids"
+                [attr.aria-describedby]="f['especialidad_ids'].invalid && f['especialidad_ids'].touched ? 'pf-spec-error' : null">
+        <legend class="fc-label">{{ 'admin_users.specialties' | translate }}</legend>
+        <p class="fc-hint">{{ 'admin_users.specialties_hint' | translate }}</p>
+        @if (cargandoServicios()) {
+          <p class="fc-loading" role="status"><span class="fc-spinner" aria-hidden="true"></span>{{ 'common.loading' | translate }}</p>
+        } @else {
+          <div class="fc-checks" [class.is-invalid]="f['especialidad_ids'].invalid && f['especialidad_ids'].touched">
+            <mat-checkbox class="fc-checks__all" [checked]="todosLosServicios"
+                          (change)="alternarTodosLosServicios($event.checked)">
+              {{ 'admin_users.specialty_all' | translate }}
+            </mat-checkbox>
+            @for (e of especialidades(); track e.id) {
+              <mat-checkbox [checked]="tieneEspecialidad(e.id)" [disabled]="todosLosServicios"
+                            (change)="alternarEspecialidad(e.id, $event.checked)">
+                {{ e.nombre }}
+              </mat-checkbox>
+            }
+          </div>
+        }
+        @if (f['especialidad_ids'].invalid && f['especialidad_ids'].touched) {
+          <p class="fc-error" id="pf-spec-error" role="alert">
+            <mat-icon aria-hidden="true">error</mat-icon>{{ 'admin_users.specialties_required' | translate }}
+          </p>
+        }
+      </fieldset>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>{{ 'admin_users.builder_message' | translate }} ({{ 'common.optional' | translate | lowercase }})</mat-label>
+        <textarea matInput rows="4" formControlName="mensaje" [placeholder]="'admin_users.builder_message_ph' | translate"></textarea>
+        <mat-hint>{{ 'admin_users.builder_message_hint' | translate }}</mat-hint>
+      </mat-form-field>
+    </ng-template>
+
+    <ng-template #tplCompania>
+      <div class="fc-grid fc-grid--2">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'admin_users.company_name' | translate }} ({{ 'common.optional' | translate | lowercase }})</mat-label>
+          <input matInput formControlName="compania_nombre">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'admin_users.company_phone' | translate }} ({{ 'common.optional' | translate | lowercase }})</mat-label>
+          <input matInput type="tel" formControlName="compania_telefono" inputmode="tel" placeholder="+1 514-555-0100">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'admin_users.company_email' | translate }} ({{ 'common.optional' | translate | lowercase }})</mat-label>
+          <input matInput type="email" formControlName="compania_email">
+          <mat-error><mat-icon aria-hidden="true">error</mat-icon>{{ 'admin_users.company_email_invalid' | translate }}</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'admin_users.company_address' | translate }} ({{ 'common.optional' | translate | lowercase }})</mat-label>
+          <input matInput formControlName="compania_direccion">
+        </mat-form-field>
+      </div>
+    </ng-template>
+  </form>
 </div>

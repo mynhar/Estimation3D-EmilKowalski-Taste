@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RealtimeChannel } from '@supabase/supabase-js';
+import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../../../services/auth-supabase.service';
 import { ContratoService } from '../../../services/contrato.service';
@@ -16,6 +17,8 @@ import { ObraVmService } from '../../../services/obra-vm.service';
 import { ObraVM } from '../../../models';
 import { ObraCardComponent } from '../../../shared/construction-monitoring/obra-card.component';
 import { ExpedientePanelComponent } from '../../../shared/ui/expediente-panel/expediente-panel.component';
+import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.component';
+import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
 
 // Estados de contrato que tienen seguimiento de obra visible para el cliente.
 const ESTADOS_OBRA = ['firmado', 'en_ejecucion', 'completado'];
@@ -23,7 +26,9 @@ const ESTADOS_OBRA = ['firmado', 'en_ejecucion', 'completado'];
 @Component({
   selector: 'app-client-construction-monitoring-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, ObraCardComponent, ExpedientePanelComponent],
+  imports: [
+    TranslatePipe, MatIconModule, ObraCardComponent, ExpedientePanelComponent, PageHeaderComponent, EmptyStateComponent,
+  ],
   templateUrl: './list.component.html',
   styleUrl: './list.component.css',
 })

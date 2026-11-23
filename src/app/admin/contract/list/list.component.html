@@ -1,238 +1,156 @@
-<div class="container-fluid py-4 px-3 px-xl-4">
+<div class="page-wrapper ls">
 
-  <!-- ── Encabezado ──────────────────────────────────────────────────────────── -->
-  <header class="page-header p-4 mb-4">
-    <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
-      <div>
-        <p class="page-eyebrow">
-          <i class="bi bi-shield-check"></i>{{ 'role.administrateur' | translate }}
-        </p>
-        <h4 class="mb-1">{{ 'admin_contract.title' | translate }}</h4>
-        <p class="text-muted small mb-0">{{ 'admin_contract.subtitle' | translate }}</p>
-      </div>
-      @if (!cargando() && !error()) {
-        <span class="kpi-pill">
-          <i class="bi bi-file-earmark-text"></i>
-          @if (hayFiltros()) {
-            {{ contratosFiltrados().length }} / {{ total }}
-          } @else {
-            {{ total }}
-          }
-          {{ 'admin_contract.count' | translate }}
-        </span>
+  <app-page-header [titulo]="'admin_contract.title' | translate"
+                   [contexto]="'admin_contract.subtitle' | translate" />
+
+  <!-- ── Cargando ────────────────────────────────────────────────────────── -->
+  @if (cargando()) {
+    <div class="ls-grid" role="status">
+      <span class="cdk-visually-hidden">{{ 'common.loading' | translate }}</span>
+      @for (_ of [1, 2, 3]; track $index) {
+        <span class="skel" aria-hidden="true"></span>
       }
     </div>
-  </header>
 
-  <!-- ── Skeleton ────────────────────────────────────────────────────────────── -->
-  @if (cargando()) {
-    <div class="skeleton-wrap">
-      <div class="skeleton-toolbar mb-3">
-        <div class="skel skel--search"></div>
-        <div class="d-flex gap-2 mt-3">
-          @for (i of [1,2,3]; track i) { <div class="skel skel--chip"></div> }
-        </div>
-      </div>
-      <div class="skeleton-table">
-        @for (i of [1,2,3,4,5,6,7,8]; track i) {
-          <div class="skeleton-row">
-            <div class="skel skel--xs"></div>
-            <div class="skel skel--lg"></div>
-            <div class="skel skel--sm"></div>
-            <div class="skel skel--md"></div>
-            <div class="skel skel--md"></div>
-            <div class="skel skel--sm"></div>
-            <div class="skel skel--xs"></div>
-            <div class="skel skel--sm"></div>
-            <div class="skel skel--xs"></div>
-          </div>
-        }
-      </div>
-    </div>
-
-  <!-- ── Error ────────────────────────────────────────────────────────────────── -->
+  <!-- ── Error ───────────────────────────────────────────────────────────── -->
   } @else if (error()) {
-    <div class="empty-state">
-      <div class="empty-state__icon empty-state__icon--danger">
-        <i class="bi bi-exclamation-triangle"></i>
-      </div>
-      <p class="empty-state__title">{{ 'common.error' | translate }}</p>
-      <p class="empty-state__desc">{{ error() }}</p>
-    </div>
+    <p class="ls-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ error() }}</p>
 
-  <!-- ── Contenido ────────────────────────────────────────────────────────────── -->
+  <!-- ── Sin contratos ───────────────────────────────────────────────────── -->
+  } @else if (total === 0) {
+    <app-empty-state class="ls-empty" matIcon="contract"
+                     [titulo]="'admin_contract.no_data' | translate"
+                     [texto]="'admin_contract.no_data_hint' | translate" />
+
   } @else {
 
-    <!-- ── Filtros ────────────────────────────────────────────────────────────── -->
-    <div class="filter-bar mb-3">
-
-      <div class="filter-bar__search">
-        <div class="input-group">
-          <span class="input-group-text search-icon">
-            <i class="bi bi-search"></i>
-          </span>
-          <input type="text" class="form-control search-input"
-                 [placeholder]="'admin_contract.search_placeholder' | translate"
-                 [value]="busqueda()"
-                 (input)="setBusqueda($event)">
-          @if (busqueda()) {
-            <button class="btn search-clear" type="button" (click)="busqueda.set('')"
-                    [title]="'common.clear' | translate">
-              <i class="bi bi-x-lg"></i>
-            </button>
-          }
-        </div>
-      </div>
-
-      <div class="filter-bar__chips">
-        <div class="status-chips" role="group">
-          @for (estado of estados; track estado) {
-            <button type="button" class="status-chip"
-                    [class.status-chip--active]="filtroEstado() === estado"
-                    (click)="filtroEstado.set(estado)">
-              <span class="status-chip__label">
-                {{ estado === 'todos'
-                    ? ('common.all' | translate)
-                    : (('admin_contract.contrato_' + estado) | translate) }}
-              </span>
-              <span class="status-chip__count">
-                {{ estado === 'todos' ? total : (estadoCounts()[estado] || 0) }}
-              </span>
-            </button>
-          }
-        </div>
-        @if (hayFiltros()) {
-          <button class="btn-clear-filters" (click)="limpiarFiltros()">
-            <i class="bi bi-x-circle"></i>{{ 'common.clear_filters' | translate }}
+    <!-- ── Búsqueda, estado y vista (filtrado en el cliente) ─────────────── -->
+    <div class="ls-tools">
+      <mat-form-field class="ls-search" appearance="outline" subscriptSizing="dynamic">
+        <mat-label>{{ 'common.search' | translate }}</mat-label>
+        <mat-icon matPrefix aria-hidden="true">search</mat-icon>
+        <input matInput type="search" autocomplete="off"
+               [placeholder]="'admin_contract.search_placeholder' | translate"
+               [value]="busqueda()" (input)="setBusqueda($event)" />
+        @if (busqueda()) {
+          <button mat-icon-button matSuffix type="button"
+                  [attr.aria-label]="'common.clear' | translate" (click)="busqueda.set('')">
+            <mat-icon>close</mat-icon>
           </button>
         }
+      </mat-form-field>
+
+      <div class="ls-filter is-grid">
+        <span class="ls-filter__label" id="acl-state-label">{{ 'admin_contract.col_contract_status' | translate }}</span>
+        <mat-button-toggle-group class="ls-toggle" hideSingleSelectionIndicator
+                                 aria-labelledby="acl-state-label"
+                                 [value]="filtroEstado()" (change)="filtroEstado.set($event.value)">
+          @for (estado of estados; track estado) {
+            <mat-button-toggle [value]="estado" [class.is-wide]="estado === 'en_ejecucion'">
+              {{ (estado === 'todos' ? 'common.all' : 'admin_contract.contrato_' + estado) | translate }}
+              <span class="ls-count">{{ estado === 'todos' ? total : (estadoCounts()[estado] || 0) }}</span>
+            </mat-button-toggle>
+          }
+        </mat-button-toggle-group>
       </div>
 
-      <div class="offer-view-toggle" role="group" [attr.aria-label]="'common.view_toggle' | translate">
-        <button type="button" class="offer-view" [class.offer-view--active]="vista() === 'tabla'"
-                (click)="vista.set('tabla')" [attr.aria-pressed]="vista() === 'tabla'"
-                [title]="'common.view_table' | translate">
-          <i class="bi bi-list-ul" aria-hidden="true"></i>
-          <span class="offer-view__label">{{ 'common.view_table' | translate }}</span>
-        </button>
-        <button type="button" class="offer-view" [class.offer-view--active]="vista() === 'tarjetas'"
-                (click)="vista.set('tarjetas')" [attr.aria-pressed]="vista() === 'tarjetas'"
-                [title]="'common.view_cards' | translate">
-          <i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>
-          <span class="offer-view__label">{{ 'common.view_cards' | translate }}</span>
-        </button>
-      </div>
-
+      <mat-button-toggle-group class="ls-toggle ls-view" hideSingleSelectionIndicator
+                               [attr.aria-label]="'common.view_toggle' | translate"
+                               [value]="vista()" (change)="vista.set($event.value)">
+        <mat-button-toggle value="tarjetas" [aria-label]="'common.view_cards' | translate"
+                           [matTooltip]="'common.view_cards' | translate">
+          <mat-icon>grid_view</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="tabla" [aria-label]="'common.view_table' | translate"
+                           [matTooltip]="'common.view_table' | translate">
+          <mat-icon>table_rows</mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
     </div>
 
-    <!-- ── Lista de contratos ───────────────────────────────────────────────── -->
-    <div class="table-card">
+    @if (hayFiltros()) {
+      <div class="ls-status">
+        <p class="ls-showing" role="status">
+          <span class="ls-fig">{{ contratosFiltrados().length }} / {{ total }}</span> {{ 'admin_contract.count' | translate }}
+        </p>
+        <button mat-button type="button" class="ls-clear" (click)="limpiarFiltros()">
+          <mat-icon>close</mat-icon>
+          {{ 'common.clear_filters' | translate }}
+        </button>
+      </div>
+    }
 
-      @if (contratosFiltrados().length === 0) {
-        <div class="empty-state empty-state--table">
-          @if (hayFiltros()) {
-            <div class="empty-state__icon">
-              <i class="bi bi-funnel"></i>
-            </div>
-            <p class="empty-state__title">{{ 'admin_contract.no_results' | translate }}</p>
-            <p class="empty-state__desc">{{ 'admin_contract.no_results_hint' | translate }}</p>
-            <button class="btn btn-outline-primary btn-sm mt-2" (click)="limpiarFiltros()">
-              <i class="bi bi-x-circle me-1"></i>{{ 'common.clear_filters' | translate }}
-            </button>
-          } @else {
-            <div class="empty-state__icon">
-              <i class="bi bi-file-earmark-text"></i>
-            </div>
-            <p class="empty-state__title">{{ 'admin_contract.no_data' | translate }}</p>
-            <p class="empty-state__desc">{{ 'admin_contract.no_data_hint' | translate }}</p>
-          }
-        </div>
+    @if (contratosFiltrados().length === 0) {
+      <app-empty-state class="ls-empty" matIcon="filter_alt_off"
+                       [titulo]="'admin_contract.no_results' | translate"
+                       [texto]="'admin_contract.no_results_hint' | translate">
+        <button actions mat-stroked-button type="button" (click)="limpiarFiltros()">
+          {{ 'common.clear_filters' | translate }}
+        </button>
+      </app-empty-state>
 
-      } @else if (vista() === 'tabla') {
+    } @else {
 
-        <!-- Escritorio: tabla con filas clicables -->
-        <div class="table-responsive d-none d-xl-block">
-          <table class="table table-admin align-middle mb-0">
+      <!-- ── Tabla (desde 1200px, si se elige) ───────────────────────────── -->
+      @if (vista() === 'tabla') {
+        <div class="ls-table-wrap">
+          <table class="ls-table">
             <thead>
               <tr>
-                <th class="col-num">{{ 'admin_contract.col_number' | translate }}</th>
-                <th class="col-identity">{{ 'admin_contract.col_client' | translate }} / {{ 'admin_contract.col_service' | translate }}</th>
-                <th>{{ 'admin_contract.col_exp_status' | translate }}</th>
-                <th class="col-person">{{ 'admin_contract.col_estimator' | translate }}</th>
-                <th class="col-person">{{ 'admin_contract.col_constructor' | translate }}</th>
-                <th class="col-date">{{ 'admin_contract.col_start_date' | translate }}</th>
-                <th class="col-precio">{{ 'admin_contract.col_price' | translate }}</th>
-                <th class="col-warranty">{{ 'admin_contract.col_warranty' | translate }}</th>
-                <th>{{ 'admin_contract.col_contract_status' | translate }}</th>
-                <th class="col-actions"></th>
+                <th scope="col">{{ 'admin_contract.col_number' | translate }}</th>
+                <th scope="col">{{ 'admin_contract.col_client' | translate }}</th>
+                <th scope="col">{{ 'admin_contract.col_exp_status' | translate }}</th>
+                <th scope="col">{{ 'admin_contract.col_estimator' | translate }}</th>
+                <th scope="col">{{ 'admin_contract.col_constructor' | translate }}</th>
+                <th scope="col" class="is-right">{{ 'admin_contract.col_price' | translate }}</th>
+                <th scope="col">{{ 'admin_contract.col_contract_status' | translate }}</th>
+                <th scope="col"><span class="cdk-visually-hidden">{{ 'admin_contract.ver_btn' | translate }}</span></th>
               </tr>
             </thead>
             <tbody>
               @for (c of contratosPaginados(); track c.contrato_id) {
-                <tr class="table-row table-row--clickable" (click)="irAEditar(c.contrato_id)">
-                  <td class="col-num">
-                    <span class="exp-num">{{ c.expediente_numero }}</span>
-                  </td>
-                  <td class="col-identity">
-                    <span class="cell-primary">{{ c.cliente_nombre }}</span>
-                    <span class="cell-secondary cell-servicios">{{ serviciosTexto(c) }}</span>
-                  </td>
-                  <td>
-                    <span class="estado-badge {{ badgeExpediente(c.expediente_estado) }}">
-                      {{ ('admin_contract.status_' + c.expediente_estado) | translate }}
+                <tr class="ls-table__row is-link" (click)="irAEditar(c.contrato_id)">
+                  <td class="ls-fig">{{ c.expediente_numero }}</td>
+                  <td class="acl-client">
+                    <span class="ls-table__text">
+                      <a class="ls-table__link" [id]="'acl-t-' + c.contrato_id" [routerLink]="['/admin/contract/edit', c.contrato_id]"
+                         (click)="$event.stopPropagation()">{{ c.cliente_nombre }}</a>
+                      <span class="ls-table__sub">{{ serviciosTexto(c) }}</span>
                     </span>
                   </td>
-                  <td class="col-person">
-                    @if (c.estimador_nombre) {
-                      <span class="cell-primary">{{ c.estimador_nombre }}</span>
-                    } @else {
-                      <span class="cell-muted">—</span>
-                    }
-                  </td>
-                  <td class="col-person">
-                    @if (c.constructor_nombre) {
-                      <span class="cell-primary">{{ c.constructor_nombre }}</span>
-                    } @else {
-                      <span class="cell-muted">—</span>
-                    }
-                  </td>
-                  <td class="col-date">
-                    <span class="cell-primary">{{ formatFecha(c.oferta_fecha_inicio) }}</span>
-                  </td>
-                  <td class="col-precio">
-                    <span class="cell-precio">{{ formatPrecio(c.precio_final) }}</span>
-                  </td>
-                  <td class="col-warranty">
-                    @if (c.garantia_anos != null) {
-                      <span class="cell-primary">{{ c.garantia_anos }} {{ 'admin_contract.years' | translate }}</span>
-                    } @else {
-                      <span class="cell-muted">—</span>
-                    }
-                  </td>
-                  <td>
-                    <div class="contrato-estado-cell">
-                      <span class="estado-badge {{ badgeContrato(c.contrato_estado) }}">
-                        {{ ('admin_contract.contrato_' + c.contrato_estado) | translate }}
-                      </span>
-                      @if (c.obra_terminada) {
-                        <span class="tag tag-gold obra-terminada">
-                          <i class="bi bi-flag" aria-hidden="true"></i>{{ 'monitoring.obra_terminada_badge' | translate }}
+                  <td><app-status-chip [estado]="c.expediente_estado" prefijo="admin_contract.status_" /></td>
+                  <td>{{ c.estimador_nombre || '—' }}</td>
+                  <td>{{ c.constructor_nombre || '—' }}</td>
+                  <td class="is-right">
+                    <span class="ls-table__text">
+                      <span class="ls-fig acl-price">{{ formatPrecio(c.precio_final) }}</span>
+                      @if (c.oferta_fecha_inicio) {
+                        <span class="ls-table__sub">
+                          {{ 'admin_contract.col_start_date' | translate }} <span class="ls-fig">{{ formatFecha(c.oferta_fecha_inicio) }}</span>
                         </span>
                       }
-                      <span class="cell-date-hint">
-                        @if (c.firmado_en && c.contrato_estado !== 'generado') {
-                          {{ formatFecha(c.firmado_en) }}
-                        } @else {
-                          {{ formatFecha(c.generado_en) }}
-                        }
-                      </span>
-                    </div>
+                      @if (c.garantia_anos != null) {
+                        <span class="ls-table__sub">
+                          {{ 'admin_contract.col_warranty' | translate }} <span class="ls-fig">{{ c.garantia_anos }}</span> {{ 'admin_contract.years' | translate }}
+                        </span>
+                      }
+                    </span>
                   </td>
-                  <td class="col-actions" (click)="$event.stopPropagation()">
-                    <a [routerLink]="['/admin/contract/edit', c.contrato_id]"
-                       class="action-btn"
-                       [title]="'admin_contract.ver_btn' | translate">
-                      <i class="bi bi-eye"></i>
+                  <td>
+                    <span class="ls-table__text">
+                      <app-status-chip [estado]="c.contrato_estado" prefijo="admin_contract.contrato_" />
+                      @if (c.obra_terminada) {
+                        <span class="ls-tag is-ok"><mat-icon aria-hidden="true">flag</mat-icon>{{ 'monitoring.obra_terminada_badge' | translate }}</span>
+                      }
+                      <span class="ls-table__sub ls-fig">{{ fechaContrato(c) }}</span>
+                    </span>
+                  </td>
+                  <td class="ls-table__action" (click)="$event.stopPropagation()">
+                    <a mat-icon-button [routerLink]="['/admin/contract/edit', c.contrato_id]"
+                       [attr.aria-label]="'admin_contract.ver_btn' | translate"
+                       [attr.aria-describedby]="'acl-t-' + c.contrato_id"
+                       [matTooltip]="'admin_contract.ver_btn' | translate">
+                      <mat-icon>visibility</mat-icon>
                     </a>
                   </td>
                 </tr>
@@ -240,131 +158,81 @@
             </tbody>
           </table>
         </div>
+      }
 
-        <!-- Móvil/tablet: tarjetas clicables (sin scroll lateral) -->
-        <div class="cm-cards d-xl-none">
-          @for (c of contratosPaginados(); track c.contrato_id) {
-            <button type="button" class="cm-card" (click)="irAEditar(c.contrato_id)">
-              <div class="cm-card__top">
-                <span class="exp-num">{{ c.expediente_numero }}</span>
-                <span class="estado-badge {{ badgeContrato(c.contrato_estado) }}">
-                  {{ ('admin_contract.contrato_' + c.contrato_estado) | translate }}
-                </span>
-              </div>
-              @if (c.obra_terminada) {
-                <span class="tag tag-gold obra-terminada">
-                  <i class="bi bi-flag" aria-hidden="true"></i>{{ 'monitoring.obra_terminada_badge' | translate }}
-                </span>
+      <!-- ── Tarjetas (siempre por debajo de 1200px; arriba, salvo vista tabla) -->
+      <ul class="ls-grid" [class.is-mobile-only]="vista() === 'tabla'">
+        @for (c of contratosPaginados(); track c.contrato_id) {
+          <li class="ls-card" [class.is-out]="c.contrato_estado === 'cancelado' || c.contrato_estado === 'archivado'">
+            <span class="ls-card__photo">
+              <mat-icon aria-hidden="true">view_in_ar</mat-icon>
+              @if (c.foto) {
+                <img [src]="c.foto" loading="lazy" alt="" referrerpolicy="no-referrer"
+                     (error)="$any($event.target).hidden = true" />
               }
-              <div class="cm-card__body">
-                <span class="cm-card__name">{{ c.cliente_nombre }}</span>
-                <span class="cm-card__svc">{{ serviciosTexto(c) }}</span>
-              </div>
-              <div class="cm-card__meta">
-                <span class="cm-meta">
-                  <i class="bi bi-person-badge" aria-hidden="true"></i>{{ c.estimador_nombre || '—' }}
-                </span>
-                <span class="cm-meta">
-                  <i class="bi bi-hard-hat" aria-hidden="true"></i>{{ c.constructor_nombre || '—' }}
-                </span>
-              </div>
-              <div class="cm-card__meta">
-                <span class="cm-meta">
-                  <i class="bi bi-cash-coin" aria-hidden="true"></i>{{ formatPrecio(c.precio_final) }}
-                </span>
-                <span class="cm-meta">
-                  <i class="bi bi-calendar-event" aria-hidden="true"></i>{{ formatFecha(c.oferta_fecha_inicio) }}
+            </span>
+
+            <div class="ls-card__body">
+              <span class="ls-tags">
+                <app-status-chip [estado]="c.contrato_estado" prefijo="admin_contract.contrato_" />
+                @if (c.obra_terminada) {
+                  <span class="ls-tag is-ok"><mat-icon aria-hidden="true">flag</mat-icon>{{ 'monitoring.obra_terminada_badge' | translate }}</span>
+                }
+                <span class="ls-tag ls-fig">{{ formatPrecio(c.precio_final) }}</span>
+              </span>
+
+              <h2 class="ls-card__title">
+                <a class="ls-card__link" [routerLink]="['/admin/contract/edit', c.contrato_id]">{{ c.cliente_nombre }}</a>
+              </h2>
+              <p class="ls-card__num">{{ c.expediente_numero }}</p>
+
+              <p class="ls-card__line">
+                <mat-icon aria-hidden="true">construction</mat-icon>
+                <span>{{ serviciosTexto(c) }}</span>
+              </p>
+              @if (direccionLinea1(c) || direccionLinea2(c)) {
+                <p class="ls-card__line" [title]="direccionCompleta(c)">
+                  <mat-icon aria-hidden="true">location_on</mat-icon>
+                  <span>
+                    @if (direccionLinea1(c)) { {{ direccionLinea1(c) }} }
+                    @if (direccionLinea2(c)) { <span class="ls-card__sub">{{ direccionLinea2(c) }}</span> }
+                  </span>
+                </p>
+              }
+              <p class="ls-card__line">
+                <mat-icon aria-hidden="true">badge</mat-icon>
+                <span><span class="cdk-visually-hidden">{{ 'admin_contract.col_estimator' | translate }} : </span>{{ c.estimador_nombre || '—' }}</span>
+              </p>
+              <p class="ls-card__line">
+                <mat-icon aria-hidden="true">engineering</mat-icon>
+                <span><span class="cdk-visually-hidden">{{ 'admin_contract.col_constructor' | translate }} : </span>{{ c.constructor_nombre || '—' }}</span>
+              </p>
+              <p class="ls-card__line">
+                <mat-icon aria-hidden="true">folder_open</mat-icon>
+                <span><span class="cdk-visually-hidden">{{ 'admin_contract.col_exp_status' | translate }} : </span>{{ ('admin_contract.status_' + c.expediente_estado) | translate }}</span>
+              </p>
+
+              <div class="ls-card__foot">
+                <span>
+                  <mat-icon aria-hidden="true">event</mat-icon>
+                  {{ 'admin_contract.col_start_date' | translate }}
+                  <strong class="ls-fig">{{ formatFecha(c.oferta_fecha_inicio) }}</strong>
                 </span>
                 @if (c.garantia_anos != null) {
-                  <span class="cm-meta">
-                    <i class="bi bi-shield-check" aria-hidden="true"></i>{{ c.garantia_anos }} {{ 'admin_contract.years' | translate }}
+                  <span>
+                    <mat-icon aria-hidden="true">verified_user</mat-icon>
+                    {{ 'admin_contract.col_warranty' | translate }}
+                    <strong class="ls-fig">{{ c.garantia_anos }}</strong> {{ 'admin_contract.years' | translate }}
                   </span>
                 }
-                <span class="estado-badge {{ badgeExpediente(c.expediente_estado) }}">
-                  {{ ('admin_contract.status_' + c.expediente_estado) | translate }}
-                </span>
               </div>
-            </button>
-          }
-        </div>
+            </div>
+          </li>
+        }
+      </ul>
 
-      } @else {
-
-        <!-- Vista de tarjetas (con foto del expediente extraída del tour 3D) -->
-        <div class="offer-cards">
-          @for (c of contratosPaginados(); track c.contrato_id) {
-            <article class="offer-card" role="button" tabindex="0"
-                     (click)="irAEditar(c.contrato_id)"
-                     (keydown.enter)="irAEditar(c.contrato_id)"
-                     (keydown.space)="$event.preventDefault(); irAEditar(c.contrato_id)">
-              <div class="offer-card__media">
-                <div class="offer-card__fallback" aria-hidden="true"><i class="bi bi-box-seam"></i></div>
-                @if (c.foto) {
-                  <img class="offer-card__img" [src]="c.foto" alt="" loading="lazy"
-                       referrerpolicy="no-referrer"
-                       (error)="$any($event.target).style.display='none'">
-                }
-                <span class="estado-badge {{ badgeContrato(c.contrato_estado) }} offer-card__badge">
-                  {{ ('admin_contract.contrato_' + c.contrato_estado) | translate }}
-                </span>
-              </div>
-              <div class="offer-card__body">
-                <div class="offer-card__head">
-                  <span class="exp-num">{{ c.expediente_numero }}</span>
-                  <span class="cell-precio">{{ formatPrecio(c.precio_final) }}</span>
-                </div>
-                <span class="offer-card__client">{{ c.cliente_nombre }}</span>
-                <span class="offer-card__svc">{{ serviciosTexto(c) }}</span>
-                @if (c.obra_terminada) {
-                  <span class="tag tag-gold obra-terminada">
-                    <i class="bi bi-flag" aria-hidden="true"></i>{{ 'monitoring.obra_terminada_badge' | translate }}
-                  </span>
-                }
-                @if (direccionLinea1(c) || direccionLinea2(c)) {
-                  <p class="offer-card__addr" [title]="direccionCompleta(c)">
-                    <i class="bi bi-geo-alt offer-card__addr-icon" aria-hidden="true"></i>
-                    <span class="offer-card__addr-text">
-                      @if (direccionLinea1(c)) {
-                        <span class="offer-card__addr-line">{{ direccionLinea1(c) }}</span>
-                      }
-                      @if (direccionLinea2(c)) {
-                        <span class="offer-card__addr-line offer-card__addr-line--muted">{{ direccionLinea2(c) }}</span>
-                      }
-                    </span>
-                  </p>
-                }
-                <div class="offer-card__meta">
-                  <span class="cm-meta"><i class="bi bi-person-badge" aria-hidden="true"></i>{{ c.estimador_nombre || '—' }}</span>
-                  <span class="cm-meta"><i class="bi bi-hard-hat" aria-hidden="true"></i>{{ c.constructor_nombre || '—' }}</span>
-                  <span class="cm-meta"><i class="bi bi-calendar-event" aria-hidden="true"></i>{{ formatFecha(c.oferta_fecha_inicio) }}</span>
-                  @if (c.garantia_anos != null) {
-                    <span class="cm-meta"><i class="bi bi-shield-check" aria-hidden="true"></i>{{ c.garantia_anos }} {{ 'admin_contract.years' | translate }}</span>
-                  }
-                </div>
-                <span class="estado-badge {{ badgeExpediente(c.expediente_estado) }}">
-                  {{ ('admin_contract.status_' + c.expediente_estado) | translate }}
-                </span>
-              </div>
-            </article>
-          }
-        </div>
-
-      }
-
-      <!-- ── Paginación ──────────────────────────────────────────────────────── -->
-      @if (contratosFiltrados().length > 0) {
-        <div class="table-footer">
-          <app-pagination
-            [total]="contratosFiltrados().length"
-            [page]="paginaActual()"
-            [pageSize]="POR_PAGINA"
-            (pageChange)="paginaActual.set($event)">
-          </app-pagination>
-        </div>
-      }
-
-    </div>
-
+      <app-pagination [total]="contratosFiltrados().length" [page]="paginaActual()"
+                      [pageSize]="POR_PAGINA" (pageChange)="paginaActual.set($event)" />
+    }
   }
-
 </div>

@@ -91,29 +91,3 @@
   color: var(--ds-ink-secondary);
   font-size: var(--ds-text-sm);
 }
-
-/* ── Entrepreneurs (piel antigua, hasta su rediseño en la fase 2) ──────────
- * Esa página aún tiene su propia piel (tema oscuro por defecto, monoespaciada,
- * esquinas vivas) y expone sus variables en el host; en tema claro apuntan a
- * los tokens --ds-*. La caja rosa de la aplicación chocaría sobre el fondo
- * oscuro: aquí el resumen es un panel del sitio con filete y texto de error.
- * --danger-text ≥ 4.5:1 en ambos temas (ver site-chrome.css). La landing ya es
- * Clarté y usa el resumen por defecto. */
-:host-context(.e3-public-page) .cf {
-  background: var(--panel);
-  color: var(--danger-text);
-  border-left-color: var(--burgundy-bright);
-  border-radius: 0;
-  font-family: var(--mono);
-  font-size: 0.78rem;
-  letter-spacing: 0.03em;
-}
-:host-context(.e3-public-page) .cf__reason { color: var(--white-dim); font-size: inherit; }
-:host-context(.e3-public-page) .cf__link:hover,
-:host-context(.e3-public-page) .cf__link:active { color: var(--white); }
-:host-context(.e3-public-page) .cf:focus-visible,
-:host-context(.e3-public-page) .cf__link:focus-visible {
-  box-shadow: none;
-  outline: 1px solid var(--gold-text);
-  outline-offset: 3px;
-}

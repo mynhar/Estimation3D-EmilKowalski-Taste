@@ -1,0 +1,470 @@
+/* Listas de dossiers, clientes y obras (Trait rouge), compartida
+ * La incluyen las listas de los roles internos con
+ *   styleUrls: ['…/shared/ui/lista/lista.css', './x.component.css']
+ * y cada componente añade solo lo suyo. Mismo patrón que «Dossiers disponibles» del contratista:
+ * búsqueda + filtros en mat-button-toggle con su recuento, conmutador tarjetas/tabla (tabla desde
+ * 768px), tarjetas con el título como enlace estirado, tabla con la fila pulsable.
+ *
+ * states: cargando (esqueleto) · vacío · filtros sin resultados · tarjetas · tabla · error
+ *         interactivos: default · hover (puntero fino) · focus-visible · active · disabled
+ * contrast: títulos ink (13.6:1 sobre vélin) · texto ink-secondary (9.6:1) · meta ink-muted (6.8:1)
+ *           marcas: warning-ink/-soft 5.8:1 · success-ink/-soft · danger-ink/-soft · info-ink/-soft
+ * type: títulos 112 %; números, recuentos y fechas al 75 % con tabular-nums
+ */
+
+.ls {
+  display: grid;
+  gap: var(--ds-space-5);
+  max-width: 1320px;
+  min-width: 0;
+}
+
+.ls-fig {
+  font-stretch: var(--ds-stretch-figure);
+  font-variant-numeric: tabular-nums;
+}
+.ls-nowrap { white-space: nowrap; }
+
+/* ── Búsqueda, filtros y vista ──────────────────────────────────────────── */
+.ls-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--ds-space-4) var(--ds-space-5);
+}
+.ls-search {
+  flex: 1 1 18rem;
+  min-width: 0;
+  max-width: 28rem;
+}
+.ls-search mat-icon[matPrefix] { margin-inline: var(--ds-space-3) var(--ds-space-1); color: var(--ds-ink-muted); }
+.ls-search [matSuffix] { margin-inline-end: var(--ds-space-1); }
+
+.ls-filter {
+  display: grid;
+  gap: var(--ds-space-1);
+  min-width: 0;
+}
+.ls-filter__label {
+  font-size: var(--ds-text-sm);
+  font-weight: var(--ds-weight-medium);
+  color: var(--ds-ink-muted);
+}
+.ls-toggle {
+  --mat-button-toggle-height: 44px;
+  --mat-button-toggle-shape: var(--ds-radius-md);
+  --mat-button-toggle-text-color: var(--ds-ink-secondary);
+  --mat-button-toggle-background-color: var(--ds-surface);
+  --mat-button-toggle-selected-state-background-color: var(--ds-action-faint);
+  --mat-button-toggle-selected-state-text-color: var(--ds-action-ink);
+  --mat-button-toggle-divider-color: var(--ds-border);
+  --mat-button-toggle-label-text-size: var(--ds-text-base);
+  --mat-button-toggle-label-text-weight: var(--ds-weight-semibold);
+}
+.ls-count {
+  margin-left: var(--ds-space-1);
+  font-weight: var(--ds-weight-regular);
+  font-stretch: var(--ds-stretch-figure);
+  font-variant-numeric: tabular-nums;
+}
+.ls-view { margin-left: auto; }
+.ls-view mat-icon { width: 22px; height: 22px; font-size: 22px; vertical-align: middle; }
+@media (max-width: 767.98px) {
+  .ls-view { display: none; }
+}
+@media (max-width: 599.98px) {
+  .ls-search { max-width: none; }
+  .ls-filter { flex: 1 1 100%; }
+  .ls-filter .ls-toggle { display: flex; }
+  .ls-filter mat-button-toggle { flex: 1; min-width: 0; }
+}
+/* Filtro por estado (4 o más opciones): en móvil, «Tous» arriba y 2 columnas debajo. */
+@media (max-width: 799.98px) {
+  .ls-filter.is-grid { flex: 1 1 100%; }
+  .ls-filter.is-grid .ls-toggle {
+    --mat-button-toggle-divider-color: transparent;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--ds-space-2);
+    overflow: visible;
+    border: 0;
+  }
+  .ls-filter.is-grid mat-button-toggle {
+    border: 1px solid var(--ds-border);
+    border-radius: var(--ds-radius-md);
+  }
+  .ls-filter.is-grid mat-button-toggle:first-child { grid-column: 1 / -1; }
+  /* Opción de etiqueta larga («En cours d'exécution»): fila entera para que quepa la cifra. */
+  .ls-filter.is-grid mat-button-toggle.is-wide { grid-column: 1 / -1; }
+}
+
+.ls-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  margin-top: calc(var(--ds-space-2) * -1);
+}
+.ls-showing {
+  margin: 0;
+  font-size: var(--ds-text-sm);
+  color: var(--ds-ink-muted);
+}
+.ls-clear {
+  --mat-button-text-label-text-color: var(--ds-action);
+  min-height: 44px;
+}
+
+/* ── Marcas pequeñas: urgencia, reciente, enviada… (icono + texto) ──────── */
+.ls-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  min-height: 28px;
+  padding: 2px var(--ds-space-3);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-band);
+  color: var(--ds-ink-secondary);
+  font-size: var(--ds-text-sm);
+  font-weight: var(--ds-weight-medium);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.ls-tag mat-icon { width: 16px; height: 16px; font-size: 16px; margin-left: -2px; }
+.ls-tag.is-warn  { background: var(--ds-warning-soft); color: var(--ds-warning-ink); }
+.ls-tag.is-ok    { background: var(--ds-success-soft); color: var(--ds-success-ink); }
+.ls-tag.is-late  { background: var(--ds-danger-soft);  color: var(--ds-danger-ink); }
+.ls-tag.is-info  { background: var(--ds-info-soft);    color: var(--ds-info-ink); }
+.ls-tags { display: flex; flex-wrap: wrap; gap: var(--ds-space-2); }
+
+/* ── Vacío, error y carga ───────────────────────────────────────────────── */
+.ls-empty { max-width: 44rem; }
+
+.ls-error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ds-space-2);
+  margin: 0;
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border: 1px solid var(--ds-danger);
+  border-radius: var(--ds-radius-lg);
+  background: var(--ds-danger-soft);
+  color: var(--ds-danger-ink);
+}
+.ls-error mat-icon { flex-shrink: 0; }
+
+.skel {
+  display: block;
+  height: 24rem;
+  border-radius: var(--ds-radius-lg);
+  background: var(--ds-bg-alt);
+  animation: skel 1.4s var(--ds-ease-in-out) infinite alternate;
+}
+.skel--row { height: 4.5rem; }
+@keyframes skel { to { opacity: 0.45; } }
+
+/* Spinner dentro de un botón (liberando, guardando…): toma el color del texto. */
+.ls-spinner {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border: 2px solid color-mix(in srgb, currentColor 30%, transparent);
+  border-top-color: currentColor;
+  border-radius: var(--ds-radius-circle);
+  animation: ls-spin 0.8s linear infinite;
+}
+@keyframes ls-spin { to { transform: rotate(360deg); } }
+
+/* ── Tarjetas ───────────────────────────────────────────────────────────── */
+.ls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  gap: var(--ds-space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 768px) {
+  .ls-grid.is-mobile-only { display: none; }
+}
+
+.ls-card {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-lg);
+  background: var(--ds-surface);
+  transition: border-color var(--ds-duration-fast) var(--ds-ease-out);
+}
+.ls-card.is-plain { grid-template-rows: 1fr; }
+.ls-card:has(.ls-card__link:focus-visible) { box-shadow: var(--ds-focus-ring); }
+
+.ls-card__photo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: var(--ds-space-2);
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--ds-band);
+  color: var(--ds-ink-muted);
+}
+.ls-card__photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--ds-duration-slow) var(--ds-ease-out);
+}
+.ls-card__photo mat-icon { width: 40px; height: 40px; font-size: 40px; }
+.ls-card__nophoto { font-size: var(--ds-text-sm); color: var(--ds-ink-secondary); }
+/* Cancelado o archivado: la foto pasa a segundo plano. */
+.ls-card.is-out .ls-card__photo img { filter: grayscale(1); opacity: 0.85; }
+
+@media (hover: hover) and (pointer: fine) {
+  .ls-card:hover { border-color: var(--ds-border-strong); }
+  .ls-card:hover .ls-card__photo img { transform: scale(1.02); }
+}
+
+.ls-card__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--ds-space-2);
+  min-width: 0;
+  padding: var(--ds-space-4) var(--ds-space-4) var(--ds-space-5);
+}
+.ls-card__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-lg);
+  font-weight: var(--ds-weight-bold);
+  font-stretch: var(--ds-stretch-heading);
+  line-height: var(--ds-leading-snug);
+  color: var(--ds-ink);
+  overflow-wrap: anywhere;
+}
+.ls-card__link {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--ds-ink);
+  text-decoration: none;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.ls-card__link:focus-visible { outline: none; }
+/* El enlace del título cubre la tarjeta entera. */
+.ls-card__link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+.ls-card__num {
+  margin: calc(var(--ds-space-1) * -1) 0 0;
+  font-size: var(--ds-text-sm);
+  font-stretch: var(--ds-stretch-figure);
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-ink-muted);
+  overflow-wrap: anywhere;
+}
+.ls-card__line {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ds-space-2);
+  margin: 0;
+  line-height: var(--ds-leading-normal);
+  color: var(--ds-ink-secondary);
+  overflow-wrap: anywhere;
+}
+.ls-card__line mat-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+  margin-top: 3px;
+  color: var(--ds-ink-muted);
+}
+.ls-card__sub { display: block; font-size: var(--ds-text-sm); color: var(--ds-ink-muted); }
+
+.ls-card__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-2) var(--ds-space-3);
+  align-self: stretch;
+  margin-top: auto;
+  padding-top: var(--ds-space-3);
+  border-top: 1px solid var(--ds-border-subtle);
+  font-size: var(--ds-text-sm);
+  color: var(--ds-ink-muted);
+}
+.ls-card__foot > span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+}
+.ls-card__foot mat-icon { width: 18px; height: 18px; font-size: 18px; }
+.ls-card__foot .is-late,
+.ls-card__foot .is-late mat-icon { color: var(--ds-danger-ink); }
+
+/* Botón de la tarjeta: por encima del enlace estirado. */
+.ls-card__cta {
+  position: relative;
+  z-index: 1;
+  align-self: stretch;
+  min-height: 44px;
+  margin-top: var(--ds-space-2);
+}
+
+/* ── Acciones destructivas: borrar (icono) y confirmar (ladrillo relleno) ── */
+.ls-delete {
+  --mat-icon-button-icon-color: var(--ds-ink-secondary);
+  --mat-icon-button-state-layer-color: var(--ds-danger);
+  flex-shrink: 0;
+}
+.ls-danger {
+  --mat-button-filled-container-color: var(--ds-danger);
+  --mat-button-filled-label-text-color: var(--ds-surface);
+  --mat-button-filled-state-layer-color: var(--ds-surface);
+  min-height: 44px;
+}
+
+/* ── Tabla (escritorio) ─────────────────────────────────────────────────── */
+.ls-table-wrap {
+  display: none;
+  overflow-x: auto;
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-lg);
+  background: var(--ds-surface);
+}
+@media (min-width: 768px) {
+  .ls-table-wrap { display: block; }
+}
+/* Listas sin vista de tarjetas: la tabla también en móvil, con scroll propio. */
+.ls-table-wrap.is-always { display: block; }
+
+.ls-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.ls-table th {
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border-bottom: 1px solid var(--ds-border);
+  font-size: var(--ds-text-sm);
+  font-weight: var(--ds-weight-semibold);
+  color: var(--ds-ink-muted);
+  text-align: left;
+  white-space: nowrap;
+}
+.ls-table td {
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border-top: 1px solid var(--ds-border);
+  vertical-align: middle;
+  color: var(--ds-ink-secondary);
+}
+.ls-table tbody tr:first-child td { border-top: 0; }
+.ls-table .is-num { text-align: right; }
+/* Dirección en dos líneas: que la calle no se parta palabra a palabra. */
+.ls-table td.is-addr { min-width: 11rem; }
+.ls-table td.ls-fig { white-space: nowrap; }
+
+.ls-table__row { transition: background-color var(--ds-duration-fast) var(--ds-ease-out); }
+.ls-table__row.is-link { cursor: pointer; }
+@media (hover: hover) and (pointer: fine) {
+  .ls-table__row:hover { background: var(--ds-bg-alt); }
+  .ls-table__row:hover .ls-table__link { text-decoration: underline; text-underline-offset: 3px; }
+}
+.ls-table__main {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  min-width: 14rem;
+}
+.ls-table__text { display: grid; justify-items: start; gap: var(--ds-space-1); min-width: 0; }
+.ls-table__title,
+.ls-table__link {
+  border-radius: var(--ds-radius-sm);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-display);
+  font-weight: var(--ds-weight-bold);
+  font-stretch: var(--ds-stretch-heading);
+  text-decoration: none;
+}
+.ls-table__link:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
+.ls-table__sub { font-size: var(--ds-text-sm); color: var(--ds-ink-muted); }
+.ls-table__action { text-align: right; white-space: nowrap; cursor: default; }
+.ls-table__action > * + * { margin-left: var(--ds-space-2); }
+
+.ls-thumb {
+  position: relative;
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 64px;
+  height: 44px;
+  overflow: hidden;
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-band);
+  color: var(--ds-ink-muted);
+}
+.ls-thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ls-thumb mat-icon { width: 22px; height: 22px; font-size: 22px; }
+
+/* ── Personas (clientes, constructores, usuarios) ───────────────────────── */
+.ls-people-skel { display: grid; gap: var(--ds-space-2); }
+
+.ls-avatar {
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+  border-radius: var(--ds-radius-circle);
+  background: var(--ds-action-faint);
+  color: var(--ds-action-ink);
+  font-size: var(--ds-text-sm);
+  font-weight: var(--ds-weight-bold);
+}
+.ls-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.ls-table__main.is-person { min-width: 12rem; }
+.ls-person {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  min-width: 0;
+}
+.ls-email { overflow-wrap: break-word; }
+
+.ls-tag.is-muted { background: var(--ds-bg-alt); color: var(--ds-ink-muted); }
+.ls-provider {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  color: var(--ds-ink-secondary);
+}
+.ls-provider mat-icon { width: 18px; height: 18px; font-size: 18px; color: var(--ds-ink-muted); }
+
+/* Cuenta inactiva: la tarjeta pasa a segundo plano sin perder contraste de texto. */
+.ls-card.is-off { background: var(--ds-bg-alt); }
+.ls-card__chev { color: var(--ds-ink-muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  .skel { animation: none; }
+  .ls-spinner { animation-duration: 2.4s; }
+  .ls-card__photo img { transition: none; }
+}

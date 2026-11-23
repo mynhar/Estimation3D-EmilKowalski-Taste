@@ -1,0 +1,57 @@
+<!-- Pie público (Trait rouge): el de la landing, compartido por Le Journal y Entrepreneurs. -->
+<footer class="ft">
+  <div class="wrap ft__in">
+    <div class="ft__brand">
+      <a routerLink="/" class="brand" (click)="inicio($event)" [attr.aria-label]="'landing.nav.home_aria' | translate">
+        <span class="brand__mark" aria-hidden="true"></span>
+        <span class="brand__name">Estimation3D</span>
+      </a>
+      <p class="ft__tagline">{{ 'landing.footer.tagline' | translate }}</p>
+    </div>
+
+    <div class="ft__col">
+      <h2 class="ft__h">{{ 'landing.footer.platform' | translate }}</h2>
+      <ul class="ft__list">
+        <li><ng-container [ngTemplateOutlet]="seccion" [ngTemplateOutletContext]="{ $implicit: 'processus', texto: 'landing.nav.process' }" /></li>
+        <li><ng-container [ngTemplateOutlet]="seccion" [ngTemplateOutletContext]="{ $implicit: 'services', texto: 'landing.nav.specialties' }" /></li>
+        <li><ng-container [ngTemplateOutlet]="seccion" [ngTemplateOutletContext]="{ $implicit: 'dossier', texto: 'landing.nav.cta' }" /></li>
+      </ul>
+    </div>
+
+    <div class="ft__col">
+      <h2 class="ft__h">{{ 'landing.footer.explore' | translate }}</h2>
+      <ul class="ft__list">
+        <li><a routerLink="/journal">{{ 'landing.nav.journal' | translate }}</a></li>
+        <li><a routerLink="/entrepreneurs">{{ 'landing.nav.contractors' | translate }}</a></li>
+        <li><a routerLink="/entrepreneurs" fragment="form">{{ 'landing.footer.apply' | translate }}</a></li>
+        <li><a routerLink="/login">{{ 'landing.nav.login' | translate }}</a></li>
+      </ul>
+    </div>
+
+    <div class="ft__col">
+      <h2 class="ft__h">{{ 'landing.footer.contact' | translate }}</h2>
+      <ul class="ft__list">
+        <li><span>{{ 'landing.footer.city' | translate }}</span></li>
+        <li><a href="tel:+15145108819">514&nbsp;510-8819</a></li>
+        <li><a href="mailto:info@estimation3d.com">info&#64;estimation3d.com</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- El filete va en el bloque interior: así empieza y acaba con el contenido, no con el margen. -->
+  <div class="wrap">
+    <div class="ft__bottom">
+      <span>© {{ year }} Hygienaction, Montréal</span>
+      <span>{{ 'landing.footer.pilot' | translate }}</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Enlace a una sección de la landing: ancla en ella, ruta con fragmento fuera. -->
+<ng-template #seccion let-id let-texto="texto">
+  @if (enInicio()) {
+    <a [href]="'#' + id" (click)="ir(id, $event)">{{ texto | translate }}</a>
+  } @else {
+    <a routerLink="/" [fragment]="id">{{ texto | translate }}</a>
+  }
+</ng-template>
