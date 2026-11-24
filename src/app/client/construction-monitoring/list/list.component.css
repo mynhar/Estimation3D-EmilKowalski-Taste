@@ -1,8 +1,8 @@
-/* component: suivi de chantier del cliente (Trait rouge)
+/* component: suivi de chantier del cliente (Lin et bronze)
  * states: cargando · error · vacío · por dossier (plegable) · obras
- * contrast: cifras ink sobre kraft (12.1:1) · etiquetas ink-secondary · error danger-ink sobre danger-soft (5.8:1)
- *           tomate: ninguno en la lista
- * type: cifras 75 % con tabular-nums; el resto lo pone cada tarjeta de obra
+ * contrast: cifras ink sobre vélin (15.5:1) · rótulos ink-muted en etiqueta (5.9:1)
+ *           error danger-ink sobre danger-soft (5.0:1) · relleno espresso: ninguno en la lista
+ * type: cifras del resumen en Cormorant 600 con tabular-nums; el resto lo pone cada tarjeta de obra
  */
 
 .cm {
@@ -27,25 +27,51 @@
 }
 .cm-error mat-icon { flex-shrink: 0; }
 
+/* Cifras como en el panel del cliente: tarjeta vélin, celdas separadas por un
+   filete (el hueco de 1px deja ver el fondo), 2 × 2 en móvil y 4 en fila desde 768px. */
 .cm-summary {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
-  gap: var(--ds-space-3) var(--ds-space-5);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
   margin: 0;
-  padding: var(--ds-space-4) var(--ds-space-5);
+  overflow: hidden;
+  border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
-  background: var(--ds-band);
+  background: var(--ds-border-subtle);
+  box-shadow: var(--ds-shadow-xs);
 }
-.cm-stat { display: grid; gap: var(--ds-space-1); min-width: 0; }
-.cm-stat dt { font-size: var(--ds-text-sm); color: var(--ds-ink-secondary); }
+@media (min-width: 768px) {
+  .cm-summary { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+/* Rótulo arriba y cifra abajo: si un rótulo ocupa dos líneas, las cifras siguen alineadas. */
+.cm-stat {
+  display: grid;
+  gap: var(--ds-space-2);
+  align-content: space-between;
+  min-width: 0;
+  padding: var(--ds-space-4);
+  background: var(--ds-surface);
+}
+@media (min-width: 768px) {
+  .cm-stat { padding: var(--ds-space-5); }
+}
+.cm-stat dt {
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
 .cm-stat dd {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-2xl);
-  font-weight: var(--ds-weight-bold);
+  font-size: clamp(var(--ds-text-2xl), 1.5rem + 1.2vw, 2.5rem);
+  font-weight: var(--ds-weight-semibold);
   font-variant-numeric: lining-nums tabular-nums;
-  line-height: var(--ds-leading-tight);
+  line-height: 1;
   color: var(--ds-ink);
+  overflow-wrap: anywhere;
 }
 
 .cm-accordion { display: grid; gap: var(--ds-space-4); }

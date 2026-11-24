@@ -162,4 +162,5 @@
   }
 }
 
-.mm__nav a[aria-current='page'] { color: var(--ds-action); }
+/* Cormorant a 28 px: el bronce puede ir como texto. */
+.mm__nav a[aria-current='page'] { color: var(--ds-accent); }

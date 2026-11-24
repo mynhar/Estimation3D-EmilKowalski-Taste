@@ -5,9 +5,9 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { ToastService } from '../../services/toast.service';
 
 /**
- * Avisos efímeros (Trait rouge): pila abajo a la derecha (abajo a lo ancho en móvil), cada aviso
+ * Avisos efímeros (Lin et bronze): pila abajo a la derecha (abajo a lo ancho en móvil), cada aviso
  * con su tono suave, borde, icono y texto, como los avisos en línea de las pantallas. Se cierran
- * solos (ToastService, 6 s) o con la cruz. Errores en ladrillo, nunca en tomate.
+ * solos (ToastService, 6 s) o con la cruz. Errores en terracota, con icono y texto.
  */
 @Component({
   selector: 'app-toast',

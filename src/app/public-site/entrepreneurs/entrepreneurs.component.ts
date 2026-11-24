@@ -38,10 +38,10 @@ function especialidadRequerida(ctrl: AbstractControl): ValidationErrors | null {
 }
 
 /**
- * Entrepreneurs: página pública (sin guard), Trait rouge. Cabecera y pie son
+ * Entrepreneurs: página pública (sin guard), Lin et bronze. Cabecera y pie son
  * los de la landing (`app-site-header` / `app-site-footer`); aquí la siguiente
- * etapa es postular, así que el tomate es «Postuler comme partenaire» y el
- * «Créer mon dossier» de la cabecera va de contorno.
+ * etapa es postular, así que el relleno espresso es «Postuler comme partenaire»
+ * y el «Créer mon dossier» de la cabecera va de contorno.
  *
  * - El acordeón de FAQ guarda el id abierto en una signal y el CSS anima
  *   `grid-template-rows: 0fr → 1fr`, sin medir el DOM. La respuesta cerrada es

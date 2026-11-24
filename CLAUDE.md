@@ -6,7 +6,7 @@ Este archivo se carga automáticamente al abrir el proyecto en Claude Code. Defi
 
 ## Regla principal
 
-Se está haciendo un **rediseño completo de la aplicación** con la dirección aprobada **Lin et bronze** (23-nov-2026; sustituye a Trait rouge): el diseño, la paleta y la tipografía de `/home/harold/proyectos/agencia-inmobiliaria`. 60 % lino (superficies), 30 % espresso (tinta y **acción por defecto**), 10 % bronce (**acento: marca, no actúa**). Cormorant Garamond para títulos y cifras, Manrope para la interfaz. **Móvil primero**, también el visor 3D. Se hace por fases (0 base → 1 cara al cliente → 2 resto del cliente y páginas públicas → 3 contratista → 4 estimador/admin); la 0 y la 1 están hechas, ver `design.md`. Rama: `redesign/lin-bronze`. Para el trabajo de UI usa la skill **`frontend-design`**. **No uses la skill `hallmark` en este proyecto.**
+Se está haciendo un **rediseño completo de la aplicación** con la dirección aprobada **Lin et bronze** (23-nov-2026; sustituye a Trait rouge): el diseño, la paleta y la tipografía de `/home/harold/proyectos/agencia-inmobiliaria`. 60 % lino (superficies), 30 % espresso (tinta y **acción por defecto**), 10 % bronce (**acento: marca, no actúa**). Cormorant Garamond para títulos y cifras, Manrope para la interfaz. **Móvil primero**, también el visor 3D. Se hace por fases (0 base → 1 cara al cliente → 2 resto del cliente y páginas públicas → 3 contratista → 4 estimador/admin); la 0, la 1 y la 2 están hechas, ver `design.md`. Rama: `redesign/lin-bronze`. Para el trabajo de UI usa la skill **`frontend-design`**. **No uses la skill `hallmark` en este proyecto.**
 
 Siguen vigentes las reglas técnicas: Angular 22, Angular Material 22 como librería de componentes, CSS plano, tokens `var(--ds-...)` y contraste WCAG AA.
 
@@ -29,7 +29,7 @@ Referencias del sistema (ya describen Lin et bronze):
 - **Sistema de diseño**: tokens CSS en `src/styles/tokens.css`
 - **Tipografía**: Cormorant Garamond (títulos 600, precios, horas, cifras con `lining-nums tabular-nums`) + Manrope 400–800 (interfaz)
 - **Iconos**: Material Symbols Outlined a peso 300 vía `mat-icon` en todas las pantallas (`bootstrap-icons` desinstalado). Tras añadir o quitar un icono: `node scripts/icons.mjs --write`
-- **Sistema de diseño**: Lin et bronze (fases 0 y 1 hechas; 2–4 pendientes)
+- **Sistema de diseño**: Lin et bronze (fases 0, 1 y 2 hechas; 3–4 pendientes)
 - **Visor 3D**: Matterport (iframe) con los controles de alrededor en Material. Un visor Three.js sería un proyecto aparte (necesita un modelo 3D por dossier)
 - **Skill de diseño**: `frontend-design` (plugin de Anthropic, instalado solo en este proyecto)
 - **Skill de Angular**: `angular-developer` (oficial de Angular, en `.claude/skills/`, instalada solo en este proyecto)

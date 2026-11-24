@@ -1,13 +1,15 @@
-/* component: Entrepreneurs (página pública, Trait rouge)
+/* component: Entrepreneurs (página pública, Lin et bronze)
  * states: enlaces y botones default · hover (solo puntero fino) · focus-visible · active
  *         FAQ cerrada · abierta (aria-expanded, respuesta inert al cerrar)
  *         formulario: ver site-blocks.css (campos, opciones, envío, éxito, error)
- * contrast: ink sobre crema 11.9:1 · ink-secondary sobre kraft 7.7:1 · ink-muted sobre vélin 7.0:1
- *           plazas: abeto sobre action-faint 8.4:1 · «Complet»: ink-muted sobre bg-alt 6.4:1
- *           isla abeto noche: vélin 13.6:1, secundario 9.3:1 ; botón vélin con ink 13.6:1
- *           tomate: «Postuler comme partenaire» (hero) y «Soumettre ma candidature» (envío),
- *           nunca a la vez en pantalla
- * type: título 125 % (display), secciones y fichas 112 %, cifras de la ficha 75 % con tabular-nums
+ * contrast: ink sobre lino 14.4:1 · ink-secondary sobre lino 7.2:1, sobre banda 6.3:1
+ *           ink-muted sobre vélin 5.9:1 · «Dossier prêt» success sobre vélin 5.3:1
+ *           plazas: action-ink sobre action-faint 5.6:1 · «Complet»: ink-muted sobre bg-alt 5.2:1
+ *           iconos en bronce: 4.6:1 sobre vélin, 3.7:1 sobre banda (gráfico, ≥ 3:1)
+ *           isla espresso profundo: crema 16.7:1, secundario 10.3:1 ; botón crema con ink 14.8:1
+ *           relleno espresso: «Postuler comme partenaire» (hero) y «Soumettre ma candidature»
+ *           (envío), nunca a la vez en pantalla
+ * type: título y secciones en Cormorant 600; fichas, pasos y FAQ a 22 px; cifras con tabular-nums
  * motion: ninguna automática; solo la FAQ al abrir y cerrar (250 ms, ease-out).
  */
 :host {
@@ -48,7 +50,7 @@
   font-size: clamp(2.125rem, 3.4vw + 1.1rem, 4.25rem);
   font-weight: var(--ds-weight-semibold);
   line-height: 1;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--ds-tracking-tight);
   text-wrap: balance;
 }
 /* Dos frases, dos líneas; mismo color y peso: ninguna se resalta. */
@@ -105,19 +107,23 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--ds-space-2) var(--ds-space-5);
+  /* 16 px entre datos: a 390 px los tres caben en una línea (con 24 px, «3 soum.» bajaba sola). */
+  gap: var(--ds-space-2) var(--ds-space-4);
   margin: 0;
   padding: var(--ds-space-3) var(--ds-space-4);
   list-style: none;
 }
+@media (min-width: 480px) {
+  .doc__bar { column-gap: var(--ds-space-5); }
+}
 .doc__bar li { display: inline-flex; align-items: center; gap: var(--ds-space-2); }
 .doc__bar mat-icon { flex-shrink: 0; width: 20px; height: 20px; font-size: 20px; }
-.doc__ready { margin-right: auto; font-weight: var(--ds-weight-bold); color: var(--ds-action); }
+.doc__ready { margin-right: auto; font-weight: var(--ds-weight-bold); color: var(--ds-success); }
 .doc__fig mat-icon { color: var(--ds-ink-muted); }
 .doc__n {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   font-variant-numeric: lining-nums tabular-nums;
 }
 
@@ -126,7 +132,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
   text-wrap: balance;
 }
@@ -199,7 +205,7 @@
 @media (min-width: 992px) {
   .en-ben__item { padding: var(--ds-space-6); }
 }
-.en-ben__item mat-icon { margin-bottom: var(--ds-space-2); color: var(--ds-action); }
+.en-ben__item mat-icon { margin-bottom: var(--ds-space-2); color: var(--ds-accent); }
 
 /* ── Cabecera fija a la izquierda y contenido a la derecha (exigencias, FAQ, formulario) ── */
 .en-split { display: grid; }
@@ -230,7 +236,7 @@
   padding: var(--ds-space-4) 0;
   border-bottom: 1px solid var(--ds-border-strong);
 }
-.en-req mat-icon { flex-shrink: 0; margin-top: 2px; color: var(--ds-action); }
+.en-req mat-icon { flex-shrink: 0; margin-top: 2px; color: var(--ds-accent); }
 .en-req p { margin: 0; font-size: var(--ds-text-lg); color: var(--ds-ink-secondary); text-wrap: pretty; }
 .en-req strong { color: var(--ds-ink); font-weight: var(--ds-weight-bold); }
 
@@ -273,7 +279,7 @@
   color: var(--ds-ink);
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
   text-align: left;
   cursor: pointer;
@@ -283,12 +289,12 @@
 .faq__q:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
 .faq__q mat-icon {
   flex-shrink: 0;
-  color: var(--ds-action);
+  color: var(--ds-accent);
   transition: transform var(--ds-duration-base) var(--ds-ease-out);
 }
 .faq__item.is-open .faq__q mat-icon { transform: rotate(45deg); }
 @media (hover: hover) and (pointer: fine) {
-  .faq__q:hover { color: var(--ds-action); }
+  .faq__q:hover { color: var(--ds-action-ink); }
 }
 /* Sin medir el DOM: la fila pasa de 0fr a 1fr y el navegador interpola la altura real. */
 .faq__a {
@@ -307,7 +313,7 @@
   text-wrap: pretty;
 }
 
-/* ── Cierre: isla abeto noche (.sec--dark, en site-base.css) ────────────── */
+/* ── Cierre: isla espresso (.sec--dark, en site-base.css) ───────────────── */
 .en-cta { display: grid; justify-items: start; gap: var(--ds-space-5); }
 .en-cta__title {
   max-width: 22ch;
@@ -316,12 +322,12 @@
   font-size: clamp(2rem, 2.6vw + 1.2rem, 3.5rem);
   font-weight: var(--ds-weight-semibold);
   line-height: 1.04;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--ds-tracking-tight);
   text-wrap: balance;
 }
 .en-cta__lede { max-width: 48ch; margin: 0; font-size: var(--ds-text-lg); color: var(--ds-ink-inverse-muted); }
 .en-cta .button { margin-top: var(--ds-space-2); }
-/* Botón vélin sobre la isla: ni tomate ni abeto sobre abeto. */
+/* Botón crema sobre la isla: un relleno espresso no se vería sobre espresso. */
 .button--light { background: var(--ds-ink-inverse); color: var(--ds-ink); }
 .button--light:active { background: var(--ds-bg); }
 @media (hover: hover) and (pointer: fine) {

@@ -2,7 +2,7 @@
  * states: default · hover · focus · active · disabled (mientras guarda) · loading (esqueleto,
  *         subiendo) · error (carga) · success (video en el expediente) · empty (sin video)
  * contrast: textos en --ds-ink / --ds-ink-secondary / --ds-ink-muted sobre papel (AA);
- *           duración en vélin sobre abeto; error en --ds-danger-ink sobre -soft
+ *           duración en crema sobre espresso; error en --ds-danger-ink sobre -soft
  *
  * La ranura, la miniatura y los estados vacío · error · esqueleto están en
  * video-slot.css (compartida con app-videos-expediente-lectura).
@@ -65,7 +65,7 @@
   margin: 0 0 var(--ds-space-2);
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   color: var(--ds-ink);
 }
 .ve-dialog__text {

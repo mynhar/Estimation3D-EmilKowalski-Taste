@@ -2,8 +2,9 @@
 
 > **Dirección aprobada: Lin et bronze** (23-nov-2026; sustituye a Trait rouge). Toma el
 > diseño, la paleta y la tipografía de `agencia-inmobiliaria` y los lleva a Estimation3D.
-> Se hace por fases (ver abajo): la 0 y la 1 están hechas (la app entera lleva la piel
-> nueva y la cara al cliente ya está recompuesta); las fases 2–4 recomponen el resto. Este archivo resume el sistema: el
+> Se hace por fases (ver abajo): la 0, la 1 y la 2 están hechas (la app entera lleva la piel
+> nueva y todo lo del cliente y las páginas públicas ya está recompuesto); las fases 3–4
+> recomponen el contratista, el estimador y el admin. Este archivo resume el sistema: el
 > detalle está en `DESIGN_GUIDELINES.md` y los valores reales en `src/styles/tokens.css`.
 > Siguen vigentes el contrato de stack, el uso de tokens `--ds-*` (sin hex sueltos ni
 > nombres `--color-*`) y el contraste AA.
@@ -225,6 +226,27 @@ La composición de cada pantalla se rehace en las fases 1–4; estos patrones t�
     Matterport y se reabre con ⓘ.
 - Vídeo y foto quedan centrados bajo la barra. Todo respeta `safe-area-inset-*`.
 
+## Resto del cliente (fase 2, hecho)
+- Tarjetas: vélin, `--ds-border`, radio 14 y `--ds-shadow-xs` en reposo. Título en Cormorant
+  600 a 22px (`--ds-text-xl`) como mínimo; por debajo de 18px Cormorant se ve débil. Títulos
+  de panel a 18px (`--ds-text-lg`).
+- Número del dossier: etiqueta en mayúsculas **sobre** el título, nunca en la línea de
+  metadatos. En listas, `order: -1` dentro de la tarjeta; en detalle,
+  `app-page-header [etiqueta]="numero"`.
+- Datos (`dl`): rótulo en mayúsculas (12px, `--ds-ink-muted`) y valor debajo, alineados entre
+  vecinos con subgrid (cada `div` ocupa dos filas, `grid-template-rows: subgrid`; el `dt` con
+  `align-self: end`): si un rótulo parte en dos líneas, los valores siguen en la misma.
+- Rótulos de grupo (meses del historial, tipos de documento) y cabeceras de tabla: la misma
+  etiqueta en mayúsculas. Si es un `h3`, `font-family: var(--ds-font-body)` (el reboot pone
+  Cormorant). Filas de tabla separadas por `--ds-border-subtle`.
+- Resúmenes de lista (contratos, obras): la tarjeta de cifras del dashboard, 2 columnas en
+  móvil y 4 desde 768px.
+- Avance y pasos en bronce: relleno `--ds-accent`, paso hecho con punto bronce e icono crema,
+  actual con halo `--ds-accent-soft`. Oferta pendiente: filete superior bronce de 3px.
+- Enlaces en `--ds-action-ink` (hover a `--ds-ink`); iconos de sección y de lista en
+  `--ds-accent`. Un solo botón relleno espresso por vista (enviar el dossier, aceptar la
+  oferta).
+
 ## Login y registro (fase 1, hecho)
 - Móvil: volver e idiomas arriba, la marca, la etiqueta («Accédez à votre espace» /
   «Créez votre compte en quelques minutes») sobre el título en Cormorant, campos outlined de
@@ -255,7 +277,14 @@ La composición de cada pantalla se rehace en las fases 1–4; estos patrones t�
 - Placeholders: nunca un valor de ejemplo. Un formato va en una ayuda bajo el campo, con
   `aria-describedby`, sustituida por el error cuando lo hay.
 - FAQ en acordeón propio (`aria-expanded`, `grid-template-rows` 0fr → 1fr, respuesta `inert`).
-- Francés: espacio de no separación antes de `? ! : ;` en los textos (` `).
+- Barra de avance del formulario en pasos: tramos en `--ds-band`, recorridos en bronce.
+- Le Journal y Entrepreneurs (fase 2, hecho): la misma cabecera, pie, `.step`, `.svc` y `.fm`
+  que la landing. Categoría del artículo en etiqueta mayúsculas `--ds-accent-ink`; iconos de
+  ventajas, exigencias y FAQ en bronce, los del problema en `--ds-ink-muted` (lo que se deja
+  atrás); plazas del piloto como insignia `--ds-action-faint`; cierre en la isla espresso con
+  el botón crema (`.button--light`).
+- Francés: espacio de no separación antes de `? ! : ;` en los textos (`\u00a0`); `fr.json`
+  revisado entero en la fase 2.
 - Copy: en la landing se puede fusionar, reordenar y recortar (acordado), marcando los textos
   nuevos para revisión.
 
@@ -317,7 +346,13 @@ cada rol `--mat-sys-*` apunta a un token `--ds-*`.
    para revisión: `nav.espace_*`, `nav.mon_compte`, `nav.tab_*`, `dashboard_client.meta_*`,
    `dashboard_client.of_total`, `dashboard_client.next_title.*`, `viewer.*`,
    `landing.hero.eyebrow`.
-2. Resto del cliente y páginas públicas (Le Journal, Entrepreneurs).
+2. **Resto del cliente y páginas públicas (hecho, 24-nov-2026)**: mis dossiers, dossier,
+   ofertas recibidas y oferta, contratos, seguimiento de obra, documentos, historial,
+   perfil, asistente IA, alta del dossier, paginación y avisos; Le Journal y Entrepreneurs.
+   Patrones nuevos: número como etiqueta, datos con subgrid, rótulos de grupo en mayúsculas,
+   tarjetas con `--ds-shadow-xs`, resúmenes con la tarjeta de cifras, avance y pasos en
+   bronce. `fr.json`: espacio de no separación antes de `? ! : ;` (solo tipografía; sin
+   claves nuevas). La barra de pasos del formulario de la landing pasa de espresso a bronce.
 3. Contratista.
 4. Estimador y admin.
 

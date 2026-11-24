@@ -1,7 +1,7 @@
-/* component: nuevo dossier (cliente, Trait rouge)
+/* component: nuevo dossier (cliente, Lin et bronze)
  * La estructura (cabecera, tarjetas, campos, raíl) vive en shared/ui/alta/alta.css.
  * Aquí solo lo propio del cliente: nota de privacidad y «qué pasa después».
- * tomate: solo «Envoyer le dossier» (blanco encima 4.8:1); «Annuler» de texto
+ * relleno espresso: solo «Envoyer le dossier» (crema encima 14.9:1); «Annuler» de texto
  */
 
 .fc-privacy {

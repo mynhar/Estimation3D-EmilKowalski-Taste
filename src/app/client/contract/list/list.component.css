@@ -1,11 +1,11 @@
-/* component: mes contrats (Trait rouge)
+/* component: mes contrats (Lin et bronze)
  * states: cargando · vacío · por dossier (plegable) · activos · cerrados · archivado
  *         firma pendiente · panel de firma · panel de cancelación · visor PDF · firmando · cancelando
  *         interactivos: default · hover · focus-visible · active · disabled
- * contrast: títulos ink (13.6:1 sobre vélin) · texto ink-secondary (9.6:1) · etiquetas ink-muted (6.8:1)
- *           enlaces action (9.0:1) · cancelar danger sobre vélin (6.7:1) · vélin sobre danger (6.7:1)
- *           tomate: «Signer le contrat» de un solo contrato a la vez (ctaId); los demás, abeto
- * type: constructor 112 %; importes, plazos y fechas 75 % con tabular-nums
+ * contrast: títulos ink (15.5:1 sobre vélin) · texto ink-secondary (7.8:1) · rótulos ink-muted (5.9:1)
+ *           enlaces action-ink (6.8:1) · cancelar danger sobre vélin (6.1:1) · vélin sobre danger (6.1:1)
+ *           relleno espresso: «Signer le contrat» de un solo contrato a la vez (ctaId); los demás, de contorno
+ * type: cifras del resumen e importes en Cormorant 600; rótulos en etiqueta; plazos y fechas con tabular-nums
  */
 
 .cl {
@@ -23,25 +23,51 @@
 .cl-empty { max-width: 44rem; }
 
 /* ── Resumen ────────────────────────────────────────────────────────────── */
+/* Cifras como en el panel del cliente: tarjeta vélin, celdas separadas por un
+   filete (el hueco de 1px deja ver el fondo), 2 × 2 en móvil y 4 en fila desde 768px. */
 .cl-summary {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
-  gap: var(--ds-space-3) var(--ds-space-5);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
   margin: 0;
-  padding: var(--ds-space-4) var(--ds-space-5);
+  overflow: hidden;
+  border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
-  background: var(--ds-band);
+  background: var(--ds-border-subtle);
+  box-shadow: var(--ds-shadow-xs);
 }
-.cl-stat { display: grid; gap: var(--ds-space-1); min-width: 0; }
-.cl-stat dt { font-size: var(--ds-text-sm); color: var(--ds-ink-secondary); }
+@media (min-width: 768px) {
+  .cl-summary { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+/* Rótulo arriba y cifra abajo: si un rótulo ocupa dos líneas, las cifras siguen alineadas. */
+.cl-stat {
+  display: grid;
+  gap: var(--ds-space-2);
+  align-content: space-between;
+  min-width: 0;
+  padding: var(--ds-space-4);
+  background: var(--ds-surface);
+}
+@media (min-width: 768px) {
+  .cl-stat { padding: var(--ds-space-5); }
+}
+.cl-stat dt {
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
 .cl-stat dd {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-2xl);
-  font-weight: var(--ds-weight-bold);
+  font-size: clamp(var(--ds-text-2xl), 1.5rem + 1.2vw, 2.5rem);
+  font-weight: var(--ds-weight-semibold);
   font-variant-numeric: lining-nums tabular-nums;
-  line-height: var(--ds-leading-tight);
+  line-height: 1;
   color: var(--ds-ink);
+  overflow-wrap: anywhere;
 }
 
 /* ── Acordeón ───────────────────────────────────────────────────────────── */
@@ -113,7 +139,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
   overflow-wrap: anywhere;
@@ -125,11 +151,30 @@
 .ct__facts {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 8rem), 1fr));
-  gap: var(--ds-space-3) var(--ds-space-4);
+  gap: var(--ds-space-4);
   margin: 0;
 }
-.ct__fact { display: grid; gap: var(--ds-space-1); align-content: start; min-width: 0; }
-.ct__fact dt { font-size: var(--ds-text-sm); font-weight: var(--ds-weight-medium); color: var(--ds-ink-muted); }
+/* Subgrid: rótulos y datos de una fila comparten pistas; si un rótulo ocupa dos
+   líneas, todos los datos de la fila bajan juntos y quedan alineados. */
+.ct__fact {
+  display: grid;
+  grid-row: span 2;
+  grid-template-rows: subgrid;
+  row-gap: var(--ds-space-1);
+  align-content: start;
+  min-width: 0;
+}
+.ct__fact dt {
+  align-self: end;
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+/* Importe (Cormorant 28px) y datos (16px) en la misma línea base. */
+.ct__fact dd { align-self: baseline; }
 .ct__fact dd {
   margin: 0;
   font-weight: var(--ds-weight-semibold);
@@ -139,7 +184,7 @@
 .ct__fact--price dd {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-2xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-tight);
 }
 
@@ -163,7 +208,7 @@
   gap: var(--ds-space-1);
   min-height: 44px;
   border-radius: var(--ds-radius-sm);
-  color: var(--ds-action);
+  color: var(--ds-action-ink);
   font-weight: var(--ds-weight-semibold);
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -171,7 +216,7 @@
 .ct__link--wrap { overflow-wrap: anywhere; }
 .ct__link:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
 @media (hover: hover) and (pointer: fine) {
-  .ct__link:hover { color: var(--ds-action-hover); }
+  .ct__link:hover { color: var(--ds-ink); }
 }
 
 .ct__desc {
@@ -287,7 +332,7 @@
   height: 40px;
   border-radius: var(--ds-radius-circle);
   background: var(--ds-action-faint);
-  color: var(--ds-action);
+  color: var(--ds-accent);
 }
 .ct-panel--danger .ct-panel__icon { background: var(--ds-surface); color: var(--ds-danger); }
 .ct-panel__titles { display: grid; gap: 2px; min-width: 0; }
@@ -295,7 +340,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
 }

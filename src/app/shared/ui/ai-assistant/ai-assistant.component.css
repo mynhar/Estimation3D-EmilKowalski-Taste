@@ -1,10 +1,11 @@
-/* component: asistente IA (compartido por los cuatro roles, Trait rouge)
+/* component: asistente IA (compartido por los cuatro roles, Lin et bronze)
  * states: cargando · sin dossiers · sin conversación (presentación) · conversación · escribiendo · error
  *         interactivos: default · hover · focus-visible · active · disabled
- * contrast: burbuja propia action-ink sobre action-faint (8.4:1) · respuesta ink sobre crema (13.6:1)
- *           error danger-ink sobre danger-soft (5.8:1) · aviso legal ink-muted (7.0:1)
- *           tomate: ninguno; la marca de Claude es la de la navegación
- * type: títulos 112 %; mensajes cuerpo
+ * contrast: burbuja propia action-ink sobre action-faint (5.6:1) · respuesta ink sobre crema (14.4:1)
+ *           error danger-ink sobre danger-soft (5.0:1) · aviso legal ink-muted (5.9:1)
+ *           bronce (solo gráfico): iconos de preguntas y capacidades; la marca de Claude es la de la navegación
+ *           relleno espresso: «Envoyer»
+ * type: títulos de tarjeta en Cormorant 600; capacidades y mensajes en Manrope
  */
 
 .ai {
@@ -44,6 +45,7 @@
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-xs);
 }
 
 .ai-scroll {
@@ -74,7 +76,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   color: var(--ds-ink);
 }
 .ai-intro__lead { margin: 0; line-height: var(--ds-leading-relaxed); color: var(--ds-ink-secondary); }
@@ -158,12 +160,13 @@
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-xs);
 }
 .ai-card__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-base);
-  font-weight: var(--ds-weight-bold);
+  font-size: var(--ds-text-xl);
+  font-weight: var(--ds-weight-semibold);
   color: var(--ds-ink);
 }
 
@@ -189,7 +192,7 @@
     border-color var(--ds-duration-fast) var(--ds-ease-out);
   -webkit-tap-highlight-color: transparent;
 }
-.ai-faq mat-icon { flex-shrink: 0; width: 18px; height: 18px; margin-top: 1px; font-size: 18px; color: var(--ds-action); }
+.ai-faq mat-icon { flex-shrink: 0; width: 18px; height: 18px; margin-top: 1px; font-size: 18px; color: var(--ds-accent); }
 @media (hover: hover) and (pointer: fine) {
   .ai-faq:hover:not(:disabled) { border-color: var(--ds-action); background: var(--ds-bg-alt); }
 }
@@ -208,10 +211,11 @@
   height: 32px;
   border-radius: var(--ds-radius-md);
   background: var(--ds-band);
-  color: var(--ds-ink-secondary);
+  color: var(--ds-accent);
 }
 .ai-cap__icon mat-icon { width: 20px; height: 20px; font-size: 20px; }
-.ai-cap__title { margin: 0; font-size: var(--ds-text-base); font-weight: var(--ds-weight-semibold); color: var(--ds-ink); }
+/* h3: vuelve a Manrope (el reboot pone Cormorant en los títulos). */
+.ai-cap__title { margin: 0; font-family: var(--ds-font-body); font-size: var(--ds-text-base); font-weight: var(--ds-weight-bold); color: var(--ds-ink); }
 .ai-cap__desc { margin: 2px 0 0; font-size: var(--ds-text-sm); color: var(--ds-ink-secondary); }
 
 /* ── Cargando ───────────────────────────────────────────────────────────── */

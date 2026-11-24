@@ -5,9 +5,10 @@
  *         · rejilla de campos Material · tipo de bien en radios-tarjeta · GPS plegable
  *         · raíl con resumen, envío (botón relleno espresso) y qué falta
  * states: sección pendiente / lista · campo con error (mat-error con icono) · enviando · error
- * contrast: títulos ink (13.6:1 sobre vélin) · ayudas ink-muted (6.8:1) · errores danger (5.9:1) con icono
- *           tipo de bien marcado: abeto sobre action-faint (7.4:1)
- * type: título de pantalla 125 %, secciones 112 %; contador y n/4 al 75 % con tabular-nums
+ * contrast: títulos ink (15.5:1 sobre vélin) · ayudas ink-muted (5.9:1) · errores danger (6.1:1) con icono
+ *           avance en bronce (marca): número de sección accent-ink (6.7:1 sobre vélin), lista en bronce con ✓ crema; n/4 en accent a 28px
+ *           tipo de bien marcado: action-ink sobre action-faint (5.6:1), borde espresso (selección)
+ * type: títulos en Cormorant 600; n/4 en Cormorant con tabular-nums; rótulos del resumen en etiqueta
  */
 
 .fc {
@@ -36,12 +37,13 @@
   font-size: var(--ds-text-base);
   color: var(--ds-ink-muted);
 }
+/* El avance marca: bronce como texto, a 28px. */
 .fc-count__num {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-2xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   font-variant-numeric: lining-nums tabular-nums;
-  color: var(--ds-ink);
+  color: var(--ds-accent);
 }
 
 /* Edición: número del dossier y su estado bajo el título. */
@@ -83,6 +85,7 @@
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-xs);
 }
 @media (max-width: 575.98px) {
   .fc-card { padding: var(--ds-space-4); }
@@ -102,25 +105,27 @@
   place-items: center;
   width: 32px;
   height: 32px;
-  border: 2px solid var(--ds-action);
+  border: 2px solid var(--ds-accent);
   border-radius: var(--ds-radius-circle);
-  color: var(--ds-action);
+  color: var(--ds-accent-ink);
   font-weight: var(--ds-weight-bold);
   font-variant-numeric: lining-nums tabular-nums;
 }
 .fc-num mat-icon { width: 20px; height: 20px; font-size: 20px; }
-.fc-card.is-done .fc-num { background: var(--ds-action); color: var(--ds-on-action); }
+/* Sección lista: bronce relleno con ✓ crema (icono, 4.4:1), como la cota de etapas. */
+.fc-card.is-done .fc-num { background: var(--ds-accent); color: var(--ds-ink-inverse); }
 
 .fc-h2,
 .fc-h3 {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
+  text-wrap: balance;
 }
 .fc-h2 { font-size: var(--ds-text-xl); }
-.fc-h3 { font-size: var(--ds-text-lg); }
+.fc-h3 { font-size: var(--ds-text-xl); }
 
 .fc-hint {
   margin: 0;
@@ -315,7 +320,7 @@ mat-error mat-icon {
 
 /* ── Buscador de cliente (alta y edición del estimador y del administrador) ──
  * mat-autocomplete con iniciales; a su lado, la ficha del cliente elegido.
- * contrast: iniciales abeto sobre action-faint (7.4:1) · correo ink-muted (6.8:1) */
+ * contrast: iniciales action-ink sobre action-faint (5.6:1) · correo ink-muted (5.9:1) */
 .fc-cli-search { display: grid; align-content: start; min-width: 0; }
 .fc-cli-search mat-form-field { width: 100%; min-width: 0; }
 
@@ -394,9 +399,16 @@ mat-error mat-icon {
   min-width: 0;
 }
 .fc-summary__icon { flex-shrink: 0; color: var(--ds-ink-muted); }
-.fc-summary__row.is-done .fc-summary__icon { color: var(--ds-action); }
+.fc-summary__row.is-done .fc-summary__icon { color: var(--ds-accent); }
 .fc-summary__text { display: grid; flex: 1; min-width: 0; }
-.fc-summary__label { font-size: var(--ds-text-sm); color: var(--ds-ink-muted); }
+.fc-summary__label {
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
 .fc-summary__value { font-weight: var(--ds-weight-semibold); color: var(--ds-ink); overflow-wrap: anywhere; }
 .fc-summary__value.is-empty { font-weight: var(--ds-weight-regular); color: var(--ds-ink-muted); }
 .fc-summary__check { flex-shrink: 0; width: 20px; height: 20px; font-size: 20px; color: var(--ds-success); }
@@ -432,7 +444,7 @@ mat-error mat-icon {
 
 /* ══ Fichas de persona: alta y edición de clientes, constructores y usuarios ══
  * Una columna (fc--narrow), secciones sin numerar (no son una secuencia) y el pie con
- * «Annuler» de texto y guardar en abeto relleno: crear o editar una persona no es una etapa.
+ * «Annuler» de texto y guardar en espresso relleno: crear o editar una persona no es una etapa.
  * contrast: foto vacía ink-muted sobre band (5.4:1) · aviso de confirmación warning-ink (5.8:1)
  */
 .fc--narrow { max-width: 60rem; }
@@ -462,7 +474,7 @@ mat-error mat-icon {
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   color: var(--ds-ink);
   overflow-wrap: anywhere;
 }
@@ -519,7 +531,7 @@ mat-error mat-icon {
   font-weight: var(--ds-weight-bold);
   color: var(--ds-ink);
 }
-.fc-invite__title mat-icon { color: var(--ds-action); }
+.fc-invite__title mat-icon { color: var(--ds-accent); }
 .fc-invite__lang { margin: 0; font-size: var(--ds-text-sm); color: var(--ds-ink-secondary); }
 .fc-invite__btn { flex-shrink: 0; min-height: 44px; }
 

@@ -21,7 +21,9 @@
   line-height: 1.3;
   letter-spacing: var(--ds-tracking-label);
   text-transform: uppercase;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-accent-ink);
+  overflow-wrap: anywhere;
 }
 
 .ph__title {

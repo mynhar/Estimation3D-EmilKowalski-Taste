@@ -1,9 +1,9 @@
 /* component: selección de servicios (tarjetas con casilla)
  * states: default · hover · focus-visible · active · disabled · error · marcada
  *         (la carga la pinta el padre mientras llega el catálogo)
- * contrast: nombre ink (13.6:1 sobre vélin) · descripción ink-secondary (9.6:1)
- *           casilla vacía con borde ink-muted (6.8:1) · marcada: abeto con check vélin (9.7:1)
- *           error danger (5.9:1) con icono
+ * contrast: nombre ink (15.5:1 sobre vélin) · descripción ink-secondary (7.8:1)
+ *           casilla vacía con borde ink-muted (5.9:1) · marcada: espresso con check crema (14.9:1)
+ *           tarjeta marcada: borde espresso sobre action-faint, icono en bronce · error danger (6.1:1) con icono
  *
  * Compartida por las altas y ediciones de dossier de cliente, estimador y administración.
  */
@@ -78,7 +78,7 @@
   color: var(--ds-ink-secondary);
 }
 .srv-icon mat-icon { width: 22px; height: 22px; font-size: 22px; }
-.srv-card--selected .srv-icon { background: var(--ds-surface); color: var(--ds-action); }
+.srv-card--selected .srv-icon { background: var(--ds-surface); color: var(--ds-accent); }
 
 .srv-text { flex: 1 1 auto; min-width: 0; }
 .srv-name {

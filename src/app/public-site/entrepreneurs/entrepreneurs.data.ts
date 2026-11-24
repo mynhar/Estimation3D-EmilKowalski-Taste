@@ -25,7 +25,7 @@ export const PROBLEM_CELLS: readonly IconItem[] = [
 /** El proceso: cuatro etapas, en orden. */
 export const STEPS: readonly string[] = ['dossier', 'soumission', 'execution', 'paiement'];
 
-/** Lo que obtiene: seis ventajas, con iconos en abeto. */
+/** Lo que obtiene: seis ventajas, con iconos en bronce. */
 export const BENEFITS: readonly IconItem[] = [
   { id: 'prequalifies',  matIcon: 'verified' },
   { id: 'sans-visite',   matIcon: 'schedule' },

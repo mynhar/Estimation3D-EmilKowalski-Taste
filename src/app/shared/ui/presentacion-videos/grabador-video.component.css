@@ -1,12 +1,12 @@
 /* component: recorder (dialog + recording overlay)
  * states: default · hover · focus · active · disabled · loading · error · success
- * contrast: pass — texto claro sólo sobre --ds-dark-surface (abeto)
+ * contrast: pass — texto claro sólo sobre --ds-dark-surface (espresso)
  */
 :host { display: contents; }
 
-/* Islas oscuras (burbuja, barra y ventana flotante sobre abeto): el acento
-   es vélin (9.7:1) con abeto encima; el abeto no se ve sobre sí mismo y el
-   tomate no va sobre abeto. */
+/* Islas oscuras (burbuja, barra y ventana flotante sobre espresso): el acento
+   es crema (14.9:1) con espresso encima; el espresso no se ve sobre sí mismo y
+   el bronce no es una acción. */
 .rec-bubble,
 .rec-bar,
 .rec-float {
@@ -39,7 +39,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
   overflow-wrap: anywhere;
@@ -254,7 +254,7 @@
   box-shadow: 0 0 0 6px var(--ds-action), var(--ds-shadow-xl);
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-5xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: 1;
   color: var(--ds-ink);
   font-variant-numeric: lining-nums tabular-nums;
@@ -377,7 +377,7 @@
   font-variant-numeric: lining-nums tabular-nums;
 }
 .rec-bar__max { color: color-mix(in oklch, var(--ds-ink-inverse) 72%, transparent); }
-/* Últimos 15 s: el contador toma el color del punto de grabación (6.1:1 sobre abeto). */
+/* Últimos 15 s: el contador toma el color del punto de grabación (8.9:1 sobre espresso). */
 .rec-bar__time.is-near-limit { color: var(--ds-danger-on-dark); }
 .rec-bar__sep {
   width: 1px;
@@ -519,7 +519,7 @@
   color: var(--ds-ink-inverse);
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-5xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: 1;
 }
 

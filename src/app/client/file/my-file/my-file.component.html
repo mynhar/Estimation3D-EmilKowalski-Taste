@@ -30,9 +30,9 @@
         <mat-icon>arrow_back</mat-icon>
         {{ 'file.back_to_files' | translate }}
       </a>
-      <app-page-header [titulo]="servicioNombre" [contexto]="('state_desc.' + d.estado) | translate" />
+      <app-page-header [etiqueta]="d.numero" [titulo]="servicioNombre"
+                       [contexto]="('state_desc.' + d.estado) | translate" />
       <div class="exp-meta">
-        <span class="exp-fig">{{ d.numero }}</span>
         <app-status-chip [estado]="d.estado" />
         <span class="exp-meta__date">
           <mat-icon aria-hidden="true">event</mat-icon>

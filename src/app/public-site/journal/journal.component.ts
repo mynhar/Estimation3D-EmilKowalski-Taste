@@ -7,7 +7,7 @@ import { SiteHeaderComponent } from '../chrome/site-header.component';
 import { JOURNAL_CARDS, JOURNAL_CATS, JournalCat } from './journal.data';
 
 /**
- * Le Journal — página pública (sin guard), Trait rouge. Cabecera y pie son los
+ * Le Journal — página pública (sin guard), Lin et bronze. Cabecera y pie son los
  * de la landing (`app-site-header` / `app-site-footer`).
  *
  * El filtro por categoría es una signal derivada: la rejilla solo contiene las

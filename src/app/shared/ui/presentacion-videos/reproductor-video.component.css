@@ -1,9 +1,9 @@
-/* component: reproductor de un video de presentación (diálogo nativo, Trait rouge)
+/* component: reproductor de un video de presentación (diálogo nativo, Lin et bronze)
  * states: cargando · error de carga · reproduciendo · solo lectura · título editable (hover, focus, guardando)
  *         interactivos: default · hover · focus-visible · active · disabled (los pone Material)
- * contrast: título ink (13.6:1 sobre vélin) · fecha y ficha ink-muted (7.0:1) · mensajes vélin sobre noche
- *           eliminar: danger sobre vélin · tomate: ninguno
- * type: título 112 %; fecha, velocidad y ficha 75 % con tabular-nums
+ * contrast: título ink (15.5:1 sobre vélin) · fecha y ficha ink-muted (5.9:1) · mensajes crema sobre espresso profundo
+ *           eliminar: danger sobre vélin · relleno espresso: ninguno
+ * type: título en Cormorant 600; fecha, velocidad y ficha con tabular-nums
  */
 :host { display: contents; }
 
@@ -40,7 +40,7 @@
   background: transparent;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
   text-overflow: ellipsis;

@@ -1,7 +1,8 @@
 /* component: paginación
  * states: default · hover · focus-visible · active · actual (aria-current) · disabled
- * contrast: números ink-secondary sobre crema (9.6:1), actual vélin sobre abeto (9.7:1)
- * type: cifras al 75 % con tabular-nums
+ * contrast: números ink-secondary sobre lino (7.2:1) · actual crema sobre espresso (14.8:1)
+ *           hover action-ink sobre action-faint (5.6:1)
+ * type: cifras con tabular-nums
  */
 :host { display: block; }
 

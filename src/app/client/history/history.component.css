@@ -1,10 +1,11 @@
-/* component: historique del cliente (Trait rouge)
+/* component: historique del cliente (Lin et bronze)
  * states: cargando · error · sin dossiers · dossier sin eventos · cancelado · archivado
  *         partes de obra plegados / desplegados · interactivos: default · hover · focus-visible · active
- * contrast: título del evento ink (13.6:1 sobre vélin) · categoría ink-secondary · detalle y hora ink-muted (7.0:1)
+ * contrast: título del evento ink (15.5:1 sobre vélin) · categoría ink-secondary (7.8:1) · detalle y hora ink-muted (5.9:1)
+ *           mes: etiqueta en mayúsculas ink-muted · iconos de evento en bronce
  *           parte de obra (rutina): mismo contraste, menos peso; nunca se atenúa con opacidad
- *           tomate: ninguno; la línea de etapas usa el abeto
- * type: grupos por fecha 112 %; fechas y horas 75 % con tabular-nums
+ *           relleno espresso: ninguno; la cota de etapas va en bronce
+ * type: meses en etiqueta; fechas y horas con tabular-nums
  */
 
 .hs {
@@ -60,12 +61,17 @@
 
 /* ── Cronología ─────────────────────────────────────────────────────────── */
 .hs-bucket { display: grid; gap: var(--ds-space-2); min-width: 0; }
+/* El mes agrupa: etiqueta en mayúsculas (es un h3: vuelve a Manrope). */
 .hs-bucket__h {
   margin: var(--ds-space-2) 0 0;
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-base);
+  font-family: var(--ds-font-body);
+  font-size: var(--ds-text-label);
   font-weight: var(--ds-weight-bold);
-  color: var(--ds-ink);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--ds-ink-muted);
 }
 
 /* El raíl une los iconos de un mismo grupo: pasa por el centro de las fichas (36px). */
@@ -101,7 +107,7 @@
   height: 36px;
   border-radius: var(--ds-radius-md);
   background: var(--ds-band);
-  color: var(--ds-ink-secondary);
+  color: var(--ds-accent);
 }
 .hs-ev__tile mat-icon { width: 20px; height: 20px; font-size: 20px; }
 

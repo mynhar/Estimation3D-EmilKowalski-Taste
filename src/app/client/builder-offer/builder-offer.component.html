@@ -33,9 +33,9 @@
         <mat-icon>arrow_back</mat-icon>
         {{ 'my_offer.back_btn' | translate }}
       </a>
-      <app-page-header [titulo]="servicioNombre()" [contexto]="('state_desc.' + exp.estado) | translate" />
+      <app-page-header [etiqueta]="exp.numero" [titulo]="servicioNombre()"
+                       [contexto]="('state_desc.' + exp.estado) | translate" />
       <div class="bo-meta">
-        <span class="bo-fig">{{ exp.numero }}</span>
         <app-status-chip [estado]="exp.estado" />
       </div>
     </header>
@@ -283,7 +283,7 @@
                   {{ (nSel === 1 ? 'builder_offer.already_accepted' : 'builder_offer.already_accepted_n') | translate }}
                 </p>
               } @else {
-                <!-- La siguiente etapa: el único botón tomate de la vista. -->
+                <!-- La siguiente etapa: el único botón relleno de la vista. -->
                 <button mat-flat-button type="button" class="bo-accept"
                         [disabled]="!puedeAceptar()" (click)="aceptarSeleccion()">
                   @if (aceptando()) {

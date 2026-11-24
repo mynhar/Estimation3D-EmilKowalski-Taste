@@ -240,7 +240,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
   overflow-wrap: anywhere;
@@ -387,7 +387,7 @@
   border-radius: var(--ds-radius-sm);
   color: var(--ds-ink);
   font-family: var(--ds-font-display);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   text-decoration: none;
 }
 .ls-table__link:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }

@@ -1,8 +1,8 @@
 /* component: ficha de la propiedad escaneada (Matterport)
  * states: default · hover · focus-visible · active · disabled · cargando (sincronizar) · error · éxito
- * contrast: cifras ink (13.6:1 sobre vélin) · etiquetas ink-muted (6.8:1) · enlace action (9.0:1)
- *           errores danger-ink sobre danger-soft (5.8:1) · éxito success-ink sobre success-soft (7.4:1)
- * type: título 112 %; cifras y medidas 75 % con tabular-nums; etiquetas en sentence case
+ * contrast: cifras ink (15.5:1 sobre vélin) · etiquetas ink-muted (5.9:1) · enlace action-ink (6.7:1) · iconos en bronce
+ *           errores danger-ink sobre danger-soft (5.0:1) · éxito success-ink sobre success-soft (5.2:1)
+ * type: título en Cormorant 600; cifras y medidas con tabular-nums; etiquetas en sentence case
  */
 
 :host { display: block; }
@@ -32,10 +32,10 @@
   min-width: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   color: var(--ds-ink);
 }
-.mpi-card__title mat-icon { flex-shrink: 0; color: var(--ds-action); }
+.mpi-card__title mat-icon { flex-shrink: 0; color: var(--ds-accent); }
 
 .mpi-card__body { padding: var(--ds-space-5); }
 
@@ -142,7 +142,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
   overflow-wrap: anywhere;
@@ -183,7 +183,7 @@
   gap: var(--ds-space-1);
   min-height: 44px;
   border-radius: var(--ds-radius-sm);
-  color: var(--ds-action);
+  color: var(--ds-action-ink);
   font-weight: var(--ds-weight-bold);
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -191,7 +191,7 @@
 }
 .mpi-link mat-icon { width: 18px; height: 18px; font-size: 18px; }
 @media (hover: hover) and (pointer: fine) {
-  .mpi-link:hover { color: var(--ds-action-hover); }
+  .mpi-link:hover { color: var(--ds-ink); }
 }
 .mpi-link:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
 
@@ -229,7 +229,7 @@
   margin: var(--ds-space-1) 0 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-2xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   font-variant-numeric: lining-nums tabular-nums;
   line-height: var(--ds-leading-tight);
   color: var(--ds-ink);

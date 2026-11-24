@@ -1,11 +1,12 @@
-/* component: mon profil (Trait rouge)
+/* component: mon profil (Lin et bronze)
  * states: cargando · cuenta por correo (cambia foto) · cuenta Google · sin cambios · con cambios
  *         guardando · guardado · error · subiendo foto · campos obligatorios vacíos
  *         interactivos: default · hover · focus-visible · active · disabled (lo pone Material)
- * contrast: nombre ink (13.6:1 sobre vélin) · datos ink-secondary · notas ink-muted (7.0:1)
- *           «Actif» success-ink · guardado success-ink sobre success-soft · error danger-ink sobre danger-soft (5.8:1)
- *           bronce: el punto de aviso de «cambios sin guardar» (--ds-accent, solo gráfico)
- * type: nombre 112 %; resto cuerpo
+ * contrast: nombre ink (15.5:1 sobre vélin) · datos ink · rótulos en etiqueta ink-muted (5.9:1) · notas ink-muted
+ *           «Actif» success-ink · guardado success-ink sobre success-soft · error danger-ink sobre danger-soft (5.0:1)
+ *           bronce (solo gráfico): iconos de los datos y el punto de «cambios sin guardar»
+ *           relleno espresso: «Enregistrer les modifications» y el botón de la cámara
+ * type: nombre y título de la tarjeta en Cormorant 600; resto Manrope
  */
 
 .pf {
@@ -37,6 +38,7 @@
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-xs);
   text-align: center;
 }
 
@@ -48,7 +50,7 @@
   box-shadow: 0 0 0 1px var(--ds-border), 0 0 0 5px var(--ds-surface), 0 0 0 6px var(--ds-border);
   object-fit: cover;
 }
-/* Botón de cámara sobre el borde del avatar: abeto relleno con icono vélin. */
+/* Botón de cámara sobre el borde del avatar: espresso relleno con icono crema. */
 .pf-avatar__edit {
   --mat-fab-small-container-color: var(--ds-action);
   --mat-fab-small-foreground-color: var(--ds-on-action);
@@ -64,7 +66,7 @@
   margin: var(--ds-space-2) 0 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
   overflow-wrap: anywhere;
@@ -99,8 +101,16 @@
   grid-template-columns: 24px minmax(0, 1fr);
   column-gap: var(--ds-space-3);
 }
-.pf-fact > mat-icon { grid-row: span 2; color: var(--ds-ink-muted); }
-.pf-fact dt { font-size: var(--ds-text-sm); color: var(--ds-ink-muted); }
+.pf-fact > mat-icon { grid-row: span 2; color: var(--ds-accent); }
+.pf-fact dt {
+  padding-top: 3px;
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
 .pf-fact dd { margin: 0; font-weight: var(--ds-weight-semibold); color: var(--ds-ink); }
 .pf-fact dd.pf-ok { display: inline-flex; align-items: center; gap: var(--ds-space-1); color: var(--ds-success-ink); }
 .pf-ok mat-icon { width: 18px; height: 18px; font-size: 18px; }
@@ -115,6 +125,7 @@
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-xs);
 }
 .pf-card__head {
   display: flex;
@@ -126,11 +137,11 @@
 .pf-card__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-bold);
+  font-size: var(--ds-text-xl);
+  font-weight: var(--ds-weight-semibold);
   color: var(--ds-ink);
 }
-/* «Cambios sin guardar»: punto de aviso tomate sobre crema, texto en tinta. */
+/* «Cambios sin guardar»: punto bronce sobre crema, texto en tinta. */
 .pf-pending {
   display: inline-flex;
   align-items: center;

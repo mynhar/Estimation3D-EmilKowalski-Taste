@@ -1,7 +1,7 @@
-/* component: expediente-panel (acordeón por expediente, Trait rouge)
+/* component: expediente-panel (acordeón por expediente, Lin et bronze)
  * states: default · hover · focus-visible · active · abierto/cerrado
- * contrast: número ink (13.6:1 sobre vélin) · cifras ink-secondary (9.6:1) · chevron ink-secondary
- * type: «Dossier» al 112 %, el número al 75 % con tabular-nums
+ * contrast: número ink (15.5:1 sobre vélin) · cifras ink-secondary (7.8:1) · chevron ink-secondary
+ * type: «Dossier EXP-…» en Cormorant 600 con tabular-nums
  */
 
 :host { display: block; }
@@ -55,7 +55,7 @@
   overflow: hidden;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   text-overflow: ellipsis;
   white-space: nowrap;
 }

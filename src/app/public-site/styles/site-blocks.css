@@ -1,4 +1,4 @@
-/* Bloques compartidos por la landing y Entrepreneurs (Trait rouge): el paso
+/* Bloques compartidos por la landing y Entrepreneurs (Lin et bronze): el paso
  * numerado, la tarjeta de especialidad con foto y las piezas del formulario.
  * La disposición de cada página (cuántas columnas, qué va al lado) la pone
  * cada una; aquí solo vive la pieza.
@@ -6,8 +6,10 @@
  * states: campo default · hover (solo puntero fino) · focus · invalid (borde + icono + texto)
  *         opción default · hover · checked · focus-visible · disabled
  *         envío: enviando (spinner) · éxito · error
- * contrast: ink sobre vélin 13.6:1 · ink-secondary sobre vélin 9.6:1 · ink-muted sobre bg-alt 6.4:1
- *           opción elegida: abeto sobre action-faint 8.4:1 · error: danger-ink 6.7:1 sobre vélin
+ * contrast: ink sobre vélin 15.5:1 · ink-secondary sobre vélin 7.8:1 · ink-muted sobre bg-alt 5.2:1
+ *           número del paso: crema sobre espresso 14.8:1
+ *           opción elegida: action-ink sobre action-faint 5.6:1, borde espresso
+ *           error: danger-ink sobre vélin 6.0:1, siempre con icono
  */
 
 /* ── Paso numerado ──────────────────────────────────────────────────────── */

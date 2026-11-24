@@ -218,7 +218,7 @@
 
 /* ── 4. Especialidades: .svc, en site-blocks.css ──────────────────────────── */
 
-/* ── 5. Tour 3D: isla abeto noche (.sec--dark) ─────────────────────────────── */
+/* ── 5. Tour 3D: isla espresso (.sec--dark) ────────────────────────────────── */
 .tour {
   display: grid;
   grid-template-areas: "title" "render" "words";
@@ -230,7 +230,7 @@
   margin: 0;
   aspect-ratio: 1400 / 1132;
 }
-/* El render viene sobre negro puro: «lighten» funde ese negro con el abeto noche. */
+/* El render viene sobre negro puro: «lighten» funde ese negro con el espresso profundo. */
 .tour__render img {
   display: block;
   width: 100%;
@@ -332,7 +332,8 @@
 }
 .fm:not(.is-steps) .fm__count { display: none; }
 
-/* Avance: tres tramos, recorridos en abeto. El paso lo dice el texto «Étape n sur 3». */
+/* Avance: tres tramos, recorridos en bronce (el progreso marca, no actúa).
+   El paso lo dice el texto «Étape n sur 3»; la barra solo lo refuerza. */
 .fm__track {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -344,11 +345,11 @@
 .fm__track li {
   height: 4px;
   border-radius: var(--ds-radius-pill);
-  background: var(--ds-border-strong);
+  background: var(--ds-band);
   transition: background-color var(--ds-duration-base) var(--ds-ease-out);
 }
 .fm__track .is-done,
-.fm__track .is-current { background: var(--ds-action); }
+.fm__track .is-current { background: var(--ds-accent); }
 
 /* El paso nuevo entra desde el lado hacia el que se avanza; el anterior sale sin animar. */
 @media (prefers-reduced-motion: no-preference) {

@@ -78,7 +78,7 @@ legend { float: none; width: auto; font-size: inherit; line-height: inherit; }
   align-items: center;
   min-height: 44px;
   border-radius: var(--ds-radius-sm);
-  color: var(--ds-action);
+  color: var(--ds-action-ink);
   font-weight: var(--ds-weight-bold);
   text-decoration: underline;
   text-decoration-thickness: 1px;
@@ -89,7 +89,7 @@ legend { float: none; width: auto; font-size: inherit; line-height: inherit; }
 @media (hover: hover) and (pointer: fine) {
   .button:hover { background: var(--ds-action-hover); }
   .button--outline:hover { background: var(--ds-bg-alt); border-color: var(--ds-ink-faint); }
-  .link:hover { color: var(--ds-action-hover); text-decoration-thickness: 2px; }
+  .link:hover { color: var(--ds-ink); text-decoration-thickness: 2px; }
 }
 
 /* ── Marca: app-brand-mark (disco vélin, casa en bronce, «E») + nombre ──── */
@@ -123,7 +123,7 @@ legend { float: none; width: auto; font-size: inherit; line-height: inherit; }
 }
 .sec--band { background: var(--ds-band); }
 .sec--rule { border-top: 1px solid var(--ds-border); }
-/* Isla abeto noche: vélin 13.6:1, secundario (ink-inverse-muted) 9.3:1. El foco va en vélin. */
+/* Isla espresso profundo: crema 16.7:1, secundario (ink-inverse-muted) 10.3:1. El foco va en crema. */
 .sec--dark {
   --ds-focus-ring: 0 0 0 2px var(--ds-dark-surface-deep), 0 0 0 4px var(--ds-ink-inverse);
   background: var(--ds-dark-surface-deep);

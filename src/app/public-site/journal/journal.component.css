@@ -1,10 +1,11 @@
-/* component: Le Journal (página pública, Trait rouge)
+/* component: Le Journal (página pública, Lin et bronze)
  * states: categoría default · hover (solo puntero fino) · focus-visible · active · elegida (aria-pressed)
  *         rejilla con fichas · filtro sin fichas no ocurre (toda categoría tiene alguna)
- * contrast: título ink sobre crema 11.8:1 · resumen ink-secondary sobre vélin 9.6:1 · fecha ink-muted 7.0:1
- *           categoría elegida: vélin sobre abeto 9.7:1 · destacado sobre kraft: ink 10.9:1
- *           tomate: «Créer mon dossier» de la cabecera, el único de la página
- * type: título 125 % (display), fichas 112 %
+ * contrast: título ink sobre lino 14.4:1 · resumen ink-secondary sobre vélin 7.8:1 · fecha ink-muted 5.9:1
+ *           categoría de la ficha: etiqueta accent-ink (6.7:1) · categoría elegida: crema sobre espresso 14.9:1
+ *           destacado sobre la banda de lino oscuro: ink 12.5:1
+ *           relleno espresso: «Créer mon dossier» de la cabecera, el único de la página
+ * type: título Cormorant 600 34–68px, fichas Cormorant 22px; fechas con tabular-nums
  * motion: ninguna automática; solo el color de las categorías al pasar o pulsar.
  */
 :host {
@@ -38,11 +39,11 @@
   font-size: clamp(2.125rem, 3.4vw + 1.1rem, 4.25rem);
   font-weight: var(--ds-weight-semibold);
   line-height: 1;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--ds-tracking-tight);
   text-wrap: balance;
 }
 
-/* Categorías: botones de filtro; la elegida, rellena de abeto. */
+/* Categorías: botones de filtro; la elegida, rellena de espresso (la selección). */
 .jr-cats { display: flex; flex-wrap: wrap; gap: var(--ds-space-2); margin-bottom: var(--ds-space-6); }
 .jr-cat {
   min-height: 44px;
@@ -89,12 +90,20 @@
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
 }
-.jr-card__cat { margin: 0; font-size: var(--ds-text-sm); font-weight: var(--ds-weight-bold); color: var(--ds-action); }
+.jr-card__cat {
+  margin: 0;
+  font-size: var(--ds-text-label);
+  line-height: 1.3;
+  font-weight: var(--ds-weight-bold);
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
+  color: var(--ds-accent-ink);
+}
 .jr-card__title {
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
   text-wrap: balance;
 }
@@ -104,6 +113,7 @@
   padding-top: var(--ds-space-3);
   border-top: 1px solid var(--ds-border-subtle);
   font-size: var(--ds-text-sm);
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink-muted);
 }
 
@@ -131,7 +141,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: clamp(1.5rem, 1.2vw + 1.1rem, 2rem);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: 1.15;
   text-wrap: balance;
 }

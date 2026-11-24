@@ -1,12 +1,13 @@
-/* component: ofertas de un dossier (Trait rouge)
+/* component: ofertas de un dossier (Lin et bronze)
  * states: cargando · no encontrado · sin ofertas · eligiendo · con selección · aceptadas · bloqueado
  *         (contratos firmados) · archivado · confirmando rechazo · aceptando · rechazando · error
  *         interactivos: default · hover · focus-visible · active · disabled · checked
- * contrast: títulos ink (13.6:1 sobre vélin) · texto ink-secondary (9.6:1) · etiquetas ink-muted (6.8:1)
- *           enlaces y casilla action (9.0:1) · check on-action sobre action (9.7:1)
- *           rechazo danger sobre vélin (6.7:1) · vélin sobre danger (6.7:1) · error danger-ink sobre danger-soft (5.8:1)
- *           tomate: solo el botón «Accepter» del panel de decisión (uno por vista)
- * type: títulos 112 %; precios, plazos, fechas y tamaños 75 % con tabular-nums
+ * contrast: títulos ink (15.5:1 sobre vélin) · texto ink-secondary (7.8:1) · rótulos ink-muted (5.9:1)
+ *           número del dossier: etiqueta accent-ink · enlaces action-ink (6.8:1)
+ *           casilla y oferta elegida: espresso (selección) · check on-action sobre action (14.9:1)
+ *           rechazo danger sobre vélin (6.1:1) · vélin sobre danger (6.1:1) · error danger-ink sobre danger-soft (5.0:1)
+ *           relleno espresso: solo «Accepter» del panel de decisión (uno por vista)
+ * type: títulos e importes en Cormorant 600; rótulos en etiqueta; plazos, fechas y tamaños con tabular-nums
  */
 
 .bo {
@@ -28,13 +29,13 @@
   gap: var(--ds-space-2);
   margin: 0;
   font-family: var(--ds-font-display);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
 }
 .bo-h2 { font-size: var(--ds-text-xl); }
 .bo-h3 { font-size: var(--ds-text-lg); }
-.bo-h3__icon { flex-shrink: 0; color: var(--ds-action); }
+.bo-h3__icon { flex-shrink: 0; color: var(--ds-accent); }
 
 .bo-label {
   display: flex;
@@ -46,9 +47,13 @@
   font-weight: var(--ds-weight-bold);
   color: var(--ds-ink);
 }
+/* Rótulo de un dato o de una cifra: etiqueta en mayúsculas. */
 .bo-label-sm {
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
   color: var(--ds-ink-muted);
 }
 
@@ -118,7 +123,7 @@
   gap: var(--ds-space-1);
   min-height: 44px;
   border-radius: var(--ds-radius-sm);
-  color: var(--ds-action);
+  color: var(--ds-action-ink);
   font-weight: var(--ds-weight-semibold);
   font-variant-numeric: lining-nums tabular-nums;
   text-decoration: underline;
@@ -127,7 +132,7 @@
 .bo-link mat-icon { flex-shrink: 0; width: 18px; height: 18px; font-size: 18px; }
 .bo-link:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
 @media (hover: hover) and (pointer: fine) {
-  .bo-link:hover { color: var(--ds-action-hover); }
+  .bo-link:hover { color: var(--ds-ink); }
 }
 
 .bo-spinner {
@@ -191,6 +196,7 @@
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-xs);
 }
 @media (max-width: 575.98px) {
   .bo-card { padding: var(--ds-space-4); }
@@ -222,8 +228,9 @@
 }
 .bo-reference mat-icon { flex-shrink: 0; color: var(--ds-ink-muted); }
 .bo-reference__value {
-  font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-bold);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-xl);
+  font-weight: var(--ds-weight-semibold);
   font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink);
 }
@@ -246,12 +253,13 @@
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-xs);
   cursor: pointer;
   transition: border-color var(--ds-duration-fast) var(--ds-ease-out),
               box-shadow var(--ds-duration-fast) var(--ds-ease-out);
 }
 .bo-offer.is-locked { cursor: default; }
-/* Seleccionada: filete abeto doble, sin mover el contenido. */
+/* Seleccionada: filete espresso doble (la selección), sin mover el contenido. */
 .bo-offer.is-selected {
   border-color: var(--ds-action);
   box-shadow: inset 0 0 0 1px var(--ds-action);
@@ -285,7 +293,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
   overflow-wrap: anywhere;
@@ -296,7 +304,7 @@
 .bo-offer__amount,
 .bo-total__value {
   font-family: var(--ds-font-display);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   font-variant-numeric: lining-nums tabular-nums;
   line-height: var(--ds-leading-tight);
   color: var(--ds-ink);
@@ -314,14 +322,27 @@
 .bo-facts {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 8rem), 1fr));
-  gap: var(--ds-space-4) var(--ds-space-5);
+  gap: var(--ds-space-5);
   margin: 0;
 }
-.bo-fact { display: grid; gap: var(--ds-space-1); align-content: start; min-width: 0; }
+/* Subgrid: rótulos y datos de una fila comparten pistas; si un rótulo ocupa dos
+   líneas, todos los datos de la fila bajan juntos y quedan alineados. */
+.bo-fact {
+  display: grid;
+  grid-row: span 2;
+  grid-template-rows: subgrid;
+  row-gap: var(--ds-space-1);
+  align-content: start;
+  min-width: 0;
+}
 .bo-fact--wide { grid-column: 1 / -1; }
 .bo-fact dt {
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
+  align-self: end;
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
   color: var(--ds-ink-muted);
 }
 .bo-fact dd {
@@ -332,6 +353,7 @@
   overflow-wrap: anywhere;
 }
 .bo-address {
+  margin: 0;
   font-style: normal;
   font-weight: var(--ds-weight-regular);
   line-height: var(--ds-leading-normal);
@@ -407,7 +429,9 @@
 .bo-sel__svc { font-size: var(--ds-text-sm); color: var(--ds-ink-muted); }
 .bo-sel__price {
   flex-shrink: 0;
-  font-weight: var(--ds-weight-bold);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-lg);
+  font-weight: var(--ds-weight-semibold);
   font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink);
 }

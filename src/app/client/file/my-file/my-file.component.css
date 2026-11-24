@@ -1,10 +1,11 @@
-/* component: dossier del cliente (Trait rouge)
+/* component: dossier del cliente (Lin et bronze)
  * states: cargando · no encontrado · activo · en oferta · con constructor(es) · cancelado · archivado
  *         interactivos: default · hover · focus-visible · active · disabled · subiendo · borrando · error
- * contrast: títulos ink (13.6:1 sobre vélin) · texto ink-secondary (9.6:1) · etiquetas ink-muted (6.8:1)
- *           enlaces action (9.0:1) · error danger-ink sobre danger-soft (5.8:1)
- *           tomate: solo «Voir les propositions» cuando el dossier está en oferta y aún sin constructor
- * type: títulos 112 %; números, fechas, importes y tamaños 75 % con tabular-nums
+ * contrast: títulos ink (15.5:1 sobre vélin) · texto ink-secondary (7.8:1) · rótulos ink-muted (5.9:1)
+ *           número del dossier: etiqueta accent-ink sobre el título · enlaces action-ink (6.8:1)
+ *           error danger-ink sobre danger-soft (5.0:1)
+ *           relleno espresso: solo «Voir les propositions» cuando el dossier está en oferta y aún sin constructor
+ * type: títulos e importes en Cormorant 600; rótulos de datos en etiqueta; cifras con tabular-nums
  */
 
 .exp {
@@ -26,7 +27,7 @@
   gap: var(--ds-space-2);
   margin: 0;
   font-family: var(--ds-font-display);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
 }
@@ -104,7 +105,7 @@
   gap: var(--ds-space-1);
   min-height: 44px;
   border-radius: var(--ds-radius-sm);
-  color: var(--ds-action);
+  color: var(--ds-action-ink);
   font-weight: var(--ds-weight-semibold);
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -113,7 +114,7 @@
 .exp-link--wrap { overflow-wrap: anywhere; }
 .exp-link:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
 @media (hover: hover) and (pointer: fine) {
-  .exp-link:hover { color: var(--ds-action-hover); }
+  .exp-link:hover { color: var(--ds-ink); }
 }
 
 .exp-spinner {
@@ -165,6 +166,7 @@
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-xs);
 }
 @media (max-width: 575.98px) {
   .exp-card { padding: var(--ds-space-4); }
@@ -226,15 +228,28 @@
 .exp-facts {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 9rem), 1fr));
-  gap: var(--ds-space-4) var(--ds-space-5);
+  gap: var(--ds-space-5);
   margin: 0;
 }
 .exp-facts--tight { grid-template-columns: repeat(auto-fill, minmax(min(100%, 8rem), 1fr)); }
-.exp-fact { display: grid; gap: var(--ds-space-1); min-width: 0; }
+/* Subgrid: rótulos y datos de una fila comparten pistas; si un rótulo ocupa dos
+   líneas, todos los datos de la fila bajan juntos y quedan alineados. */
+.exp-fact {
+  display: grid;
+  grid-row: span 2;
+  grid-template-rows: subgrid;
+  row-gap: var(--ds-space-1);
+  align-content: start;
+  min-width: 0;
+}
+.exp-fact dt { align-self: end; }
 .exp-fact--wide { grid-column: 1 / -1; }
 .exp-fact dt {
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
   color: var(--ds-ink-muted);
 }
 .exp-fact dd {
@@ -245,6 +260,7 @@
   overflow-wrap: anywhere;
 }
 .exp-address {
+  margin: 0;
   font-style: normal;
   font-weight: var(--ds-weight-regular);
   line-height: var(--ds-leading-normal);
@@ -272,7 +288,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
   overflow-wrap: anywhere;
@@ -293,13 +309,12 @@
   gap: var(--ds-space-3) var(--ds-space-7);
   margin: 0;
 }
-.exp-cost__range dt { font-size: var(--ds-text-sm); color: var(--ds-ink-secondary); }
 .exp-cost__range dd,
 .exp-price__value {
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-2xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   font-variant-numeric: lining-nums tabular-nums;
   line-height: var(--ds-leading-tight);
   color: var(--ds-ink);
@@ -417,7 +432,15 @@
 }
 
 .exp-price { display: grid; gap: var(--ds-space-1); }
-.exp-price .exp-label { font-size: var(--ds-text-sm); font-weight: var(--ds-weight-medium); color: var(--ds-ink-muted); }
+.exp-price .exp-label,
+.exp-cost__range dt {
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
 .exp-price__value { font-size: var(--ds-text-3xl); }
 
 .exp-more { border-top: 1px solid var(--ds-border-subtle); }

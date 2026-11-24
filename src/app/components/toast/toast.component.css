@@ -1,13 +1,14 @@
-/* component: avisos efímeros (Trait rouge)
+/* component: avisos efímeros (Lin et bronze)
  * Pila fija abajo a la derecha; en móvil, abajo a lo ancho con el margen de la página.
  *
- * states: éxito (abeto suave) · error (ladrillo suave) · aviso (ámbar suave) · información (azul
- *         suave) · entrando · saliendo · cerrar: hover, focus-visible
- * contrast: success-ink/-soft 8.4:1 · danger-ink/-soft 5.8:1 · warning-ink/-soft 5.8:1 ·
- *           info-ink/-soft 5.8:1
+ * states: éxito (verde suave) · error (terracota suave) · aviso (ámbar suave) · información
+ *         (azul suave) · entrando · saliendo · cerrar: hover, focus-visible
+ * contrast: success-ink/-soft 5.2:1 · danger-ink/-soft 5.0:1 · warning-ink/-soft 4.9:1 ·
+ *           info-ink/-soft 6.1:1
  * motion: entra desde abajo (8px) con opacidad en duration-base y ease-out; sale solo con
  *         opacidad, más rápida (duration-fast). Sin movimiento con prefers-reduced-motion.
- * Sin tomate: un aviso no es la siguiente etapa; los errores van en ladrillo con icono y texto.
+ * Ni espresso ni bronce: un aviso no es una acción ni una marca; los errores van en
+ * terracota con icono y texto.
  */
 :host { display: contents; }
 

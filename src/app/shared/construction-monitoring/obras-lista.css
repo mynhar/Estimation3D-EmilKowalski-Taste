@@ -219,7 +219,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
 }
 .cml-card__link {
@@ -292,7 +292,7 @@
 .cml-card__price {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   font-variant-numeric: lining-nums tabular-nums;
   line-height: var(--ds-leading-tight);
 }
@@ -364,7 +364,7 @@
   border-radius: var(--ds-radius-sm);
   color: var(--ds-ink);
   font-family: var(--ds-font-display);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   text-decoration: none;
 }
 .cml-table__link:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }

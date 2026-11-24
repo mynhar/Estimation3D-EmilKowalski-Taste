@@ -2,7 +2,7 @@
 
 Guía de diseño y código para este proyecto. Aplica también si usas Claude Code, Copilot u otra IA para generar componentes.
 
-> **Dirección aprobada: Lin et bronze** (23-nov-2026; sustituye a Trait rouge). Toma el diseño, la paleta y la tipografía de `agencia-inmobiliaria`. La fase 0 (base) está hecha y toda la app lleva ya la piel nueva; las fases 1–4 recomponen pantalla a pantalla (ver `design.md`). Siguen vigentes las convenciones técnicas (secciones 3–6, 9–11), el uso de tokens `var(--ds-...)` y el contraste WCAG AA.
+> **Dirección aprobada: Lin et bronze** (23-nov-2026; sustituye a Trait rouge). Toma el diseño, la paleta y la tipografía de `agencia-inmobiliaria`. Las fases 0 (base), 1 (cara al cliente) y 2 (resto del cliente y páginas públicas) están hechas y toda la app lleva ya la piel nueva; las fases 3–4 recomponen el contratista, el estimador y el admin (ver `design.md`). Siguen vigentes las convenciones técnicas (secciones 3–6, 9–11), el uso de tokens `var(--ds-...)` y el contraste WCAG AA.
 
 ---
 
@@ -145,7 +145,7 @@ Dos familias, bien distintas:
 | Cifra | Cormorant Garamond | 500–600 | Precios, horas, porcentajes, KPI; siempre con `font-variant-numeric: lining-nums tabular-nums` |
 | Palabra en cursiva | Cormorant Garamond itálica | 500–600, `--ds-accent` | **Solo** el saludo del dashboard y los títulos de la landing; una palabra, ≥ 24px |
 | Interfaz | Manrope (`--ds-font-body`) | 400 / 500 / 600 / 700 / 800 | Texto, botones, formularios, navegación |
-| Etiqueta en mayúsculas | Manrope | 700, `--ds-text-label` (12px), `--ds-tracking-label` (0.2em) | Grupos de navegación, cabeceras de tabla, etiquetas de KPI (`--ds-ink-muted`); etiqueta sobre un título (`--ds-accent-ink`) |
+| Etiqueta en mayúsculas | Manrope | 700, `--ds-text-label` (12px), `--ds-tracking-label` (0.2em) | Grupos de navegación y de lista (meses, tipos), cabeceras de tabla, etiquetas de KPI y rótulos de datos (`dt`) en `--ds-ink-muted`; etiqueta sobre un título (número de dossier, categoría) en `--ds-accent-ink` |
 
 - Cormorant trae **cifras de estilo antiguo** por defecto: toda cifra lleva `lining-nums tabular-nums`. En Manrope no cambia nada.
 - `h1`–`h6` globales (`src/styles/base.css`) van en Cormorant 600, espresso, `--ds-leading-tight`, `--ds-tracking-tight` y `lining-nums` («3D» o «2026» en un título no bailan). Cada pantalla fija el tamaño de sus títulos en el CSS del componente. Un texto en Cormorant que no es título (marca, cifra, `<p>` grande) pone `lining-nums` en su componente.
@@ -495,6 +495,7 @@ Antes de cerrar un componente, verifica que:
 - En móvil, CTA fijo abajo entre el final del hero y el formulario; oculto en escritorio.
 - Un solo botón relleno a la vista con la misma acción. Si aparece en la cabecera y en el hero, la de la cabecera va de contorno mientras el hero se ve y pasa a relleno cuando queda sola. En Entrepreneurs lo principal es postular: «Créer mon dossier» de la cabecera va siempre de contorno (`[ctaRelleno]="false"`).
 - Sobre la isla espresso (`.sec--dark`) el botón es crema (`.button--light`, definido en `entrepreneurs.component.css`).
+- Iconos de bloque (ventajas, exigencias, FAQ) en `--ds-accent`; los del problema de Entrepreneurs en `--ds-ink-muted`, porque es lo que se deja atrás. La categoría de un artículo de Le Journal es una etiqueta en mayúsculas `--ds-accent-ink`; las plazas del piloto, una insignia píldora `--ds-action-faint` / `--ds-action-ink` («Complet» en `--ds-bg-alt` / `--ds-ink-muted`).
 - Acordeón de preguntas (FAQ): `h3` > `button` con `aria-expanded` / `aria-controls`; respuesta `role="region"` con `aria-labelledby`, `inert` mientras está cerrada y altura animada con `grid-template-rows: 0fr → 1fr` (sin medir el DOM).
 - Francés: espacio de no separación (`\u00a0`) antes de `? ! : ;` en los textos de i18n.
 - Marca: `<app-brand-mark class="brand__mark" />` + `.brand__name` (Cormorant 600, 28px). `site-base.css` solo fija su tamaño (`--bm-size: 36px`). La página actual de la cabecera va subrayada en bronce (`--ds-accent`).
@@ -512,6 +513,28 @@ Antes de cerrar un componente, verifica que:
 - `app-page-header`: `etiqueta` (mayúsculas, `--ds-accent-ink`, sobre el título), `titulo` (h1 Cormorant 600, 28–44px), `contexto` (línea de metadatos `--ds-ink-muted`, con «·» si junta datos) y las acciones proyectadas con `actions`. `enfasis` pinta una palabra final en cursiva bronce y es **solo** para el saludo del dashboard del cliente («Bonjour, *Marie*»).
 - Tarjeta de la siguiente etapa (dashboard del cliente): `--ds-dark-surface`, etiqueta en `--ds-accent-on-dark`, título Cormorant 28–36px en crema, texto `--ds-ink-inverse-muted`, `mat-flat-button` crema (`--mat-button-filled-container-color: var(--ds-ink-inverse)`, texto espresso) y `--ds-focus-ring: var(--ds-focus-ring-dark)` en el contenedor.
 - Cifras (KPI): rejilla en una tarjeta vélin, celdas separadas por `--ds-border-subtle`; rótulo en mayúsculas `--ds-ink-muted` arriba y la cifra abajo (`align-content: space-between`, para que dos rótulos de distinta altura no desalineen las cifras), Cormorant 600 a 40px con `lining-nums tabular-nums`; la unidad en Manrope 14px `--ds-ink-muted`.
+
+### Pantallas del cliente (fase 2)
+
+- **Tarjeta**: vélin, `1px solid var(--ds-border)`, `--ds-radius-lg` y `--ds-shadow-xs` en reposo. Título en Cormorant 600 a `--ds-text-xl` (22px) como mínimo: por debajo de 18px Cormorant pierde cuerpo. Títulos de panel a `--ds-text-lg` con `--ds-leading-snug`.
+- **Número del dossier**: etiqueta en mayúsculas sobre el título, nunca mezclado en la línea de metadatos. En una tarjeta de lista va después del título en el HTML (el enlace es el título) y sube con `order: -1`; en una pantalla de detalle, `app-page-header [etiqueta]="numero"` (la etiqueta lleva `lining-nums tabular-nums` y `overflow-wrap: anywhere`).
+- **Etiqueta en mayúsculas** (rótulos de datos, grupos, cabeceras de tabla):
+  ```css
+  font-size: var(--ds-text-label); font-weight: var(--ds-weight-bold); line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label); text-transform: uppercase; color: var(--ds-ink-muted);
+  ```
+  Si el elemento es un `h2`–`h6`, añade `font-family: var(--ds-font-body)`: el reboot lo pone en Cormorant.
+- **Datos alineados** (`dl`): cada par ocupa dos filas de la rejilla del padre y las comparte con subgrid, así un rótulo que parte en dos líneas no descoloca los valores vecinos:
+  ```css
+  .x-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr)); gap: var(--ds-space-5); }
+  .x-fact  { display: grid; grid-row: span 2; grid-template-rows: subgrid; row-gap: var(--ds-space-1); align-content: start; min-width: 0; }
+  .x-fact dt { align-self: end; /* + etiqueta en mayúsculas */ }
+  ```
+  Con rótulos largos en mayúsculas, columnas de 11rem como mínimo (a menos parten en tres líneas).
+- **Resumen de una lista** (contratos, obras): la tarjeta de cifras del dashboard (ver «Cabecera de pantalla y cifras»), 2 columnas en móvil y 4 desde 768px, celdas con `--ds-space-4` (5 desde 768px) y la cifra a `clamp(var(--ds-text-2xl), 1.5rem + 1.2vw, 2.5rem)`.
+- **Tablas**: `th` con la etiqueta en mayúsculas; filas separadas por `--ds-border-subtle`; el enlace de la fila a `--ds-text-lg`.
+- **Avance y pasos**: barra con pista `--ds-band` y relleno `--ds-accent`; paso hecho con punto bronce e icono crema (`--ds-ink-inverse`); el actual con halo `--ds-accent-soft`. Una oferta que espera respuesta lleva un filete superior bronce de 3px.
+- **Color**: enlaces en `--ds-action-ink` con hover a `--ds-ink`; iconos de sección, de lista y de dato en `--ds-accent`. Un solo botón relleno espresso por vista.
 
 ### Visor de medios (`shared/ui/media-viewer`)
 

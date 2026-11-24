@@ -1,13 +1,13 @@
-/* component: mes documents del cliente (Trait rouge)
+/* component: mes documents del cliente (Lin et bronze)
  * states: cargando · error · sin dossiers · dossier vacío · sin resultados del filtro · lista · galería
  *         subida: default · arrastrando encima · subiendo
  *         borrar: confirmar · borrando
  *         interactivos: default · hover · focus-visible · active · disabled
- * contrast: nombre ink (13.6:1 sobre vélin) · datos ink-muted (7.0:1) · grupo ink-secondary
- *           arrastrando: action-ink sobre action-faint (8.4:1)
- *           borrar: vélin sobre danger (6.7:1) · papelera danger sobre vélin
- *           tomate: ninguno; subir y ver son acciones del abeto
- * type: títulos 112 %; tamaños y conteos 75 % con tabular-nums
+ * contrast: nombre ink (15.5:1 sobre vélin) · datos ink-muted (5.9:1) · grupo: etiqueta en mayúsculas ink-muted
+ *           arrastrando: action-ink sobre action-faint (5.6:1) · iconos de grupo y de subida en bronce
+ *           borrar: vélin sobre danger (6.1:1) · papelera danger sobre vélin
+ *           relleno espresso: ninguno
+ * type: nombres en Manrope; grupos en etiqueta; tamaños y recuentos con tabular-nums
  */
 
 .md {
@@ -115,9 +115,8 @@
   color: var(--ds-action-ink);
 }
 .md-drop.is-busy { cursor: progress; }
-.md-drop__icon { width: 32px; height: 32px; font-size: 32px; color: var(--ds-action); }
+.md-drop__icon { width: 32px; height: 32px; font-size: 32px; color: var(--ds-accent); }
 .md-drop__title {
-  font-family: var(--ds-font-display);
   font-size: var(--ds-text-base);
   font-weight: var(--ds-weight-bold);
 }
@@ -127,15 +126,19 @@
 
 /* Grupo por persona que subió */
 .md-group { display: grid; gap: var(--ds-space-2); min-width: 0; }
+/* Quién subió el grupo: etiqueta en mayúsculas (es un h3: vuelve a Manrope). */
 .md-group__h {
   display: flex;
   align-items: center;
   gap: var(--ds-space-2);
   margin: var(--ds-space-2) 0 0;
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-base);
+  font-family: var(--ds-font-body);
+  font-size: var(--ds-text-label);
   font-weight: var(--ds-weight-bold);
-  color: var(--ds-ink);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
 }
 .md-group__tile {
   display: grid;
@@ -145,7 +148,7 @@
   height: 32px;
   border-radius: var(--ds-radius-md);
   background: var(--ds-band);
-  color: var(--ds-ink-secondary);
+  color: var(--ds-accent);
 }
 .md-group__tile mat-icon { width: 20px; height: 20px; font-size: 20px; }
 .md-group__n {
@@ -158,6 +161,7 @@
   background: var(--ds-bg-alt);
   font-family: var(--ds-font-body);
   font-size: var(--ds-text-sm);
+  letter-spacing: normal;
   color: var(--ds-ink-secondary);
 }
 
@@ -182,7 +186,7 @@
 }
 @media (hover: hover) and (pointer: fine) {
   .md-open:hover { background: var(--ds-bg-alt); }
-  .md-open:hover .md-name { color: var(--ds-action); text-decoration: underline; text-underline-offset: 3px; }
+  .md-open:hover .md-name { color: var(--ds-action-ink); text-decoration: underline; text-underline-offset: 3px; }
 }
 .md-open:active { background: var(--ds-border-subtle); }
 .md-open:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }

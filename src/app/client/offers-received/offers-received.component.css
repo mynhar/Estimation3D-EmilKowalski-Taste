@@ -1,10 +1,12 @@
-/* component: offres reçues (Trait rouge)
+/* component: offres reçues (Lin et bronze)
  * states: cargando · sin ofertas · pendientes · gestionados · tarjetas · tabla (escritorio)
  *         interactivos: default · hover · focus-visible · active
- * contrast: títulos ink (13.6:1 sobre vélin) · meta ink-muted (6.8:1) · acción action (9.0:1)
- *           aceptada: icono success, texto ink · «Chantier terminé» success-ink sobre success-soft (7.4:1)
- *           tomate: ninguno en la lista; el botón tomate es «Accepter» en la oferta
- * type: servicio 112 %; precios, números y fechas 75 % con tabular-nums
+ * contrast: servicio ink (15.5:1 sobre vélin) · meta ink-muted (5.9:1) · «Voir» ink
+ *           número y cabeceras de tabla: etiqueta en mayúsculas ink-muted
+ *           pendiente de decisión: filete bronce arriba (marca, no alarma)
+ *           aceptada: icono success, texto ink · «Chantier terminé» success-ink sobre success-soft (5.2:1)
+ *           relleno espresso: ninguno en la lista; es «Accepter» en la oferta
+ * type: servicio en Cormorant 22px; importes en Cormorant 600; fechas con tabular-nums
  */
 
 .or {
@@ -43,7 +45,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
 }
@@ -92,10 +94,11 @@
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-xs);
   transition: border-color var(--ds-duration-fast) var(--ds-ease-out);
 }
-/* Pendiente de decisión: filete abeto arriba, sin color de alarma. */
-.or-card.is-pending { border-top: 3px solid var(--ds-action); }
+/* Pendiente de decisión: filete bronce arriba, sin color de alarma. */
+.or-card.is-pending { border-top: 3px solid var(--ds-accent); }
 .or-card:has(.or-card__link:focus-visible) { box-shadow: var(--ds-focus-ring); }
 
 .or-card__photo {
@@ -116,7 +119,7 @@
 
 @media (hover: hover) and (pointer: fine) {
   .or-card:hover { border-color: var(--ds-border-strong); }
-  .or-card.is-pending:hover { border-top-color: var(--ds-action); }
+  .or-card.is-pending:hover { border-top-color: var(--ds-accent); }
   .or-card:hover .or-card__photo img { transform: scale(1.02); }
   .or-card:hover .or-card__cta { text-decoration: underline; text-underline-offset: 3px; }
 }
@@ -127,25 +130,32 @@
   align-items: flex-start;
   gap: var(--ds-space-2);
   min-width: 0;
-  padding: var(--ds-space-4) var(--ds-space-4) var(--ds-space-5);
+  padding: var(--ds-space-4) var(--ds-space-5) var(--ds-space-5);
 }
 
 .or-card__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-bold);
+  font-size: var(--ds-text-xl);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
 }
 .or-card__link { color: var(--ds-ink); text-decoration: none; }
 .or-card__link:focus-visible { outline: none; }
 .or-card__link::after { content: ''; position: absolute; inset: 0; }
 
+/* El número va encima del servicio, como etiqueta (en el DOM, después del h3). */
 .or-card__num {
+  order: -1;
   margin: 0;
-  font-size: var(--ds-text-sm);
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
   font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink-muted);
+  overflow-wrap: anywhere;
 }
 
 .or-card__meta {
@@ -198,13 +208,21 @@
   color: var(--ds-ink-secondary);
 }
 .or-sum__count { font-weight: var(--ds-weight-semibold); color: var(--ds-ink); }
-.or-sum strong { font-size: var(--ds-text-lg); color: var(--ds-ink); }
+/* Importes en Cormorant: la cifra manda en la fila. */
+.or-sum strong,
+.or-accepted__text strong {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-xl);
+  font-weight: var(--ds-weight-semibold);
+  line-height: var(--ds-leading-snug);
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--ds-ink);
+}
 
 .or-accepted { display: grid; gap: var(--ds-space-3); margin: 0; padding: 0; list-style: none; }
 .or-accepted__row { display: flex; align-items: flex-start; gap: var(--ds-space-2); }
 .or-accepted__icon { flex-shrink: 0; width: 20px; height: 20px; font-size: 20px; margin-top: 2px; color: var(--ds-success); }
 .or-accepted__text { display: grid; gap: 2px; min-width: 0; color: var(--ds-ink-secondary); }
-.or-accepted__text strong { color: var(--ds-ink); }
 
 .or-obra {
   display: inline-flex;
@@ -228,6 +246,7 @@
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-xs);
 }
 @media (min-width: 768px) {
   .or-table-wrap { display: block; }
@@ -236,15 +255,17 @@
 .or-table th {
   padding: var(--ds-space-3) var(--ds-space-4);
   border-bottom: 1px solid var(--ds-border);
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-semibold);
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
   color: var(--ds-ink-muted);
   text-align: left;
   white-space: nowrap;
 }
 .or-table td {
   padding: var(--ds-space-3) var(--ds-space-4);
-  border-top: 1px solid var(--ds-border);
+  border-top: 1px solid var(--ds-border-subtle);
   vertical-align: middle;
   color: var(--ds-ink-secondary);
 }
@@ -260,7 +281,8 @@
   border-radius: var(--ds-radius-sm);
   color: var(--ds-ink);
   font-family: var(--ds-font-display);
-  font-weight: var(--ds-weight-bold);
+  font-size: var(--ds-text-lg);
+  font-weight: var(--ds-weight-semibold);
   text-decoration: none;
 }
 .or-table__link:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
