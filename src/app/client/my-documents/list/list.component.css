@@ -20,7 +20,7 @@
   min-width: 0;
 }
 
-.md-fig { font-stretch: var(--ds-stretch-figure); font-variant-numeric: tabular-nums; }
+.md-fig { font-variant-numeric: lining-nums tabular-nums; }
 .md-hidden-input { display: none; }
 .md-empty { max-width: 44rem; }
 
@@ -48,11 +48,9 @@
 .md-filter,
 .md-view {
   --mat-button-toggle-height: 44px;
-  --mat-button-toggle-shape: var(--ds-radius-md);
+  --mat-button-toggle-shape: var(--ds-radius-pill);
   --mat-button-toggle-text-color: var(--ds-ink-secondary);
   --mat-button-toggle-background-color: var(--ds-surface);
-  --mat-button-toggle-selected-state-background-color: var(--ds-action-faint);
-  --mat-button-toggle-selected-state-text-color: var(--ds-action-ink);
   --mat-button-toggle-divider-color: var(--ds-border);
 }
 /* En estrecho, el filtro se desplaza dentro de su caja en vez de empujar la página. */
@@ -60,8 +58,7 @@
 .md-filter__n {
   margin-left: var(--ds-space-1);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .md-filter__icon { display: none; }
 .md-view mat-icon,
@@ -123,7 +120,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-base);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
 }
 .md-drop__sub { font-size: var(--ds-text-sm); color: var(--ds-ink-muted); }
 
@@ -139,7 +135,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-base);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   color: var(--ds-ink);
 }
 .md-group__tile {

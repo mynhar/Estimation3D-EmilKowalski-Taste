@@ -40,7 +40,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   color: var(--ds-ink);
 }
 .efd-cost__row {
@@ -54,7 +53,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-2xl);
-  font-weight: var(--ds-weight-black);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-tight);
   color: var(--ds-ink);
 }

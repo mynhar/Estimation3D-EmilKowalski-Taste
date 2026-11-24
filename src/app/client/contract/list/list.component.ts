@@ -95,16 +95,6 @@ export class ContractListComponent implements OnInit {
     };
   });
 
-  /**
-   * La firma es la siguiente etapa y lleva el único botón tomate de la vista:
-   * el contrato con el panel de firma abierto o, si no, el primero pendiente.
-   * Las demás firmas pendientes van en abeto.
-   */
-  ctaId = computed(() =>
-    this.confirmandoId()
-    ?? this.grupos().flatMap(g => g.activos).find(c => c.estado === 'generado')?.id
-    ?? null);
-
   /** Cerrados: completados, cancelados y archivados (expediente archivado). */
   esCerrado(estado: string): boolean { return estado === 'completado' || estado === 'cancelado' || estado === 'archivado'; }
   toggle(key: string): void {

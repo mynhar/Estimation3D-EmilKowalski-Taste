@@ -18,8 +18,7 @@
 
 /* Códigos y cifras: ancho de cifras. */
 .cf-fig {
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 /* El código es corto: un campo estrecho, no a todo el ancho. */

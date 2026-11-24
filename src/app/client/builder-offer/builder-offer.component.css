@@ -17,8 +17,7 @@
 }
 
 .bo-fig {
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 /* ── Títulos y textos comunes ───────────────────────────────────────────── */
@@ -30,7 +29,6 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
 }
@@ -66,8 +64,7 @@
   font-family: var(--ds-font-body);
   font-size: var(--ds-text-sm);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 .bo-muted {
@@ -123,8 +120,7 @@
   border-radius: var(--ds-radius-sm);
   color: var(--ds-action);
   font-weight: var(--ds-weight-semibold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -228,8 +224,7 @@
 .bo-reference__value {
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink);
 }
 
@@ -291,7 +286,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
   overflow-wrap: anywhere;
@@ -303,8 +297,7 @@
 .bo-total__value {
   font-family: var(--ds-font-display);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   line-height: var(--ds-leading-tight);
   color: var(--ds-ink);
 }
@@ -415,8 +408,7 @@
 .bo-sel__price {
   flex-shrink: 0;
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink);
 }
 .bo-sel__remove { --mat-icon-button-icon-color: var(--ds-ink-secondary); flex-shrink: 0; margin-right: calc(var(--ds-space-2) * -1); }
@@ -540,8 +532,7 @@
 .bo-file__name { font-weight: var(--ds-weight-medium); color: var(--ds-ink); overflow-wrap: anywhere; }
 .bo-file__size {
   font-size: var(--ds-text-sm);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink-muted);
 }
 .bo-file__open { flex-shrink: 0; min-height: 44px; }

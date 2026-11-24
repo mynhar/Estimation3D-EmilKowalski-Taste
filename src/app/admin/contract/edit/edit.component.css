@@ -134,11 +134,9 @@
 /* Mismo conmutador que los filtros de las listas (shared/ui/lista/lista.css). */
 .acd-lang {
   --mat-button-toggle-height: 44px;
-  --mat-button-toggle-shape: var(--ds-radius-md);
+  --mat-button-toggle-shape: var(--ds-radius-pill);
   --mat-button-toggle-text-color: var(--ds-ink-secondary);
   --mat-button-toggle-background-color: var(--ds-surface);
-  --mat-button-toggle-selected-state-background-color: var(--ds-action-faint);
-  --mat-button-toggle-selected-state-text-color: var(--ds-action-ink);
   --mat-button-toggle-divider-color: var(--ds-border);
   --mat-button-toggle-label-text-size: var(--ds-text-base);
   --mat-button-toggle-label-text-weight: var(--ds-weight-semibold);

@@ -1,13 +1,10 @@
-/* component: landing pública (Trait rouge)
+/* component: landing pública (Lin et bronze; se rediseña entera en la fase 1)
  * states: enlaces y botones default · hover (solo puntero fino) · focus-visible · active (escala 0.97)
  *         · disabled (enviando) · loading (spinner) · éxito · error de envío
  *         campos default · hover · focus · invalid (borde + icono + texto) ; servicio default · checked · focus
- * contrast: ink sobre crema 11.8:1 · ink-secondary sobre band 7.7:1 · vélin sobre abeto 9.7:1
- *           isla abeto noche: vélin 13.6:1, secundario ≥ 9:1 ; cotas: ink sobre vélin 13.6:1
- *           el tomate (--ds-mark) solo dibuja líneas, nunca texto
- *           tomate: un solo botón de «Créer mon dossier» a la vista (blanco encima 4.8:1)
- * type: Archivo; display 125 % (hero), títulos 112 %, cifras de las cotas 75 % con tabular-nums
- * motion: un único momento automático (barrido del escaneo, una vez, 1.6 s); el resto responde a la persona.
+ * contrast: tinta espresso sobre lino ≥ 13:1 · ink-secondary sobre band ≥ 6.5:1 · crema sobre espresso ≥ 13:1
+ * type: Cormorant Garamond en títulos, Manrope en la interfaz
+ * motion: solo responde a la persona; no hay momento automático.
  */
 :host {
   display: block;
@@ -47,8 +44,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: clamp(2.125rem, 3.4vw + 1.1rem, 4.25rem);
-  font-weight: var(--ds-weight-black);
-  font-stretch: var(--ds-stretch-display);
+  font-weight: var(--ds-weight-semibold);
   line-height: 1;
   letter-spacing: -0.02em;
   text-wrap: balance;
@@ -79,91 +75,21 @@
   color: var(--ds-ink-muted);
 }
 
-/* Escaneo: isla oscura con las cotas encima. Las etiquetas son HTML (no texto
-   SVG) para que nunca bajen de 14 px al encoger la imagen. */
+/* Escaneo del hero: isla oscura con el render (viene sobre negro). */
 .scan {
   position: relative;
   margin: 0;
   aspect-ratio: 900 / 920;
   overflow: hidden;
   border-radius: var(--ds-radius-lg);
-  background: var(--ds-dark-surface-deep);
-  container-type: inline-size;
+  background: var(--ds-scan-bg);
 }
-.scan__img,
-.scan__veil,
-.scan__marks,
-.scan__lines,
-.scan__sweep {
+.scan__img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-}
-.scan__img { object-fit: cover; }
-/* Lo que el escáner aún no ha recorrido queda en penumbra. */
-.scan__veil {
-  background: color-mix(in srgb, var(--ds-dark-surface-deep) 55%, transparent);
-  clip-path: inset(0 0 0 100%);
-  pointer-events: none;
-}
-.scan__lines line {
-  stroke: var(--ds-mark);
-  stroke-width: 2;
-  stroke-linecap: square;
-  vector-effect: non-scaling-stroke;
-}
-.scan__label {
-  position: absolute;
-  padding: 0.3em 0.55em;
-  border-radius: var(--ds-radius-sm);
-  font-family: var(--ds-font-display);
-  font-size: clamp(var(--ds-text-sm), 3.4cqi, 1.25rem);
-  font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-  white-space: nowrap;
-  transform: translate(-50%, -50%);
-}
-.scan__label--cote { background: var(--ds-surface); color: var(--ds-ink); }
-.scan__label--area {
-  background: color-mix(in srgb, var(--ds-dark-surface) 88%, transparent);
-  color: var(--ds-ink-inverse);
-}
-.scan__sweep { opacity: 0; pointer-events: none; }
-.scan__sweep::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 2px;
-  background: var(--ds-mark);
-  box-shadow: 0 0 16px 3px color-mix(in srgb, var(--ds-mark) 55%, transparent);
-}
-
-/* Barrido: la línea, el velo y las cotas comparten duración y curva, así
-   que la línea es siempre el borde de lo ya medido. Transform y clip-path. */
-@media (prefers-reduced-motion: no-preference) {
-  .scan:not(.is-ready) .scan__marks { clip-path: inset(0 100% 0 0); }
-  .scan:not(.is-ready) .scan__veil { clip-path: inset(0); }
-  .scan.is-ready .scan__marks { animation: scan-reveal 1.6s var(--ds-ease-in-out) 0.25s both; }
-  .scan.is-ready .scan__veil { animation: scan-veil 1.6s var(--ds-ease-in-out) 0.25s both; }
-  .scan.is-ready .scan__sweep { animation: scan-sweep 1.6s var(--ds-ease-in-out) 0.25s both; }
-}
-@keyframes scan-reveal {
-  from { clip-path: inset(0 100% 0 0); }
-  to { clip-path: inset(0); }
-}
-@keyframes scan-veil {
-  from { clip-path: inset(0); }
-  to { clip-path: inset(0 0 0 100%); }
-}
-@keyframes scan-sweep {
-  0% { opacity: 1; transform: translateX(-100%); }
-  88% { opacity: 1; }
-  100% { opacity: 0; transform: translateX(0); }
+  object-fit: cover;
 }
 
 /* ── 2. Problema frente a solución ──────────────────────────────────────── */
@@ -186,7 +112,6 @@
 .cmp__label {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-stretch: var(--ds-stretch-heading);
   font-size: var(--ds-text-2xl);
   font-weight: var(--ds-weight-bold);
   line-height: var(--ds-leading-snug);
@@ -272,7 +197,6 @@
   padding: var(--ds-space-3) 0;
   border-top: 1px solid color-mix(in srgb, var(--ds-ink-inverse) 18%, transparent);
   font-family: var(--ds-font-display);
-  font-stretch: var(--ds-stretch-heading);
   font-size: var(--ds-text-2xl);
   font-weight: var(--ds-weight-bold);
   line-height: var(--ds-leading-snug);
@@ -342,7 +266,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   line-height: var(--ds-leading-snug);
 }
 /* Recibe el foco al cambiar de paso (lo anuncia el lector); no es un control. */
@@ -351,7 +274,6 @@
   font-family: var(--ds-font-body);
   font-size: var(--ds-text-sm);
   font-weight: var(--ds-weight-medium);
-  font-stretch: var(--ds-stretch-body);
   color: var(--ds-ink-muted);
 }
 .fm:not(.is-steps) .fm__count { display: none; }
@@ -407,7 +329,7 @@
   .addr__street { grid-column: span 4; }
 }
 
-/* Volver: botón de texto, nunca relleno junto al tomate. */
+/* Volver: botón de texto, nunca relleno junto al principal. */
 .fm__back {
   display: inline-flex;
   flex-shrink: 0;
@@ -417,7 +339,7 @@
   margin-left: calc(var(--ds-space-2) * -1);
   padding: 0 var(--ds-space-3) 0 var(--ds-space-2);
   border: 0;
-  border-radius: var(--ds-radius-md);
+  border-radius: var(--ds-radius-pill);
   background: transparent;
   color: var(--ds-ink-secondary);
   font: inherit;

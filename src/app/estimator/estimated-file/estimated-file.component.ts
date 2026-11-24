@@ -469,7 +469,7 @@ export class EstimatedFileComponent implements OnInit {
   <title>${t('file.exp_abbr')} ${d.numero} — Estimation3D</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,300..700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     @page { size: A4; margin: 2cm; }
@@ -477,17 +477,17 @@ export class EstimatedFileComponent implements OnInit {
        var(--ds-*) de la app. El hex aquí es intencional; los valores se
        mantienen alineados a la paleta canónica de src/styles/tokens.css. */
     :root {
-      --gold:        #1B4532;  /* --ds-action */
-      --gold-faint:  #DDE5D6;  /* --ds-action-faint */
-      --gold-soft:   #C5D3C0;  /* --ds-action-soft */
-      --ink:         #142A20;  /* --ds-ink */
-      --ink-2:       #2E3F35;  /* --ds-ink-secondary */
-      --ink-3:       #4A5547;  /* --ds-ink-muted */
+      --gold:        #9A6B3A;  /* --ds-accent (bronce): filetes y marca; 4.6:1 sobre blanco */
+      --gold-faint:  #F3E7D8;  /* --ds-accent-soft */
+      --gold-soft:   #DCCBB0;  /* --ds-action-soft */
+      --ink:         #2B2119;  /* --ds-ink */
+      --ink-2:       #5C4F43;  /* --ds-ink-secondary */
+      --ink-3:       #6E6156;  /* --ds-ink-muted */
       --surface:     #FFFFFF;  /* papel: en impresión no se rellena con vélin */
-      --border:      #D9CBAE;  /* --ds-border */
-      --bg:          #F1E8D6;  /* --ds-bg-alt (insignias) */
-      --ff-display:  'Archivo', 'Helvetica Neue', Arial, sans-serif;
-      --ff-body:     'Archivo', 'Helvetica Neue', Arial, sans-serif;
+      --border:      #DDD1BF;  /* --ds-border */
+      --bg:          #F4EEE4;  /* --ds-bg-alt (insignias) */
+      --ff-display:  'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+      --ff-body:     'Manrope', 'Helvetica Neue', Arial, sans-serif;
     }
     body {
       font-family: var(--ff-body);
@@ -506,7 +506,7 @@ export class EstimatedFileComponent implements OnInit {
       border-bottom: 3px solid var(--gold);
       margin-bottom: 28px;
     }
-    .letterhead__brand { font-family: var(--ff-display); font-size: 22pt; font-weight: 300; color: var(--ink); letter-spacing: -0.5px; }
+    .letterhead__brand { font-family: var(--ff-display); font-size: 22pt; font-weight: 500; color: var(--ink); letter-spacing: -0.5px; }
     .letterhead__brand span { font-weight: 600; color: var(--gold); }
     .letterhead__meta { text-align: right; font-size: 8.5pt; color: var(--ink-3); line-height: 1.6; }
     .letterhead__meta strong { color: var(--ink-2); font-weight: 500; }
@@ -519,13 +519,13 @@ export class EstimatedFileComponent implements OnInit {
     }
     .title-block__bar { width: 4px; background: var(--gold); border-radius: 2px; flex-shrink: 0; }
     .title-block__eyebrow { font-size: 7.5pt; font-weight: 500; text-transform: uppercase; letter-spacing: 1.5px; color: var(--ink-3); margin-bottom: 4px; }
-    .title-block__name { font-family: var(--ff-display); font-size: 18pt; font-weight: 300; color: var(--ink); line-height: 1.2; }
+    .title-block__name { font-family: var(--ff-display); font-size: 18pt; font-weight: 600; color: var(--ink); line-height: 1.2; }
     .title-block__badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
     .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 7.5pt; font-weight: 500; border: 1px solid var(--border); color: var(--ink-2); background: var(--bg); }
     .badge--gold { background: var(--gold-faint); border-color: var(--gold-soft); color: var(--ink); }
     /* ── Sections ── */
     .section { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; margin-bottom: 16px; }
-    .section__title { font-family: var(--ff-display); font-size: 11pt; font-weight: 400; color: var(--ink); margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+    .section__title { font-family: var(--ff-display); font-size: 13pt; font-weight: 600; color: var(--ink); margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
     /* ── Info grid ── */
     .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; }
     .info-grid--wide { grid-template-columns: 2fr 1fr 1fr; }
@@ -549,7 +549,7 @@ export class EstimatedFileComponent implements OnInit {
     .cost-block__row { display: flex; align-items: center; gap: 20px; }
     .cost-item { display: flex; flex-direction: column; gap: 2px; }
     .cost-item__tag { font-size: 7pt; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--ink-3); }
-    .cost-item__value { font-family: var(--ff-display); font-size: 20pt; font-weight: 300; color: var(--ink); line-height: 1; }
+    .cost-item__value { font-family: var(--ff-display); font-size: 20pt; font-weight: 500; color: var(--ink); line-height: 1; }
     .cost-item__sep { font-size: 14pt; color: var(--gold); font-weight: 300; align-self: flex-end; margin-bottom: 4px; }
     /* ── Prose blocks ── */
     .prose-block { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
@@ -566,7 +566,7 @@ export class EstimatedFileComponent implements OnInit {
       font-size: 7.5pt;
       color: var(--ink-3);
     }
-    .footer__brand { font-family: var(--ff-display); font-size: 9pt; color: var(--ink-3); font-weight: 300; }
+    .footer__brand { font-family: var(--ff-display); font-size: 10pt; color: var(--ink-3); font-weight: 500; }
     .footer__brand span { color: var(--gold); }
     .empty-note { font-size: 10pt; color: var(--ink-3); font-style: italic; }
     /* ── Print ── */

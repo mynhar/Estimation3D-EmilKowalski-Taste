@@ -628,7 +628,7 @@
             }
             {{ (guardandoVisita() ? 'estimator_file.saving' : 'estimator_file.save_draft') | translate }}
           </button>
-          <button mat-flat-button type="button" class="ds-cta" [disabled]="guardando()" (click)="guardarEstimacion()">
+          <button mat-flat-button type="button" [disabled]="guardando()" (click)="guardarEstimacion()">
             @if (guardando()) {
               <span class="fi-spinner" aria-hidden="true"></span>
             } @else {

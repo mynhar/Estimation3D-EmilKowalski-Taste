@@ -28,33 +28,6 @@ export const COMPARE_ROWS = ['1', '2', '3', '4'] as const;
 /** Los cuatro verbos del tour 3D. */
 export const IMMERSION_WORDS = ['1', '2', '3', '4'] as const;
 
-/**
- * Cotas sobre el escaneo del hero, en el sistema de coordenadas de la imagen
- * (900 × 920 px). Son medidas del plano Jolicoeur: la firma del escaneo solo dibuja
- * una cota cuando la medida es real.
- */
-export interface HeroCote {
-  /** Extremos de la línea de cota. */
-  x1: number; y1: number; x2: number; y2: number;
-  /** Centro de la etiqueta. */
-  lx: number; ly: number;
-  label: string;
-}
-
-export const HERO_COTES: readonly HeroCote[] = [
-  { x1: 448, y1: 38, x2: 765, y2: 38, lx: 606, ly: 38, label: '14′ 2″' },
-  { x1: 90, y1: 260, x2: 90, y2: 605, lx: 90, ly: 432, label: '11′ 6″' },
-] as const;
-
-/** Superficies por pieza sobre el mismo escaneo. */
-export interface HeroArea { x: number; y: number; value: number; }
-
-export const HERO_AREAS: readonly HeroArea[] = [
-  { x: 281, y: 432, value: 100 },
-  { x: 606, y: 265, value: 177 },
-  { x: 631, y: 728, value: 112 },
-] as const;
-
 /** Opciones del selector "type de propriété". */
 export const PROPERTY_TYPES = ['house', 'apartment', 'building', 'commercial', 'other'] as const;
 export type PropertyType = (typeof PROPERTY_TYPES)[number];

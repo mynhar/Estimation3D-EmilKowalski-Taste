@@ -82,8 +82,6 @@ export class FilesUnderEstimationComponent implements OnInit {
 
   hayFiltros = computed(() => this.busqueda() !== '' || this.soloUrgentes());
 
-  /** Tomate solo en el primer dossier de la lista: la siguiente etapa es terminar su estimación. */
-  ctaId = computed(() => this.expedientesFiltrados()[0]?.id ?? null);
 
   async ngOnInit() {
     const userId = this.user()?.id;

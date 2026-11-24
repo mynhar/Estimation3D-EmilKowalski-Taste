@@ -10,7 +10,7 @@
 
 :host { display: block; container-type: inline-size; min-width: 0; }
 
-.ob-fig { font-stretch: var(--ds-stretch-figure); font-variant-numeric: tabular-nums; }
+.ob-fig { font-variant-numeric: lining-nums tabular-nums; }
 
 .ob {
   display: grid;
@@ -43,8 +43,7 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink);
 }
 .ob-id__svc { margin: 0; color: var(--ds-ink-secondary); }
@@ -65,8 +64,7 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-4xl);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   line-height: 1;
   color: var(--ds-ink);
 }
@@ -147,8 +145,7 @@
 .ob-kpi dd {
   margin: 0;
   font-weight: var(--ds-weight-semibold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink);
 }
 
@@ -188,7 +185,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-base);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   color: var(--ds-ink);
 }
 .ob-panel__title mat-icon { flex-shrink: 0; color: var(--ds-ink-muted); }
@@ -197,8 +193,7 @@
   font-family: var(--ds-font-body);
   font-size: var(--ds-text-sm);
   font-weight: var(--ds-weight-regular);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink-secondary);
 }
 .ob-panel,
@@ -256,8 +251,7 @@
 .ob-when strong {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink);
 }
 .ob-when small { font-size: var(--ds-text-sm); color: var(--ds-ink-secondary); }
@@ -268,8 +262,7 @@
   display: flex;
   align-items: baseline;
   gap: var(--ds-space-2);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .ob-event__acum { font-size: var(--ds-text-lg); font-weight: var(--ds-weight-bold); color: var(--ds-ink); }
 .ob-event__delta { font-size: var(--ds-text-sm); font-weight: var(--ds-weight-semibold); color: var(--ds-success); }
@@ -301,8 +294,7 @@
   flex-shrink: 0;
   font-size: var(--ds-text-sm);
   font-weight: var(--ds-weight-semibold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink-secondary);
 }
 .ob-bar.is-off .ob-bar__name { color: var(--ds-ink-secondary); }
@@ -334,8 +326,7 @@
   border-radius: var(--ds-radius-pill);
   background: var(--ds-band);
   color: var(--ds-ink);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 .ob-strip {

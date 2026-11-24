@@ -1,9 +1,9 @@
-<!-- Landing pública, dirección Trait rouge. Seis secciones; el texto vive en i18n bajo `landing.*`. -->
+<!-- Landing pública (Lin et bronze; se rediseña en la fase 1). Seis secciones; el texto vive en i18n bajo `landing.*`. -->
 <a class="skip" href="#contenu" (click)="goTo('contenu', $event)">{{ 'nav.skip' | translate }}</a>
 
 <!-- ── Cabecera (compartida con Le Journal y Entrepreneurs) ─────────────── -->
-<!-- El botón de la cabecera es tomate solo cuando el del hero ya no se ve. -->
-<app-site-header pagina="inicio" [ctaTomate]="ctaBar()" (irA)="goTo($event)" (arriba)="goTop()" />
+<!-- El botón de la cabecera va relleno solo cuando el del hero ya no se ve. -->
+<app-site-header pagina="inicio" [ctaRelleno]="ctaBar()" (irA)="goTo($event)" (arriba)="goTop()" />
 
 <main id="contenu" tabindex="-1">
 
@@ -16,41 +16,15 @@
         </h1>
         <p class="hero__lede">{{ 'landing.hero.lede' | translate }}</p>
         <div class="hero__actions">
-          <a class="button button--lg button--cta" href="#dossier" (click)="goTo('dossier', $event)">{{ 'landing.nav.cta' | translate }}</a>
+          <a class="button button--lg" href="#dossier" (click)="goTo('dossier', $event)">{{ 'landing.nav.cta' | translate }}</a>
           <a class="link" href="#processus" (click)="goTo('processus', $event)">{{ 'landing.hero.cta_secondary' | translate }}</a>
         </div>
         <p class="hero__price">{{ 'landing.hero.price' | translate }}</p>
       </div>
 
-      <!-- El momento de la página: el barrido tomate recorre el escaneo una vez y deja las cotas. -->
-      <figure class="scan" [class.is-ready]="scanReady()">
+      <figure class="scan">
         <img class="scan__img" [ngSrc]="media.scan" width="900" height="920" priority
-             [alt]="'landing.hero.scan_alt' | translate"
-             (load)="scanReady.set(true)" (error)="scanReady.set(true)" />
-        <span class="scan__veil" aria-hidden="true"></span>
-        <div class="scan__marks" aria-hidden="true">
-          <svg class="scan__lines" viewBox="0 0 900 920" preserveAspectRatio="none" focusable="false">
-            @for (c of cotes; track c.label) {
-              <line [attr.x1]="c.x1" [attr.y1]="c.y1" [attr.x2]="c.x2" [attr.y2]="c.y2" />
-              @if (c.y1 === c.y2) {
-                <line [attr.x1]="c.x1" [attr.y1]="c.y1 - 16" [attr.x2]="c.x1" [attr.y2]="c.y1 + 16" />
-                <line [attr.x1]="c.x2" [attr.y1]="c.y2 - 16" [attr.x2]="c.x2" [attr.y2]="c.y2 + 16" />
-              } @else {
-                <line [attr.x1]="c.x1 - 16" [attr.y1]="c.y1" [attr.x2]="c.x1 + 16" [attr.y2]="c.y1" />
-                <line [attr.x1]="c.x2 - 16" [attr.y1]="c.y2" [attr.x2]="c.x2 + 16" [attr.y2]="c.y2" />
-              }
-            }
-          </svg>
-          @for (c of cotes; track c.label) {
-            <span class="scan__label scan__label--cote"
-                  [style.left.%]="c.lx / 9" [style.top.%]="c.ly / 9.2">{{ c.label }}</span>
-          }
-          @for (a of areas; track a.value) {
-            <span class="scan__label scan__label--area"
-                  [style.left.%]="a.x / 9" [style.top.%]="a.y / 9.2">{{ a.value }}&nbsp;ft²</span>
-          }
-        </div>
-        <span class="scan__sweep" aria-hidden="true"></span>
+             [alt]="'landing.hero.scan_alt' | translate" />
       </figure>
     </div>
   </section>
@@ -383,7 +357,7 @@
                 </button>
               }
               <!-- Activo aunque falten datos: al pulsarlo, el paso o el resumen dicen qué falta. -->
-              <button type="submit" class="button button--lg button--cta fm__submit" [disabled]="sending()">
+              <button type="submit" class="button button--lg fm__submit" [disabled]="sending()">
                 @if (sending()) { <span class="spinner" aria-hidden="true"></span> }
                 @if (pasos() && paso() < 3) {
                   {{ 'common.continue' | translate }}
@@ -414,5 +388,5 @@
 
 <!-- ── Botón fijo (móvil): aparece al salir del hero, se va al llegar al formulario ── -->
 <div class="ctabar" [class.is-on]="ctaBar()">
-  <a class="button button--lg button--cta ctabar__btn" href="#dossier" (click)="goTo('dossier', $event)">{{ 'landing.nav.cta' | translate }}</a>
+  <a class="button button--lg ctabar__btn" href="#dossier" (click)="goTo('dossier', $event)">{{ 'landing.nav.cta' | translate }}</a>
 </div>

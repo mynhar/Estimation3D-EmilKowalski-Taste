@@ -30,14 +30,12 @@
   color: var(--ds-ink-inverse);
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-black);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-weight: var(--ds-weight-semibold);
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .step__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-stretch: var(--ds-stretch-heading);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
   line-height: var(--ds-leading-snug);
@@ -76,7 +74,6 @@
 .svc__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-stretch: var(--ds-stretch-heading);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
   line-height: var(--ds-leading-snug);
@@ -152,7 +149,7 @@ legend.fld__label { margin-bottom: var(--ds-space-2); }
 .fld__input::placeholder { color: var(--ds-ink-muted); opacity: 1; }
 .fld__input--area { min-height: 128px; padding-block: var(--ds-space-3); line-height: var(--ds-leading-normal); resize: vertical; }
 .fld__input--upper { text-transform: uppercase; }
-.fld__input--fig { font-variant-numeric: tabular-nums; }
+.fld__input--fig { font-variant-numeric: lining-nums tabular-nums; }
 .fld__input--upper::placeholder { text-transform: none; }
 .fld__input:focus { outline: none; border-color: var(--ds-action); box-shadow: 0 0 0 1px var(--ds-action); }
 .fld__input[aria-invalid='true'] { border-color: var(--ds-danger); box-shadow: 0 0 0 1px var(--ds-danger); }

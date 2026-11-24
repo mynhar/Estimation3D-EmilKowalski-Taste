@@ -147,9 +147,8 @@
       </div>
 
       <div class="ct__actions">
-        <!-- Firmar: la siguiente etapa. Tomate solo en un contrato a la vez (ctaId). -->
         @if (c.estado === 'generado' && !ocupado) {
-          <button mat-flat-button type="button" class="ct__sign" [class.ds-cta]="ctaId() === c.id"
+          <button mat-flat-button type="button" class="ct__sign"
                   [id]="'ct-sign-open-' + c.id" (click)="abrirPanelFirma(c.id)">
             <mat-icon>draw</mat-icon>
             {{ 'contract_list.sign_btn' | translate }}
@@ -235,7 +234,7 @@
         </mat-checkbox>
 
         <div class="ct-panel__actions">
-          <button mat-flat-button type="button" class="ds-cta"
+          <button mat-flat-button type="button"
                   [disabled]="!aceptado() || firmandoId() === c.id" (click)="confirmarFirma(c)">
             @if (firmandoId() === c.id) {
               <span class="ct__spinner" aria-hidden="true"></span>

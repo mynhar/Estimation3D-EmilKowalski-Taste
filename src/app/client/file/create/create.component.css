@@ -29,8 +29,7 @@
   color: var(--ds-ink);
   font-size: var(--ds-text-sm);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .fc-process__text { display: grid; gap: 2px; min-width: 0; }
 .fc-process__title { font-weight: var(--ds-weight-bold); color: var(--ds-ink); }

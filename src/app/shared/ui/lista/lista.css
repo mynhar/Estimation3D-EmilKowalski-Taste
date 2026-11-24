@@ -20,8 +20,7 @@
 }
 
 .ls-fig {
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .ls-nowrap { white-space: nowrap; }
 
@@ -52,11 +51,9 @@
 }
 .ls-toggle {
   --mat-button-toggle-height: 44px;
-  --mat-button-toggle-shape: var(--ds-radius-md);
+  --mat-button-toggle-shape: var(--ds-radius-pill);
   --mat-button-toggle-text-color: var(--ds-ink-secondary);
   --mat-button-toggle-background-color: var(--ds-surface);
-  --mat-button-toggle-selected-state-background-color: var(--ds-action-faint);
-  --mat-button-toggle-selected-state-text-color: var(--ds-action-ink);
   --mat-button-toggle-divider-color: var(--ds-border);
   --mat-button-toggle-label-text-size: var(--ds-text-base);
   --mat-button-toggle-label-text-weight: var(--ds-weight-semibold);
@@ -64,8 +61,7 @@
 .ls-count {
   margin-left: var(--ds-space-1);
   font-weight: var(--ds-weight-regular);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .ls-view { margin-left: auto; }
 .ls-view mat-icon { width: 22px; height: 22px; font-size: 22px; vertical-align: middle; }
@@ -91,7 +87,7 @@
   }
   .ls-filter.is-grid mat-button-toggle {
     border: 1px solid var(--ds-border);
-    border-radius: var(--ds-radius-md);
+    border-radius: var(--ds-radius-pill);
   }
   .ls-filter.is-grid mat-button-toggle:first-child { grid-column: 1 / -1; }
   /* Opción de etiqueta larga («En cours d'exécution»): fila entera para que quepa la cifra. */
@@ -245,7 +241,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
   overflow-wrap: anywhere;
@@ -268,8 +263,7 @@
 .ls-card__num {
   margin: calc(var(--ds-space-1) * -1) 0 0;
   font-size: var(--ds-text-sm);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink-muted);
   overflow-wrap: anywhere;
 }
@@ -394,7 +388,6 @@
   color: var(--ds-ink);
   font-family: var(--ds-font-display);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   text-decoration: none;
 }
 .ls-table__link:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }

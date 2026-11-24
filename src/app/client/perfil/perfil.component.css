@@ -4,7 +4,7 @@
  *         interactivos: default · hover · focus-visible · active · disabled (lo pone Material)
  * contrast: nombre ink (13.6:1 sobre vélin) · datos ink-secondary · notas ink-muted (7.0:1)
  *           «Actif» success-ink · guardado success-ink sobre success-soft · error danger-ink sobre danger-soft (5.8:1)
- *           tomate: solo el punto de aviso de «cambios sin guardar» (--ds-mark), lejos del botón abeto
+ *           bronce: el punto de aviso de «cambios sin guardar» (--ds-accent, solo gráfico)
  * type: nombre 112 %; resto cuerpo
  */
 
@@ -65,7 +65,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
   overflow-wrap: anywhere;
@@ -129,7 +128,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   color: var(--ds-ink);
 }
 /* «Cambios sin guardar»: punto de aviso tomate sobre crema, texto en tinta. */
@@ -145,7 +143,7 @@
   font-weight: var(--ds-weight-semibold);
   color: var(--ds-ink-secondary);
 }
-.pf-pending__dot { width: 8px; height: 8px; border-radius: var(--ds-radius-circle); background: var(--ds-mark); }
+.pf-pending__dot { width: 8px; height: 8px; border-radius: var(--ds-radius-circle); background: var(--ds-accent); }
 
 .pf-live:empty { display: none; }
 .pf-msg {

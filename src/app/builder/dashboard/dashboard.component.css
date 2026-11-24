@@ -30,7 +30,6 @@
 .bd-h2 {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-stretch: var(--ds-stretch-heading);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
   line-height: var(--ds-leading-snug);
@@ -47,8 +46,7 @@
   color: var(--ds-ink);
   font-size: var(--ds-text-sm);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .bd-link {
   margin-left: auto;
@@ -66,8 +64,7 @@
 .bd-fig {
   font-family: var(--ds-font-display);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink);
 }
 /* Claves que empiezan en minúscula («avancement moyen», «mis à jour le…»). */
@@ -165,7 +162,6 @@
 .bd-work__service {
   min-width: 0;
   font-family: var(--ds-font-display);
-  font-stretch: var(--ds-stretch-heading);
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-bold);
   line-height: var(--ds-leading-snug);
@@ -186,9 +182,8 @@
 .bd-work__pct {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-2xl);
-  font-weight: var(--ds-weight-black);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-weight: var(--ds-weight-semibold);
+  font-variant-numeric: lining-nums tabular-nums;
   line-height: var(--ds-leading-tight);
 }
 
@@ -309,8 +304,7 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   white-space: nowrap;
 }
 @media (min-width: 768px) {
@@ -338,9 +332,8 @@
 .bd-sum__amount {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-3xl);
-  font-weight: var(--ds-weight-black);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-weight: var(--ds-weight-semibold);
+  font-variant-numeric: lining-nums tabular-nums;
   line-height: var(--ds-leading-tight);
   color: var(--ds-ink);
 }

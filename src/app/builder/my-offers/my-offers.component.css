@@ -18,8 +18,7 @@
 .ofs-find { min-height: 44px; }
 
 .ofs-fig {
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .ofs-nowrap { white-space: nowrap; }
 
@@ -47,11 +46,9 @@
 
 .ofs-toggle {
   --mat-button-toggle-height: 44px;
-  --mat-button-toggle-shape: var(--ds-radius-md);
+  --mat-button-toggle-shape: var(--ds-radius-pill);
   --mat-button-toggle-text-color: var(--ds-ink-secondary);
   --mat-button-toggle-background-color: var(--ds-surface);
-  --mat-button-toggle-selected-state-background-color: var(--ds-action-faint);
-  --mat-button-toggle-selected-state-text-color: var(--ds-action-ink);
   --mat-button-toggle-divider-color: var(--ds-border);
   --mat-button-toggle-label-text-size: var(--ds-text-base);
   --mat-button-toggle-label-text-weight: var(--ds-weight-semibold);
@@ -59,8 +56,7 @@
 .ofs-count {
   margin-left: var(--ds-space-1);
   font-weight: var(--ds-weight-regular);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 /* Cuatro estados no caben en una fila de móvil: rejilla 2 × 2 de botones sueltos. */
 @media (max-width: 699.98px) {
@@ -76,7 +72,7 @@
   }
   .ofs-filter mat-button-toggle {
     border: 1px solid var(--ds-border);
-    border-radius: var(--ds-radius-md);
+    border-radius: var(--ds-radius-pill);
   }
 }
 
@@ -94,7 +90,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-2xl);
-  font-weight: var(--ds-weight-black);
+  font-weight: var(--ds-weight-semibold);
   line-height: 44px;
   color: var(--ds-ink);
 }
@@ -193,7 +189,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   line-height: var(--ds-leading-snug);
 }
 /* Dossier archivado: ya no hay servicio que mostrar, solo el porqué. */
@@ -201,7 +196,6 @@
   font-family: var(--ds-font-body);
   font-size: var(--ds-text-base);
   font-weight: var(--ds-weight-medium);
-  font-stretch: normal;
 }
 .ofs-card__title.is-hidden-file .ofs-card__link { color: var(--ds-ink-secondary); }
 .ofs-card__link {
@@ -223,8 +217,7 @@
 .ofs-card__num {
   margin: calc(var(--ds-space-1) * -1) 0 0;
   font-size: var(--ds-text-sm);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink-muted);
   overflow-wrap: anywhere;
 }
@@ -289,8 +282,7 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   line-height: var(--ds-leading-tight);
 }
 .ofs-card__sub { display: block; font-size: var(--ds-text-sm); color: var(--ds-ink-muted); }
@@ -301,8 +293,7 @@
   gap: var(--ds-space-2);
   margin: 0;
   font-size: var(--ds-text-sm);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink-muted);
 }
 .ofs-card__date mat-icon { margin-top: 1px; }
@@ -362,13 +353,11 @@
   color: var(--ds-ink);
   font-family: var(--ds-font-display);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   text-decoration: none;
 }
 .ofs-table__link.is-hidden-file {
   font-family: var(--ds-font-body);
   font-weight: var(--ds-weight-medium);
-  font-stretch: normal;
   color: var(--ds-ink-secondary);
 }
 .ofs-table__link:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }

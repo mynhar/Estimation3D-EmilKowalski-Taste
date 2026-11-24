@@ -376,7 +376,7 @@
         }
 
         <div class="mo-actions">
-          <button mat-flat-button type="button" class="mo-submit" [class.ds-cta]="!ofertaId()"
+          <button mat-flat-button type="button" class="mo-submit"
                   (click)="enviar(f)"
                   [disabled]="enviando() || (enviada() && !ofertaId())">
             @if (enviando()) {

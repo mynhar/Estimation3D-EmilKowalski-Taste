@@ -10,7 +10,7 @@
   grid-auto-columns: 1fr;
   gap: 2px;
   padding: 2px;
-  border-radius: var(--ds-radius-md);
+  border-radius: var(--ds-radius-pill);
   background: var(--ds-band);
 }
 
@@ -21,7 +21,7 @@
   min-height: 36px;
   padding: 0 var(--ds-space-2);
   border: 0;
-  border-radius: var(--ds-radius-sm);
+  border-radius: var(--ds-radius-pill);
   background: transparent;
   color: var(--ds-ink-secondary);
   font: inherit;

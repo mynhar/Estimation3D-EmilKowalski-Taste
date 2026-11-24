@@ -40,7 +40,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
   overflow-wrap: anywhere;
@@ -85,11 +84,9 @@
 /* ── Modo: control segmentado (mat-button-toggle) ─────────────────────────── */
 .rec-modes {
   --mat-button-toggle-height: 44px;
-  --mat-button-toggle-shape: var(--ds-radius-md);
+  --mat-button-toggle-shape: var(--ds-radius-pill);
   --mat-button-toggle-text-color: var(--ds-ink-secondary);
   --mat-button-toggle-background-color: var(--ds-surface);
-  --mat-button-toggle-selected-state-background-color: var(--ds-action-faint);
-  --mat-button-toggle-selected-state-text-color: var(--ds-action-ink);
   --mat-button-toggle-divider-color: var(--ds-border);
   --mat-button-toggle-label-text-size: var(--ds-text-base);
   --mat-button-toggle-label-text-weight: var(--ds-weight-semibold);
@@ -111,7 +108,7 @@
   }
   .rec-modes mat-button-toggle {
     border: 1px solid var(--ds-border);
-    border-radius: var(--ds-radius-md);
+    border-radius: var(--ds-radius-pill);
   }
 }
 
@@ -258,10 +255,9 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-5xl);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
   line-height: 1;
   color: var(--ds-ink);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 /* Sólo cámara: escenario centrado; el resto de la página se atenúa. */
@@ -335,7 +331,7 @@
   width: 30px;
   height: 30px;
   border: 0;
-  border-radius: var(--ds-radius-md);
+  border-radius: var(--ds-radius-pill);
   background: color-mix(in oklch, var(--ds-ink-inverse) 12%, transparent);
   color: var(--ds-ink-inverse);
   transition: var(--ds-transition-color);
@@ -378,8 +374,7 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-base);
   font-weight: var(--ds-weight-semibold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .rec-bar__max { color: color-mix(in oklch, var(--ds-ink-inverse) 72%, transparent); }
 /* Últimos 15 s: el contador toma el color del punto de grabación (6.1:1 sobre abeto). */
@@ -398,7 +393,7 @@
   flex-shrink: 0;
   padding: 0;
   border: 0;
-  border-radius: var(--ds-radius-md);
+  border-radius: var(--ds-radius-pill);
   background: color-mix(in oklch, var(--ds-ink-inverse) 10%, transparent);
   color: var(--ds-ink-inverse);
   cursor: pointer;
@@ -479,7 +474,7 @@
   width: 30px;
   height: 30px;
   border: 0;
-  border-radius: var(--ds-radius-md);
+  border-radius: var(--ds-radius-pill);
   background: color-mix(in oklch, var(--ds-dark-surface-deep) 88%, transparent);
   color: var(--ds-ink-inverse);
 }
@@ -525,7 +520,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-5xl);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
   line-height: 1;
 }
 

@@ -36,8 +36,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: clamp(2.125rem, 3.4vw + 1.1rem, 4.25rem);
-  font-weight: var(--ds-weight-black);
-  font-stretch: var(--ds-stretch-display);
+  font-weight: var(--ds-weight-semibold);
   line-height: 1;
   letter-spacing: -0.02em;
   text-wrap: balance;
@@ -96,7 +95,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   line-height: var(--ds-leading-snug);
   text-wrap: balance;
 }
@@ -134,7 +132,6 @@
   font-family: var(--ds-font-display);
   font-size: clamp(1.5rem, 1.2vw + 1.1rem, 2rem);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   line-height: 1.15;
   text-wrap: balance;
 }

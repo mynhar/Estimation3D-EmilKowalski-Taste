@@ -46,14 +46,14 @@
           }
           <!-- La siguiente etapa del contrato: firmar o dar por terminado. -->
           @if (puedeFirmar) {
-            <button mat-flat-button type="button" class="ds-cta"
+            <button mat-flat-button type="button"
                     [disabled]="firmando()" [attr.aria-expanded]="confirmandoFirmar()"
                     (click)="iniciarFirmar()">
               <mat-icon>draw</mat-icon>
               {{ 'admin_contract_detail.firmar_btn' | translate }}
             </button>
           } @else if (puedeCompletar) {
-            <button mat-flat-button type="button" class="ds-cta"
+            <button mat-flat-button type="button"
                     [disabled]="completando()" [attr.aria-expanded]="confirmandoCompletar()"
                     (click)="iniciarCompletar()">
               <mat-icon>task_alt</mat-icon>

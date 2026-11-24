@@ -45,8 +45,7 @@
   background: var(--ds-band);
   color: var(--ds-ink);
   font-size: var(--ds-text-sm);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   font-weight: var(--ds-weight-semibold);
 }
 
@@ -66,7 +65,6 @@
   margin: 0 0 var(--ds-space-2);
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-stretch: var(--ds-stretch-heading);
   font-weight: var(--ds-weight-bold);
   color: var(--ds-ink);
 }

@@ -35,7 +35,6 @@
   min-width: 0;
   margin: 0;
   font-family: var(--ds-font-display);
-  font-stretch: var(--ds-stretch-heading);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
   line-height: var(--ds-leading-snug);
@@ -73,7 +72,6 @@
 .cx-row__name {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-stretch: var(--ds-stretch-heading);
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-bold);
   line-height: var(--ds-leading-snug);
@@ -124,11 +122,10 @@
 }
 .cx-row__pct {
   font-family: var(--ds-font-display);
-  font-stretch: var(--ds-stretch-figure);
   font-size: var(--ds-text-2xl);
-  font-weight: var(--ds-weight-black);
+  font-weight: var(--ds-weight-semibold);
   line-height: 1;
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink);
 }
 .cx-row__pct--done { color: var(--ds-success-ink); }
@@ -182,11 +179,10 @@
 }
 .cx-row__price {
   font-family: var(--ds-font-display);
-  font-stretch: var(--ds-stretch-figure);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
   line-height: 1.1;
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink);
   white-space: nowrap;
 }
@@ -322,11 +318,10 @@
 }
 .cx__total-value {
   font-family: var(--ds-font-display);
-  font-stretch: var(--ds-stretch-figure);
   font-size: clamp(var(--ds-text-xl), 7cqi, var(--ds-text-3xl));
-  font-weight: var(--ds-weight-black);
+  font-weight: var(--ds-weight-semibold);
   line-height: 1;
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink);
   white-space: nowrap;
 }

@@ -314,12 +314,6 @@ export class ConstructionMonitoringComponent implements OnInit, OnDestroy {
     return this.esAdmin && !!c && c.estado !== 'archivado' && c.expediente_estado !== 'archivado';
   });
 
-  /**
-   * El botón tomate de la vista: para el administrador, completar el contrato
-   * cuando la obra llegó al 100 %; si no, guardar el parte del día.
-   */
-  ctaCompletar = computed(() => this.esAdmin && this.obraTerminada());
-
   /** Tras archivar: cierra la confirmación de completar y relee contrato y avance. */
   recargarTrasArchivar = async (): Promise<void> => {
     this.confirmandoCompletar.set(false);

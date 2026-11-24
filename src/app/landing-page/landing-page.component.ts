@@ -16,7 +16,7 @@ import { LangService } from '../services/lang.service';
 import { SolicitudLandingService } from '../services/solicitud-landing.service';
 import { CAMPOS_FALTANTES } from '../shared/ui/campos-faltantes/campos-faltantes.component';
 import {
-  COMPARE_ROWS, HERO_AREAS, HERO_COTES, IMMERSION_WORDS, MEDIA, PROCESS_STEPS,
+  COMPARE_ROWS, IMMERSION_WORDS, MEDIA, PROCESS_STEPS,
   PROPERTY_TYPES, SPECIALTIES,
 } from './landing.data';
 
@@ -36,17 +36,16 @@ const CONTROLES_PASO = {
 } as const;
 
 /**
- * Landing pública, dirección Trait rouge: una sola superficie clara, seis secciones
+ * Landing pública (Lin et bronze; se rediseña en la fase 1): seis secciones
  * (escaneo, problema frente a solución, pasos, especialidades, tour 3D y
- * formulario) y un único momento de movimiento, el barrido del escáner del hero.
+ * formulario).
  *
  * Sin Material salvo botón de icono, iconos y el menú de idioma, que el armazón
  * de la aplicación ya carga: los campos y botones son CSS propio para que la
  * primera visita en 4G no cargue el resto de la librería.
  *
- * «Créer mon dossier» es la siguiente etapa y va en tomate, pero solo un botón
- * tomate a la vista: el del hero, después el de la barra fija (móvil) o el de la
- * cabecera (escritorio), y al llegar al formulario el de enviar.
+ * «Créer mon dossier» va relleno (espresso) solo en un sitio a la vez: el del
+ * hero; mientras se ve, el de la cabecera va de contorno.
  */
 @Component({
   selector: 'app-landing-page',
@@ -79,15 +78,11 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   readonly steps = PROCESS_STEPS;
   readonly compareRows = COMPARE_ROWS;
   readonly immersionWords = IMMERSION_WORDS;
-  readonly cotes = HERO_COTES;
-  readonly areas = HERO_AREAS;
   readonly propertyTypes = PROPERTY_TYPES;
   readonly provincesCanada = PROVINCIAS_CANADA;
   readonly media = MEDIA;
 
   // ── Estado de interfaz ────────────────────────────────────────────────────
-  /** El escaneo del hero cargó: arranca el barrido (antes pasaría sobre una caja vacía). */
-  readonly scanReady = signal(false);
   /** Botón fijo de móvil: entre el final del hero y el principio del formulario. */
   readonly ctaBar = signal(false);
   /** Envíos con campos sin completar: cada uno trae el resumen de lo que falta. */

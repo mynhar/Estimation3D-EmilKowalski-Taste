@@ -55,7 +55,7 @@
   gap: var(--ds-space-2);
   min-height: 40px;
   padding: 0 var(--ds-space-3);
-  border-radius: var(--ds-radius-md);
+  border-radius: var(--ds-radius-pill);
   font-size: var(--ds-text-sm);
   font-weight: var(--ds-weight-bold);
   white-space: nowrap;

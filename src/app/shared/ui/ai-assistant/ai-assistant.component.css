@@ -75,7 +75,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   color: var(--ds-ink);
 }
 .ai-intro__lead { margin: 0; line-height: var(--ds-leading-relaxed); color: var(--ds-ink-secondary); }
@@ -165,7 +164,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-base);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   color: var(--ds-ink);
 }
 

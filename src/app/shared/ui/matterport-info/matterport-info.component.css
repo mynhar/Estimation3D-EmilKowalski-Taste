@@ -33,7 +33,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   color: var(--ds-ink);
 }
 .mpi-card__title mat-icon { flex-shrink: 0; color: var(--ds-action); }
@@ -52,8 +51,7 @@
   font-family: var(--ds-font-body);
   font-size: var(--ds-text-sm);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 /* ── Botón de sincronizar (de contorno) ──────────────────────────────────── */
@@ -145,7 +143,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
   overflow-wrap: anywhere;
@@ -233,8 +230,7 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-2xl);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   line-height: var(--ds-leading-tight);
   color: var(--ds-ink);
   overflow-wrap: anywhere;
@@ -266,8 +262,7 @@
 .mpi-planta__nombre { color: var(--ds-ink); overflow-wrap: anywhere; }
 .mpi-planta__dato {
   flex: 0 0 auto;
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink-secondary);
 }
 
@@ -324,8 +319,7 @@
 }
 .mpi-tabla__num {
   text-align: right;
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 .mpi-tag {

@@ -24,8 +24,7 @@
 .rp-bar__all { font-weight: var(--ds-weight-semibold); }
 .rp-bar__count {
   font-size: var(--ds-text-sm);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink-secondary);
 }
 .rp-bar__clear { min-height: 44px; margin-left: auto; }

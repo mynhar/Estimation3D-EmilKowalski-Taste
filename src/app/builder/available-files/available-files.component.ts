@@ -111,14 +111,6 @@ export class AvailableFilesComponent implements OnInit {
     return this.expedientesFiltrados().slice(desde, desde + this.POR_PAGINA);
   });
 
-  /**
-   * La siguiente etapa del constructor es ofertar: solo la primera tarjeta de la página
-   * en la que aún puede hacerlo lleva el botón tomate; las demás, abeto.
-   */
-  ctaId = computed(() =>
-    this.expedientesPaginados().find(e => this.puedeOfertar(e))?.id ?? null
-  );
-
   totalUrgentes = computed(() =>
     this.expedientes().filter(e => this.esUrgente(e.id)).length
   );

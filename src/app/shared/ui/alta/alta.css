@@ -3,7 +3,7 @@
  *   styleUrls: ['…/shared/ui/alta/alta.css', './x.component.css']
  * Piezas: cabecera con volver y n/4 · tarjetas de sección numeradas (es una secuencia real)
  *         · rejilla de campos Material · tipo de bien en radios-tarjeta · GPS plegable
- *         · raíl con resumen, envío tomate (.ds-cta, uno por vista) y qué falta
+ *         · raíl con resumen, envío (botón relleno espresso) y qué falta
  * states: sección pendiente / lista · campo con error (mat-error con icono) · enviando · error
  * contrast: títulos ink (13.6:1 sobre vélin) · ayudas ink-muted (6.8:1) · errores danger (5.9:1) con icono
  *           tipo de bien marcado: abeto sobre action-faint (7.4:1)
@@ -40,8 +40,7 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-2xl);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink);
 }
 
@@ -55,8 +54,7 @@
 }
 .fc-meta__num {
   font-weight: var(--ds-weight-semibold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink-secondary);
 }
 
@@ -108,8 +106,7 @@
   border-radius: var(--ds-radius-circle);
   color: var(--ds-action);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .fc-num mat-icon { width: 20px; height: 20px; font-size: 20px; }
 .fc-card.is-done .fc-num { background: var(--ds-action); color: var(--ds-on-action); }
@@ -119,7 +116,6 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
 }
@@ -183,8 +179,7 @@ mat-error mat-icon {
   margin-top: 1px;
 }
 .fc-counter {
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .fc-counter.is-warn { color: var(--ds-warning-ink); font-weight: var(--ds-weight-bold); }
 .fc-upper { text-transform: uppercase; }
@@ -468,7 +463,6 @@ mat-error mat-icon {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   color: var(--ds-ink);
   overflow-wrap: anywhere;
 }

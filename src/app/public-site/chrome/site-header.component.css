@@ -2,7 +2,7 @@
  * states: enlaces default · hover (solo puntero fino) · focus-visible · página actual (aria-current)
  *         cabecera arriba / con scroll (filete) ; menú abierto / cerrado
  * contrast: enlaces ink-secondary sobre crema (9.1:1) · página actual ink con subrayado abeto
- *           tomate: «Créer mon dossier» solo con ctaTomate; si no, de contorno
+ *           «Créer mon dossier» relleno solo con ctaRelleno; si no, de contorno
  */
 /* contents: la cabecera es sticky respecto a la página, no a esta etiqueta. */
 :host { display: contents; }
@@ -69,7 +69,7 @@
   .hd__nav { display: flex; gap: var(--ds-space-1); }
   .hd__lang,
   .hd__login { display: inline-flex; }
-  /* De contorno mientras el CTA del hero se ve; tomate cuando él solo queda a la vista. */
+  /* De contorno mientras el CTA del hero se ve; relleno (espresso) cuando él solo queda a la vista. */
   .hd__cta { display: inline-flex; flex-shrink: 0; margin-left: var(--ds-space-2); white-space: nowrap; }
   .hd__langmenu,
   .hd__menu { display: none; }
@@ -131,7 +131,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-2xl);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   text-decoration: none;
 }
 .mm__nav a:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }

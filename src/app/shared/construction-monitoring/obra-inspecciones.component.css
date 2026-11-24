@@ -3,7 +3,7 @@
  *         interactivos: default · hover · focus-visible · active · disabled · seleccionado
  * contrast: texto ink / ink-secondary (≥ 9.6:1 sobre vélin) · fechas ink · error danger-ink sobre danger-soft (5.8:1)
  *           calendario: trabajado action-ink sobre action-faint · hoy, anillo abeto
- *           tomate: solo el punto de inspección del calendario (--ds-mark, trazo de aviso), nunca junto al abeto
+ *           bronce: el punto de inspección del calendario (--ds-accent, solo gráfico)
  * type: título 112 %; día, hora y cifras 75 % con tabular-nums
  */
 
@@ -14,7 +14,7 @@
 .oi-cal { grid-template-columns: minmax(0, 1fr); }
 .oi-form mat-form-field { width: 100%; }
 
-.oi-fig { font-stretch: var(--ds-stretch-figure); font-variant-numeric: tabular-nums; }
+.oi-fig { font-variant-numeric: lining-nums tabular-nums; }
 
 .oi-head {
   display: flex;
@@ -31,7 +31,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-base);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   color: var(--ds-ink);
 }
 .oi-title mat-icon { flex-shrink: 0; color: var(--ds-ink-muted); }
@@ -60,8 +59,7 @@
 .oi-when strong {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink);
 }
 .oi-when small { font-size: var(--ds-text-sm); color: var(--ds-ink-secondary); }
@@ -100,11 +98,9 @@
 .oi-label { font-size: var(--ds-text-sm); font-weight: var(--ds-weight-semibold); color: var(--ds-ink-secondary); }
 .oi-tipo {
   --mat-button-toggle-height: 44px;
-  --mat-button-toggle-shape: var(--ds-radius-md);
+  --mat-button-toggle-shape: var(--ds-radius-pill);
   --mat-button-toggle-text-color: var(--ds-ink-secondary);
   --mat-button-toggle-background-color: var(--ds-surface);
-  --mat-button-toggle-selected-state-background-color: var(--ds-action-faint);
-  --mat-button-toggle-selected-state-text-color: var(--ds-action-ink);
   --mat-button-toggle-divider-color: var(--ds-border);
   justify-self: start;
   max-width: 100%;
@@ -168,14 +164,13 @@
   aspect-ratio: 1;
   border-radius: var(--ds-radius-sm);
   font-size: var(--ds-text-sm);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink-secondary);
 }
 .oi-cal__day.is-empty { visibility: hidden; }
 .oi-cal__day.is-worked { background: var(--ds-action-faint); color: var(--ds-action-ink); font-weight: var(--ds-weight-semibold); }
 .oi-cal__day.is-today { box-shadow: inset 0 0 0 2px var(--ds-action); color: var(--ds-ink); font-weight: var(--ds-weight-bold); }
-/* Punto de aviso tomate bajo el número, sobre crema: nunca sobre abeto. */
+/* Punto de aviso en bronce bajo el número, sobre la superficie clara. */
 .oi-cal__day.is-insp { background: var(--ds-surface); color: var(--ds-ink); font-weight: var(--ds-weight-bold); }
 .oi-cal__day.is-insp::after {
   content: '';
@@ -184,7 +179,7 @@
   width: 6px;
   height: 6px;
   border-radius: var(--ds-radius-circle);
-  background: var(--ds-mark);
+  background: var(--ds-accent);
 }
 
 .oi-cal__legend {
@@ -201,7 +196,7 @@
 .oi-cal__key { width: 14px; height: 14px; border-radius: var(--ds-radius-sm); }
 .oi-cal__key--worked { background: var(--ds-action-faint); box-shadow: inset 0 0 0 1px var(--ds-action); }
 .oi-cal__key--today { box-shadow: inset 0 0 0 2px var(--ds-action); }
-.oi-cal__key--insp { width: 8px; height: 8px; margin: 0 3px; border-radius: var(--ds-radius-circle); background: var(--ds-mark); }
+.oi-cal__key--insp { width: 8px; height: 8px; margin: 0 3px; border-radius: var(--ds-radius-circle); background: var(--ds-accent); }
 
 @media (prefers-reduced-motion: reduce) {
   .oi-spinner { animation-duration: 2s; }

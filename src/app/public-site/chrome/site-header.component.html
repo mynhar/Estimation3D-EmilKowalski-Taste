@@ -24,7 +24,7 @@
       <app-lang-toggle class="hd__lang" />
       <a class="hd__link hd__login" routerLink="/login">{{ 'landing.nav.login' | translate }}</a>
       <ng-container [ngTemplateOutlet]="seccion"
-                    [ngTemplateOutletContext]="{ $implicit: 'dossier', texto: 'landing.nav.cta', clase: 'button hd__cta ' + (ctaTomate() ? 'button--cta' : 'button--outline') }" />
+                    [ngTemplateOutletContext]="{ $implicit: 'dossier', texto: 'landing.nav.cta', clase: 'button hd__cta' + (ctaRelleno() ? '' : ' button--outline') }" />
 
       <!-- Móvil y tableta: idioma en menú (como la barra de la app) y navegación en hoja. -->
       <button mat-button type="button" class="hd__langmenu" [matMenuTriggerFor]="langMenu"
@@ -81,7 +81,7 @@
       </a>
       <a class="button button--lg button--outline" routerLink="/login" (click)="closeMenu(false)">{{ 'landing.nav.login' | translate }}</a>
       <ng-container [ngTemplateOutlet]="seccion"
-                    [ngTemplateOutletContext]="{ $implicit: 'dossier', texto: 'landing.nav.cta', clase: 'button button--lg ' + (ctaTomate() ? 'button--cta' : 'button--outline') }" />
+                    [ngTemplateOutletContext]="{ $implicit: 'dossier', texto: 'landing.nav.cta', clase: 'button button--lg' + (ctaRelleno() ? '' : ' button--outline') }" />
     </div>
   </div>
 </dialog>

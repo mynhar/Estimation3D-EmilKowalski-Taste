@@ -163,13 +163,13 @@
         @if (esAdmin) {
           <div class="mon-banner__actions">
             @if (!confirmandoCompletar()) {
-              <button mat-flat-button type="button" class="ds-cta" (click)="confirmandoCompletar.set(true)">
+              <button mat-flat-button type="button" (click)="confirmandoCompletar.set(true)">
                 <mat-icon>task_alt</mat-icon>
                 {{ 'monitoring.completar_contrato' | translate }}
               </button>
             } @else {
               <p class="mon-banner__confirm">{{ 'monitoring.completar_confirm' | translate }}</p>
-              <button mat-flat-button type="button" class="ds-cta"
+              <button mat-flat-button type="button"
                       (click)="completarContrato()" [disabled]="completando()">
                 @if (completando()) {
                   <span class="mon-spinner is-light" aria-hidden="true"></span>
@@ -398,7 +398,7 @@
                Si el administrador tiene que completar el contrato, ese manda. -->
           @if (puedeGuardar()) {
             <div class="mon-actions">
-              <button mat-flat-button type="button" class="mon-save" [class.ds-cta]="!ctaCompletar()"
+              <button mat-flat-button type="button" class="mon-save"
                       (click)="guardarReporte()" [disabled]="guardando()">
                 @if (guardando()) {
                   <span class="mon-spinner is-light" aria-hidden="true"></span>

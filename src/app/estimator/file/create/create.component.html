@@ -358,7 +358,7 @@
 
         <!-- Activo aunque falten datos: al pulsarlo, el resumen de abajo dice cuáles. -->
         <div class="fc-actions">
-          <button mat-flat-button type="button" class="ds-cta fc-submit" (click)="onSubmit()" [disabled]="enviando()">
+          <button mat-flat-button type="button" class="fc-submit" (click)="onSubmit()" [disabled]="enviando()">
             @if (enviando()) { <span class="fc-spinner" aria-hidden="true"></span> } @else { <mat-icon>create_new_folder</mat-icon> }
             {{ (enviando() ? 'admin_file_create.sending' : 'admin_file_create.submit_btn') | translate }}
           </button>

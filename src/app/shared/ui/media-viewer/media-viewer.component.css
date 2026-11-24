@@ -34,7 +34,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   letter-spacing: normal;
   white-space: nowrap;
   text-overflow: ellipsis;

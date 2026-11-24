@@ -23,8 +23,7 @@
 }
 .ed-btn-count {
   margin-left: var(--ds-space-2);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 /* ── Comunes ────────────────────────────────────────────────────────────── */
@@ -42,7 +41,6 @@
   gap: var(--ds-space-3);
   margin: 0;
   font-family: var(--ds-font-display);
-  font-stretch: var(--ds-stretch-heading);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
   line-height: var(--ds-leading-snug);
@@ -61,8 +59,7 @@
   font-family: var(--ds-font-body);
   font-size: var(--ds-text-sm);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .ed-link {
   margin-left: auto;
@@ -78,8 +75,7 @@
 }
 
 .ed-fig {
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .ed-nowrap { white-space: nowrap; }
 /* Claves que empiezan en minúscula («avancement moyen»). */
@@ -197,14 +193,12 @@
 }
 .ed-work__num {
   font-size: var(--ds-text-sm);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink-muted);
 }
 .ed-work__service {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-stretch: var(--ds-stretch-heading);
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-bold);
   line-height: var(--ds-leading-snug);
@@ -254,9 +248,8 @@
 .ed-sum__amount {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-3xl);
-  font-weight: var(--ds-weight-black);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-weight: var(--ds-weight-semibold);
+  font-variant-numeric: lining-nums tabular-nums;
   line-height: var(--ds-leading-tight);
   color: var(--ds-ink);
 }
@@ -297,11 +290,9 @@
 
 .ed-toggle {
   --mat-button-toggle-height: 44px;
-  --mat-button-toggle-shape: var(--ds-radius-md);
+  --mat-button-toggle-shape: var(--ds-radius-pill);
   --mat-button-toggle-text-color: var(--ds-ink-secondary);
   --mat-button-toggle-background-color: var(--ds-surface);
-  --mat-button-toggle-selected-state-background-color: var(--ds-action-faint);
-  --mat-button-toggle-selected-state-text-color: var(--ds-action-ink);
   --mat-button-toggle-divider-color: var(--ds-border);
 }
 .ed-view { margin-left: auto; }
@@ -456,7 +447,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   line-height: var(--ds-leading-snug);
 }
 .ed-card__link {
@@ -531,7 +521,6 @@
 .ed-obra__service {
   min-width: 0;
   font-family: var(--ds-font-display);
-  font-stretch: var(--ds-stretch-heading);
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-bold);
   line-height: var(--ds-leading-snug);
@@ -554,9 +543,8 @@
 .ed-obra__pct {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-2xl);
-  font-weight: var(--ds-weight-black);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-weight: var(--ds-weight-semibold);
+  font-variant-numeric: lining-nums tabular-nums;
   line-height: var(--ds-leading-tight);
 }
 

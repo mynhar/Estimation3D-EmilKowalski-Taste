@@ -27,7 +27,6 @@
 .ft__h {
   margin: 0 0 var(--ds-space-2);
   font-family: var(--ds-font-display);
-  font-stretch: var(--ds-stretch-heading);
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-bold);
   color: var(--ds-ink);

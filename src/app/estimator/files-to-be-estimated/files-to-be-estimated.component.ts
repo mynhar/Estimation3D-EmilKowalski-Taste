@@ -76,8 +76,6 @@ export class FilesToBeEstimatedComponent implements OnInit {
 
   hayFiltros    = computed(() => this.busqueda() !== '' || this.soloUrgentes());
 
-  /** Tomate solo en el primer dossier de la lista: la siguiente etapa es tomar uno. */
-  ctaId = computed(() => this.expedientesFiltrados()[0]?.id ?? null);
   urgentesCount = computed(() =>
     this.expedientes().filter(e => this.urgencia(e.fecha_visita) !== null).length
   );

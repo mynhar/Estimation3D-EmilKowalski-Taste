@@ -26,10 +26,10 @@ export type PaginaPublica = 'inicio' | 'journal' | 'entrepreneurs';
  * - En las demás páginas esos enlaces van a `/#seccion` (el router tiene
  *   `anchorScrolling` activado).
  *
- * `ctaTomate`: el botón «Créer mon dossier» es tomate solo cuando es la
- * siguiente etapa y no hay otro tomate a la vista (la landing lo apaga mientras
- * se ve el del hero; Entrepreneurs, donde la siguiente etapa es postular, lo
- * deja de contorno).
+ * `ctaRelleno`: el botón «Créer mon dossier» va relleno (espresso) solo cuando no
+ * hay otro botón principal a la vista; si no, de contorno (la landing lo pasa a
+ * contorno mientras se ve el del hero; en Entrepreneurs, donde lo principal es
+ * postular, va siempre de contorno).
  */
 @Component({
   selector: 'app-site-header',
@@ -47,7 +47,7 @@ export class SiteHeaderComponent {
   readonly lang = inject(LangService);
 
   readonly pagina = input<PaginaPublica>('inicio');
-  readonly ctaTomate = input(true);
+  readonly ctaRelleno = input(true);
 
   /** Solo en la landing: sección de la propia página a la que ir. */
   readonly irA = output<string>();

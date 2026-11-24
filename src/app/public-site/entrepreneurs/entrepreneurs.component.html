@@ -3,7 +3,7 @@
 <a class="skip" href="#contenu" (click)="goTo('contenu', $event)">{{ 'nav.skip' | translate }}</a>
 
 <!-- Aquí la siguiente etapa es postular: «Créer mon dossier» de la cabecera va de contorno. -->
-<app-site-header pagina="entrepreneurs" [ctaTomate]="false" />
+<app-site-header pagina="entrepreneurs" [ctaRelleno]="false" />
 
 <main id="contenu" tabindex="-1">
 
@@ -25,7 +25,7 @@
           </h1>
           <p class="en-hero__lede">{{ 'entrepreneurs.hero.lede' | translate }}</p>
           <div class="en-hero__actions">
-            <a class="button button--lg button--cta" href="#form" (click)="goTo('form', $event)">{{ 'entrepreneurs.hero.cta' | translate }}</a>
+            <a class="button button--lg" href="#form" (click)="goTo('form', $event)">{{ 'entrepreneurs.hero.cta' | translate }}</a>
             <a class="link" href="#how" (click)="goTo('how', $event)">{{ 'entrepreneurs.hero.cta_how' | translate }}</a>
           </div>
           <!-- Como el precio bajo el botón de la landing: un dato, no una etiqueta sobre el título. -->
@@ -365,7 +365,7 @@
           } @else {
             <div class="fm__actions">
               <!-- Activo aunque falten datos: al pulsarlo, el resumen dice qué falta. -->
-              <button type="submit" class="button button--lg button--cta fm__submit" [disabled]="sending()">
+              <button type="submit" class="button button--lg fm__submit" [disabled]="sending()">
                 @if (sending()) { <span class="spinner" aria-hidden="true"></span> }
                 {{ (sending() ? 'entrepreneurs.form.sending' : 'entrepreneurs.form.submit') | translate }}
               </button>

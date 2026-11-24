@@ -17,8 +17,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: clamp(var(--ds-text-2xl), 1.3rem + 1.8vw, 2.75rem);
-  font-weight: var(--ds-weight-black);
-  font-stretch: var(--ds-stretch-display);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-tight);
   letter-spacing: -0.02em;
   color: var(--ds-ink);

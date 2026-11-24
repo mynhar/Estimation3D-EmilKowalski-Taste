@@ -15,7 +15,7 @@
   min-width: 0;
 }
 
-.hs-fig { font-stretch: var(--ds-stretch-figure); font-variant-numeric: tabular-nums; }
+.hs-fig { font-variant-numeric: lining-nums tabular-nums; }
 .hs-empty { max-width: 44rem; }
 
 .hs-error {
@@ -65,7 +65,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-base);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   color: var(--ds-ink);
 }
 

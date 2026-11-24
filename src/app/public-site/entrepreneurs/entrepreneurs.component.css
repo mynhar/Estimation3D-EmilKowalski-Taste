@@ -46,8 +46,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: clamp(2.125rem, 3.4vw + 1.1rem, 4.25rem);
-  font-weight: var(--ds-weight-black);
-  font-stretch: var(--ds-stretch-display);
+  font-weight: var(--ds-weight-semibold);
   line-height: 1;
   letter-spacing: -0.02em;
   text-wrap: balance;
@@ -119,8 +118,7 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 /* ── Fichas con icono (problema y ventajas) ─────────────────────────────── */
@@ -129,7 +127,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   line-height: var(--ds-leading-snug);
   text-wrap: balance;
 }
@@ -277,7 +274,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   line-height: var(--ds-leading-snug);
   text-align: left;
   cursor: pointer;
@@ -318,8 +314,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: clamp(2rem, 2.6vw + 1.2rem, 3.5rem);
-  font-weight: var(--ds-weight-black);
-  font-stretch: var(--ds-stretch-display);
+  font-weight: var(--ds-weight-semibold);
   line-height: 1.04;
   letter-spacing: -0.02em;
   text-wrap: balance;

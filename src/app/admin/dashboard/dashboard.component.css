@@ -17,8 +17,7 @@
 }
 
 .ad-fig {
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 /* ── Cabecera: hora de actualización + recargar ─────────────────────────── */
@@ -44,7 +43,6 @@
 .ad-h2 {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-stretch: var(--ds-stretch-heading);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
   line-height: var(--ds-leading-snug);
@@ -80,9 +78,8 @@ ul.ad-cards { margin: 0; padding: 0; list-style: none; }
 .ad-sum__amount {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-3xl);
-  font-weight: var(--ds-weight-black);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-weight: var(--ds-weight-semibold);
+  font-variant-numeric: lining-nums tabular-nums;
   line-height: var(--ds-leading-tight);
   color: var(--ds-ink);
 }
@@ -232,6 +229,8 @@ ul.ad-cards { margin: 0; padding: 0; list-style: none; }
   font-weight: var(--ds-weight-medium);
   line-height: var(--ds-leading-snug);
   color: var(--ds-action);
+  /* Manrope es más ancha: en la teja de 95 px «Entrepreneurs» no cabe; se parte con guion. */
+  hyphens: auto;
   overflow-wrap: anywhere;
 }
 
@@ -252,7 +251,7 @@ ul.ad-cards { margin: 0; padding: 0; list-style: none; }
 .ad-obra__pct {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-4xl);
-  font-weight: var(--ds-weight-black);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-tight);
   color: var(--ds-ink);
 }

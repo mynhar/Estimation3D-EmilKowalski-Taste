@@ -242,7 +242,7 @@
 
 <!-- Continuar (tomate en el primero) y liberar en dos pasos: el segundo clic confirma. -->
 <ng-template #acciones let-exp let-ref="ref" let-icono="icono">
-  <button mat-flat-button type="button" class="fue-continue" [class.ds-cta]="ctaId() === exp.id"
+  <button mat-flat-button type="button" class="fue-continue"
           [attr.aria-describedby]="ref" (click)="estimar(exp.id)">
     @if (icono) { <mat-icon>edit_note</mat-icon> }
     {{ 'files_under_estimation.continue_btn' | translate }}

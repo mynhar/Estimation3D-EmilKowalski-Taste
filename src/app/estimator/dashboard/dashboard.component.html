@@ -7,7 +7,7 @@
          Con estimaciones en curso, el tomate es «Continuer» de la primera. -->
     @if (!cargando() && disponibles() > 0) {
       @if (activos().length === 0) {
-        <a actions mat-flat-button class="ed-cta ds-cta" routerLink="/estimator/files-to-be-estimated">
+        <a actions mat-flat-button class="ed-cta" routerLink="/estimator/files-to-be-estimated">
           <mat-icon>inbox</mat-icon>
           {{ 'dashboard_estimator.see_available_btn' | translate }}
           <span class="ed-btn-count">{{ disponibles() }}</span>
@@ -108,7 +108,7 @@
 
                 <div class="ed-work__foot">
                   @if (exp.id === primeraActiva()) {
-                    <a mat-flat-button class="ds-cta" [routerLink]="['/estimator/file-under-estimation', exp.id]">
+                    <a mat-flat-button [routerLink]="['/estimator/file-under-estimation', exp.id]">
                       <mat-icon>edit_note</mat-icon>
                       {{ 'common.continue' | translate }}
                     </a>

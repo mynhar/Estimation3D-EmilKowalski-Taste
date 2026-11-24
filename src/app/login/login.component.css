@@ -3,7 +3,7 @@
  *         envío: default · hover · focus-visible · active · loading · éxito (cuenta creada)
  * contrast: formulario ink sobre crema (11.8:1) · errores danger-ink sobre danger-soft (5.8:1)
  *           isla abeto: texto ink-inverse (9.7:1), secundario ink-inverse-muted (6.6:1), iconos vélin
- *           enviar: el botón tomate de la vista (.ds-cta, blanco encima 4.8:1); Google, de contorno
+ *           enviar: botón relleno espresso (crema encima 14.9:1); Google, de contorno
  * type: títulos en display 125 %, marca y éxito en 112 %
  */
 :host {
@@ -29,8 +29,7 @@
   color: var(--ds-ink);
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-black);
-  font-stretch: var(--ds-stretch-heading);
+  font-weight: var(--ds-weight-semibold);
   text-decoration: none;
 }
 .lg-brand:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
@@ -84,8 +83,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: clamp(var(--ds-text-3xl), 2.2vw + 1rem, 3.5rem);
-  font-weight: var(--ds-weight-black);
-  font-stretch: var(--ds-stretch-display);
+  font-weight: var(--ds-weight-semibold);
   line-height: 1.02;
   letter-spacing: -0.02em;
   color: var(--ds-ink-inverse);
@@ -158,8 +156,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: clamp(var(--ds-text-3xl), 2vw + 1.5rem, var(--ds-text-4xl));
-  font-weight: var(--ds-weight-black);
-  font-stretch: var(--ds-stretch-display);
+  font-weight: var(--ds-weight-semibold);
   letter-spacing: -0.02em;
   line-height: var(--ds-leading-tight);
   color: var(--ds-ink);
@@ -174,8 +171,6 @@
 .lg-switch {
   --mat-button-toggle-height: 44px;
   --mat-button-toggle-text-color: var(--ds-ink-secondary);
-  --mat-button-toggle-selected-state-background-color: var(--ds-action-faint);
-  --mat-button-toggle-selected-state-text-color: var(--ds-action-ink);
   --mat-button-toggle-divider-color: var(--ds-border);
   --mat-button-toggle-label-text-size: var(--ds-text-base);
   --mat-button-toggle-label-text-weight: var(--ds-weight-bold);
@@ -323,7 +318,6 @@ mat-error mat-icon,
 .lg-success__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-stretch: var(--ds-stretch-heading);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
   line-height: var(--ds-leading-snug);

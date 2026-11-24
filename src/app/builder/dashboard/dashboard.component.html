@@ -4,7 +4,7 @@
     [titulo]="nombre() ? ('dashboard_client.welcome' | translate) + ', ' + nombre() : ('dashboard_builder.title' | translate)"
     [contexto]="'dashboard_builder.subtitle' | translate">
     @if (!cargando() && (total() > 0 || obras().length > 0)) {
-      <a actions mat-flat-button class="bd-cta ds-cta" routerLink="/builder/available-files">
+      <a actions mat-flat-button class="bd-cta" routerLink="/builder/available-files">
         <mat-icon>search</mat-icon>
         {{ 'common.see_available' | translate }}
       </a>
@@ -25,7 +25,7 @@
                      matIcon="search"
                      [titulo]="'dashboard_builder.no_offers' | translate"
                      [texto]="'dashboard_builder.no_offers_text' | translate">
-      <a actions mat-flat-button class="bd-cta ds-cta" routerLink="/builder/available-files">
+      <a actions mat-flat-button class="bd-cta" routerLink="/builder/available-files">
         <mat-icon>search</mat-icon>
         {{ 'common.see_available' | translate }}
       </a>

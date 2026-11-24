@@ -12,7 +12,7 @@
   min-width: 0;
 }
 
-.cm-fig { font-stretch: var(--ds-stretch-figure); font-variant-numeric: tabular-nums; }
+.cm-fig { font-variant-numeric: lining-nums tabular-nums; }
 .cm-empty { max-width: 44rem; }
 
 .cm-error {
@@ -43,8 +43,7 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-2xl);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   line-height: var(--ds-leading-tight);
   color: var(--ds-ink);
 }

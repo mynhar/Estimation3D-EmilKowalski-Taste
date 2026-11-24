@@ -1,15 +1,15 @@
-/* component: stage line (cota de etapas)
+/* component: stage line (barra de etapas, Lin et bronze)
  * states: done · current · upcoming · compact
- * contrast: texto ink / ink-secondary / ink-muted (≥ 5.4:1). El tramo abeto es
- * refuerzo visual: la etapa la dicen el texto «Étape n sur 6» y las marcas
- * (marca actual en abeto 8.4:1, hechas en tinta, pendientes en ink-faint 3.5:1).
+ * contrast: texto ink / ink-secondary / ink-muted (≥ 5.4:1). La barra es
+ * refuerzo visual: la etapa la dicen el texto «Étape n sur 6» y los puntos
+ * (hechos y actual en bronce 4.2:1, pendientes con borde ink-faint 3.5:1).
  */
 :host {
   display: block;
   container-type: inline-size;
 }
 
-/* ── Cabecera: título + medida ─────────────────────────────────────────── */
+/* ── Cabecera: título + etapa ──────────────────────────────────────────── */
 .sl__head {
   display: flex;
   align-items: baseline;
@@ -25,17 +25,17 @@
 .sl__count {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-weight: var(--ds-weight-semibold);
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink);
   white-space: nowrap;
 }
 
-/* ── Línea de medida ───────────────────────────────────────────────────── */
+/* ── Barra ─────────────────────────────────────────────────────────────── */
 .sl__track {
   --sl-col: calc(100% / var(--sl-n));
-  --sl-axis: 12px;                 /* eje de la línea dentro de la fila de marcas */
+  --sl-row: 24px;                  /* alto de la fila de puntos; la barra va en su eje */
+  --sl-bar: 4px;
   position: relative;
   display: grid;
   grid-template-columns: repeat(var(--sl-n), minmax(0, 1fr));
@@ -44,30 +44,28 @@
   list-style: none;
 }
 
-/* Línea base: de la primera marca a la última. */
-.sl__track::before {
-  content: '';
-  position: absolute;
-  top: calc(var(--sl-axis) - 0.5px);
-  left: calc(var(--sl-col) / 2);
-  right: calc(var(--sl-col) / 2);
-  height: 1px;
-  background: var(--ds-ink-faint);
-}
-
-/* Tramo recorrido: la medida, en abeto. */
+/* Pista vacía: de la primera etapa a la última, en lino oscuro. */
+.sl__track::before,
 .sl__track::after {
   content: '';
   position: absolute;
-  top: calc(var(--sl-axis) - 3px);
+  top: calc((var(--sl-row) - var(--sl-bar)) / 2);
   left: calc(var(--sl-col) / 2);
+  height: var(--sl-bar);
+  border-radius: var(--ds-radius-pill);
+}
+.sl__track::before {
+  right: calc(var(--sl-col) / 2);
+  background: var(--ds-band);
+}
+
+/* Tramo recorrido, en bronce. */
+.sl__track::after {
   width: calc(var(--sl-col) * var(--sl-done));
-  height: 6px;
-  border-radius: 3px;
-  background: var(--ds-action);
+  background: var(--ds-accent);
   transition: width var(--ds-duration-slow) var(--ds-ease-out);
 }
-/* Se mide una vez al aparecer; después solo responde a cambios de etapa. */
+/* Se llena una vez al aparecer; después solo responde a cambios de etapa. */
 @starting-style {
   .sl__track::after { width: 0; }
 }
@@ -83,26 +81,26 @@
   text-align: center;
 }
 
-/* Marcas: pendientes cortas y claras, hechas en tinta, la actual larga en abeto. */
+/* Puntos: pendientes huecos, hechos en bronce, el actual mayor con halo. */
 .sl__tick {
+  --sl-dot: 10px;
   display: block;
-  width: 2px;
-  height: 12px;
-  margin-block: 6px;
-  border-radius: 1px;
-  background: var(--ds-ink-faint);
+  width: var(--sl-dot);
+  height: var(--sl-dot);
+  margin-block: calc((var(--sl-row) - var(--sl-dot)) / 2);
+  border: 2px solid var(--ds-ink-faint);
+  border-radius: var(--ds-radius-circle);
+  background: var(--ds-surface);
 }
 .is-done .sl__tick {
-  height: 16px;
-  margin-block: 4px;
-  background: var(--ds-ink);
+  border-color: var(--ds-accent);
+  background: var(--ds-accent);
 }
 .is-current .sl__tick {
-  width: 4px;
-  height: 24px;
-  margin-block: 0;
-  border-radius: 2px;
-  background: var(--ds-action);
+  --sl-dot: 14px;
+  border-color: var(--ds-accent);
+  background: var(--ds-accent);
+  box-shadow: 0 0 0 4px var(--ds-accent-soft);
 }
 
 .sl__label {
@@ -140,15 +138,9 @@
 }
 
 /* ── Compacta (tarjetas) ───────────────────────────────────────────────── */
-:host(.is-compact) .sl__track { --sl-axis: 8px; }
-:host(.is-compact) .sl__track::after {
-  top: calc(var(--sl-axis) - 2px);
-  height: 4px;
-  border-radius: 2px;
-}
-:host(.is-compact) .sl__tick { height: 8px; margin-block: 4px; width: 1.5px; }
-:host(.is-compact) .is-done .sl__tick { height: 10px; margin-block: 3px; }
-:host(.is-compact) .is-current .sl__tick { width: 3px; height: 16px; margin-block: 0; }
+:host(.is-compact) .sl__track { --sl-row: 14px; --sl-bar: 3px; }
+:host(.is-compact) .sl__tick { --sl-dot: 8px; border-width: 1.5px; }
+:host(.is-compact) .is-current .sl__tick { --sl-dot: 10px; box-shadow: 0 0 0 3px var(--ds-accent-soft); }
 
 .sr-only {
   position: absolute;

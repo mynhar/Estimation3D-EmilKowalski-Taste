@@ -1,8 +1,7 @@
 /* ══════════════════════════════════════════════════════════════════════════
-   BASE — reboot de elementos (Trait rouge)
+   BASE — reboot de elementos (Lin et bronze)
 
-   Sustituye a ui-base.css y bootstrap-overrides.css (fin de la fase 4): conserva
-   solo el reboot de elementos que todas las pantallas dan por hecho (márgenes de
+   Conserva solo el reboot de elementos que todas las pantallas dan por hecho (márgenes de
    párrafos, títulos y listas, box-sizing, controles que heredan la fuente,
    [hidden]…), con los valores ya resueltos a tokens --ds-*, más la base de
    títulos y enlaces que antes repartían bootstrap-overrides.css y styles.css.
@@ -51,7 +50,7 @@ hr {
   border-top: 1px solid var(--ds-border-subtle);
 }
 
-/* ── Títulos: Archivo, abeto noche, interlineado ajustado ─────────────────── */
+/* ── Títulos: Cormorant Garamond 600, espresso, interlineado ajustado ────── */
 h1, h2, h3, h4, h5, h6 {
   margin-top: 0;
   margin-bottom: 0.5rem;
@@ -59,13 +58,9 @@ h1, h2, h3, h4, h5, h6 {
   line-height: var(--ds-leading-tight);
   color: var(--ds-ink);
 }
-h1, h2, h3, h4 {
-  font-weight: var(--ds-weight-bold);
-  letter-spacing: var(--ds-tracking-tight);
-}
-h5, h6 {
+h1, h2, h3, h4, h5, h6 {
   font-weight: var(--ds-weight-semibold);
-  letter-spacing: -0.01em;
+  letter-spacing: var(--ds-tracking-tight);
 }
 h1 { font-size: var(--ds-text-5xl); }
 h2 { font-size: var(--ds-text-4xl); }
@@ -143,7 +138,7 @@ sup {
 sub { bottom: -0.25em; }
 sup { top: -0.5em; }
 
-/* Enlaces en abeto (8.4:1 sobre crema), tinta al pasar. Nunca en tomate. */
+/* Enlaces en bronce oscuro (6.3:1 sobre lino), espresso al pasar. */
 a {
   color: var(--ds-action-ink);
   text-decoration: underline;

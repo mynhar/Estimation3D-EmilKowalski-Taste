@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Tema de Angular Material 22 (M3) — Trait rouge
+   Tema de Angular Material 22 (M3) — Lin et bronze
    --------------------------------------------------------------------------
    ÚNICO archivo SCSS del proyecto. Existe porque Material solo genera su
    tema con Sass. No pongas aquí estilos de componentes ni crees otros .scss:
@@ -12,12 +12,13 @@
    - `$roles-color` enlaza cada rol de color `--mat-sys-*` a un token --ds-*
      de tokens.css, y la tipografía usa var(--ds-font-*) / var(--ds-weight-*).
      Si cambian los tokens, Material cambia solo, sin tocar este archivo.
-   - `$green-palette` solo se usa para generar el tema. Los colores que se
+   - `$orange-palette` solo se usa para generar el tema. Los colores que se
      ven son los de $roles-color.
-   - Formas: 6 px controles (botones, campos, menús), 12 px tarjetas,
-     20 px hojas y diálogos. Elevaciones: las de Material por defecto.
-   - El botón de la siguiente etapa (tomate) es la clase `.ds-cta`, definida
-     al final: un solo sitio para todo el proyecto.
+   - Formas: píldora en botones y segmentados, 10 px campos, 14 px tarjetas,
+     menús y avisos, 20 px hojas y diálogos. Elevaciones: las de Material.
+   - Tipografía: Manrope en todos los componentes (brand-family también es
+     --ds-font-body, para que pestañas y títulos de lista no salgan en serif
+     a 14 px). Solo el título de los diálogos va en Cormorant Garamond.
    ========================================================================== */
 @use '@angular/material' as mat;
 @use '@angular/cdk' as cdk;
@@ -25,13 +26,13 @@
 $tema: mat.define-theme((
   color: (
     theme-type: light,
-    primary: mat.$green-palette,
+    primary: mat.$orange-palette,
     use-system-variables: true,
     system-variables-prefix: mat-sys,
   ),
   typography: (
     plain-family: var(--ds-font-body),
-    brand-family: var(--ds-font-display),
+    brand-family: var(--ds-font-body),
     bold-weight: var(--ds-weight-bold),
     medium-weight: var(--ds-weight-medium),
     regular-weight: var(--ds-weight-regular),
@@ -44,16 +45,16 @@ $tema: mat.define-theme((
 ));
 
 /* Roles de color M3 → tokens del sistema.
-   - `primary` es el abeto: la acción por defecto. En M3 también es color de
-     TEXTO (botón de texto, etiqueta en foco, checkbox): 8.4:1 sobre crema,
-     9.7 sobre vélin. El tomate NO es un rol: solo existe en `.ds-cta`.
+   - `primary` es el espresso: la acción por defecto. En M3 también es color
+     de TEXTO (botón de texto, etiqueta en foco, checkbox): 14.4:1 sobre lino,
+     15.5 sobre vélin. El bronce NO es un rol de acción: es acento.
    - `primary-container` y `secondary-container` (chip seleccionado, elemento
-     activo de listas y navegación, botón tonal) son action-faint con abeto
-     encima (8.4:1).
-   - `inverse-surface` es el abeto (snack-bar); encima, texto vélin y acción
-     en action-faint.
-   - `outline` es el borde de los campos: liquen --ds-ink-faint (4.0:1 sobre
-     vélin, AA no-texto). */
+     activo de listas y navegación, botón tonal) son bronce suave con bronce
+     oscuro encima (5.6:1).
+   - `inverse-surface` es el espresso (snack-bar, tooltip); encima, texto
+     crema y acción en bronce suave.
+   - `outline` es el borde de los campos: --ds-ink-faint (3.5:1 sobre vélin,
+     AA no-texto). */
 $roles-color: (
   primary: var(--ds-action),
   on-primary: var(--ds-on-action),
@@ -132,19 +133,32 @@ html {
 :root {
   /* Formas. Las declaraciones van antes de los @include: Sass desaconseja
      declaraciones detrás de reglas anidadas (mixed-decls). */
-  /* Controles: 6 px */
-  --mat-button-filled-container-shape: var(--ds-radius-md);
-  --mat-button-outlined-container-shape: var(--ds-radius-md);
-  --mat-button-text-container-shape: var(--ds-radius-md);
-  --mat-button-tonal-container-shape: var(--ds-radius-md);
-  --mat-button-protected-container-shape: var(--ds-radius-md);
-  --mat-button-toggle-shape: var(--ds-radius-md);
+  /* Botones y segmentados: píldora */
+  --mat-button-filled-container-shape: var(--ds-radius-pill);
+  --mat-button-outlined-container-shape: var(--ds-radius-pill);
+  --mat-button-text-container-shape: var(--ds-radius-pill);
+  --mat-button-tonal-container-shape: var(--ds-radius-pill);
+  --mat-button-protected-container-shape: var(--ds-radius-pill);
+  --mat-button-toggle-shape: var(--ds-radius-pill);
+  /* Botón relleno: espresso con texto crema; la capa de estado en crema lo
+     aclara al pasar (hover = --ds-action-hover aprox.). */
+  --mat-button-filled-container-color: var(--ds-action);
+  --mat-button-filled-label-text-color: var(--ds-on-action);
+  --mat-button-outlined-outline-color: var(--ds-ink-faint);
+  --mat-button-outlined-label-text-color: var(--ds-ink);
+  --mat-button-text-label-text-color: var(--ds-ink);
+  /* Segmento elegido: espresso con texto crema, como en la referencia. */
+  --mat-button-toggle-selected-state-background-color: var(--ds-action);
+  --mat-button-toggle-selected-state-text-color: var(--ds-on-action);
+  --mat-button-toggle-divider-color: var(--ds-border);
+  /* Campos: 10 px */
   --mat-form-field-outlined-container-shape: var(--ds-radius-md);
   --mat-form-field-filled-container-shape: var(--ds-radius-md);
-  --mat-menu-container-shape: var(--ds-radius-md);
-  --mat-autocomplete-container-shape: var(--ds-radius-md);
-  --mat-snack-bar-container-shape: var(--ds-radius-md);
-  /* Tarjetas: 12 px */
+  /* Menús, autocompletar y avisos: 14 px */
+  --mat-menu-container-shape: var(--ds-radius-lg);
+  --mat-autocomplete-container-shape: var(--ds-radius-lg);
+  --mat-snack-bar-container-shape: var(--ds-radius-lg);
+  /* Tarjetas: 14 px */
   --mat-card-elevated-container-shape: var(--ds-radius-lg);
   --mat-card-outlined-container-shape: var(--ds-radius-lg);
   --mat-card-filled-container-shape: var(--ds-radius-lg);
@@ -154,6 +168,12 @@ html {
   --mat-dialog-container-shape: var(--ds-radius-xl);
   --mat-bottom-sheet-container-shape: var(--ds-radius-xl);
   --mat-datepicker-calendar-container-touch-shape: var(--ds-radius-xl);
+  /* Título de los diálogos: Cormorant Garamond 600, como los de la referencia. */
+  --mat-dialog-subhead-font: var(--ds-font-display);
+  --mat-dialog-subhead-size: var(--ds-text-2xl);
+  --mat-dialog-subhead-weight: var(--ds-weight-semibold);
+  --mat-dialog-subhead-line-height: var(--ds-leading-snug);
+  --mat-dialog-subhead-tracking: var(--ds-tracking-tight);
   /* Ayudas y errores de los campos: mínimo de 14 px (M3 usa 12 px).
      Excepción conocida: la etiqueta flotante de los campos se escala al 75 %
      (12 px) y Material no ofrece token oficial para cambiarlo. */
@@ -162,17 +182,4 @@ html {
 
   @include mat.system-level-colors($tema, $roles-color);
   @include mat.system-level-typography($tema);
-}
-
-/* Siguiente etapa: el único botón tomate de la vista.
-   Uso: <a mat-flat-button class="ds-cta">…</a>. Texto blanco sobre
-   --ds-cta (4.8:1); al pasar o pulsar, la capa de estado en abeto noche lo
-   oscurece, así que el contraste solo sube. */
-.ds-cta {
-  @include mat.button-overrides((
-    filled-container-color: var(--ds-cta),
-    filled-label-text-color: var(--ds-on-cta),
-    filled-state-layer-color: var(--ds-ink),
-    filled-ripple-color: color-mix(in srgb, var(--ds-ink) 16%, transparent),
-  ));
 }

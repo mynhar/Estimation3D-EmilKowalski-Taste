@@ -1,7 +1,7 @@
 /* component: empty state
  * states: default (con o sin pasos, con o sin acción)
  * contrast: título ink (13.6:1 sobre vélin), texto ink-secondary (10:1); icono ink-secondary sobre band
- * acción: si es la siguiente etapa, el padre la marca con .ds-cta (tomate)
+ * acción: botón relleno espresso (mat-flat-button), la acción principal de la vista
  */
 :host {
   display: grid;
@@ -28,7 +28,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-2xl);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   line-height: var(--ds-leading-snug);
   letter-spacing: normal;
   color: var(--ds-ink);

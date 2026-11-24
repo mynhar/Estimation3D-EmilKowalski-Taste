@@ -15,8 +15,7 @@
 }
 
 .exp-fig {
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 /* ── Títulos y textos comunes ───────────────────────────────────────────── */
@@ -28,7 +27,6 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
 }
@@ -58,8 +56,7 @@
   font-family: var(--ds-font-body);
   font-size: var(--ds-text-sm);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 .exp-muted {
@@ -154,8 +151,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--ds-space-1);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .exp-meta__date mat-icon { width: 18px; height: 18px; font-size: 18px; }
 
@@ -277,7 +273,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
   overflow-wrap: anywhere;
@@ -305,8 +300,7 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-2xl);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   line-height: var(--ds-leading-tight);
   color: var(--ds-ink);
 }
@@ -370,8 +364,7 @@
 }
 .exp-file__size {
   font-size: var(--ds-text-sm);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink-muted);
 }
 .exp-file__open { flex-shrink: 0; min-height: 44px; }
@@ -396,7 +389,7 @@
   min-height: 44px;
   padding: 0 var(--ds-space-4);
   border: 1px solid var(--ds-ink-faint);
-  border-radius: var(--ds-radius-md);
+  border-radius: var(--ds-radius-pill);
   background: transparent;
   color: var(--ds-action);
   font-weight: var(--ds-weight-bold);

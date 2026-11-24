@@ -47,7 +47,7 @@
 .aviso__meta {
   margin: var(--ds-space-1) 0 0;
   font-size: var(--ds-text-sm);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-info-ink);
 }
 

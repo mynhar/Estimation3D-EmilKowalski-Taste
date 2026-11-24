@@ -47,7 +47,7 @@
           </span>
         </li>
       </ol>
-      <a actions mat-flat-button class="dash-cta ds-cta" routerLink="/client/file/create">
+      <a actions mat-flat-button class="dash-cta" routerLink="/client/file/create">
         <mat-icon>add</mat-icon>
         {{ 'dashboard_client.create_first' | translate }}
       </a>
@@ -149,21 +149,21 @@
                   }
                   {{ 'dashboard_client.compare_text' | translate }}
                 </p>
-                <a mat-flat-button class="dash-next__cta ds-cta" routerLink="/client/offers-received">
+                <a mat-flat-button class="dash-next__cta" routerLink="/client/offers-received">
                   <mat-icon>request_quote</mat-icon>
                   {{ 'dashboard_client.review_offers' | translate }}
                 </a>
               }
               @case ('adjudicado') {
                 <p class="dash-next__text">{{ 'state_desc.adjudicado' | translate }}</p>
-                <a mat-flat-button class="dash-next__cta ds-cta" routerLink="/client/contracts">
+                <a mat-flat-button class="dash-next__cta" routerLink="/client/contracts">
                   <mat-icon>contract</mat-icon>
                   {{ 'dashboard_client.view_contract' | translate }}
                 </a>
               }
               @case ('contratado') {
                 <p class="dash-next__text">{{ 'state_desc.contratado' | translate }}</p>
-                <a mat-flat-button class="dash-next__cta ds-cta" routerLink="/client/construction-monitoring/list">
+                <a mat-flat-button class="dash-next__cta" routerLink="/client/construction-monitoring/list">
                   <mat-icon>construction</mat-icon>
                   {{ 'dashboard_client.view_monitoring' | translate }}
                 </a>

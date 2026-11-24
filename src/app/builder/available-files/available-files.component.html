@@ -172,7 +172,7 @@
                     } @else if (completo(exp)) {
                       <button mat-stroked-button type="button" disabled>{{ 'available_files.full' | translate }}</button>
                     } @else {
-                      <a mat-flat-button [class.ds-cta]="ctaId() === exp.id"
+                      <a mat-flat-button
                          [routerLink]="['/builder/make-offer', exp.id]"
                          [attr.aria-describedby]="'aft-' + exp.id">{{ 'available_files.make_offer' | translate }}</a>
                     }
@@ -259,7 +259,7 @@
                   {{ 'available_files.full' | translate }}
                 </button>
               } @else {
-                <a mat-flat-button class="af-card__cta" [class.ds-cta]="ctaId() === exp.id"
+                <a mat-flat-button class="af-card__cta"
                    [routerLink]="['/builder/make-offer', exp.id]"
                    [attr.aria-describedby]="'afc-' + exp.id">
                   <mat-icon>send</mat-icon>

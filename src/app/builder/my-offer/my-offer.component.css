@@ -15,8 +15,7 @@
 }
 
 .mof-fig {
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 /* ── Comunes ────────────────────────────────────────────────────────────── */
@@ -29,7 +28,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
 }
@@ -59,8 +57,7 @@
   font-family: var(--ds-font-body);
   font-size: var(--ds-text-sm);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .mof-tag {
   display: inline-flex;
@@ -73,7 +70,6 @@
   font-family: var(--ds-font-body);
   font-size: var(--ds-text-sm);
   font-weight: var(--ds-weight-medium);
-  font-stretch: normal;
   line-height: 1.2;
   white-space: nowrap;
 }
@@ -222,7 +218,7 @@
 .mof-price dd {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-4xl);
-  font-weight: var(--ds-weight-black);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-tight);
 }
 
@@ -351,8 +347,7 @@
 }
 .mof-file__size {
   font-size: var(--ds-text-sm);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink-muted);
 }
 .mof-file__act { flex-shrink: 0; min-height: 44px; }

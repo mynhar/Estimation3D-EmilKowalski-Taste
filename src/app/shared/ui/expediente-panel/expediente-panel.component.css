@@ -56,13 +56,11 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .xp__fig {
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 /* Cifras de la cabecera (las pone quien usa el panel). */

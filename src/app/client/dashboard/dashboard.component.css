@@ -19,7 +19,6 @@
 .dash-h2 {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-stretch: var(--ds-stretch-heading);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
   line-height: var(--ds-leading-snug);
@@ -83,8 +82,7 @@
   color: var(--ds-ink);
   font-size: var(--ds-text-sm);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 /* ── Esqueleto ──────────────────────────────────────────────────────────── */
@@ -128,8 +126,7 @@
   color: var(--ds-ink);
   font-family: var(--ds-font-display);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .dash-steps__text {
   display: grid;
@@ -265,7 +262,6 @@
   font-family: var(--ds-font-display);
   font-size: clamp(var(--ds-text-2xl), 2vw + 1.25rem, var(--ds-text-3xl));
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   line-height: var(--ds-leading-tight);
   color: var(--ds-ink);
   overflow-wrap: anywhere;
@@ -396,7 +392,6 @@
 .dash-pending__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-stretch: var(--ds-stretch-heading);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
   color: var(--ds-ink);
@@ -428,7 +423,6 @@
   content: counter(paso);
   display: block;
   font-family: var(--ds-font-display);
-  font-stretch: var(--ds-stretch-figure);
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-bold);
   color: var(--ds-ink);
@@ -474,10 +468,9 @@
 .dash-cost__value {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-3xl);
-  font-weight: var(--ds-weight-black);
-  font-stretch: var(--ds-stretch-figure);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-tight);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink);
 }
 .dash-cost__sep { margin-inline: var(--ds-space-1); color: var(--ds-ink-muted); }
@@ -506,9 +499,8 @@
 .dash-progress__pct {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-2xl);
-  font-weight: var(--ds-weight-black);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-weight: var(--ds-weight-semibold);
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink);
 }
 .dash-bar {
@@ -625,7 +617,7 @@
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 2px;
   text-align: center;
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .dash-cal__wd {
   padding-bottom: var(--ds-space-1);

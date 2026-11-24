@@ -1,11 +1,11 @@
 /* Base común de las páginas públicas (landing, Le Journal, Entrepreneurs) y de
  * su cabecera y pie: contenedor, salto al contenido, botones, enlace, marca y
- * secciones. Sale tal cual de la landing (Trait rouge), para que las tres
- * páginas hablen el mismo sistema. El :host de cada página (fondo, tipografía,
- * --hd-h) lo pone la propia página.
+ * secciones. Sale de la landing, para que las tres páginas hablen el mismo
+ * sistema (Lin et bronze; se rediseña en las fases 1 y 2). El :host de cada
+ * página (fondo, tipografía, --hd-h) lo pone la propia página.
  *
- * contrast: vélin sobre abeto 9.7:1 · ink sobre vélin 13.6:1 · blanco sobre tomate 4.8:1
- *           tomate: un solo .button--cta a la vista, nunca texto ni junto al abeto
+ * contrast: crema sobre espresso ≥ 13:1 · espresso sobre vélin ≥ 14:1
+ *           un solo .button relleno principal a la vista; los demás, .button--outline
  */
 
 /* Contenedor: márgenes de 16 / 24 / 40 px. */
@@ -48,7 +48,7 @@ legend { float: none; width: auto; font-size: inherit; line-height: inherit; }
   min-height: 44px;
   padding: 0 var(--ds-space-5);
   border: 1px solid transparent;
-  border-radius: var(--ds-radius-md);
+  border-radius: var(--ds-radius-pill);
   background: var(--ds-action);
   color: var(--ds-on-action);
   font: inherit;
@@ -72,9 +72,6 @@ legend { float: none; width: auto; font-size: inherit; line-height: inherit; }
   color: var(--ds-ink);
 }
 .button--outline:active { background: var(--ds-bg-alt); }
-/* Siguiente etapa: el único botón tomate a la vista. Ni texto tomate ni tomate junto al abeto. */
-.button--cta { background: var(--ds-cta); color: var(--ds-on-cta); }
-.button--cta:active { background: var(--ds-cta-pressed); }
 
 .link {
   display: inline-flex;
@@ -92,7 +89,6 @@ legend { float: none; width: auto; font-size: inherit; line-height: inherit; }
 @media (hover: hover) and (pointer: fine) {
   .button:hover { background: var(--ds-action-hover); }
   .button--outline:hover { background: var(--ds-bg-alt); border-color: var(--ds-ink-faint); }
-  .button--cta:hover { background: var(--ds-cta-hover); }
   .link:hover { color: var(--ds-action-hover); text-decoration-thickness: 2px; }
 }
 
@@ -125,8 +121,7 @@ legend { float: none; width: auto; font-size: inherit; line-height: inherit; }
 .brand__name {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-black);
-  font-stretch: var(--ds-stretch-heading);
+  font-weight: var(--ds-weight-semibold);
   letter-spacing: -0.01em;
 }
 
@@ -158,8 +153,7 @@ legend { float: none; width: auto; font-size: inherit; line-height: inherit; }
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: clamp(1.875rem, 2.2vw + 1.2rem, 3rem);
-  font-weight: var(--ds-weight-black);
-  font-stretch: var(--ds-stretch-heading);
+  font-weight: var(--ds-weight-semibold);
   line-height: 1.04;
   letter-spacing: -0.01em;
   text-wrap: balance;

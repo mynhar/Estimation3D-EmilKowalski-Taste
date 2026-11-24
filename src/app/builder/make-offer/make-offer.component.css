@@ -16,8 +16,7 @@
 }
 
 .mo-fig {
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 /* ── Comunes ────────────────────────────────────────────────────────────── */
@@ -30,7 +29,6 @@
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-heading);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
 }
@@ -67,8 +65,7 @@
   font-family: var(--ds-font-body);
   font-size: var(--ds-text-sm);
   font-weight: var(--ds-weight-bold);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .mo-tag {
   display: inline-flex;
@@ -82,7 +79,6 @@
   font-family: var(--ds-font-body);
   font-size: var(--ds-text-sm);
   font-weight: var(--ds-weight-medium);
-  font-stretch: normal;
   line-height: 1.2;
   white-space: nowrap;
 }
@@ -267,8 +263,7 @@
 }
 .mo-file__size {
   font-size: var(--ds-text-sm);
-  font-stretch: var(--ds-stretch-figure);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink-muted);
 }
 .mo-file__open { flex-shrink: 0; min-height: 44px; }
@@ -319,7 +314,7 @@
 .mo-progress .mo-fig {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-black);
+  font-weight: var(--ds-weight-semibold);
   color: var(--ds-ink);
 }
 
@@ -342,7 +337,7 @@ mat-error mat-icon {
 .mo-field-group { display: grid; gap: var(--ds-space-2); min-width: 0; margin-bottom: var(--ds-space-3); }
 
 .mo-price { max-width: 22rem; }
-.mo-price input { font-stretch: var(--ds-stretch-figure); font-variant-numeric: tabular-nums; }
+.mo-price input { font-variant-numeric: lining-nums tabular-nums; }
 .mo-date { max-width: 16rem; }
 
 .mo-fieldset {
@@ -362,7 +357,7 @@ mat-error mat-icon {
 @media (min-width: 600px) {
   .mo-grid3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
-.mo-grid3 input { font-stretch: var(--ds-stretch-figure); font-variant-numeric: tabular-nums; }
+.mo-grid3 input { font-variant-numeric: lining-nums tabular-nums; }
 
 /* Zona del PDF: clic en «Joindre» o arrastre. */
 .mo-drop {
