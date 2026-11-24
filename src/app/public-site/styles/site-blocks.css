@@ -37,7 +37,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
 }
 .step__text { margin: 0; color: var(--ds-ink-secondary); max-width: 52ch; }
@@ -75,7 +75,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
 }
 .svc__text { margin: 0; color: var(--ds-ink-secondary); }

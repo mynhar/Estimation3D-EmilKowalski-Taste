@@ -2,8 +2,8 @@
 
 > **Dirección aprobada: Lin et bronze** (23-nov-2026; sustituye a Trait rouge). Toma el
 > diseño, la paleta y la tipografía de `agencia-inmobiliaria` y los lleva a Estimation3D.
-> Se hace por fases (ver abajo): la 0 está hecha y la app entera ya lleva la piel nueva;
-> las fases 1–4 recomponen pantalla a pantalla. Este archivo resume el sistema: el
+> Se hace por fases (ver abajo): la 0 y la 1 están hechas (la app entera lleva la piel
+> nueva y la cara al cliente ya está recompuesta); las fases 2–4 recomponen el resto. Este archivo resume el sistema: el
 > detalle está en `DESIGN_GUIDELINES.md` y los valores reales en `src/styles/tokens.css`.
 > Siguen vigentes el contrato de stack, el uso de tokens `--ds-*` (sin hex sueltos ni
 > nombres `--color-*`) y el contraste AA.
@@ -148,7 +148,15 @@ La composición de cada pantalla se rehace en las fases 1–4; estos patrones t�
 - Tarjeta enlazada: el título es el enlace y su `::after` cubre la tarjeta; el anillo de foco
   sale de `:has(a:focus-visible)`. Foto en caja con `aspect-ratio`: imagen `position: absolute`.
 - Fotos, vídeos y tours se abren con `abrirVisor()` (`shared/ui/media-viewer`); el tour en
-  la página se muestra con `app-tour-poster`.
+  la página se muestra con `app-tour-poster` (con `[medios]` y `[contexto]` el visor ofrece el
+  segmentado y la hoja con la etapa y «Voir le dossier»).
+- Cabecera de pantalla (`app-page-header`): `etiqueta` en mayúsculas bronce oscuro sobre el
+  título, `titulo` en Cormorant 600, `contexto` como línea de metadatos con «·». `enfasis`
+  (palabra final en cursiva bronce) **solo** en el saludo del dashboard del cliente.
+- Cifras (KPI): rótulo en mayúsculas `--ds-ink-muted` y la cifra en Cormorant 600 con
+  `lining-nums tabular-nums`; la unidad («sur 6», «%») en Manrope 14px `--ds-ink-muted`.
+- Títulos `h1`–`h6`: el reboot ya pone `lining-nums` (Cormorant trae cifras de estilo antiguo
+  y «3D» bailaba). En textos en Cormorant que no son títulos, ponlo en el componente.
 - Seguimiento de obra: `mat-slider` con la pista inactiva visible, fases y actividades como
   botones con `aria-pressed`, pasos con `aria-current="step"`.
 - Vídeos de presentación: opciones en `mat-menu`; dentro de un `<dialog>` nativo, selects
@@ -166,23 +174,66 @@ La composición de cada pantalla se rehace en las fases 1–4; estos patrones t�
   `-soft` con su `-ink`, borde, icono y texto; `role="alert"` para error y aviso, `status` para
   el resto; entrada con `animate.enter`, salida solo opacidad.
 
-## Armazón de la app (fase 1)
-- Escritorio: barra superior crema (`--ds-surface-bar`) con la marca, el idioma y el avatar;
-  barra lateral agrupada con etiquetas en mayúsculas y la entrada activa en una tarjeta vélin
-  con su marca de bronce.
-- Móvil: barra superior y pestañas inferiores de Material para el cliente (Accueil · Mes
-  dossiers · Offres · Plus); roles internos con cajón lateral.
-- Cliente: la siguiente etapa en una tarjeta espresso, como la cifra principal de la referencia.
+## Marca
+- `app-brand-mark` (`shared/ui/brand-mark`): disco vélin con el perfil de una casa y su línea
+  de base en bronce y la «E» en Cormorant, espresso. Decorativa (`aria-hidden`): el nombre
+  «Estimation3D» va al lado, en Cormorant 600. `tono="oscuro"` sobre espresso (disco
+  espresso, bronce claro, letra crema). Tamaño con `--bm-size` (36px por defecto).
+- Se usa en el armazón, el login y la cabecera y el pie públicos. Ya no hay cuadros con
+  escuadra (`.lg-mark`, `.brand__mark::after`).
+
+## Armazón de la app (fase 1, hecho)
+- Barra superior fija para todos los anchos: crema translúcida (`--ds-surface-overlay`) con
+  desenfoque y filete `--ds-border-subtle`. Marca + nombre + espacio del rol en mayúsculas
+  («Espace client», `nav.espace_<rol>`), idiomas (segmentado en escritorio, menú en móvil) y
+  la cuenta (nombre, rol y avatar) que abre un `mat-menu` con «Mon profil» y «Se déconnecter».
+  Sin campana: los avisos son efímeros (`components/toast`) y no hay bandeja.
+- Barra lateral en `--ds-bg-alt`: grupos con etiqueta en mayúsculas; la entrada activa es una
+  tarjeta vélin con sombra mínima, filete bronce de 2px a la izquierda e icono en bronce.
+  Plegable en escritorio (se recuerda en `localStorage`).
+- Móvil: el cliente tiene pestañas inferiores (Accueil · Dossiers · Offres · Plus) en crema
+  translúcida; la elegida lleva el icono en una píldora `--ds-action-faint`. Las pestañas usan
+  etiquetas cortas (`nav.tab_*`, propiedad `corta` del `NavItem`) para que quepan las cuatro
+  a 375px en los tres idiomas. Los roles internos tienen cajón lateral.
 - Objetivos táctiles ≥ 44px, `safe-area-inset-*`, enlace «Aller au contenu».
 - `.page-wrapper`: 16px de margen lateral en móvil, 24px desde 768px, 32px desde 1200px.
-- Hasta la fase 1, el armazón conserva la composición de Trait rouge con la piel nueva.
 
-## Visor 3D
+## Dashboard del cliente (fase 1, hecho)
+- Cabecera: etiqueta «Tableau de bord», «Bonjour, *Marie*» (nombre de pila en cursiva bronce)
+  y la línea «4 dossiers · 1 avec offres».
+- Selector de dossiers (si hay varios), luego la **siguiente etapa en una tarjeta espresso**:
+  etiqueta en `--ds-accent-on-dark`, título en Cormorant (`dashboard_client.next_title.*`),
+  texto en `--ds-ink-inverse-muted` y botón crema con texto espresso. Fuera del flujo
+  (cancelado, archivado) la tarjeta pasa a `--ds-band` sin botón y ocupa todo el ancho.
+- Al lado (abajo en móvil) dos cifras: «Progression 4 sur 6» y «Offres reçues».
+- Hoja del dossier: número en mayúsculas, chip, servicio en Cormorant, dirección · visita, y
+  la barra de etapas. Después el tour (póster), el informe del estimador (coste en bronce,
+  cifra grande), los contratos y, a la derecha en escritorio, documentos e historial.
+- Sin tour todavía: banda `--ds-band` con los tres pasos sobre una pista y su número en
+  Cormorant bronce.
+
+## Visor 3D (fase 1, hecho)
 - **Matterport** se queda (iframe de `url_tour`, en `media-viewer` a pantalla completa).
   Un visor propio con Three.js sería un proyecto aparte: necesita un modelo 3D por dossier.
-- Controles alrededor del visor en Angular Material; fondo `--ds-dark-surface-deep`.
-- En la fase 1 se revisa en el teléfono: alto con `dvh`, gestos sin secuestrar el scroll,
-  controles al alcance del pulgar.
+- La escena ocupa toda la pantalla (`100dvh`) sobre `--ds-dark-surface-deep`; los controles
+  flotan encima en paneles crema translúcidos con desenfoque (`.mv-glass`):
+  - arriba, volver, título, «Tour 3D · número» y pantalla completa (solo si el navegador la
+    permite; en iPhone no);
+  - debajo, el segmentado «Tour 3D / Vidéo» si el dossier tiene varios medios;
+  - abajo, al alcance del pulgar, la hoja del tour: «EXP-… · Étape 4 sur 6», cómo moverse y
+    «Voir le dossier». Se abre la primera vez; se cierra para dejar libres los controles de
+    Matterport y se reabre con ⓘ.
+- Vídeo y foto quedan centrados bajo la barra. Todo respeta `safe-area-inset-*`.
+
+## Login y registro (fase 1, hecho)
+- Móvil: volver e idiomas arriba, la marca, la etiqueta («Accédez à votre espace» /
+  «Créez votre compte en quelques minutes») sobre el título en Cormorant, campos outlined de
+  Material, error con icono y texto, botón relleno, «ou continuez avec», Google de contorno y,
+  abajo, el paso a la otra vista («Créer un compte» / «Se connecter»), que lleva el foco al
+  título. Ya no hay segmentado arriba.
+- Escritorio: a la izquierda, el panel espresso con la marca (`tono="oscuro"`), el escaneo en
+  su isla `--ds-scan-bg` y la promesa con sus cuatro puntos (iconos en `--ds-accent-on-dark`).
+- No hay «Mot de passe oublié ?»: la app no tiene ese flujo; el enlace llegará con él.
 
 ## Landing y páginas públicas
 - Solo tema claro; el idioma va en la cabecera. CSS propio con CSS grid y pulido de Emil
@@ -194,6 +245,11 @@ La composición de cada pantalla se rehace en las fases 1–4; estos patrones t�
   cabecera va de contorno. En Entrepreneurs lo principal es postular: «Créer mon dossier» de
   la cabecera va siempre de contorno.
 - Imágenes con `NgOptimizedImage` y copias web. El escaneo del hero, sin cotas ni barrido.
+- Hero (fase 1, hecho): etiqueta «Visite unique · 399 $ tarif fixe», título por líneas (una
+  por parte de i18n: `l1`, `l2`, `l3`) con la última en cursiva bronce (`.acc`), lead y dos
+  botones («Créer mon dossier» relleno, «Voir le processus» de contorno); a la derecha (debajo
+  en móvil) el escaneo en una isla `--ds-scan-bg` de 20px.
+- Cursiva bronce en los títulos de la landing: el hero y «tout» del proceso. No más.
 - Formulario: por debajo de 768px, tres pasos con «Étape n sur 3»; cada paso valida lo suyo y
   lleva el foco al primer error. Los tres bloques siempre en el DOM (`[hidden]`).
 - Placeholders: nunca un valor de ejemplo. Un formato va en una ayuda bajo el campo, con
@@ -205,7 +261,11 @@ La composición de cada pantalla se rehace en las fases 1–4; estos patrones t�
 
 ## Motion stance
 - Sobria. Lo que responde a una acción (abrir, expandir, confirmar, cambiar de paso) sí;
-  entradas en cascada por reflejo, no. La landing puede tener un momento orquestado (fase 1).
+  entradas en cascada por reflejo, no. La landing tiene su único momento orquestado al cargar:
+  el título del hero entra por líneas (máscara, 900ms, 90ms entre líneas) y el escaneo aparece
+  y se mece despacio (±5°, 28s por vaivén; un giro entero dejaría ver las esquinas de la foto).
+- Las animaciones infinitas se paran a mano con `prefers-reduced-motion`: la regla global solo
+  acorta la duración y una infinita seguiría moviéndose a saltos.
 - Curvas y duraciones con `--ds-ease-*` / `--ds-duration-*` (`--ds-ease-out` =
   `cubic-bezier(0.2, 1, 0.3, 1)`). Reduced-motion cubierto globalmente.
 - Sin `@angular/animations` (y sin `provideAnimations()`): CSS, WAAPI o `animate.enter` / `animate.leave`.
@@ -250,9 +310,13 @@ cada rol `--mat-sys-*` apunta a un token `--ds-*`.
    Symbols a peso 300; tema de Material (píldora / 10 / 14 / 20, segmento elegido en espresso,
    títulos de diálogo en Cormorant); cifras `lining-nums`; docs. La app entera cambia de piel;
    los comentarios de cabecera de cada pantalla se reescriben en su fase.
-1. Cara al cliente: armazón (barra superior + lateral agrupada; pestañas inferiores en móvil),
-   dashboard del cliente, visor 3D en el móvil, login y registro, landing (CSS grid + Emil).
-   También la marca (hoy, cuadro con escuadra) y la banda de pasos del dashboard sin tour.
+1. **Cara al cliente (hecho, 24-nov-2026)**: armazón (barra superior + lateral agrupada;
+   pestañas inferiores en móvil), marca (`app-brand-mark`), dashboard del cliente (siguiente
+   etapa en espresso, cifras, banda sin tour), visor 3D, login y registro (panel espresso con
+   el escaneo), landing (hero por líneas con el escaneo que se mece). Textos nuevos marcados
+   para revisión: `nav.espace_*`, `nav.mon_compte`, `nav.tab_*`, `dashboard_client.meta_*`,
+   `dashboard_client.of_total`, `dashboard_client.next_title.*`, `viewer.*`,
+   `landing.hero.eyebrow`.
 2. Resto del cliente y páginas públicas (Le Journal, Entrepreneurs).
 3. Contratista.
 4. Estimador y admin.

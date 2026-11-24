@@ -24,8 +24,8 @@ import { StatusChipComponent } from '../../shared/ui/status-chip/status-chip.com
 import { StageLineComponent } from '../../shared/ui/stage-line/stage-line.component';
 import { DossierCardComponent } from '../../shared/ui/dossier-card/dossier-card.component';
 import { TourPosterComponent } from '../../shared/ui/tour-poster/tour-poster.component';
-import { abrirVisor } from '../../shared/ui/media-viewer/media-viewer.component';
-import { etapaDossier } from '../../shared/util/etapas';
+import { MediaViewerItem, VisorContexto, abrirVisor } from '../../shared/ui/media-viewer/media-viewer.component';
+import { ETAPAS, etapaDossier } from '../../shared/util/etapas';
 
 // Último hito de un contrato según su estado. Fechado con `actualizado_en`:
 // la base no guarda cuándo empezó la ejecución ni cuándo terminó.
@@ -122,21 +122,47 @@ export class DashboardComponent implements OnInit {
     return exp ? etapaDossier(exp.estado, this.contratos()) : 0;
   });
 
+  /** Número de etapas del flujo: el «sur 6» de la cifra de progreso. */
+  readonly totalEtapas = ETAPAS.length;
+
+  /** Expedientes con ofertas por revisar (todos, para la línea de la cabecera). */
+  conOfertas = computed(() => this.expedientes().filter(e => e.estado === 'en_oferta').length);
+
   /** Otros expedientes (no el activo) que tienen ofertas por revisar. */
   ofertasEnOtros = computed(() => {
     const activo = this.expedienteActivo();
     return this.expedientes().filter(e => e.estado === 'en_oferta' && e !== activo).length;
   });
 
-  /** Nombre para el saludo: perfil, metadatos de la cuenta o el correo. */
-  nombre = computed(() => {
+  /** Nombre de pila para el saludo («Bonjour, Marie»); si no hay, el del correo. */
+  nombrePila = computed(() => {
     const p = this.perfil();
-    if (p?.nombre) return [p.nombre, p.apellido].filter(Boolean).join(' ');
+    if (p?.nombre) return p.nombre.trim().split(/\s+/)[0];
     const u = this.user();
-    return u?.user_metadata?.['full_name'] ?? u?.email?.split('@')[0] ?? '';
+    const completo: string | undefined = u?.user_metadata?.['full_name'];
+    return completo?.trim().split(/\s+/)[0] ?? u?.email?.split('@')[0] ?? '';
   });
 
   // ── Medios ────────────────────────────────────────────────────────────────
+
+  /** Tours y vídeos del expediente activo, en ese orden: el segmentado del visor. */
+  mediosVisor = computed((): MediaViewerItem[] => {
+    this.currentLang(); // los títulos cambian con el idioma
+    return [
+      ...this.tourUrls().map((url, i): MediaViewerItem => ({ tipo: 'tour', url, titulo: this.tituloTour(i) })),
+      ...this.videos().map((v, i): MediaViewerItem => ({
+        tipo: 'video',
+        url: this.archivoService.publicUrl(v.url_storage),
+        titulo: `${this.translate.instant('dashboard_client.video_label')} ${i + 1}`,
+      })),
+    ];
+  });
+
+  /** El dossier activo visto desde el visor: número, etapa y su ficha. */
+  contextoVisor = computed((): VisorContexto | null => {
+    const exp = this.expedienteActivo();
+    return exp ? { numero: exp.numero, etapa: this.etapaActiva(), ruta: ['/client/file/my-file', exp.id] } : null;
+  });
 
   tieneTour    = computed(() => this.tourUrls().length > 0);
   tieneVideos  = computed(() => this.videos().length > 0);
@@ -455,6 +481,8 @@ export class DashboardComponent implements OnInit {
       tipo: 'video',
       url: this.archivoService.publicUrl(v.url_storage),
       titulo: `${this.translate.instant('dashboard_client.video_label')} ${i + 1}`,
+      medios: this.mediosVisor(),
+      contexto: this.contextoVisor(),
     });
   }
 

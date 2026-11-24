@@ -11,6 +11,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 
 import { LangService } from '../../services/lang.service';
 import { LangToggleComponent } from '../../components/lang-toggle/lang-toggle.component';
+import { BrandMarkComponent } from '../../shared/ui/brand-mark/brand-mark.component';
 
 /** Página pública en la que está la cabecera (marca el enlace con aria-current). */
 export type PaginaPublica = 'inicio' | 'journal' | 'entrepreneurs';
@@ -36,7 +37,7 @@ export type PaginaPublica = 'inicio' | 'journal' | 'entrepreneurs';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     NgTemplateOutlet, RouterLink, MatButtonModule, MatIconModule, MatMenuModule, TranslatePipe,
-    LangToggleComponent,
+    LangToggleComponent, BrandMarkComponent,
   ],
   templateUrl: './site-header.component.html',
   styleUrls: ['../styles/site-base.css', './site-header.component.css'],

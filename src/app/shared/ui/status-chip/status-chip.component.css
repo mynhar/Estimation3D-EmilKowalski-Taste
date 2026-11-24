@@ -1,7 +1,7 @@
 /* component: status chip
  * states: info · accion · atencion · ok · neutro · error
- * contrast: texto -ink sobre su -soft (≥ 5.8:1); neutro ink-secondary sobre band (7.7:1)
- *           nunca tomate: el chip informa, no es una acción
+ * contrast: texto -ink sobre su -soft (≥ 4.9:1); neutro ink-secondary sobre band (6.3:1)
+ *           nunca espresso relleno: el chip informa, no es una acción
  */
 :host {
   display: inline-flex;
@@ -11,7 +11,7 @@
   padding: 2px var(--ds-space-3);
   border-radius: var(--ds-radius-pill);
   font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
+  font-weight: var(--ds-weight-semibold);
   line-height: 1.2;
   white-space: nowrap;
   background: var(--ds-band);

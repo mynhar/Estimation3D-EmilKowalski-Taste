@@ -1,6 +1,6 @@
-/* component: pie público (Trait rouge; sale de la landing)
+/* component: pie público (Lin et bronze; landing, Le Journal, Entrepreneurs)
  * states: enlaces default · hover (solo puntero fino) · focus-visible
- * contrast: ink-secondary sobre kraft 7.7:1 · títulos ink · pie ink-muted sobre kraft 5.4:1
+ * contrast: ink-secondary sobre lino oscuro 6.3:1 · títulos ink · pie ink-muted sobre lino oscuro 4.7:1
  */
 :host { display: block; }
 
@@ -28,7 +28,7 @@
   margin: 0 0 var(--ds-space-2);
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   color: var(--ds-ink);
 }
 .ft__list { display: grid; margin: 0; padding: 0; list-style: none; }

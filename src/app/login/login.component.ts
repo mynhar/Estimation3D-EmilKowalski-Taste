@@ -1,14 +1,17 @@
-import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy, Component, ElementRef, Injector, OnInit, afterNextRender, inject, signal, viewChild,
+} from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthSupabaseService } from '../services/auth-supabase.service';
 import { MatButtonModule } from '@angular/material/button';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { LangToggleComponent } from '../components/lang-toggle/lang-toggle.component';
+import { BrandMarkComponent } from '../shared/ui/brand-mark/brand-mark.component';
 import { RolUsuario } from '../types/supabase';
 import { passwordComplexityValidator } from '../shared/validators/password.validator';
 import { CAMPOS_FALTANTES } from '../shared/ui/campos-faltantes/campos-faltantes.component';
@@ -17,9 +20,9 @@ import { CAMPOS_FALTANTES } from '../shared/ui/campos-faltantes/campos-faltantes
   selector: 'app-login',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    ReactiveFormsModule, TranslatePipe, RouterLink, ...CAMPOS_FALTANTES,
-    MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatIconModule, MatInputModule,
-    LangToggleComponent,
+    ReactiveFormsModule, TranslatePipe, RouterLink, NgOptimizedImage, ...CAMPOS_FALTANTES,
+    MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule,
+    LangToggleComponent, BrandMarkComponent,
   ],
   templateUrl: './login.component.html',
   styleUrl:    './login.component.css',
@@ -29,6 +32,8 @@ export class LoginComponent implements OnInit {
   private router = inject(Router);
   private route  = inject(ActivatedRoute);
   private fb     = inject(FormBuilder);
+  private injector = inject(Injector);
+  private titulo = viewChild<ElementRef<HTMLElement>>('titulo');
 
   vista            = signal<'login' | 'registro'>('login');
   /** Envíos con campos sin completar, por formulario: cada uno trae el resumen de lo que falta. */
@@ -65,11 +70,13 @@ export class LoginComponent implements OnInit {
     }
   }
 
+  /** Pasa de iniciar sesión a crear cuenta (o al revés) y lleva el foco al nuevo título. */
   cambiarVista(v: 'login' | 'registro') {
     this.vista.set(v);
     this.errorLogin.set('');
     this.errorRegistro.set('');
     this.registroExitoso.set(false);
+    afterNextRender(() => this.titulo()?.nativeElement.focus(), { injector: this.injector });
   }
 
   async onLogin() {

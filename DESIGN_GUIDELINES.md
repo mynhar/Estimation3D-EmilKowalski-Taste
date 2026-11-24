@@ -148,7 +148,7 @@ Dos familias, bien distintas:
 | Etiqueta en mayúsculas | Manrope | 700, `--ds-text-label` (12px), `--ds-tracking-label` (0.2em) | Grupos de navegación, cabeceras de tabla, etiquetas de KPI (`--ds-ink-muted`); etiqueta sobre un título (`--ds-accent-ink`) |
 
 - Cormorant trae **cifras de estilo antiguo** por defecto: toda cifra lleva `lining-nums tabular-nums`. En Manrope no cambia nada.
-- `h1`–`h6` globales (`src/styles/base.css`) van en Cormorant 600, espresso, `--ds-leading-tight` y `--ds-tracking-tight`. Cada pantalla fija el tamaño de sus títulos en el CSS del componente.
+- `h1`–`h6` globales (`src/styles/base.css`) van en Cormorant 600, espresso, `--ds-leading-tight`, `--ds-tracking-tight` y `lining-nums` («3D» o «2026» en un título no bailan). Cada pantalla fija el tamaño de sus títulos en el CSS del componente. Un texto en Cormorant que no es título (marca, cifra, `<p>` grande) pone `lining-nums` en su componente.
 - `body` lleva `font-feature-settings: "ss01", "cv11"` (las variantes de Manrope de la referencia).
 - **Sentence case** en títulos, botones y texto corrido. Las mayúsculas son solo de las etiquetas, y por CSS (`text-transform: uppercase`), nunca escritas así en i18n.
 - «·» permitido en líneas de metadatos (`Dossier E3D-014 · étape 4 sur 6`).
@@ -410,7 +410,7 @@ Angular Material 22 (M3) es la librería de componentes del rediseño. Botones, 
 Bootstrap, `@ng-bootstrap`, Popper y `bootstrap-icons` ya no están instalados, y la capa de transición (`ui-base.css`, `bootstrap-overrides.css`) se borró al cerrar la fase 4. Los estilos globales, en este orden (`angular.json`, build y test):
 
 1. `src/styles/material-theme.scss`: el tema de Material (roles `--mat-sys-*` → `--ds-*`, formas, colores de botones y segmentados).
-2. `src/styles/base.css`: reboot de **elementos** (box-sizing, márgenes de `p`, títulos y listas, `h1`–`h6` en Cormorant 600, enlaces en bronce oscuro, controles que heredan la fuente, `[hidden]`…). Solo selectores de elemento, sin clases.
+2. `src/styles/base.css`: reboot de **elementos** (box-sizing, márgenes de `p`, títulos y listas, `h1`–`h6` en Cormorant 600 con `lining-nums`, enlaces en bronce oscuro, controles que heredan la fuente, `[hidden]`…). Solo selectores de elemento, sin clases.
 3. `src/styles/tokens.css`: los tokens `--ds-*`, la base de `html` / `body`, `::selection` y el corte global de animaciones con reduced motion.
 4. `src/styles/components.css`: solo `.page-wrapper`, el margen de las pantallas de la app.
 5. `src/styles.css`: solo lo que vive fuera de cualquier componente (`.e3d-viewer-pane`, el panel del visor en el overlay del CDK).
@@ -482,6 +482,7 @@ Antes de cerrar un componente, verifica que:
 - Abre con lo más característico del dominio: el escaneo de una vivienda real.
 - Título grande en Cormorant (en la landing puede llevar una palabra en cursiva bronce) + lead + el botón relleno de la acción principal y, si hace falta, uno secundario de contorno o un enlace.
 - Como mucho un momento orquestado; nada de entradas en cascada por reflejo.
+- **Hero de la landing** (`landing-page.component.*`): etiqueta en mayúsculas (`landing.hero.eyebrow`), el `h1` en tres `.hero__line` (una por parte de i18n) con la última en `.acc` (cursiva bronce), lead, «Créer mon dossier» (`.button`) y «Voir le processus» (`.button--outline`); a la derecha, el escaneo en una isla `--ds-scan-bg` de 20px. El momento al cargar: cada línea sube dentro de su máscara (`overflow: clip` con holgura para acentos, descendentes y la cursiva; 900ms, 90ms entre líneas) y el escaneo aparece y se mece ±5° (28s por vaivén, `--ds-ease-in-out`, a sangre con `scale(1.1)` para que no asomen las esquinas).
 
 ### Páginas públicas (landing, Le Journal, Entrepreneurs)
 
@@ -496,6 +497,26 @@ Antes de cerrar un componente, verifica que:
 - Sobre la isla espresso (`.sec--dark`) el botón es crema (`.button--light`, definido en `entrepreneurs.component.css`).
 - Acordeón de preguntas (FAQ): `h3` > `button` con `aria-expanded` / `aria-controls`; respuesta `role="region"` con `aria-labelledby`, `inert` mientras está cerrada y altura animada con `grid-template-rows: 0fr → 1fr` (sin medir el DOM).
 - Francés: espacio de no separación (`\u00a0`) antes de `? ! : ;` en los textos de i18n.
+- Marca: `<app-brand-mark class="brand__mark" />` + `.brand__name` (Cormorant 600, 28px). `site-base.css` solo fija su tamaño (`--bm-size: 36px`). La página actual de la cabecera va subrayada en bronce (`--ds-accent`).
+- Cursiva bronce: el hero y «tout» del título del proceso. No la pongas en más títulos.
+
+### Armazón de la app (`app.component.*`)
+
+- Barra superior `.tb` fija en todos los anchos: `--ds-surface-overlay` + `backdrop-filter: blur(14px) saturate(1.1)`, filete `--ds-border-subtle`, alto `--tb-h` (64px; 56px en móvil). Marca (`app-brand-mark` + «Estimation3D» + espacio del rol en mayúsculas, `nav.espace_<rol>`; el espacio se oculta por debajo de 360px), idiomas (`app-lang-toggle` en escritorio, `mat-menu` en móvil) y la cuenta: un botón con nombre, rol y avatar que abre un `mat-menu` (perfil y salir).
+- Barra lateral `.sb` en `--ds-bg-alt` bajo la barra superior: títulos de grupo en mayúsculas; entrada de 40px, 14px, peso 500, `--ds-ink-secondary`; la activa en tarjeta vélin (`--ds-shadow-xs` + filete interior `--ds-border-subtle`), peso 700, icono en bronce y una barra bronce de 2px a la izquierda (`::before`). Plegable (`--sb-w` 248px / 76px).
+- Móvil (< 992px): cajón lateral para los roles internos; el cliente tiene `.tabs` abajo (crema translúcida con desenfoque; la elegida con el icono en una píldora `--ds-action-faint` / `--ds-action-ink`) y la hoja «Plus» (`mat-bottom-sheet`). Cada `NavItem` de las pestañas puede llevar `corta` (`nav.tab_*`): cuatro pestañas tienen que caber a 375px en los tres idiomas.
+- Un contenido fijo arriba bajo la barra (p. ej. una columna `sticky`) usa `top: calc(var(--tb-h) + …)`.
+
+### Cabecera de pantalla y cifras
+
+- `app-page-header`: `etiqueta` (mayúsculas, `--ds-accent-ink`, sobre el título), `titulo` (h1 Cormorant 600, 28–44px), `contexto` (línea de metadatos `--ds-ink-muted`, con «·» si junta datos) y las acciones proyectadas con `actions`. `enfasis` pinta una palabra final en cursiva bronce y es **solo** para el saludo del dashboard del cliente («Bonjour, *Marie*»).
+- Tarjeta de la siguiente etapa (dashboard del cliente): `--ds-dark-surface`, etiqueta en `--ds-accent-on-dark`, título Cormorant 28–36px en crema, texto `--ds-ink-inverse-muted`, `mat-flat-button` crema (`--mat-button-filled-container-color: var(--ds-ink-inverse)`, texto espresso) y `--ds-focus-ring: var(--ds-focus-ring-dark)` en el contenedor.
+- Cifras (KPI): rejilla en una tarjeta vélin, celdas separadas por `--ds-border-subtle`; rótulo en mayúsculas `--ds-ink-muted` arriba y la cifra abajo (`align-content: space-between`, para que dos rótulos de distinta altura no desalineen las cifras), Cormorant 600 a 40px con `lining-nums tabular-nums`; la unidad en Manrope 14px `--ds-ink-muted`.
+
+### Visor de medios (`shared/ui/media-viewer`)
+
+- `abrirVisor(dialog, { tipo, url, titulo, medios?, contexto? })`. `medios` (todos los del dossier) añade el segmentado «Tour 3D / Vidéo»; `contexto` (`{ numero, etapa, ruta }`) añade «EXP-… · Étape n sur 6» y «Voir le dossier». `app-tour-poster` acepta los mismos `[medios]` y `[contexto]`.
+- Escena a pantalla completa (`100dvh`, panel `.e3d-viewer-pane` sin forma ni sombra) sobre `--ds-dark-surface-deep`; los controles flotan en `.mv-glass` (crema translúcida, `blur(16px)`, `--ds-shadow-lg`) y respetan `safe-area-inset-*`: barra arriba (volver, título, tipo · número, ⓘ y pantalla completa solo si `document.fullscreenEnabled`), segmentado debajo y la hoja del tour abajo, al alcance del pulgar (se abre la primera vez; ⓘ la reabre).
 
 ### Formularios largos en móvil (pasos)
 
@@ -547,6 +568,7 @@ Antes de cerrar un componente, verifica que:
 - **Hover en botones rellenos**: cambio de color a `--ds-action-hover`; `:active` con `-pressed` y `scale(0.98)`.
 - **Hover en tarjetas enlazadas**: borde o sombra (`--ds-shadow-md`) en el CSS del componente, solo con puntero fino (`@media (hover: hover) and (pointer: fine)`), para que no se quede pegado en táctil.
 - **View Transitions** del router: activarlas en `app.config.ts` con `withViewTransitions()`.
+- **Animaciones infinitas** (esqueletos, spinners, el escaneo del hero): el corte global de `tokens.css` solo acorta la duración, así que una infinita seguiría moviéndose a saltos. Cada componente las para con `@media (prefers-reduced-motion: reduce) { … { animation: none; } }`.
 - **PROHIBIDO**: animaciones de `300ms ease` por reflejo. Usa `var(--ds-ease-out)` y duraciones de los tokens.
 
 ```typescript

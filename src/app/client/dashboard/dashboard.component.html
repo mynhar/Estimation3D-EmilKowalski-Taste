@@ -1,7 +1,14 @@
 <div class="page-wrapper dash">
 
   <app-page-header
-    [titulo]="('dashboard_client.welcome' | translate) + (nombre() ? ', ' + nombre() : '')">
+    [etiqueta]="'dashboard_client.title' | translate"
+    [titulo]="('dashboard_client.welcome' | translate) + (nombrePila() ? ', ' : '')"
+    [enfasis]="nombrePila()"
+    [contexto]="cargando() || expedientes().length === 0 ? null
+      : (expedientes().length === 1
+          ? ('dashboard_client.meta_files_one' | translate)
+          : ('dashboard_client.meta_files' | translate: { n: expedientes().length }))
+        + (conOfertas() > 0 ? ' · ' + ('dashboard_client.meta_with_offers' | translate: { n: conOfertas() }) : '')">
     @if (!cargando() && expedientes().length > 0) {
       <a actions mat-stroked-button class="dash-new" routerLink="/client/file/create">
         <mat-icon>add</mat-icon>
@@ -96,81 +103,103 @@
         <!-- ════ Columna principal ════ -->
         <div class="dash-col">
 
+          <!-- Prochaine étape (espresso) y cifras del dossier -->
+          <div class="dash-top" [class.is-solo]="etapaActiva() === 0">
+            <section class="dash-next" [class.is-off]="etapaActiva() === 0"
+                     aria-labelledby="dash-next-title">
+              <h2 id="dash-next-title" class="dash-next__label">{{ 'dashboard_client.next_step' | translate }}</h2>
+              @if (etapaActiva() === 0) {
+                <p class="dash-next__title">{{ ('state.' + exp.estado) | translate }}</p>
+                <p class="dash-next__text">{{ ('state_desc.' + exp.estado) | translate }}</p>
+              } @else {
+                @switch (exp.estado) {
+                  @case ('en_oferta') {
+                    <p class="dash-next__title">
+                      @if (ofertasHistorial().length > 1) {
+                        {{ 'dashboard_client.next_title.en_oferta_many' | translate: { count: ofertasHistorial().length } }}
+                      } @else if (ofertasHistorial().length === 1) {
+                        {{ 'dashboard_client.next_title.en_oferta_one' | translate }}
+                      } @else {
+                        {{ 'dashboard_client.next_title.en_oferta' | translate }}
+                      }
+                    </p>
+                    <p class="dash-next__text">{{ 'dashboard_client.compare_text' | translate }}</p>
+                    <a mat-flat-button class="dash-next__cta" routerLink="/client/offers-received">
+                      <mat-icon>request_quote</mat-icon>
+                      {{ 'dashboard_client.review_offers' | translate }}
+                    </a>
+                  }
+                  @case ('adjudicado') {
+                    <p class="dash-next__title">{{ 'dashboard_client.next_title.adjudicado' | translate }}</p>
+                    <p class="dash-next__text">{{ 'state_desc.adjudicado' | translate }}</p>
+                    <a mat-flat-button class="dash-next__cta" routerLink="/client/contracts">
+                      <mat-icon>contract</mat-icon>
+                      {{ 'dashboard_client.view_contract' | translate }}
+                    </a>
+                  }
+                  @case ('contratado') {
+                    <p class="dash-next__title">{{ 'dashboard_client.next_title.contratado' | translate }}</p>
+                    <p class="dash-next__text">{{ 'state_desc.contratado' | translate }}</p>
+                    <a mat-flat-button class="dash-next__cta" routerLink="/client/construction-monitoring/list">
+                      <mat-icon>construction</mat-icon>
+                      {{ 'dashboard_client.view_monitoring' | translate }}
+                    </a>
+                  }
+                  @default {
+                    <p class="dash-next__title">{{ ('dashboard_client.next_title.' + exp.estado) | translate }}</p>
+                    <p class="dash-next__text">{{ ('state_desc.' + exp.estado) | translate }}</p>
+                  }
+                }
+              }
+            </section>
+
+            @if (etapaActiva() > 0) {
+              <dl class="dash-kpis">
+                <div class="dash-kpi">
+                  <dt class="dash-kpi__label">{{ 'dashboard_client.progress' | translate }}</dt>
+                  <dd class="dash-kpi__value">
+                    {{ etapaActiva() }}
+                    <small>{{ 'dashboard_client.of_total' | translate: { total: totalEtapas } }}</small>
+                  </dd>
+                </div>
+                <div class="dash-kpi">
+                  <dt class="dash-kpi__label">{{ 'dashboard_client.received_offers' | translate }}</dt>
+                  <dd class="dash-kpi__value">{{ ofertasHistorial().length }}</dd>
+                </div>
+              </dl>
+            }
+          </div>
+
           <!-- Hoja del expediente: qué es, dónde está, en qué etapa va -->
           <section class="dash-sheet" aria-labelledby="dash-exp-title">
             <div class="dash-sheet__head">
-              <h2 id="dash-exp-title" class="dash-sheet__title">
-                @if (detalleActivo(); as d) {
-                  {{ servicioNombreVista(d) || exp.numero }}
-                } @else {
-                  {{ servicioNombre(exp.servicio) || exp.numero }}
-                }
-              </h2>
+              <p class="dash-sheet__ref">{{ exp.numero }}</p>
               <app-status-chip [estado]="exp.estado" />
             </div>
+            <h2 id="dash-exp-title" class="dash-sheet__title">
+              @if (detalleActivo(); as d) {
+                {{ servicioNombreVista(d) || exp.numero }}
+              } @else {
+                {{ servicioNombre(exp.servicio) || exp.numero }}
+              }
+            </h2>
 
-            <ul class="dash-meta">
-              <li>
-                <mat-icon aria-hidden="true">folder</mat-icon>
-                {{ 'file.exp_abbr' | translate }} {{ exp.numero }}
-              </li>
-              @if (detalleActivo()?.direccion; as dir) {
-                <li>
-                  <mat-icon aria-hidden="true">location_on</mat-icon>
-                  {{ dir }}
-                </li>
-              }
-              @if (exp.fecha_visita) {
-                <li>
-                  <mat-icon aria-hidden="true">event</mat-icon>
-                  {{ 'file.visit_date' | translate }} {{ formatFecha(exp.fecha_visita) }}
-                </li>
-              }
-            </ul>
+            @if (detalleActivo()?.direccion || exp.fecha_visita) {
+              <p class="dash-meta">
+                @if (detalleActivo()?.direccion; as dir) {
+                  <span>{{ dir }}</span>
+                }
+                @if (detalleActivo()?.direccion && exp.fecha_visita) {
+                  <span class="dash-meta__sep" aria-hidden="true">·</span>
+                }
+                @if (exp.fecha_visita) {
+                  <span>{{ 'file.visit_date' | translate }} {{ formatFecha(exp.fecha_visita) }}</span>
+                }
+              </p>
+            }
 
             @if (etapaActiva() > 0) {
               <app-stage-line class="dash-sheet__line" [actual]="etapaActiva()" />
-            }
-          </section>
-
-          <!-- Prochaine étape: una sola acción -->
-          <section class="dash-next" [class.is-off]="etapaActiva() === 0"
-                   aria-labelledby="dash-next-title">
-            <h2 id="dash-next-title" class="dash-h2">{{ 'dashboard_client.next_step' | translate }}</h2>
-            @switch (exp.estado) {
-              @case ('en_oferta') {
-                <p class="dash-next__text">
-                  @if (ofertasHistorial().length > 1) {
-                    {{ 'dashboard_client.banner_plural' | translate: { count: ofertasHistorial().length } }}
-                  } @else if (ofertasHistorial().length === 1) {
-                    {{ 'dashboard_client.banner_single' | translate }}
-                  } @else {
-                    {{ 'state_desc.en_oferta' | translate }}
-                  }
-                  {{ 'dashboard_client.compare_text' | translate }}
-                </p>
-                <a mat-flat-button class="dash-next__cta" routerLink="/client/offers-received">
-                  <mat-icon>request_quote</mat-icon>
-                  {{ 'dashboard_client.review_offers' | translate }}
-                </a>
-              }
-              @case ('adjudicado') {
-                <p class="dash-next__text">{{ 'state_desc.adjudicado' | translate }}</p>
-                <a mat-flat-button class="dash-next__cta" routerLink="/client/contracts">
-                  <mat-icon>contract</mat-icon>
-                  {{ 'dashboard_client.view_contract' | translate }}
-                </a>
-              }
-              @case ('contratado') {
-                <p class="dash-next__text">{{ 'state_desc.contratado' | translate }}</p>
-                <a mat-flat-button class="dash-next__cta" routerLink="/client/construction-monitoring/list">
-                  <mat-icon>construction</mat-icon>
-                  {{ 'dashboard_client.view_monitoring' | translate }}
-                </a>
-              }
-              @default {
-                <p class="dash-next__text">{{ ('state_desc.' + exp.estado) | translate }}</p>
-              }
             }
           </section>
 
@@ -182,7 +211,8 @@
               <span class="skel skel--media" aria-hidden="true"></span>
             } @else if (tieneMedia()) {
               @for (url of tourUrls(); track url; let i = $index) {
-                <app-tour-poster [url]="url" [titulo]="tituloTour(i)" />
+                <app-tour-poster [url]="url" [titulo]="tituloTour(i)"
+                                 [medios]="mediosVisor()" [contexto]="contextoVisor()" />
               }
 
               @if (tieneVideos()) {

@@ -17,11 +17,14 @@ import { ToastComponent } from './components/toast/toast.component';
 import { LangToggleComponent } from './components/lang-toggle/lang-toggle.component';
 import { AppFooterComponent } from './components/app-footer/app-footer.component';
 import { ClaudeIconComponent } from './shared/ui/claude-icon/claude-icon.component';
+import { BrandMarkComponent } from './shared/ui/brand-mark/brand-mark.component';
 
 /** Entrada de navegación. `ia` pinta el icono propio del asistente en vez de un Material Symbol. */
 interface NavItem {
   ruta: string;
   etiqueta: string;
+  /** Etiqueta corta para las pestañas inferiores (4 a lo ancho de un teléfono de 375px). */
+  corta?: string;
   matIcon?: string;
   ia?: boolean;
   exacto?: boolean;
@@ -113,8 +116,8 @@ const NAV_ADMIN: NavSeccion[] = [
  */
 const TABS_CLIENTE: NavItem[] = [
   { ruta: '/client/dashboard', etiqueta: 'nav.inicio', matIcon: 'home', exacto: true },
-  { ruta: '/client/file/my-files', etiqueta: 'nav.mes_dossiers', matIcon: 'folder' },
-  { ruta: '/client/offers-received', etiqueta: 'nav.offres_recues', matIcon: 'request_quote' },
+  { ruta: '/client/file/my-files', etiqueta: 'nav.mes_dossiers', corta: 'nav.tab_dossiers', matIcon: 'folder' },
+  { ruta: '/client/offers-received', etiqueta: 'nav.offres_recues', corta: 'nav.tab_offres', matIcon: 'request_quote' },
 ];
 
 /** Lo que va en la hoja «Plus»: la navegación del cliente que no está en las pestañas. */
@@ -134,7 +137,7 @@ const PLUS_CLIENTE: NavItem[] = [
   imports: [
     RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe,
     MatBottomSheetModule, MatButtonModule, MatIconModule, MatListModule, MatMenuModule,
-    ToastComponent, LangToggleComponent, AppFooterComponent, ClaudeIconComponent,
+    ToastComponent, LangToggleComponent, AppFooterComponent, ClaudeIconComponent, BrandMarkComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
@@ -161,6 +164,9 @@ export class AppComponent {
   esAdministrador = computed(() => !this.cargandoPerfil() && this.rolPerfil() === 'administrador');
 
   rolLabel = computed(() => 'role.' + (this.rolPerfil() ?? 'cliente'));
+
+  /** Subtítulo de la marca en la barra superior: el espacio del rol. */
+  espacioLabel = computed(() => 'nav.espace_' + (this.rolPerfil() ?? 'cliente'));
 
   /** Navegación lateral del rol actual. */
   secciones = computed((): NavSeccion[] => {

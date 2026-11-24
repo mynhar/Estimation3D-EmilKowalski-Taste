@@ -1,7 +1,7 @@
-/* component: cabecera pública con menú móvil (Trait rouge; sale de la landing)
+/* component: cabecera pública con menú móvil (Lin et bronze; landing, Le Journal, Entrepreneurs)
  * states: enlaces default · hover (solo puntero fino) · focus-visible · página actual (aria-current)
  *         cabecera arriba / con scroll (filete) ; menú abierto / cerrado
- * contrast: enlaces ink-secondary sobre crema (9.1:1) · página actual ink con subrayado abeto
+ * contrast: enlaces ink-secondary sobre crema (7.4:1) · página actual ink con subrayado bronce
  *           «Créer mon dossier» relleno solo con ctaRelleno; si no, de contorno
  */
 /* contents: la cabecera es sticky respecto a la página, no a esta etiqueta. */
@@ -83,7 +83,7 @@
   color: var(--ds-ink);
   font-weight: var(--ds-weight-bold);
   text-decoration: underline;
-  text-decoration-color: var(--ds-action);
+  text-decoration-color: var(--ds-accent);
   text-decoration-thickness: 2px;
   text-underline-offset: 8px;
 }
@@ -130,7 +130,7 @@
   color: var(--ds-ink);
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-2xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   text-decoration: none;
 }
 .mm__nav a:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }

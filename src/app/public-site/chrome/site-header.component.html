@@ -3,7 +3,7 @@
   <div class="wrap hd__in">
     <a routerLink="/" class="brand" (click)="inicio($event)"
        [attr.aria-label]="'landing.nav.home_aria' | translate">
-      <span class="brand__mark" aria-hidden="true"></span>
+      <app-brand-mark class="brand__mark" />
       <span class="brand__name">Estimation3D</span>
     </a>
 
@@ -56,7 +56,7 @@
   <div class="mm__sheet">
     <div class="mm__top">
       <a routerLink="/" class="brand" (click)="inicio($event)" [attr.aria-label]="'landing.nav.home_aria' | translate">
-        <span class="brand__mark" aria-hidden="true"></span>
+        <app-brand-mark class="brand__mark" />
         <span class="brand__name">Estimation3D</span>
       </a>
       <button mat-icon-button type="button" class="mm__close" autofocus (click)="closeMenu()"

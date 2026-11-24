@@ -1,4 +1,4 @@
-<!-- Landing pública (Lin et bronze; se rediseña en la fase 1). Seis secciones; el texto vive en i18n bajo `landing.*`. -->
+<!-- Landing pública (Lin et bronze). Seis secciones; el texto vive en i18n bajo `landing.*`. -->
 <a class="skip" href="#contenu" (click)="goTo('contenu', $event)">{{ 'nav.skip' | translate }}</a>
 
 <!-- ── Cabecera (compartida con Le Journal y Entrepreneurs) ─────────────── -->
@@ -11,17 +11,21 @@
   <section class="hero" id="hero" aria-labelledby="hero-title">
     <div class="wrap hero__in">
       <div class="hero__copy">
+        <p class="hero__eyebrow">{{ 'landing.hero.eyebrow' | translate }}</p>
+        <!-- Un momento al cargar: el título entra por líneas (cada línea es una parte de i18n). -->
         <h1 class="hero__title" id="hero-title">
-          {{ 'landing.hero.l1' | translate }} {{ 'landing.hero.l2' | translate }} {{ 'landing.hero.l3' | translate }}
+          <span class="hero__line"><span>{{ 'landing.hero.l1' | translate }}</span></span>
+          <span class="hero__line"><span>{{ 'landing.hero.l2' | translate }}</span></span>
+          <span class="hero__line"><span><em class="acc">{{ 'landing.hero.l3' | translate }}</em></span></span>
         </h1>
         <p class="hero__lede">{{ 'landing.hero.lede' | translate }}</p>
         <div class="hero__actions">
           <a class="button button--lg" href="#dossier" (click)="goTo('dossier', $event)">{{ 'landing.nav.cta' | translate }}</a>
-          <a class="link" href="#processus" (click)="goTo('processus', $event)">{{ 'landing.hero.cta_secondary' | translate }}</a>
+          <a class="button button--lg button--outline" href="#processus" (click)="goTo('processus', $event)">{{ 'landing.hero.cta_secondary' | translate }}</a>
         </div>
-        <p class="hero__price">{{ 'landing.hero.price' | translate }}</p>
       </div>
 
+      <!-- …y el escaneo se mece despacio, como sobre un plato (quieto con movimiento reducido). -->
       <figure class="scan">
         <img class="scan__img" [ngSrc]="media.scan" width="900" height="920" priority
              [alt]="'landing.hero.scan_alt' | translate" />
@@ -68,7 +72,7 @@
     <div class="wrap proc">
       <header class="sec__head proc__head">
         <h2 class="sec__title" id="processus-title">
-          {{ 'landing.process.title_a' | translate }} {{ 'landing.process.title_b' | translate }} {{ 'landing.process.title_c' | translate }}
+          {{ 'landing.process.title_a' | translate }} <em class="acc">{{ 'landing.process.title_b' | translate }}</em> {{ 'landing.process.title_c' | translate }}
         </h2>
       </header>
 

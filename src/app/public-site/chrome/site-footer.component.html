@@ -3,7 +3,7 @@
   <div class="wrap ft__in">
     <div class="ft__brand">
       <a routerLink="/" class="brand" (click)="inicio($event)" [attr.aria-label]="'landing.nav.home_aria' | translate">
-        <span class="brand__mark" aria-hidden="true"></span>
+        <app-brand-mark class="brand__mark" />
         <span class="brand__name">Estimation3D</span>
       </a>
       <p class="ft__tagline">{{ 'landing.footer.tagline' | translate }}</p>

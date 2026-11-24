@@ -92,7 +92,7 @@ legend { float: none; width: auto; font-size: inherit; line-height: inherit; }
   .link:hover { color: var(--ds-action-hover); text-decoration-thickness: 2px; }
 }
 
-/* ── Marca: cuadro abeto con la cota vélin (mismo signo que la app) ─────── */
+/* ── Marca: app-brand-mark (disco vélin, casa en bronce, «E») + nombre ──── */
 .brand {
   display: inline-flex;
   align-items: center;
@@ -103,26 +103,14 @@ legend { float: none; width: auto; font-size: inherit; line-height: inherit; }
   text-decoration: none;
 }
 .brand:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
-.brand__mark {
-  position: relative;
-  flex-shrink: 0;
-  width: 30px;
-  height: 30px;
-  border-radius: var(--ds-radius-md);
-  background: var(--ds-action);
-}
-.brand__mark::after {
-  content: '';
-  position: absolute;
-  inset: 8px;
-  border-left: 2px solid var(--ds-ink-inverse);
-  border-bottom: 2px solid var(--ds-ink-inverse);
-}
+.brand__mark { --bm-size: 36px; flex-shrink: 0; }
 .brand__name {
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-xl);
+  font-size: var(--ds-text-2xl);
+  line-height: 1;
+  font-variant-numeric: lining-nums;
   font-weight: var(--ds-weight-semibold);
-  letter-spacing: -0.01em;
+  letter-spacing: var(--ds-tracking-tight);
 }
 
 /* ── Secciones ──────────────────────────────────────────────────────────── */
@@ -155,7 +143,7 @@ legend { float: none; width: auto; font-size: inherit; line-height: inherit; }
   font-size: clamp(1.875rem, 2.2vw + 1.2rem, 3rem);
   font-weight: var(--ds-weight-semibold);
   line-height: 1.04;
-  letter-spacing: -0.01em;
+  letter-spacing: var(--ds-tracking-tight);
   text-wrap: balance;
 }
 .sec__lead {

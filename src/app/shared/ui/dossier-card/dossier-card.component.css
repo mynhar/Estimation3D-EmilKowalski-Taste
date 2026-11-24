@@ -1,6 +1,6 @@
 /* component: dossier card
  * states: default · selected (lo pinta el padre con su hover/focus)
- * contrast: servicio ink (13.6:1 sobre vélin), número ink-muted (7.0:1)
+ * contrast: servicio ink (15.5:1 sobre vélin), número ink-muted (5.9:1) como etiqueta en mayúsculas
  */
 :host {
   display: grid;
@@ -13,8 +13,8 @@
   display: -webkit-box;
   overflow: hidden;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-bold);
+  font-size: var(--ds-text-xl);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
   -webkit-line-clamp: 2;
@@ -22,7 +22,11 @@
 }
 
 .dc__num {
-  font-size: var(--ds-text-sm);
+  order: -1;
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
   font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink-muted);
   overflow-wrap: anywhere;

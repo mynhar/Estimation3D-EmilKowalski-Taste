@@ -155,7 +155,14 @@
     "evenements_ia": "AI events",
     "archivados": "Archived",
     "skip": "Skip to content",
-    "plus": "More"
+    "plus": "More",
+    "mon_compte": "My account",
+    "espace_cliente": "Client area",
+    "espace_estimador": "Estimator area",
+    "espace_constructor": "Builder area",
+    "espace_administrador": "Administration",
+    "tab_dossiers": "Files",
+    "tab_offres": "Offers"
   },
   "ai_assistant": {
     "eyebrow": "Client area",
@@ -529,7 +536,21 @@
     "obras_completadas": "Completed works: {{done}}/{{total}}",
     "empty_step1_text": "A documentation visit at a fixed price of $399.",
     "empty_step2_text": "The whole property, measured in one pass.",
-    "empty_step3_text": "Your 3D tour, 24–48 h after the visit."
+    "empty_step3_text": "Your 3D tour, 24–48 h after the visit.",
+    "meta_files_one": "1 file",
+    "meta_files": "{{n}} files",
+    "meta_with_offers": "{{n}} with offers",
+    "of_total": "of {{total}}",
+    "next_title": {
+      "nuevo": "Assigning an estimator",
+      "en_estimacion": "Estimate in progress",
+      "estimado": "Waiting for offers",
+      "en_oferta": "Offers received",
+      "en_oferta_one": "One offer received",
+      "en_oferta_many": "{{count}} offers received",
+      "adjudicado": "Finalize the contract",
+      "contratado": "Follow the work"
+    }
   },
   "timeline": {
     "created": "File created",
@@ -1367,6 +1388,7 @@
       "phone_aria": "Call 514 510-8819"
     },
     "hero": {
+      "eyebrow": "One visit · $399 flat rate",
       "l1": "A single visit,",
       "l2": "three comparable",
       "l3": "estimates.",
@@ -2966,5 +2988,9 @@
   },
   "stage": {
     "step_of": "Step {{n}} of {{total}}"
+  },
+  "viewer": {
+    "help": "Navigation help",
+    "media": "Media"
   }
 }

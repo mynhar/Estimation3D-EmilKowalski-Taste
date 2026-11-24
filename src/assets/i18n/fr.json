@@ -155,7 +155,14 @@
     "evenements_ia": "Événements IA",
     "archivados": "Archivés",
     "skip": "Aller au contenu",
-    "plus": "Plus"
+    "plus": "Plus",
+    "mon_compte": "Mon compte",
+    "espace_cliente": "Espace client",
+    "espace_estimador": "Espace estimateur",
+    "espace_constructor": "Espace constructeur",
+    "espace_administrador": "Administration",
+    "tab_dossiers": "Dossiers",
+    "tab_offres": "Offres"
   },
   "ai_assistant": {
     "eyebrow": "Espace client",
@@ -529,7 +536,21 @@
     "obras_completadas": "Chantiers terminés : {{done}}/{{total}}",
     "empty_step1_text": "Une visite de documentation à tarif fixe de 399 $.",
     "empty_step2_text": "Toute la propriété, mesurée en une seule fois.",
-    "empty_step3_text": "Votre tour 3D, 24–48 h après la visite."
+    "empty_step3_text": "Votre tour 3D, 24–48 h après la visite.",
+    "meta_files_one": "1 dossier",
+    "meta_files": "{{n}} dossiers",
+    "meta_with_offers": "{{n}} avec offres",
+    "of_total": "sur {{total}}",
+    "next_title": {
+      "nuevo": "Attribution d'un estimateur",
+      "en_estimacion": "Estimation en cours",
+      "estimado": "En attente des offres",
+      "en_oferta": "Offres reçues",
+      "en_oferta_one": "Une offre reçue",
+      "en_oferta_many": "{{count}} offres reçues",
+      "adjudicado": "Finalisez le contrat",
+      "contratado": "Suivez les travaux"
+    }
   },
   "timeline": {
     "created": "Dossier créé",
@@ -1367,6 +1388,7 @@
       "phone_aria": "Appeler le 514 510-8819"
     },
     "hero": {
+      "eyebrow": "Visite unique · 399 $ tarif fixe",
       "l1": "Une seule visite,",
       "l2": "trois estimations",
       "l3": "comparables.",
@@ -2966,5 +2988,9 @@
   },
   "stage": {
     "step_of": "Étape {{n}} sur {{total}}"
+  },
+  "viewer": {
+    "help": "Aide à la navigation",
+    "media": "Médias"
   }
 }

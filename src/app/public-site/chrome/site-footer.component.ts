@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 import { NgTemplateOutlet } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
+import { BrandMarkComponent } from '../../shared/ui/brand-mark/brand-mark.component';
 
 /**
  * Pie de las páginas públicas (el de la landing). Con `enInicio` los enlaces a
@@ -11,7 +12,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-site-footer',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgTemplateOutlet, RouterLink, TranslatePipe],
+  imports: [NgTemplateOutlet, RouterLink, TranslatePipe, BrandMarkComponent],
   templateUrl: './site-footer.component.html',
   styleUrls: ['../styles/site-base.css', './site-footer.component.css'],
 })

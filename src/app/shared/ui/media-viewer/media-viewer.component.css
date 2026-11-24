@@ -1,89 +1,192 @@
-/* component: media viewer (tour 3D / vídeo a pantalla completa)
- * states: tour · vídeo · consejo de primera vez
- * contrast: texto claro sobre el fondo del escaneo (≥ 14:1); consejo ink sobre blanco
+/* component: media viewer (Lin et bronze: tour 3D / vídeo / foto a pantalla completa)
+ * states: tour (con o sin hoja) · vídeo · foto · varios medios (segmentado) · pantalla completa
+ *         botones: default · hover · focus-visible · active (Material)
+ * contrast: paneles crema translúcida (0.92) con desenfoque sobre la escena: título ink (≥ 13:1),
+ *           meta ink-muted (≥ 5:1), etiqueta accent-ink (≥ 5.6:1); escena sobre espresso profundo
+ * layout: la escena ocupa toda la pantalla (100dvh); los controles flotan encima, respetan las
+ *         zonas seguras y quedan abajo, al alcance del pulgar, en el móvil
  */
 :host {
+  --mv-gap: var(--ds-space-3);
+  --mv-top: calc(env(safe-area-inset-top) + var(--mv-gap));
+  --mv-bar-h: 56px;
+
   display: block;
   height: 100%;
-  /* Botones de icono claros sobre el fondo oscuro. */
-  --mat-icon-button-icon-color: var(--ds-ink-inverse);
-  --mat-icon-button-state-layer-color: var(--ds-ink-inverse);
+  --mat-icon-button-icon-color: var(--ds-ink);
+  --mat-icon-button-state-layer-color: var(--ds-ink);
 }
 
 .mv {
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  height: 100%;
-  background: var(--ds-dark-surface-deep);
-  color: var(--ds-ink-inverse);
-}
-
-.mv__bar {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-space-3);
-  min-height: 56px;
-  padding: env(safe-area-inset-top) var(--ds-space-2) 0 var(--ds-space-4);
-}
-
-.mv__title {
-  flex: 1;
-  min-width: 0;
-  margin: 0;
-  overflow: hidden;
-  font-family: var(--ds-font-display);
-  font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-bold);
-  letter-spacing: normal;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  color: var(--ds-ink-inverse);
-}
-
-.mv__stage {
   position: relative;
-  min-height: 0;
-  padding-bottom: env(safe-area-inset-bottom);
+  height: 100%;
+  overflow: hidden;
+  background: var(--ds-dark-surface-deep);
+  color: var(--ds-ink);
 }
 
-.mv__frame,
-.mv__video {
+/* Panel flotante: crema translúcida con desenfoque, como el mapa vivo de la referencia. */
+.mv-glass {
+  border: 1px solid color-mix(in srgb, var(--ds-surface) 60%, transparent);
+  background: var(--ds-surface-overlay);
+  -webkit-backdrop-filter: blur(16px) saturate(1.1);
+  backdrop-filter: blur(16px) saturate(1.1);
+  box-shadow: var(--ds-shadow-lg);
+}
+
+/* ── Escena ─────────────────────────────────────────────────────────────── */
+.mv__stage {
+  position: absolute;
+  inset: 0;
+}
+/* Vídeo y foto: centrados bajo la barra (el tour va a sangre). */
+.mv__stage.is-media {
+  display: grid;
+  place-items: center;
+  padding: calc(var(--mv-top) + var(--mv-bar-h) + var(--mv-gap)) 0 env(safe-area-inset-bottom);
+}
+.has-seg .mv__stage.is-media { padding-top: calc(var(--mv-top) + var(--mv-bar-h) + 64px); }
+
+.mv__frame {
   display: block;
   width: 100%;
   height: 100%;
   border: 0;
-  background: var(--ds-dark-surface);
+  background: var(--ds-dark-surface-deep);
 }
-.mv__video { object-fit: contain; }
+.mv__media {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: contain;
+}
 
-/* Consejo de navegación (primera vez). Tarjeta clara, abajo, en la zona del pulgar. */
-.mv__tip {
-  --mat-icon-button-icon-color: var(--ds-ink-secondary);
-  --mat-icon-button-state-layer-color: var(--ds-ink);
+/* ── Barra superior ─────────────────────────────────────────────────────── */
+.mv__bar {
   position: absolute;
-  inset-inline: var(--ds-space-3);
-  bottom: calc(var(--ds-space-3) + env(safe-area-inset-bottom));
+  top: var(--mv-top);
+  left: max(var(--mv-gap), env(safe-area-inset-left));
+  right: max(var(--mv-gap), env(safe-area-inset-right));
   display: flex;
   align-items: center;
-  gap: var(--ds-space-3);
-  max-width: 34rem;
-  margin-inline: auto;
-  padding: var(--ds-space-2) var(--ds-space-2) var(--ds-space-2) var(--ds-space-4);
+  gap: var(--ds-space-1);
+  min-height: var(--mv-bar-h);
+  padding: var(--ds-space-1);
   border-radius: var(--ds-radius-lg);
-  background: var(--ds-surface);
-  color: var(--ds-ink);
-  box-shadow: var(--ds-shadow-lg);
-  animation: mv-tip-in var(--ds-duration-base) var(--ds-ease-out) both;
-  animation-delay: var(--ds-duration-slow);
 }
-.mv__tip mat-icon { flex-shrink: 0; color: var(--ds-action); }
-.mv__tip p {
-  flex: 1;
-  margin: 0;
-  font-size: var(--ds-text-sm);
-  line-height: var(--ds-leading-snug);
+@media (min-width: 768px) {
+  .mv__bar { right: auto; width: min(40rem, 100% - 2 * var(--mv-gap)); }
 }
 
-@keyframes mv-tip-in {
-  from { opacity: 0; transform: translateY(8px); }
+.mv__heading {
+  flex: 1;
+  min-width: 0;
+  padding-inline: var(--ds-space-1);
+}
+.mv__title {
+  margin: 0;
+  overflow: hidden;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-xl);
+  font-weight: var(--ds-weight-semibold);
+  line-height: 1.15;
+  letter-spacing: var(--ds-tracking-tight);
+  font-variant-numeric: lining-nums tabular-nums;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--ds-ink);
+}
+.mv__meta {
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--ds-text-sm);
+  font-variant-numeric: lining-nums tabular-nums;
+  line-height: 1.3;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--ds-ink-muted);
+}
+
+/* ── Segmentado entre medios ────────────────────────────────────────────── */
+.mv__seg {
+  --mat-button-toggle-background-color: transparent;
+  --mat-button-toggle-divider-color: transparent;
+
+  position: absolute;
+  top: calc(var(--mv-top) + var(--mv-bar-h) + var(--ds-space-2));
+  left: 50%;
+  max-width: calc(100% - 2 * var(--mv-gap));
+  padding: var(--ds-space-1);
+  overflow-x: auto;
+  border-radius: var(--ds-radius-pill);
+  transform: translateX(-50%);
+  scrollbar-width: none;
+}
+@media (min-width: 768px) {
+  .mv__seg { left: var(--mv-gap); transform: none; }
+}
+.mv__seg-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  white-space: nowrap;
+}
+.mv__seg-label mat-icon { width: 20px; height: 20px; font-size: 20px; }
+
+/* ── Hoja del tour (abajo) ──────────────────────────────────────────────── */
+.mv__sheet {
+  position: absolute;
+  left: max(var(--mv-gap), env(safe-area-inset-left));
+  right: max(var(--mv-gap), env(safe-area-inset-right));
+  bottom: calc(env(safe-area-inset-bottom) + var(--mv-gap));
+  display: grid;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-2) var(--ds-space-2) var(--ds-space-4) var(--ds-space-5);
+  border-radius: var(--ds-radius-xl);
+  animation: mv-sheet-in var(--ds-duration-base) var(--ds-ease-out) both;
+}
+@media (min-width: 768px) {
+  .mv__sheet { right: auto; width: 24rem; }
+}
+@keyframes mv-sheet-in {
+  from { opacity: 0; transform: translateY(16px); }
+}
+
+.mv__sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-2);
+  min-height: 40px;
+}
+/* Cada parte entera: «ÉTAPE 4 SUR 6» no se parte por dentro. */
+.mv__eyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--ds-space-2);
+  margin: 0;
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--ds-accent-ink);
+}
+.mv__eyebrow span { white-space: nowrap; }
+.mv__sheet-close { flex-shrink: 0; margin-left: auto; }
+
+.mv__sheet-text {
+  max-width: 40ch;
+  margin: 0;
+  padding-right: var(--ds-space-3);
+  font-size: var(--ds-text-base);
+  line-height: var(--ds-leading-normal);
+  color: var(--ds-ink);
+}
+
+.mv__cta {
+  width: calc(100% - var(--ds-space-3));
+  min-height: 48px;
 }

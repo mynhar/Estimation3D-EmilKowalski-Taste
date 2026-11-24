@@ -1,7 +1,8 @@
-/* component: page header
- * states: con o sin contexto, con o sin acciones
- * contrast: título ink (11.9:1 sobre crema), contexto ink-muted (6.1:1)
- * type: título de pantalla en display 125 %
+/* component: page header (Lin et bronze)
+ * states: con o sin etiqueta, énfasis, contexto y acciones
+ * contrast: título ink (14.4:1 sobre lino) · etiqueta accent-ink (6.3:1) · contexto ink-muted (5.5:1)
+ *           énfasis en accent: solo a tamaño de título (≥ 28px, 4.2:1 como texto grande)
+ * type: título Cormorant 600, 28–44px; etiqueta Manrope 700 12px en mayúsculas
  */
 :host {
   display: flex;
@@ -13,20 +14,39 @@
 
 .ph__text { min-width: 0; flex: 1 1 18rem; }
 
+.ph__label {
+  margin: 0 0 var(--ds-space-2);
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
+  color: var(--ds-accent-ink);
+}
+
 .ph__title {
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: clamp(var(--ds-text-2xl), 1.3rem + 1.8vw, 2.75rem);
   font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-tight);
-  letter-spacing: -0.02em;
+  letter-spacing: var(--ds-tracking-tight);
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink);
   overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.ph__em {
+  font-style: italic;
+  font-weight: var(--ds-weight-medium);
+  color: var(--ds-accent);
 }
 
 .ph__context {
   margin: var(--ds-space-2) 0 0;
   font-size: var(--ds-text-base);
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink-muted);
 }
 

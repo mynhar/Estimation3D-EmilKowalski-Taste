@@ -1,4 +1,4 @@
-<!-- El armazón (navegación lateral, barra móvil, pestañas, pie) se omite sin sesión
+<!-- El armazón (barra superior, navegación lateral, pestañas, pie) se omite sin sesión
      y también en el sitio público: allí cada página trae su propia cabecera y pie. -->
 @if (mostrarArmazon()) {
   <a class="skip" href="#contenu">{{ 'nav.skip' | translate }}</a>
@@ -11,21 +11,92 @@
 
   @if (mostrarArmazon()) {
 
+    <!-- ── Barra superior: marca, idioma y cuenta ─────────────────────────── -->
+    <header class="tb">
+      @if (!esCliente()) {
+        <button mat-icon-button type="button" class="tb__menu"
+                (click)="toggleMobile()"
+                [attr.aria-label]="'nav.ouvrir_menu' | translate"
+                [attr.aria-expanded]="mobileOpen()">
+          <mat-icon>menu</mat-icon>
+        </button>
+      }
+
+      <a class="brand" [routerLink]="rutaHome()" [attr.aria-label]="'nav.inicio' | translate">
+        <app-brand-mark class="brand__mark" />
+        <span class="brand__text">
+          <span class="brand__name">Estimation3D</span>
+          @if (!cargandoPerfil()) {
+            <span class="brand__space">{{ espacioLabel() | translate }}</span>
+          }
+        </span>
+      </a>
+
+      <!-- Escritorio: los tres idiomas a la vista. Móvil: menú. -->
+      <app-lang-toggle class="tb__langs" />
+
+      <button mat-button type="button" class="tb__lang" [matMenuTriggerFor]="menuLang"
+              [attr.title]="'lang.' + langSvc.current() | translate">
+        <mat-icon>language</mat-icon>
+        {{ langSvc.current().toUpperCase() }}
+      </button>
+      <mat-menu #menuLang="matMenu" xPosition="before">
+        @for (l of langSvc.langs; track l) {
+          <button mat-menu-item type="button" role="menuitemradio" (click)="langSvc.set(l)"
+                  [attr.aria-checked]="langSvc.current() === l">
+            <mat-icon [class.is-blank]="langSvc.current() !== l" aria-hidden="true">check</mat-icon>
+            <span>{{ 'lang.' + l | translate }}</span>
+          </button>
+        }
+      </mat-menu>
+
+      <button type="button" class="tb__me" [matMenuTriggerFor]="menuCuenta"
+              [attr.aria-label]="'nav.mon_compte' | translate">
+        <span class="tb__me-info" aria-hidden="true">
+          @if (cargandoPerfil()) {
+            <span class="skel skel--name"></span>
+          } @else {
+            <span class="tb__me-name">{{ nombrePerfil() || user()?.email }}</span>
+            <span class="tb__me-role">{{ rolLabel() | translate }}</span>
+          }
+        </span>
+        <span class="avatar" aria-hidden="true">
+          @if (avatarPerfil(); as src) {
+            <img [src]="src" alt="" referrerpolicy="no-referrer" (error)="avatarPerfil.set(null)" />
+          } @else {
+            {{ iniciales() }}
+          }
+        </span>
+      </button>
+      <mat-menu #menuCuenta="matMenu" xPosition="before">
+        <div class="cuenta" aria-hidden="true">
+          <span class="cuenta__name">{{ nombrePerfil() || user()?.email }}</span>
+          <span class="cuenta__role">{{ rolLabel() | translate }}</span>
+        </div>
+        <a mat-menu-item routerLink="/client/perfil">
+          <mat-icon>account_circle</mat-icon>
+          <span>{{ 'nav.mon_profil' | translate }}</span>
+        </a>
+        <button mat-menu-item type="button" (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>{{ 'nav.deconnexion' | translate }}</span>
+        </button>
+      </mat-menu>
+    </header>
+
     <!-- ── Navegación lateral (escritorio; cajón en móvil para los roles internos) ── -->
     <div class="sb">
 
+      <!-- Solo en el cajón móvil: la marca y el cierre. -->
       <div class="sb__head">
-        <a class="sb__brand" [routerLink]="rutaHome()" (click)="closeMobile()"
+        <a class="brand" [routerLink]="rutaHome()" (click)="closeMobile()"
            [attr.aria-label]="'nav.inicio' | translate">
-          <span class="brand-mark" aria-hidden="true"></span>
-          <span class="sb__brand-text">Estimation3D</span>
+          <app-brand-mark class="brand__mark" />
+          <span class="brand__text">
+            <span class="brand__name">Estimation3D</span>
+            <span class="brand__space">{{ espacioLabel() | translate }}</span>
+          </span>
         </a>
-        <button mat-icon-button type="button" class="sb__collapse"
-                (click)="toggleCollapse()"
-                [attr.aria-label]="(collapsed() ? 'nav.ouvrir_menu' : 'nav.colapsar_menu') | translate"
-                [attr.aria-expanded]="!collapsed()">
-          @if (collapsed()) { <mat-icon>chevron_right</mat-icon> } @else { <mat-icon>chevron_left</mat-icon> }
-        </button>
       </div>
 
       <nav class="sb__nav" [attr.aria-label]="'nav.section_principal' | translate">
@@ -37,7 +108,7 @@
 
         @for (sec of secciones(); track sec.titulo) {
           <section class="sb__sec">
-            @if (!$first) { <h2 class="sb__sec-title">{{ sec.titulo | translate }}</h2> }
+            <h2 class="sb__sec-title">{{ sec.titulo | translate }}</h2>
             <ul class="sb__list">
               @for (item of sec.items; track item.ruta) {
                 <li>
@@ -61,33 +132,21 @@
       </nav>
 
       <div class="sb__foot">
-        <a class="sb__user" routerLink="/client/perfil" routerLinkActive="is-active"
-           ariaCurrentWhenActive="page" (click)="closeMobile()"
-           [attr.title]="collapsed() ? ('nav.mon_profil' | translate) : null">
-          <span class="avatar" aria-hidden="true">
-            @if (avatarPerfil(); as src) {
-              <img [src]="src" alt="" referrerpolicy="no-referrer" (error)="avatarPerfil.set(null)" />
-            } @else {
-              {{ iniciales() }}
-            }
-          </span>
-          <span class="sb__user-info">
-            @if (cargandoPerfil()) {
-              <span class="skel skel--name" aria-hidden="true"></span>
-            } @else {
-              <span class="sb__user-name">{{ nombrePerfil() || user()?.email }}</span>
-              <span class="sb__user-role">{{ rolLabel() | translate }}</span>
-              <span class="vh">{{ 'nav.mon_profil' | translate }}</span>
-            }
-          </span>
-        </a>
+        <!-- Escritorio: plegar la barra. -->
+        <button type="button" class="sb__item sb__collapse"
+                (click)="toggleCollapse()"
+                [attr.aria-label]="(collapsed() ? 'nav.ouvrir_menu' : 'nav.colapsar_menu') | translate"
+                [attr.aria-expanded]="!collapsed()">
+          @if (collapsed()) {
+            <mat-icon class="sb__icon" aria-hidden="true">left_panel_open</mat-icon>
+          } @else {
+            <mat-icon class="sb__icon" aria-hidden="true">left_panel_close</mat-icon>
+          }
+          <span class="sb__label">{{ 'nav.colapsar_menu' | translate }}</span>
+        </button>
 
-        <div class="sb__lang">
-          <app-lang-toggle [compact]="collapsed()" />
-        </div>
-
-        <button type="button" class="sb__item sb__logout" (click)="logout()"
-                [attr.title]="collapsed() ? ('nav.deconnexion' | translate) : null">
+        <!-- Cajón móvil: salir. -->
+        <button type="button" class="sb__item sb__logout" (click)="logout()">
           <mat-icon class="sb__icon" aria-hidden="true">logout</mat-icon>
           <span class="sb__label">{{ 'nav.deconnexion' | translate }}</span>
         </button>
@@ -95,47 +154,6 @@
     </div>
 
     <div class="sb-backdrop" (click)="closeMobile()" aria-hidden="true"></div>
-
-    <!-- ── Barra superior (móvil) ─────────────────────────────────────────── -->
-    <header class="tb">
-      @if (!esCliente()) {
-        <button mat-icon-button type="button" class="tb__menu"
-                (click)="toggleMobile()"
-                [attr.aria-label]="'nav.ouvrir_menu' | translate"
-                [attr.aria-expanded]="mobileOpen()">
-          <mat-icon>menu</mat-icon>
-        </button>
-      }
-      <a class="tb__brand" [routerLink]="rutaHome()" [attr.aria-label]="'nav.inicio' | translate">
-        <span class="brand-mark" aria-hidden="true"></span>
-        <span>Estimation3D</span>
-      </a>
-
-      <button mat-button type="button" class="tb__lang" [matMenuTriggerFor]="menuLang"
-              [attr.title]="'lang.' + langSvc.current() | translate">
-        <mat-icon>language</mat-icon>
-        {{ langSvc.current().toUpperCase() }}
-      </button>
-      <mat-menu #menuLang="matMenu" xPosition="before">
-        @for (l of langSvc.langs; track l) {
-          <button mat-menu-item type="button" role="menuitemradio" (click)="langSvc.set(l)"
-                  [attr.aria-checked]="langSvc.current() === l">
-            <mat-icon [class.is-blank]="langSvc.current() !== l" aria-hidden="true">check</mat-icon>
-            <span>{{ 'lang.' + l | translate }}</span>
-          </button>
-        }
-      </mat-menu>
-
-      <a class="tb__avatar" routerLink="/client/perfil" [attr.aria-label]="'nav.mon_profil' | translate">
-        <span class="avatar" aria-hidden="true">
-          @if (avatarPerfil(); as src) {
-            <img [src]="src" alt="" referrerpolicy="no-referrer" (error)="avatarPerfil.set(null)" />
-          } @else {
-            {{ iniciales() }}
-          }
-        </span>
-      </a>
-    </header>
   }
 
   <!-- ── Router outlet único — nunca se destruye ─────────────────────────── -->
@@ -155,7 +173,7 @@
            routerLinkActive="is-active" ariaCurrentWhenActive="page"
            [routerLinkActiveOptions]="{ exact: !!tab.exacto }">
           <mat-icon aria-hidden="true">{{ tab.matIcon }}</mat-icon>
-          <span>{{ tab.etiqueta | translate }}</span>
+          <span>{{ (tab.corta ?? tab.etiqueta) | translate }}</span>
         </a>
       }
       <button type="button" class="tabs__item" [class.is-active]="plusActivo() || plusAbierto()"

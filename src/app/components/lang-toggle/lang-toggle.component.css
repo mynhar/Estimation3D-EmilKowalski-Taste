@@ -1,24 +1,25 @@
-/* component: selector de idioma (control segmentado)
- * states: default · hover · focus-visible · active (idioma actual) · compacto (barra colapsada)
- * contrast: ink-secondary sobre stone (8.9:1) · actual ink sobre surface (13.9:1)
+/* component: selector de idioma (segmentado en píldora)
+ * states: default · hover · focus-visible · active (idioma actual) · compacto
+ * contrast: ink-secondary sobre lino claro (6.9:1) · actual crema sobre espresso (14.9:1)
  */
 :host { display: block; }
 
 .lang-toggle {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: 1fr;
+  grid-auto-columns: minmax(0, 1fr);
   gap: 2px;
-  padding: 2px;
+  padding: 3px;
+  border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-pill);
-  background: var(--ds-band);
+  background: var(--ds-bg-alt);
 }
 
 .lang-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 36px;
+  min-height: 34px;
   padding: 0 var(--ds-space-2);
   border: 0;
   border-radius: var(--ds-radius-pill);
@@ -26,25 +27,25 @@
   color: var(--ds-ink-secondary);
   font: inherit;
   font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
+  font-weight: var(--ds-weight-semibold);
+  letter-spacing: 0.04em;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
   transition: var(--ds-transition-color);
 }
 .lang-btn:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
 @media (hover: hover) and (pointer: fine) {
-  .lang-btn:hover { color: var(--ds-ink); background: var(--ds-bg-alt); }
+  .lang-btn:hover { color: var(--ds-ink); background: var(--ds-surface); }
 }
 
 .lang-btn--active,
 .lang-btn--active:hover {
-  background: var(--ds-surface);
-  color: var(--ds-ink);
-  font-weight: var(--ds-weight-bold);
-  box-shadow: var(--ds-shadow-xs);
+  background: var(--ds-action);
+  color: var(--ds-on-action);
 }
 
-/* Barra lateral colapsada: los tres idiomas en columna. */
+/* Compacto: los tres idiomas en columna. */
 .lang-toggle--compact {
   grid-auto-flow: row;
   width: 44px;

@@ -1,33 +1,106 @@
-<div class="mv">
-  <header class="mv__bar">
-    <h2 class="mv__title">{{ data.titulo }}</h2>
-    <button mat-icon-button type="button" class="mv__close"
-            (click)="cerrar()" [attr.aria-label]="'common.close' | translate">
-      <mat-icon>close</mat-icon>
-    </button>
-  </header>
+<div class="mv" [class.has-seg]="medios.length > 1">
 
-  <div class="mv__stage">
+  <!-- La escena, a sangre -->
+  <div class="mv__stage" [class.is-media]="!urlTour()">
     @if (urlTour(); as url) {
       <iframe class="mv__frame"
               [src]="url"
               allow="fullscreen; xr-spatial-tracking"
-              [title]="data.titulo"></iframe>
-    } @else if (data.tipo === 'foto') {
-      <img class="mv__video"[src]="data.url" [alt]="data.titulo" />
+              [title]="actual().titulo"></iframe>
+    } @else if (actual().tipo === 'foto') {
+      <img class="mv__media" [src]="actual().url" [alt]="actual().titulo" />
     } @else {
-      <video class="mv__video" [src]="data.url" controls autoplay playsinline preload="metadata"></video>
+      <video class="mv__media" [src]="actual().url" controls autoplay playsinline preload="metadata"></video>
     }
+  </div>
 
-    @if (consejo()) {
-      <div class="mv__tip" role="note">
-        <mat-icon aria-hidden="true">touch_app</mat-icon>
-        <p>{{ 'dashboard_client.matterport_tooltip' | translate }}</p>
-        <button mat-icon-button type="button" (click)="ocultarConsejo()"
+  <!-- Arriba: volver, título y pantalla completa -->
+  <header class="mv__bar mv-glass">
+    <button mat-icon-button type="button" (click)="cerrar()" [attr.aria-label]="'common.back' | translate">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+
+    <div class="mv__heading">
+      <h2 class="mv__title">{{ actual().titulo }}</h2>
+      <p class="mv__meta">
+        @switch (actual().tipo) {
+          @case ('tour')  { {{ 'dashboard_client.tour_label' | translate }} }
+          @case ('video') { {{ 'dashboard_client.video_label' | translate }} }
+          @default        { {{ 'dashboard_client.photos' | translate }} }
+        }
+        @if (data.contexto; as ctx) {
+          <span aria-hidden="true">·</span> {{ ctx.numero }}
+        }
+      </p>
+    </div>
+
+    @if (urlTour() && !hoja()) {
+      <button mat-icon-button type="button" (click)="abrirHoja()"
+              [attr.aria-label]="'viewer.help' | translate">
+        <mat-icon>info</mat-icon>
+      </button>
+    }
+    @if (puedePantallaCompleta) {
+      <button mat-icon-button type="button" (click)="alternarPantallaCompleta()"
+              [attr.aria-label]="'dashboard_client.matterport_fullscreen' | translate"
+              [attr.aria-pressed]="pantallaCompleta()">
+        @if (pantallaCompleta()) {
+          <mat-icon>fullscreen_exit</mat-icon>
+        } @else {
+          <mat-icon>fullscreen</mat-icon>
+        }
+      </button>
+    }
+  </header>
+
+  <!-- Debajo: entre los medios del dossier -->
+  @if (medios.length > 1) {
+    <div class="mv__seg mv-glass">
+      <mat-button-toggle-group hideSingleSelectionIndicator
+                               [value]="indice()" (change)="indice.set($event.value)"
+                               [attr.aria-label]="'viewer.media' | translate">
+        @for (m of medios; track m.url; let i = $index) {
+          <mat-button-toggle [value]="i">
+            <span class="mv__seg-label">
+              @if (m.tipo === 'tour') {
+                <mat-icon aria-hidden="true">view_in_ar</mat-icon>
+                {{ 'dashboard_client.tour_label' | translate }}@if (numerar().tour) { {{ numeroDe(i) }} }
+              } @else {
+                <mat-icon aria-hidden="true">play_circle</mat-icon>
+                {{ 'dashboard_client.video_label' | translate }}@if (numerar().video) { {{ numeroDe(i) }} }
+              }
+            </span>
+          </mat-button-toggle>
+        }
+      </mat-button-toggle-group>
+    </div>
+  }
+
+  <!-- Abajo, al alcance del pulgar: dónde está el dossier, cómo moverse y volver a la ficha -->
+  @if (urlTour() && hoja()) {
+    <section class="mv__sheet mv-glass" [attr.aria-label]="'viewer.help' | translate">
+      <div class="mv__sheet-head">
+        @if (data.contexto; as ctx) {
+          <p class="mv__eyebrow">
+            <span>{{ ctx.numero }}</span>
+            @if (ctx.etapa > 0) {
+              <span aria-hidden="true">·</span>
+              <span>{{ 'stage.step_of' | translate: { n: ctx.etapa, total: totalEtapas } }}</span>
+            }
+          </p>
+        }
+        <button mat-icon-button type="button" class="mv__sheet-close" (click)="cerrarHoja()"
                 [attr.aria-label]="'common.close' | translate">
           <mat-icon>close</mat-icon>
         </button>
       </div>
-    }
-  </div>
+      <p class="mv__sheet-text">{{ 'dashboard_client.matterport_tooltip' | translate }}</p>
+      @if (data.contexto?.ruta; as ruta) {
+        <a mat-flat-button class="mv__cta" [routerLink]="ruta" (click)="cerrar()">
+          {{ 'file.see_file' | translate }}
+          <mat-icon iconPositionEnd>chevron_right</mat-icon>
+        </a>
+      }
+    </section>
+  }
 </div>

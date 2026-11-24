@@ -1,0 +1,25 @@
+/* component: marca (disco, casa y «E»)
+ * contrast: decorativa (aria-hidden); el nombre va siempre en texto al lado.
+ *           borde del disco border-strong sobre lino, letra espresso sobre vélin 15.5:1
+ */
+:host {
+  display: inline-block;
+  flex-shrink: 0;
+  width: var(--bm-size, 36px);
+  height: var(--bm-size, 36px);
+}
+svg { display: block; width: 100%; height: 100%; }
+
+.bm__disc { fill: var(--ds-surface); stroke: var(--ds-border-strong); stroke-width: 1; }
+.bm__line { fill: none; stroke: var(--ds-accent); stroke-width: 1.2; stroke-linejoin: round; }
+.bm__letter {
+  fill: var(--ds-ink);
+  font-family: var(--ds-font-display);
+  font-size: 16px;
+  font-weight: var(--ds-weight-bold);
+}
+
+/* Sobre espresso: disco espresso con filo bronce claro y letra crema. */
+:host(.is-dark) .bm__disc { fill: var(--ds-dark-surface); stroke: var(--ds-accent-on-dark); }
+:host(.is-dark) .bm__line { stroke: var(--ds-accent-on-dark); }
+:host(.is-dark) .bm__letter { fill: var(--ds-ink-inverse); }

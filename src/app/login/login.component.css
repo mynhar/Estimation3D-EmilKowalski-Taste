@@ -1,10 +1,11 @@
-/* component: acceso (iniciar sesión / crear cuenta)
+/* component: acceso (Lin et bronze: iniciar sesión / crear cuenta)
  * states: campos default · focus · error (mat-error con icono) · disabled (enviando)
  *         envío: default · hover · focus-visible · active · loading · éxito (cuenta creada)
- * contrast: formulario ink sobre crema (11.8:1) · errores danger-ink sobre danger-soft (5.8:1)
- *           isla abeto: texto ink-inverse (9.7:1), secundario ink-inverse-muted (6.6:1), iconos vélin
+ * contrast: formulario ink sobre lino (14.4:1) · etiqueta accent-ink (6.3:1) · errores danger-ink
+ *           sobre danger-soft (5.0:1) · panel espresso: texto ink-inverse (14.9:1), secundario
+ *           ink-inverse-muted (9.2:1), iconos accent-on-dark (6.2:1), foco crema
  *           enviar: botón relleno espresso (crema encima 14.9:1); Google, de contorno
- * type: títulos en display 125 %, marca y éxito en 112 %
+ * type: títulos Cormorant 600; etiqueta Manrope 700 12px en mayúsculas
  */
 :host {
   display: block;
@@ -28,37 +29,19 @@
   border-radius: var(--ds-radius-md);
   color: var(--ds-ink);
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-xl);
+  font-size: var(--ds-text-2xl);
   font-weight: var(--ds-weight-semibold);
+  line-height: 1;
+  font-variant-numeric: lining-nums;
   text-decoration: none;
 }
 .lg-brand:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
+.lg-brand__mark { --bm-size: 40px; flex-shrink: 0; }
 
-/* Cuadro abeto con la L vélin en la esquina (mismo signo que el armazón). */
-.lg-mark {
-  position: relative;
-  flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--ds-radius-md);
-  background: var(--ds-action);
-}
-.lg-mark::after {
-  content: '';
-  position: absolute;
-  inset: 8px;
-  border-left: 2px solid var(--ds-ink-inverse);
-  border-bottom: 2px solid var(--ds-ink-inverse);
-}
-/* Sobre la isla abeto, el signo se invierte: cuadro vélin, L abeto. */
-.lg-side .lg-mark { background: var(--ds-ink-inverse); }
-.lg-side .lg-mark::after { border-color: var(--ds-action); }
-
-/* ── Isla abeto (escritorio) ────────────────────────────────────────────── */
+/* ── Panel espresso (escritorio): marca, escaneo y promesa ─────────────── */
 .lg-side {
-  /* Sobre abeto el foco y el acento van en vélin. */
+  /* Sobre espresso el foco va en crema. */
   --ds-focus-ring: var(--ds-focus-ring-dark);
-  --side-text-2: var(--ds-ink-inverse-muted);
 
   display: none;
   background: var(--ds-dark-surface);
@@ -68,46 +51,64 @@
   .lg-side {
     position: sticky;
     top: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: var(--ds-space-8);
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: var(--ds-space-6);
     height: 100dvh;
-    padding: var(--ds-space-7) var(--ds-space-8);
+    padding: var(--ds-space-7) var(--ds-space-8) var(--ds-space-8);
   }
 }
-.lg-brand--dark { align-self: flex-start; color: var(--ds-ink-inverse); }
+.lg-brand--dark { justify-self: start; color: var(--ds-ink-inverse); }
 
-.lg-side__copy { display: grid; gap: var(--ds-space-4); max-width: 30rem; }
+/* El escaneo viene sobre negro: su marco es del mismo fondo y se funde. */
+.lg-scan {
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+  border-radius: var(--ds-radius-xl);
+  background: var(--ds-scan-bg);
+}
+.lg-scan__img {
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.lg-side__copy { display: grid; gap: var(--ds-space-4); max-width: 32rem; }
 .lg-side__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: clamp(var(--ds-text-3xl), 2.2vw + 1rem, 3.5rem);
+  font-size: clamp(var(--ds-text-3xl), 1.6vw + 1.2rem, var(--ds-text-4xl));
   font-weight: var(--ds-weight-semibold);
-  line-height: 1.02;
-  letter-spacing: -0.02em;
+  line-height: 1.05;
+  letter-spacing: var(--ds-tracking-tight);
   color: var(--ds-ink-inverse);
   text-wrap: balance;
 }
 .lg-side__lead {
-  max-width: 34ch;
+  max-width: 40ch;
   margin: 0;
-  font-size: var(--ds-text-lg);
+  font-size: var(--ds-text-base);
   line-height: var(--ds-leading-normal);
-  color: var(--side-text-2);
+  color: var(--ds-ink-inverse-muted);
 }
 
 .lg-points {
   display: grid;
-  gap: var(--ds-space-3);
-  margin: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ds-space-3) var(--ds-space-5);
+  margin: var(--ds-space-2) 0 0;
   padding: var(--ds-space-5) 0 0;
   border-top: 1px solid color-mix(in srgb, var(--ds-ink-inverse) 16%, transparent);
   list-style: none;
-  color: var(--side-text-2);
+  font-size: var(--ds-text-sm);
+  color: var(--ds-ink-inverse-muted);
 }
-.lg-points li { display: flex; align-items: center; gap: var(--ds-space-3); }
-.lg-points mat-icon { flex-shrink: 0; color: var(--ds-ink-inverse); }
+.lg-points li { display: flex; align-items: center; gap: var(--ds-space-2); min-width: 0; }
+.lg-points mat-icon { flex-shrink: 0; width: 20px; height: 20px; font-size: 20px; color: var(--ds-accent-on-dark); }
 
 /* ── Columna del formulario ─────────────────────────────────────────────── */
 .lg-main {
@@ -151,35 +152,28 @@
   .lg-brand--mobile { display: none; }
 }
 
-.lg-head { display: grid; gap: var(--ds-space-1); }
+.lg-head { display: grid; gap: var(--ds-space-2); }
+.lg-eyebrow {
+  margin: 0;
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
+  color: var(--ds-accent-ink);
+}
 .lg-title {
   margin: 0;
+  border-radius: var(--ds-radius-sm);
   font-family: var(--ds-font-display);
-  font-size: clamp(var(--ds-text-3xl), 2vw + 1.5rem, var(--ds-text-4xl));
+  font-size: clamp(var(--ds-text-4xl), 2vw + 2rem, 3.5rem);
   font-weight: var(--ds-weight-semibold);
-  letter-spacing: -0.02em;
-  line-height: var(--ds-leading-tight);
+  letter-spacing: var(--ds-tracking-tight);
+  line-height: 1;
   color: var(--ds-ink);
 }
-.lg-sub {
-  margin: 0;
-  font-size: var(--ds-text-lg);
-  color: var(--ds-ink-secondary);
-}
-
-/* Cambiar entre iniciar sesión y crear cuenta */
-.lg-switch {
-  --mat-button-toggle-height: 44px;
-  --mat-button-toggle-text-color: var(--ds-ink-secondary);
-  --mat-button-toggle-divider-color: var(--ds-border);
-  --mat-button-toggle-label-text-size: var(--ds-text-base);
-  --mat-button-toggle-label-text-weight: var(--ds-weight-bold);
-
-  display: flex;
-  width: 100%;
-  background: var(--ds-surface);
-}
-.lg-switch mat-button-toggle { flex: 1; }
+.lg-title:focus { outline: none; }
+.lg-title:focus-visible { box-shadow: var(--ds-focus-ring); }
 
 /* ── Formulario ─────────────────────────────────────────────────────────── */
 .lg-form {
@@ -318,9 +312,17 @@ mat-error mat-icon,
 .lg-success__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-bold);
+  font-size: var(--ds-text-2xl);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
+}
+
+/* Pasar a la otra vista: botón de texto bajo todo, como en la maqueta. */
+.lg-alt {
+  --mat-button-text-label-text-color: var(--ds-action-ink);
+  --mat-button-text-label-text-weight: var(--ds-weight-bold);
+  width: 100%;
+  min-height: 48px;
 }
 
 @media (prefers-reduced-motion: reduce) {

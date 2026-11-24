@@ -1,35 +1,39 @@
 <div class="lg">
 
-  <!-- ── Panel de marca (escritorio): isla abeto ─────────────────────────── -->
+  <!-- ── Panel de marca (escritorio): espresso con el escaneo ─────────────── -->
   <aside class="lg-side" [attr.aria-label]="'auth.aria_platform_info' | translate">
     <a class="lg-brand lg-brand--dark" routerLink="/">
-      <span class="lg-mark" aria-hidden="true"></span>
+      <app-brand-mark class="lg-brand__mark" tono="oscuro" />
       Estimation3D
     </a>
+
+    <figure class="lg-scan">
+      <img class="lg-scan__img" ngSrc="assets/landing/scan-dollhouse-jolicoeur.jpg" width="900" height="920"
+           priority alt="" />
+    </figure>
 
     <div class="lg-side__copy">
       <h2 class="lg-side__title">{{ 'auth.side_title' | translate }}</h2>
       <p class="lg-side__lead">{{ 'auth.side_lead' | translate }}</p>
+      <ul class="lg-points">
+        <li>
+          <mat-icon aria-hidden="true">view_in_ar</mat-icon>
+          {{ 'auth.side_point_3d' | translate }}
+        </li>
+        <li>
+          <mat-icon aria-hidden="true">verified</mat-icon>
+          {{ 'auth.side_point_verified' | translate }}
+        </li>
+        <li>
+          <mat-icon aria-hidden="true">translate</mat-icon>
+          {{ 'lang.fr' | translate }}, {{ 'lang.en' | translate }}, {{ 'lang.es' | translate }}
+        </li>
+        <li>
+          <mat-icon aria-hidden="true">redeem</mat-icon>
+          {{ 'auth.side_point_free' | translate }}
+        </li>
+      </ul>
     </div>
-
-    <ul class="lg-points">
-      <li>
-        <mat-icon aria-hidden="true">view_in_ar</mat-icon>
-        {{ 'auth.side_point_3d' | translate }}
-      </li>
-      <li>
-        <mat-icon aria-hidden="true">verified</mat-icon>
-        {{ 'auth.side_point_verified' | translate }}
-      </li>
-      <li>
-        <mat-icon aria-hidden="true">translate</mat-icon>
-        {{ 'lang.fr' | translate }}, {{ 'lang.en' | translate }}, {{ 'lang.es' | translate }}
-      </li>
-      <li>
-        <mat-icon aria-hidden="true">redeem</mat-icon>
-        {{ 'auth.side_point_free' | translate }}
-      </li>
-    </ul>
   </aside>
 
   <!-- ── Formulario ──────────────────────────────────────────────────────── -->
@@ -44,25 +48,18 @@
 
     <div class="lg-wrap">
       <a class="lg-brand lg-brand--mobile" routerLink="/">
-        <span class="lg-mark" aria-hidden="true"></span>
+        <app-brand-mark class="lg-brand__mark" />
         Estimation3D
       </a>
 
       <header class="lg-head">
-        <h1 class="lg-title">
-          {{ (vista() === 'login' ? 'auth.sign_in' : 'auth.sign_up') | translate }}
-        </h1>
-        <p class="lg-sub">
+        <p class="lg-eyebrow">
           {{ (vista() === 'login' ? 'auth.sign_in_sub' : 'auth.sign_up_sub') | translate }}
         </p>
+        <h1 #titulo class="lg-title" tabindex="-1">
+          {{ (vista() === 'login' ? 'auth.sign_in' : 'auth.sign_up') | translate }}
+        </h1>
       </header>
-
-      <mat-button-toggle-group class="lg-switch" hideSingleSelectionIndicator
-                               [value]="vista()" (change)="cambiarVista($event.value)"
-                               [attr.aria-label]="'auth.login' | translate">
-        <mat-button-toggle value="login">{{ 'auth.sign_in' | translate }}</mat-button-toggle>
-        <mat-button-toggle value="registro">{{ 'auth.sign_up' | translate }}</mat-button-toggle>
-      </mat-button-toggle-group>
 
       <!-- ═══ Iniciar sesión ═══════════════════════════════════════════════ -->
       @if (vista() === 'login') {
@@ -122,6 +119,10 @@
             <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
           </svg>
           {{ 'auth.google_btn' | translate }}
+        </button>
+
+        <button mat-button type="button" class="lg-alt" (click)="cambiarVista('registro')">
+          {{ 'auth.create_account' | translate }}
         </button>
       }
 
@@ -211,6 +212,10 @@
             </button>
             <app-campos-faltantes [formulario]="registroForm" [intento]="intentosRegistro()" />
           </form>
+
+          <button mat-button type="button" class="lg-alt" (click)="cambiarVista('login')">
+            {{ 'auth.sign_in' | translate }}
+          </button>
         }
       }
     </div>

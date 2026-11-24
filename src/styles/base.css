@@ -61,6 +61,8 @@ h1, h2, h3, h4, h5, h6 {
 h1, h2, h3, h4, h5, h6 {
   font-weight: var(--ds-weight-semibold);
   letter-spacing: var(--ds-tracking-tight);
+  /* Cormorant trae cifras de estilo antiguo: «3D» o «2026» en un título bailan. */
+  font-variant-numeric: lining-nums;
 }
 h1 { font-size: var(--ds-text-5xl); }
 h2 { font-size: var(--ds-text-4xl); }
