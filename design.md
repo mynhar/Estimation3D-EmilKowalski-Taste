@@ -412,7 +412,9 @@ cada rol `--mat-sys-*` apunta a un token `--ds-*`.
    bronce en los tres tableros. Sin claves de i18n nuevas.
 
 Historial: Clarté (6-nov-2026) → Trait rouge (20 al 23-nov-2026, cerrado en el commit
-`38ddb15` de `redesign/clarte`) → Lin et bronze (rama `redesign/lin-bronze`).
+`38ddb15`) → Lin et bronze (fases 0–4, 23 al 25-nov-2026). Las ramas de trabajo
+(`redesign/clarte`, `redesign/lin-bronze`, `upgrade/angular-22`) se fusionaron en `main` y se
+borraron el 25-nov-2026; desde entonces todo se trabaja en `main`.
 
 ## Stack output contract
 - Componentes **Angular 22 standalone**, `OnPush`, signals (`input()`/`signal()`),
