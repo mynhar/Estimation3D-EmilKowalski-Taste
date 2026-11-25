@@ -78,6 +78,19 @@
           }
         </mat-button-toggle-group>
       </div>
+
+      <mat-button-toggle-group class="ls-toggle ls-view" hideSingleSelectionIndicator
+                               [attr.aria-label]="'common.view_toggle' | translate"
+                               [value]="vista()" (change)="vista.set($event.value)">
+        <mat-button-toggle value="tarjetas" [aria-label]="'common.view_cards' | translate"
+                           [matTooltip]="'common.view_cards' | translate">
+          <mat-icon>grid_view</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="tabla" [aria-label]="'common.view_table' | translate"
+                           [matTooltip]="'common.view_table' | translate">
+          <mat-icon>table_rows</mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
     </div>
 
     @if (hayFiltros()) {
@@ -103,52 +116,54 @@
 
     } @else {
 
-      <!-- ── Tabla (desde 768px) ─────────────────────────────────────────── -->
-      <div class="ls-table-wrap">
-        <table class="ls-table">
-          <thead>
-            <tr>
-              <th scope="col">{{ 'admin_users.col_fullname' | translate }}</th>
-              <th scope="col">{{ 'admin_users.col_email' | translate }}</th>
-              <th scope="col">{{ 'admin_users.col_phone' | translate }}</th>
-              <th scope="col">{{ 'admin_users.col_role' | translate }}</th>
-              <th scope="col">{{ 'admin_users.col_provider' | translate }}</th>
-              <th scope="col">{{ 'admin_users.col_active' | translate }}</th>
-              <th scope="col"><span class="cdk-visually-hidden">{{ 'admin_users.edit_user' | translate }}</span></th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (u of usuariosPaginados(); track u.id) {
-              <tr class="ls-table__row is-link" (click)="irAEditar(u.id)">
-                <td>
-                  <div class="ls-table__main is-person">
-                    <ng-container [ngTemplateOutlet]="tplAvatar" [ngTemplateOutletContext]="{ $implicit: u }" />
-                    <a class="ls-table__link" [id]="'aul-t-' + u.id"
-                       [routerLink]="['/admin/user/edit', u.id]"
-                       (click)="$event.stopPropagation()">{{ u.nombre }} {{ u.apellido }}</a>
-                  </div>
-                </td>
-                <td class="ls-email"><ng-container [ngTemplateOutlet]="tplCorreo" [ngTemplateOutletContext]="{ $implicit: u.email }" /></td>
-                <td class="ls-fig ls-nowrap">{{ u.telefono ?? '—' }}</td>
-                <td><ng-container [ngTemplateOutlet]="tplRol" [ngTemplateOutletContext]="{ $implicit: u }" /></td>
-                <td><ng-container [ngTemplateOutlet]="tplProveedor" [ngTemplateOutletContext]="{ $implicit: u }" /></td>
-                <td><ng-container [ngTemplateOutlet]="tplActivo" [ngTemplateOutletContext]="{ $implicit: u }" /></td>
-                <td class="ls-table__action" (click)="$event.stopPropagation()">
-                  <a mat-icon-button [routerLink]="['/admin/user/edit', u.id]"
-                     [attr.aria-label]="'admin_users.edit_user' | translate"
-                     [attr.aria-describedby]="'aul-t-' + u.id"
-                     [matTooltip]="'admin_users.edit_user' | translate">
-                    <mat-icon>edit</mat-icon>
-                  </a>
-                </td>
+      <!-- ── Tabla (si se elige y cabe en el hueco; ver el CSS) ──────────── -->
+      @if (vista() === 'tabla') {
+        <div class="ls-table-wrap">
+          <table class="ls-table">
+            <thead>
+              <tr>
+                <th scope="col">{{ 'admin_users.col_fullname' | translate }}</th>
+                <th scope="col">{{ 'admin_users.col_email' | translate }}</th>
+                <th scope="col">{{ 'admin_users.col_phone' | translate }}</th>
+                <th scope="col">{{ 'admin_users.col_role' | translate }}</th>
+                <th scope="col">{{ 'admin_users.col_provider' | translate }}</th>
+                <th scope="col">{{ 'admin_users.col_active' | translate }}</th>
+                <th scope="col"><span class="cdk-visually-hidden">{{ 'admin_users.edit_user' | translate }}</span></th>
               </tr>
-            }
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              @for (u of usuariosPaginados(); track u.id) {
+                <tr class="ls-table__row is-link" (click)="irAEditar(u.id)">
+                  <td>
+                    <div class="ls-table__main is-person">
+                      <ng-container [ngTemplateOutlet]="tplAvatar" [ngTemplateOutletContext]="{ $implicit: u }" />
+                      <a class="ls-table__link" [id]="'aul-t-' + u.id"
+                         [routerLink]="['/admin/user/edit', u.id]"
+                         (click)="$event.stopPropagation()">{{ u.nombre }} {{ u.apellido }}</a>
+                    </div>
+                  </td>
+                  <td class="ls-email"><ng-container [ngTemplateOutlet]="tplCorreo" [ngTemplateOutletContext]="{ $implicit: u.email }" /></td>
+                  <td class="ls-fig ls-nowrap">{{ u.telefono ?? '—' }}</td>
+                  <td><ng-container [ngTemplateOutlet]="tplRol" [ngTemplateOutletContext]="{ $implicit: u }" /></td>
+                  <td><ng-container [ngTemplateOutlet]="tplProveedor" [ngTemplateOutletContext]="{ $implicit: u }" /></td>
+                  <td><ng-container [ngTemplateOutlet]="tplActivo" [ngTemplateOutletContext]="{ $implicit: u }" /></td>
+                  <td class="ls-table__action" (click)="$event.stopPropagation()">
+                    <a mat-icon-button [routerLink]="['/admin/user/edit', u.id]"
+                       [attr.aria-label]="'admin_users.edit_user' | translate"
+                       [attr.aria-describedby]="'aul-t-' + u.id"
+                       [matTooltip]="'admin_users.edit_user' | translate">
+                      <mat-icon>edit</mat-icon>
+                    </a>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
 
-      <!-- ── Tarjetas (móvil) ────────────────────────────────────────────── -->
-      <ul class="ls-grid is-mobile-only">
+      <!-- ── Tarjetas (por defecto; con la vista de tabla, solo cuando la tabla no cabe) ── -->
+      <ul class="ls-grid" [class.is-mobile-only]="vista() === 'tabla'">
         @for (u of usuariosPaginados(); track u.id) {
           <li class="ls-card is-plain" [class.is-off]="!u.activo">
             <div class="ls-card__body">

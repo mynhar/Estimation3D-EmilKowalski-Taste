@@ -15,6 +15,7 @@ import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.
 import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
 
 type FiltroActivo = 'todos' | 'activo' | 'inactivo';
+type VistaUsuarios = 'tabla' | 'tarjetas';
 
 @Component({
   selector: 'app-admin-user-list',
@@ -45,6 +46,9 @@ export class AdminUserListComponent implements OnInit {
   readonly roles: Array<RolUsuario | 'todos'>          = ['todos', 'cliente', 'estimador', 'constructor', 'administrador'];
   readonly proveedores: Array<ProveedorAuth | 'todos'> = ['todos', 'email', 'google'];
   readonly estadosActivo: FiltroActivo[]               = ['todos', 'activo', 'inactivo'];
+
+  /** Tarjetas por defecto (y la única vista en móvil); la tabla se elige con el conmutador si cabe. */
+  vista = signal<VistaUsuarios>('tarjetas');
 
   readonly POR_PAGINA = 15;
   paginaActual = signal(1);
