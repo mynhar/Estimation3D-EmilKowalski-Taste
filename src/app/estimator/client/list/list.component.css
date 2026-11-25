@@ -1,6 +1,9 @@
 /* component: clientes y constructores (estimador, Lin et bronze)
  * Todo el aspecto viene de shared/ui/lista/lista.css (búsqueda, filtros, tabla, tarjetas de persona);
  * aquí solo cuándo cabe la tabla.
+ * states: cargando · error · sin personas · filtros sin resultados ·
+ *         tarjetas (por defecto; siempre en móvil y huecos estrechos) ·
+ *         tabla (elegida con el conmutador, si cabe) · persona inactiva atenuada (.is-off)
  * relleno espresso: crear una persona, la única acción de la vista.
  */
 
@@ -10,8 +13,9 @@
 }
 
 /* Seis columnas: unos 1045px de tabla. Se mide el hueco del componente (no la ventana); si no
-   cabe, tarjetas. 1045px de tabla + 2px de borde + 2 × 32px del .page-wrapper. */
+   cabe, tarjetas y sin conmutador. 1045px de tabla + 2px de borde + 2 × 32px del .page-wrapper. */
 @container personas (max-width: 1119.98px) {
-  .ls-table-wrap { display: none; }
+  .ls-table-wrap,
+  .ls-view { display: none; }
   .ls-grid.is-mobile-only { display: grid; }
 }

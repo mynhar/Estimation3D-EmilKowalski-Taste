@@ -15,6 +15,7 @@ import { PageHeaderComponent } from '../../../shared/ui/page-header/page-header.
 import { EmptyStateComponent } from '../../../shared/ui/empty-state/empty-state.component';
 
 type FiltroActivo = 'todos' | 'activo' | 'inactivo';
+type VistaPersonas = 'tabla' | 'tarjetas';
 
 /** El estimador gestiona los dos roles externos; el resto no es asunto suyo. */
 type RolExterno = Extract<RolUsuario, 'cliente' | 'constructor'>;
@@ -47,6 +48,9 @@ export class EstimatorClientListComponent implements OnInit {
   readonly rolesFiltro: Array<RolExterno | 'todos'>    = ['todos', 'cliente', 'constructor'];
   readonly proveedores: Array<ProveedorAuth | 'todos'> = ['todos', 'email', 'google'];
   readonly estadosActivo: FiltroActivo[]               = ['todos', 'activo', 'inactivo'];
+
+  /** Tarjetas por defecto (y la única vista en móvil); la tabla se elige con el conmutador si cabe. */
+  vista = signal<VistaPersonas>('tarjetas');
 
   readonly POR_PAGINA = 15;
   paginaActual = signal(1);
