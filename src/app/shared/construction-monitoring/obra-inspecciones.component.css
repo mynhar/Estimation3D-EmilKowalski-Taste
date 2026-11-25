@@ -95,7 +95,7 @@
   border-radius: var(--ds-radius-md);
   background: var(--ds-bg);
 }
-.oi-field { display: grid; gap: var(--ds-space-2); margin-bottom: var(--ds-space-3); }
+.oi-field { display: grid; gap: var(--ds-space-2); margin-bottom: var(--ds-space-3); container: oi-tipo / inline-size; }
 .oi-label { font-size: var(--ds-text-sm); font-weight: var(--ds-weight-semibold); color: var(--ds-ink-secondary); }
 .oi-tipo {
   --mat-button-toggle-height: 44px;
@@ -106,6 +106,24 @@
   justify-self: start;
   max-width: 100%;
   overflow-x: auto;
+}
+/* Las tres opciones del estimador («Propriétaire» en FR) no caben en una fila de menos de 22rem:
+   cada opción pasa a píldora con su borde y la que no cabe baja de línea, sin desplazamiento. */
+@container oi-tipo (max-width: 22rem) {
+  .oi-field .oi-tipo {
+    --mat-button-toggle-divider-color: transparent;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ds-space-2);
+    justify-self: stretch;
+    overflow: visible;
+    border: 0;
+  }
+  .oi-field .oi-tipo mat-button-toggle {
+    flex: 1 1 auto;
+    border: 1px solid var(--ds-border);
+    border-radius: var(--ds-radius-pill);
+  }
 }
 .oi-row {
   display: grid;

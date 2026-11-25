@@ -93,6 +93,10 @@
   }
   .cml-filter mat-button-toggle:first-child { grid-column: 1 / -1; }
 }
+/* Teléfono estrecho: etiqueta a 14px, como los filtros de shared/ui/lista. */
+@media (max-width: 399.98px) {
+  .cml-filter .cml-toggle { --mat-button-toggle-label-text-size: var(--ds-text-sm); }
+}
 
 .cml-view { margin-left: auto; }
 .cml-view mat-icon { width: 22px; height: 22px; font-size: 22px; vertical-align: middle; }

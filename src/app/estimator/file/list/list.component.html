@@ -42,7 +42,7 @@
                [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)" />
       </mat-form-field>
 
-      <div class="ls-filter is-grid">
+      <div class="ls-filter is-grid is-stack">
         <span class="ls-filter__label" id="efl-group-label">{{ 'estimator_file_list.groups_label' | translate }}</span>
         <mat-button-toggle-group class="ls-toggle" hideSingleSelectionIndicator
                                  aria-labelledby="efl-group-label"

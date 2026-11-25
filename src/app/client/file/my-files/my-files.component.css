@@ -42,6 +42,11 @@
   .mf-filter { display: flex; width: 100%; }
   .mf-filter mat-button-toggle { flex: 1; }
 }
+/* Teléfono estrecho: etiqueta a 14px, como los filtros de shared/ui/lista. «Todos · Activos ·
+   Finalizados» a 16px desbordaba la página 11px a 320px. */
+@media (max-width: 399.98px) {
+  .mf-tools .mf-filter { --mat-button-toggle-label-text-size: var(--ds-text-sm); }
+}
 
 .mf-count {
   margin-left: var(--ds-space-1);

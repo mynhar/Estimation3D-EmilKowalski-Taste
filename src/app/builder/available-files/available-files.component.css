@@ -64,6 +64,10 @@
   .af-filter .af-toggle { display: flex; }
   .af-filter mat-button-toggle { flex: 1; }
 }
+/* Teléfono estrecho: etiqueta a 14px, como los filtros de shared/ui/lista. */
+@media (max-width: 399.98px) {
+  .af-filter .af-toggle { --mat-button-toggle-label-text-size: var(--ds-text-sm); }
+}
 
 .af-count {
   margin-left: var(--ds-space-1);

@@ -79,7 +79,13 @@
   .ls-filter .ls-toggle { display: flex; }
   .ls-filter mat-button-toggle { flex: 1; min-width: 0; }
 }
-/* Filtro por estado (4 o más opciones): en móvil, «Tous» arriba y 2 columnas debajo. */
+/* Teléfono estrecho (320–399px): la etiqueta del segmento baja a 14px, el mínimo de lectura,
+   para que «Under estimation 1» o «En estimación 1» quepan en media fila sin cortarse. */
+@media (max-width: 399.98px) {
+  .ls-filter .ls-toggle { --mat-button-toggle-label-text-size: var(--ds-text-sm); }
+}
+/* Filtro de 4 o más opciones, o de 3 con una etiqueta larga («Constructeur» no cabe en un
+   tercio a 360px): en móvil, «Tous» arriba y 2 columnas debajo. */
 @media (max-width: 799.98px) {
   .ls-filter.is-grid { flex: 1 1 100%; }
   .ls-filter.is-grid .ls-toggle {
@@ -97,6 +103,11 @@
   .ls-filter.is-grid mat-button-toggle:first-child { grid-column: 1 / -1; }
   /* Opción de etiqueta larga («En cours d'exécution»): fila entera para que quepa la cifra. */
   .ls-filter.is-grid mat-button-toggle.is-wide { grid-column: 1 / -1; }
+}
+/* Teléfono de 320px: «Under estimation 0» no cabe en media fila ni a 14px. Los filtros cortos
+   marcados con is-stack pasan a una columna, en el mismo orden (sin huecos ni reordenar). */
+@media (max-width: 359.98px) {
+  .ls-filter.is-grid.is-stack .ls-toggle { grid-template-columns: minmax(0, 1fr); }
 }
 
 .ls-status {

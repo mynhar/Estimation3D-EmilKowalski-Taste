@@ -13,8 +13,11 @@
  *       en mayúsculas; porcentajes, fechas, horas e importes con lining-nums tabular-nums
  */
 
+/* minmax(0, 1fr): la columna implícita (auto) crecía hasta el min-content de la banda de avance
+   y la página desbordaba la pantalla (379px a 360px en EN). */
 .mon {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--ds-space-5);
   min-width: 0;
 }
@@ -212,6 +215,7 @@
 /* ── Resumen: avance, cifras y etapas ───────────────────────────────────── */
 .mon-sum {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--ds-space-5) var(--ds-space-6);
   padding: var(--ds-space-5);
   border-radius: var(--ds-radius-lg);
@@ -372,7 +376,10 @@
 }
 .mon-step.is-current { font-weight: var(--ds-weight-bold); }
 .mon-step.is-cancelled .mon-step__label { text-decoration: line-through; }
+/* Móvil: el punto encima de la etiqueta. Las tres etapas siguen en fila y «Completed» o
+   «Completado» caben en un tercio sin empujar la banda fuera de la pantalla. */
 @media (max-width: 479.98px) {
+  .mon-step { flex-direction: column; align-items: flex-start; gap: var(--ds-space-1); }
   .mon-step__label { white-space: normal; }
   .mon-step:not(:last-child)::after { display: none; }
 }
@@ -446,6 +453,25 @@
 }
 
 .mon-group { display: grid; gap: var(--ds-space-2); min-width: 0; }
+/* Tipo de visitante: las tres opciones del admin («Propriétaire» en FR) no caben en una fila de
+   menos de 22rem. Entonces cada opción es una píldora con su borde y la que no cabe baja de línea. */
+.mon-group.is-tipo { container: mon-tipo / inline-size; }
+@container mon-tipo (max-width: 22rem) {
+  .mon-group.is-tipo .mon-toggle {
+    --mat-button-toggle-divider-color: transparent;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ds-space-2);
+    justify-self: stretch;
+    overflow: visible;
+    border: 0;
+  }
+  .mon-group.is-tipo .mon-toggle mat-button-toggle {
+    flex: 1 1 auto;
+    border: 1px solid var(--ds-border);
+    border-radius: var(--ds-radius-pill);
+  }
+}
 .mon-row2 {
   display: grid;
   grid-template-columns: minmax(0, 1fr);

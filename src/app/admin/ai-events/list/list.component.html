@@ -29,7 +29,8 @@
         </mat-select>
       </mat-form-field>
 
-      <div class="ls-filter">
+      <!-- «En attente 1» no cabe en un tercio a 360px: en móvil, «Tous» arriba y 2 columnas debajo. -->
+      <div class="ls-filter is-grid">
         <span class="ls-filter__label" id="aev-res-label">{{ 'admin_ai_events.filter_status' | translate }}</span>
         <mat-button-toggle-group class="ls-toggle" hideSingleSelectionIndicator aria-labelledby="aev-res-label"
                                  [value]="filtroResuelto()" (change)="filtroResuelto.set($event.value)">

@@ -36,7 +36,8 @@
                [value]="busqueda()" (input)="setBusqueda($event)" />
       </mat-form-field>
 
-      <div class="ls-filter">
+      <!-- «Constructeur» no cabe en un tercio a 360px: en móvil, «Tous» arriba y 2 columnas debajo. -->
+      <div class="ls-filter is-grid">
         <span class="ls-filter__label" id="ecl-rol-label">{{ 'admin_users.role_filter' | translate }}</span>
         <mat-button-toggle-group class="ls-toggle" hideSingleSelectionIndicator aria-labelledby="ecl-rol-label"
                                  [value]="filtroRol()" (change)="filtroRol.set($event.value)">

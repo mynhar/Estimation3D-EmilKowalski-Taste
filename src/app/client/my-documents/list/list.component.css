@@ -65,6 +65,9 @@
 
 /* En estrecho, el tipo pasa a icono; la palabra queda para el lector de pantalla. */
 @media (max-width: 640px) {
+  /* El grupo ocupa la fila y los segmentos se reparten el ancho: a 320px no se desplaza ni corta el último. */
+  .md-filter { display: flex; width: 100%; overflow: hidden; }
+  .md-filter mat-button-toggle { flex: 1 1 auto; min-width: 0; }
   .md-filter__icon { display: inline-block; }
   .md-filter__label {
     position: absolute;

@@ -79,6 +79,10 @@
     border-radius: var(--ds-radius-pill);
   }
 }
+/* Teléfono estrecho: etiqueta a 14px, como los filtros de shared/ui/lista. */
+@media (max-width: 399.98px) {
+  .ofs-filter .ofs-toggle { --mat-button-toggle-label-text-size: var(--ds-text-sm); }
+}
 
 .ofs-awarded {
   display: grid;

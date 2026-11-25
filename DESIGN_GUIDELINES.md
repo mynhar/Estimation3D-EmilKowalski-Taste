@@ -403,7 +403,13 @@ Angular Material 22 (M3) es la librería de componentes del rediseño. Botones, 
 - **Destructivo irreversible** (eliminar un vídeo, descartar una grabación, borrar un contrato): `mat-flat-button` con `--mat-button-filled-container-color: var(--ds-danger)`, texto y capa de estado `--ds-surface`, siempre con icono y texto.
 - **Campos**: `appearance="outline"` y `subscriptSizing="dynamic"` cuando el campo no tiene ayuda fija (el hueco del error solo aparece con el error). Fecha y hora llevan siempre la etiqueta flotada (el control nativo muestra su formato).
 - **Slider**: la pista inactiva por defecto no se ve sobre vélin; ajústala con `--mat-slider-inactive-track-color: var(--ds-border-strong)` y alturas de 6px (`--mat-slider-active-track-height`, `--mat-slider-inactive-track-height`).
-- **`mat-button-toggle-group` como filtro**: segmentado píldora, `hideSingleSelectionIndicator`, el recuento dentro de la opción (con `lining-nums tabular-nums`, hereda el color), seleccionado en espresso con texto crema (global, en el tema; no lo sobrescribas). En móvil, si no caben, rejilla con `--mat-button-toggle-divider-color: transparent`, `border: 0` en el grupo y borde y radio píldora en cada `mat-button-toggle`.
+- **`mat-button-toggle-group` como filtro**: segmentado píldora, `hideSingleSelectionIndicator`, el recuento dentro de la opción (con `lining-nums tabular-nums`, hereda el color), seleccionado en espresso con texto crema (global, en el tema; no lo sobrescribas). En móvil, si no caben, rejilla con `--mat-button-toggle-divider-color: transparent`, `border: 0` en el grupo y borde y radio píldora en cada `mat-button-toggle`. En `lista.css`, cuatro modificadores:
+  - `.is-grid`: «Tous» arriba y 2 columnas debajo. Para filtros de 4 o más opciones, o de 3 con una etiqueta larga.
+  - `.is-wide`: en una opción, la pone en fila entera.
+  - `.is-stack`: por debajo de 360px, una sola columna en el mismo orden. Es para los filtros cortos cuya opción larga no cabe en media fila, como «Under estimation 0».
+  - Por debajo de 400px, la etiqueta baja a 14px (`--mat-button-toggle-label-text-size: var(--ds-text-sm)`), también en los filtros con CSS propio.
+
+  Material no expone el relleno del segmento, así que no se toca. Si el grupo está en un panel estrecho y no es una lista (por ejemplo, el tipo de visitante), una container query lo convierte en píldoras sueltas con `flex-wrap` en lugar de desplazarse.
 
 ### Estilos globales: `base.css` y nada más
 
