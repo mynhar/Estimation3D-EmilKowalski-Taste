@@ -32,9 +32,8 @@
         <mat-icon>arrow_back</mat-icon>
         {{ 'make_offer.back_to_files' | translate }}
       </a>
-      <app-page-header [titulo]="multiServicio() ? serviciosTexto() : servicioNombre()" />
+      <app-page-header [etiqueta]="d.numero" [titulo]="multiServicio() ? serviciosTexto() : servicioNombre()" />
       <div class="mo-meta">
-        <span class="mo-fig">{{ d.numero }}</span>
         @if (ofertaId()) {
           <span class="mo-tag is-edit">
             <mat-icon aria-hidden="true">edit</mat-icon>

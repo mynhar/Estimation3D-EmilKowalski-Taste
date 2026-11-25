@@ -1,6 +1,8 @@
 <div class="page-wrapper bd">
 
+  <!-- Con nombre, «Tableau de bord» pasa a etiqueta sobre el saludo (sin cursiva: es solo del cliente). -->
   <app-page-header
+    [etiqueta]="nombre() ? ('dashboard_builder.title' | translate) : null"
     [titulo]="nombre() ? ('dashboard_client.welcome' | translate) + ', ' + nombre() : ('dashboard_builder.title' | translate)"
     [contexto]="'dashboard_builder.subtitle' | translate">
     @if (!cargando() && (total() > 0 || obras().length > 0)) {
@@ -52,11 +54,11 @@
           @for (o of obras(); track o.contratoId) {
             <li>
               <a class="bd-work" [routerLink]="['/builder/construction-monitoring/monitoring', o.contratoId]">
+                <span class="bd-work__num">{{ 'file.exp_abbr' | translate }} {{ o.expedienteNumero }}</span>
                 <span class="bd-work__top">
                   <span class="bd-work__service">{{ servicioObra(o) }}</span>
                   <app-status-chip [estado]="o.estado" prefijo="construction_monitoring.estado_" />
                 </span>
-                <span class="bd-work__num">{{ 'file.exp_abbr' | translate }} {{ o.expedienteNumero }}</span>
 
                 <span class="bd-work__avance">
                   <span class="bd-work__pct">{{ o.avance }} %</span>
@@ -93,6 +95,9 @@
               <li>
                 <a class="bd-offer" [routerLink]="['/builder/my-offer', oferta.id]">
                   <span class="bd-offer__main">
+                    @if (!sinDossier(oferta)) {
+                      <span class="bd-offer__num">{{ 'file.exp_abbr' | translate }} {{ oferta.expediente_numero }}</span>
+                    }
                     @if (sinDossier(oferta)) {
                       <span class="bd-offer__title is-hidden-file">{{ 'state_desc.archivado' | translate }}</span>
                     } @else {
@@ -100,9 +105,6 @@
                     }
 
                     <span class="bd-offer__meta">
-                      @if (!sinDossier(oferta)) {
-                        <span>{{ 'file.exp_abbr' | translate }} {{ oferta.expediente_numero }}</span>
-                      }
                       @if (oferta.canton !== SIN_DATO) {
                         <span><mat-icon aria-hidden="true">location_on</mat-icon>{{ oferta.canton }}, {{ oferta.provincia }}</span>
                       }

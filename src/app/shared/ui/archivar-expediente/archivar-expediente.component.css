@@ -1,9 +1,10 @@
-/* Confirmación de archivar / desarchivar (Trait rouge)
+/* Confirmación de archivar / desarchivar (Lin et bronze)
  * states: default · hover · focus-visible · active · disabled · loading (spinner, aria-busy) · error
  *         los botones son de Material; el éxito lo pinta la pantalla (aviso de archivado)
- * contrast: título ink sobre warning-soft ≥ 12:1 · texto warning-ink sobre warning-soft 5.0:1
+ * contrast: título ink sobre warning-soft 13.4:1 · texto warning-ink sobre warning-soft 4.9:1
  *           error danger-ink, con icono y texto
- * Archivar es reversible, no destructivo: tono aviso, sin ladrillo; el «sí» es el abeto por defecto.
+ * Archivar es reversible, no destructivo: tono aviso, sin terracota; el «sí» es el relleno
+ * espresso por defecto.
  */
 
 /* Sin caja propia: cerrado no ocupa sitio ni suma un hueco en contenedores con gap. */
@@ -26,9 +27,10 @@
 .ar__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-lg);
+  font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
+  font-variant-numeric: lining-nums;
   color: var(--ds-ink);
 }
 .ar__desc {

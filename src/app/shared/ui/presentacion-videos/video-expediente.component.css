@@ -8,7 +8,7 @@
  * video-slot.css (compartida con app-videos-expediente-lectura).
  *
  * Misma familia que la biblioteca de videos del perfil (miniatura 16:9 con
- * duración, icono de grabar en ladrillo), en formato de una sola ranura: aquí sólo
+ * duración, icono de grabar en terracota), en formato de una sola ranura: aquí sólo
  * hay un video por expediente.
  */
 :host { display: block; }
@@ -29,8 +29,8 @@
   gap: var(--ds-space-2);
 }
 .ve-btn { white-space: nowrap; }
-/* El icono de grabar conserva el ladrillo de siempre: es el signo universal
-   de grabación, no un error ni la acción de la siguiente etapa. */
+/* El icono de grabar va en terracota: es el signo universal de grabación,
+   no un error ni una acción. */
 .ve-rec { color: var(--ds-danger); }
 .ve-btn:disabled .ve-rec { color: inherit; }
 .ve-count {

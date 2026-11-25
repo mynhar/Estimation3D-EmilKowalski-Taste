@@ -36,12 +36,11 @@
         <mat-icon>arrow_back</mat-icon>
         {{ 'my_offer.back_btn' | translate }}
       </a>
-      <app-page-header [titulo]="archivadoSinDatos ? ('archivo.titulo_expediente' | translate) : titulo"
+      <!-- El número de dossier, como etiqueta sobre el título. -->
+      <app-page-header [etiqueta]="hay(d.expediente_numero) ? d.expediente_numero : null"
+                       [titulo]="archivadoSinDatos ? ('archivo.titulo_expediente' | translate) : titulo"
                        [contexto]="archivadoSinDatos ? ('archivo.texto_oferta' | translate) : ''" />
       <div class="mof-meta">
-        @if (hay(d.expediente_numero)) {
-          <span class="mof-fig">{{ d.expediente_numero }}</span>
-        }
         <app-status-chip [estado]="d.estado" />
       </div>
     </header>
@@ -172,8 +171,8 @@
             }
           </div>
 
-          <!-- Mientras el cliente no decide, la oferta se puede cambiar. No es la
-               siguiente etapa: va en abeto, no en tomate. -->
+          <!-- Mientras el cliente no decide, la oferta se puede cambiar. Es la única
+               acción de la vista: relleno espresso. -->
           @if (d.estado === 'pendiente') {
             <div class="mof-actions">
               <button mat-flat-button type="button" (click)="editarOferta()">

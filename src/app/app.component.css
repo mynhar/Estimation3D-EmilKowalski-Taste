@@ -466,6 +466,13 @@ main:focus { outline: none; }
   .tabs__item.is-active mat-icon { background: var(--ds-action-faint); color: var(--ds-action-ink); }
 }
 
+/* Roles internos en teléfono: el botón del cajón ocupa la izquierda y «Espace constructeur»
+   (o estimateur…) no cabe junto al disco. El disco se queda en la cabecera del cajón. */
+@media (max-width: 429.98px) {
+  .app-shell:not(.has-tabs) .tb .brand__mark { display: none; }
+  .app-shell:not(.has-tabs) .tb .brand__space { letter-spacing: 0.1em; }
+}
+
 /* Teléfonos estrechos: el subtítulo de la marca no cabe junto al idioma y la cuenta. */
 @media (max-width: 359.98px) {
   .tb .brand__space { display: none; }

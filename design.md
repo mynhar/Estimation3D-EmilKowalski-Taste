@@ -2,9 +2,9 @@
 
 > **Dirección aprobada: Lin et bronze** (23-nov-2026; sustituye a Trait rouge). Toma el
 > diseño, la paleta y la tipografía de `agencia-inmobiliaria` y los lleva a Estimation3D.
-> Se hace por fases (ver abajo): la 0, la 1 y la 2 están hechas (la app entera lleva la piel
-> nueva y todo lo del cliente y las páginas públicas ya está recompuesto); las fases 3–4
-> recomponen el contratista, el estimador y el admin. Este archivo resume el sistema: el
+> Se hace por fases (ver abajo): la 0, la 1, la 2 y la 3 están hechas (la app entera lleva la
+> piel nueva y el cliente, las páginas públicas y el contratista ya están recompuestos); la
+> fase 4 recompone el estimador y el admin. Este archivo resume el sistema: el
 > detalle está en `DESIGN_GUIDELINES.md` y los valores reales en `src/styles/tokens.css`.
 > Siguen vigentes el contrato de stack, el uso de tokens `--ds-*` (sin hex sueltos ni
 > nombres `--color-*`) y el contraste AA.
@@ -247,6 +247,23 @@ La composición de cada pantalla se rehace en las fases 1–4; estos patrones t�
   `--ds-accent`. Un solo botón relleno espresso por vista (enviar el dossier, aceptar la
   oferta).
 
+## Contratista (fase 3, hecho)
+- Mismos patrones que el cliente: número como etiqueta sobre el título, datos con subgrid,
+  rótulos en mayúsculas, tarjetas con `--ds-shadow-xs`, avance y pasos en bronce.
+- Una acción repetida en cada tarjeta o fila de una lista («Faire une offre») va con borde
+  (`mat-stroked-button`): con varios rellenos a la vista ninguno destaca.
+- Un solo relleno espresso por vista también cuando dos acciones compiten: en el seguimiento
+  de obra, guardar el parte va relleno salvo que el admin tenga que completar el contrato;
+  entonces pasa a borde con `[matButton]="cond ? 'outlined' : 'filled'"`.
+- Tablas anchas (obras: 8 columnas): la lista mide su propio hueco con un container query en
+  el `:host` (cuenta la barra lateral plegada) y muestra tarjetas si la tabla no cabe.
+- Bandas de lino oscuro (precio de la oferta, avance de la obra): rótulos en mayúsculas en
+  `--ds-ink-secondary` (6.3:1), cifra en Cormorant; la etapa en curso con halo bronce.
+- Subapartados (`h3`) de las fichas en Manrope 700 a 16px, como los grupos de los
+  formularios: `font-family: var(--ds-font-body)`, porque el reboot pone Cormorant.
+- Armazón de los roles internos por debajo de 430px: el disco de la marca se oculta (la
+  hamburguesa ocupa la izquierda; el disco sigue en la cabecera del cajón).
+
 ## Login y registro (fase 1, hecho)
 - Móvil: volver e idiomas arriba, la marca, la etiqueta («Accédez à votre espace» /
   «Créez votre compte en quelques minutes») sobre el título en Cormorant, campos outlined de
@@ -353,7 +370,12 @@ cada rol `--mat-sys-*` apunta a un token `--ds-*`.
    tarjetas con `--ds-shadow-xs`, resúmenes con la tarjeta de cifras, avance y pasos en
    bronce. `fr.json`: espacio de no separación antes de `? ! : ;` (solo tipografía; sin
    claves nuevas). La barra de pasos del formulario de la landing pasa de espresso a bronce.
-3. Contratista.
+3. **Contratista (hecho, 24-nov-2026)**: dashboard, dossiers disponibles, mis ofertas,
+   hacer una oferta, mi oferta, lista y detalle del seguimiento de obra (el detalle y
+   `obras-lista.css` los comparten el estimador y el admin), y las piezas compartidas que
+   usan (vídeo del dossier, archivar, matterport-info). «Faire une offre» con borde en las
+   listas; la tabla de obras se mide con un container query; en el seguimiento, la raya entre
+   etapas solo se pinta pasada la actual. Sin claves de i18n nuevas.
 4. Estimador y admin.
 
 Historial: Clarté (6-nov-2026) → Trait rouge (20 al 23-nov-2026, cerrado en el commit

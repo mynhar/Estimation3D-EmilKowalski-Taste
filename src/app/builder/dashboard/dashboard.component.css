@@ -1,11 +1,12 @@
-/* component: tablero del constructor (Trait rouge)
+/* component: tablero del constructor (Lin et bronze)
  * states: cargando · sin ofertas ni obras · con obras · con ofertas · oferta de dossier archivado
  *         interactivos: default · hover (puntero fino) · focus-visible · active
- * contrast: títulos ink (11.8:1) · texto ink-secondary (8.7:1) · secundarios ink-muted (6.1:1)
- *           resumen sobre kraft: ink-secondary 7.7:1 · enlaces action (8.4:1)
- *           barras solo como gráfico: el porcentaje va siempre en texto
- *           tomate: solo «Voir les dossiers disponibles» (cabecera o estado vacío, nunca ambos)
- * type: títulos 112 %; importes, porcentajes y recuentos 75 % con tabular-nums
+ * contrast: títulos ink (15.5:1 sobre vélin) · texto ink-secondary (7.8:1) · secundarios ink-muted (5.9:1)
+ *           resumen sobre banda: ink-secondary 6.3:1, rótulos ink-muted 4.7:1 · enlaces action-ink (6.3:1)
+ *           barras en bronce, solo como gráfico: el porcentaje va siempre en texto
+ *           relleno espresso: solo «Voir les dossiers disponibles» (cabecera o estado vacío, nunca ambos)
+ * type: títulos y cifras en Cormorant 600 con lining-nums tabular-nums; números de dossier y
+ *       rótulos del resumen en etiqueta en mayúsculas
  */
 
 .bd {
@@ -31,7 +32,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
 }
@@ -51,25 +52,40 @@
 .bd-link {
   margin-left: auto;
   border-radius: var(--ds-radius-sm);
-  color: var(--ds-action);
+  color: var(--ds-action-ink);
   font-weight: var(--ds-weight-bold);
   text-decoration: underline;
   text-underline-offset: 3px;
+  transition: var(--ds-transition-color);
 }
 .bd-link:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
 @media (hover: hover) and (pointer: fine) {
-  .bd-link:hover { color: var(--ds-action-hover); }
+  .bd-link:hover { color: var(--ds-ink); }
 }
 
 .bd-fig {
   font-family: var(--ds-font-display);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink);
 }
 /* Claves que empiezan en minúscula («avancement moyen», «mis à jour le…»). */
 .bd-cap { display: inline-block; }
 .bd-cap::first-letter { text-transform: uppercase; }
+
+/* Etiqueta en mayúsculas: número del dossier y rótulos del resumen. */
+.bd-work__num,
+.bd-offer__num,
+.bd-sum dt,
+.bd-sum__rate-head > span {
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+  font-variant-numeric: lining-nums tabular-nums;
+}
 
 .bd-card {
   display: grid;
@@ -80,8 +96,10 @@
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-xs);
 }
 
+/* Avance en bronce: marca, no actúa. */
 .bd-bar {
   display: block;
   height: 8px;
@@ -93,8 +111,7 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--ds-action-soft);
-  box-shadow: inset 0 0 0 1px var(--ds-action);
+  background: var(--ds-accent);
   transition: width var(--ds-duration-slow) var(--ds-ease-out);
 }
 
@@ -118,10 +135,13 @@
 .bd-works__summary {
   display: flex;
   flex-wrap: wrap;
+  align-items: baseline;
   gap: var(--ds-space-1) var(--ds-space-5);
   margin: 0;
   color: var(--ds-ink-secondary);
 }
+/* Cifra en línea: a 22px, para que Cormorant no quede más débil que el texto de al lado. */
+.bd-works__summary .bd-fig { font-size: var(--ds-text-xl); line-height: 1; }
 
 .bd-works__list {
   display: grid;
@@ -140,19 +160,23 @@
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-xs);
   color: var(--ds-ink);
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
   transition: border-color var(--ds-duration-fast) var(--ds-ease-out),
+              box-shadow var(--ds-duration-fast) var(--ds-ease-out),
               transform var(--ds-duration-fast) var(--ds-ease-out);
 }
 .bd-work:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
 .bd-work:active { transform: scale(0.99); }
 @media (hover: hover) and (pointer: fine) {
-  .bd-work:hover { border-color: var(--ds-border-strong); }
+  .bd-work:hover { border-color: var(--ds-border-strong); box-shadow: var(--ds-shadow-md); }
   .bd-work:hover .bd-work__go { text-decoration-color: currentColor; }
 }
 
+/* El número va encima del servicio, pegado a él. */
+.bd-work__num { margin-bottom: calc(var(--ds-space-2) * -1); }
 .bd-work__top {
   display: flex;
   align-items: flex-start;
@@ -162,15 +186,11 @@
 .bd-work__service {
   min-width: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-bold);
+  font-size: var(--ds-text-xl);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
+  font-variant-numeric: lining-nums;
   overflow-wrap: anywhere;
-}
-.bd-work__num {
-  margin-top: calc(var(--ds-space-2) * -1);
-  font-size: var(--ds-text-sm);
-  color: var(--ds-ink-muted);
 }
 
 .bd-work__avance {
@@ -199,7 +219,7 @@
   color: var(--ds-ink-muted);
 }
 .bd-work__go {
-  color: var(--ds-action);
+  color: var(--ds-action-ink);
   font-weight: var(--ds-weight-bold);
   text-decoration: underline;
   text-decoration-color: transparent;
@@ -287,12 +307,13 @@
   width: 18px;
   height: 18px;
   font-size: 18px;
-  color: var(--ds-ink-muted);
+  color: var(--ds-accent);
 }
 .bd-offer__note {
   font-size: var(--ds-text-sm);
   color: var(--ds-ink-muted);
 }
+.bd-offer__note mat-icon { color: var(--ds-ink-muted); }
 
 .bd-offer__side {
   display: flex;
@@ -303,7 +324,7 @@
 .bd-offer__price {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   font-variant-numeric: lining-nums tabular-nums;
   white-space: nowrap;
 }
@@ -315,7 +336,7 @@
   }
 }
 
-/* Resumen sobre banda kraft: se lee como el pie de la lista, no como otra tarjeta. */
+/* Resumen sobre la banda de lino oscuro: se lee como el pie de la lista, no como otra tarjeta. */
 .bd-sum {
   display: grid;
   gap: var(--ds-space-5);
@@ -326,9 +347,8 @@
 }
 .bd-sum dl,
 .bd-sum dd { margin: 0; }
-.bd-sum dt { font-size: var(--ds-text-sm); font-weight: var(--ds-weight-medium); }
 
-.bd-sum__lead { display: grid; gap: 2px; }
+.bd-sum__lead { display: grid; gap: var(--ds-space-1); }
 .bd-sum__amount {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-3xl);
@@ -336,16 +356,25 @@
   font-variant-numeric: lining-nums tabular-nums;
   line-height: var(--ds-leading-tight);
   color: var(--ds-ink);
+  overflow-wrap: anywhere;
 }
 
+/* Recuentos: rótulo arriba y cifra abajo; con subgrid, un rótulo en dos líneas no baja las cifras vecinas. */
 .bd-sum__counts {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--ds-space-3);
+  gap: var(--ds-space-1) var(--ds-space-3);
   padding-top: var(--ds-space-4);
   border-top: 1px solid var(--ds-border-strong);
 }
-.bd-sum__counts > div { display: grid; gap: 2px; min-width: 0; }
+.bd-sum__counts > div {
+  display: grid;
+  grid-row: span 2;
+  grid-template-rows: subgrid;
+  row-gap: var(--ds-space-1);
+  min-width: 0;
+}
+.bd-sum__counts dt { align-self: end; }
 .bd-sum__counts dd { font-size: var(--ds-text-2xl); line-height: var(--ds-leading-tight); }
 
 .bd-sum__rate { display: grid; gap: var(--ds-space-2); }
@@ -354,8 +383,6 @@
   align-items: baseline;
   justify-content: space-between;
   gap: var(--ds-space-3);
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
 }
 .bd-sum__rate-head .bd-fig { font-size: var(--ds-text-xl); }
 .bd-sum .bd-bar { background: var(--ds-surface); }

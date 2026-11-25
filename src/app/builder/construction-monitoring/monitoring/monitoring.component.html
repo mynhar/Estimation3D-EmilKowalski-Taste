@@ -35,13 +35,15 @@
         <mat-icon>arrow_back</mat-icon>
         {{ 'construction_monitoring.title' | translate }}
       </a>
-      <app-page-header [titulo]="servicioNombre(c)">
+      <!-- El número de dossier, como etiqueta sobre el título. Archivado, el servicio
+           devuelve «—» en su lugar: entonces no hay etiqueta. -->
+      <app-page-header [etiqueta]="c.expediente_numero !== '—' ? c.expediente_numero : null"
+                       [titulo]="servicioNombre(c)">
         @if (puedeArchivar()) {
           <app-boton-archivar actions [control]="archivo" />
         }
       </app-page-header>
       <div class="mon-meta">
-        <span class="mon-fig">{{ c.expediente_numero }}</span>
         <app-status-chip [estado]="c.estado" prefijo="construction_monitoring.estado_" />
         @if (c.expediente_estado) {
           <app-status-chip [estado]="c.expediente_estado" prefijo="construction_monitoring.estado_" />
@@ -61,7 +63,7 @@
       </div>
     </header>
 
-    <!-- ── Avance, cifras y etapas del contrato (banda kraft) ────────────── -->
+    <!-- ── Avance, cifras y etapas del contrato (banda de lino oscuro) ───── -->
     <section class="mon-sum" aria-labelledby="mon-progress-title">
       <div class="mon-sum__progress">
         <div class="mon-sum__top">
@@ -152,7 +154,8 @@
       </p>
     }
     <!-- Obra al 100 % con el contrato aún abierto: se avisa a todos y el
-         administrador lo completa tras revisar (su siguiente etapa: tomate). -->
+         administrador lo completa tras revisar. Para él es la acción de la vista:
+         relleno espresso, y guardar el parte pasa a borde. -->
     @if (obraTerminada()) {
       <div class="mon-banner is-ok" role="status">
         <mat-icon aria-hidden="true">flag</mat-icon>
@@ -394,11 +397,12 @@
             </p>
           }
 
-          <!-- Guardar el parte es la siguiente etapa del constructor: tomate.
-               Si el administrador tiene que completar el contrato, ese manda. -->
+          <!-- Guardar el parte es la acción de la vista: relleno espresso. Si el
+               administrador tiene que completar el contrato, ese manda y guardar
+               pasa a borde: nunca dos rellenos a la vez. -->
           @if (puedeGuardar()) {
             <div class="mon-actions">
-              <button mat-flat-button type="button" class="mon-save"
+              <button [matButton]="esAdmin && obraTerminada() ? 'outlined' : 'filled'" type="button" class="mon-save"
                       (click)="guardarReporte()" [disabled]="guardando()">
                 @if (guardando()) {
                   <span class="mon-spinner is-light" aria-hidden="true"></span>

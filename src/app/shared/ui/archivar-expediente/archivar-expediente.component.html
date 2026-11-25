@@ -13,7 +13,7 @@
         <p class="ar__error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ error() }}</p>
       }
     </div>
-    <!-- Reversible: el «sí» es abeto, no tomate ni ladrillo. Foco inicial en «Cancelar». -->
+    <!-- Reversible: el «sí» es el relleno espresso, sin terracota. Foco inicial en «Cancelar». -->
     <div class="ar__actions">
       <button #botonNo mat-button type="button" [disabled]="archivando()" (click)="cancelar()">
         {{ 'common.cancel' | translate }}

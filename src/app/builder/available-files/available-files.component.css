@@ -1,12 +1,13 @@
-/* component: dossiers disponibles (Trait rouge)
+/* component: dossiers disponibles (Lin et bronze)
  * states: cargando · sin dossiers · filtros sin resultados · tarjetas · tabla (escritorio)
  *         tarjeta: puede ofertar · oferta enviada · completo (5/5) · invitado · nuevo · sin foto
  *         interactivos: default · hover (puntero fino) · focus-visible · active · disabled (completo)
- * contrast: títulos ink (13.6:1 sobre vélin) · lugar ink-secondary (9.6:1) · meta ink-muted (6.8:1)
- *           invitado warning-ink sobre warning-soft (5.8:1) · enviada success-ink sobre success-soft
- *           competencia: el nivel va en texto; los segmentos son solo gráfico
- *           tomate: solo «Faire une offre» de la primera tarjeta de la página en la que se puede ofertar
- * type: servicio 112 %; número, recuentos, fechas y n/5 al 75 % con tabular-nums
+ * contrast: títulos ink (15.5:1 sobre vélin) · lugar ink-secondary (7.8:1) · meta ink-muted (5.9:1)
+ *           invitado warning-ink sobre warning-soft (4.9:1) · enviada success-ink sobre success-soft (5.2:1)
+ *           competencia: el nivel va en texto; los segmentos en bronce son solo gráfico
+ *           sin relleno espresso: «Faire une offre» se repite en cada tarjeta y va de contorno
+ * type: servicio en Cormorant 600 a 22px; número, rótulos de filtro y cabeceras en etiqueta en
+ *       mayúsculas; recuentos, fechas y n/5 con tabular-nums
  */
 
 .af {
@@ -41,8 +42,11 @@
   min-width: 0;
 }
 .af-filter__label {
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
   color: var(--ds-ink-muted);
 }
 
@@ -87,7 +91,7 @@
   color: var(--ds-ink-muted);
 }
 .af-clear {
-  --mat-button-text-label-text-color: var(--ds-action);
+  --mat-button-text-label-text-color: var(--ds-action-ink);
   min-height: 44px;
 }
 
@@ -129,8 +133,9 @@
   background: var(--ds-band);
   box-shadow: inset 0 0 0 1px var(--ds-border);
 }
+/* Plazas ocupadas en bronce: marca, no actúa. */
 .af-comp__bar > span.is-on {
-  background: var(--ds-ink-secondary);
+  background: var(--ds-accent);
   box-shadow: none;
 }
 .af-comp__text {
@@ -173,7 +178,9 @@
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
-  transition: border-color var(--ds-duration-fast) var(--ds-ease-out);
+  box-shadow: var(--ds-shadow-xs);
+  transition: border-color var(--ds-duration-fast) var(--ds-ease-out),
+              box-shadow var(--ds-duration-fast) var(--ds-ease-out);
 }
 .af-card:has(.af-card__link:focus-visible) { box-shadow: var(--ds-focus-ring); }
 
@@ -200,7 +207,7 @@
 .af-card__nophoto { font-size: var(--ds-text-sm); color: var(--ds-ink-secondary); }
 
 @media (hover: hover) and (pointer: fine) {
-  .af-card:hover { border-color: var(--ds-border-strong); }
+  .af-card:hover { border-color: var(--ds-border-strong); box-shadow: var(--ds-shadow-md); }
   .af-card:hover .af-card__photo img { transform: scale(1.02); }
 }
 
@@ -216,8 +223,8 @@
 .af-card__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-bold);
+  font-size: var(--ds-text-xl);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
 }
 .af-card__link {
@@ -236,11 +243,19 @@
   inset: 0;
 }
 
+/* El número va como etiqueta sobre el título; en el HTML sigue al enlace (que es el título).
+   La marca (invitado, enviada, nueva) sube por encima de los dos. */
+.af-card__body > .af-tag { order: -2; margin-bottom: var(--ds-space-1); }
 .af-card__num {
-  margin: calc(var(--ds-space-1) * -1) 0 0;
-  font-size: var(--ds-text-sm);
-  font-variant-numeric: lining-nums tabular-nums;
+  order: -1;
+  margin: 0 0 calc(var(--ds-space-1) * -1);
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
   color: var(--ds-ink-muted);
+  font-variant-numeric: lining-nums tabular-nums;
   overflow-wrap: anywhere;
 }
 
@@ -259,7 +274,7 @@
   height: 18px;
   font-size: 18px;
   margin-top: 3px;
-  color: var(--ds-ink-muted);
+  color: var(--ds-accent);
 }
 .af-card__addr { display: block; font-size: var(--ds-text-sm); color: var(--ds-ink-muted); }
 
@@ -282,7 +297,7 @@
   font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink-muted);
 }
-.af-card__date mat-icon { width: 18px; height: 18px; font-size: 18px; }
+.af-card__date mat-icon { width: 18px; height: 18px; font-size: 18px; color: var(--ds-accent); }
 
 /* El botón queda por encima del enlace estirado. */
 .af-card__cta {
@@ -300,6 +315,7 @@
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-xs);
 }
 @media (min-width: 768px) {
   .af-table-wrap { display: block; }
@@ -312,15 +328,18 @@
 .af-table th {
   padding: var(--ds-space-3) var(--ds-space-4);
   border-bottom: 1px solid var(--ds-border);
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-semibold);
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
   color: var(--ds-ink-muted);
   text-align: left;
   white-space: nowrap;
 }
 .af-table td {
   padding: var(--ds-space-3) var(--ds-space-4);
-  border-top: 1px solid var(--ds-border);
+  border-top: 1px solid var(--ds-border-subtle);
   vertical-align: middle;
   color: var(--ds-ink-secondary);
 }
@@ -347,7 +366,9 @@
   border-radius: var(--ds-radius-sm);
   color: var(--ds-ink);
   font-family: var(--ds-font-display);
-  font-weight: var(--ds-weight-bold);
+  font-size: var(--ds-text-lg);
+  font-weight: var(--ds-weight-semibold);
+  font-variant-numeric: lining-nums;
   text-decoration: none;
 }
 .af-table__link:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
@@ -376,11 +397,16 @@
   padding-top: var(--ds-space-4);
   border-top: 1px solid var(--ds-border);
 }
+/* h2 por estructura; se pinta como etiqueta (el reboot lo pondría en Cormorant). */
 .af-legend__title {
   margin: 0;
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-semibold);
-  color: var(--ds-ink-secondary);
+  font-family: var(--ds-font-body);
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
 }
 .af-legend__list {
   display: flex;

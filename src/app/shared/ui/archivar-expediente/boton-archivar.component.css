@@ -1,7 +1,7 @@
-/* Botón Archivar / Desarchivar de la cabecera (Trait rouge)
+/* Botón Archivar / Desarchivar de la cabecera (Lin et bronze)
  * states: default · hover · focus-visible · active · disabled (mientras confirma o archiva)
  *         los da mat-stroked-button; aquí solo la altura táctil
- * contrast: texto abeto sobre crema 8.4:1
+ * contrast: texto espresso sobre lino 14.4:1
  * Mismo estilo para las dos acciones: ambas son reversibles.
  */
 :host { display: inline-flex; }

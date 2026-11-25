@@ -52,6 +52,8 @@
   font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
+  /* Los títulos llevan números de dossier y fechas: cifras de caja alta. */
+  font-variant-numeric: lining-nums;
   color: var(--ds-ink);
   text-align: left;
   overflow-wrap: anywhere;

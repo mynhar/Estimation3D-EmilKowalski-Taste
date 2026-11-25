@@ -1,13 +1,16 @@
-/* component: suivi de chantier, detalle (Trait rouge). Lo usan el constructor y el administrador.
+/* component: suivi de chantier, detalle (Lin et bronze). Lo usan el constructor y el administrador.
  * states: cargando · error · firmado · en curso · terminado · cancelado · archivado · obra al 100 %
  *         parte: nuevo · existente (elegido en el journal) · guardando · guardado · error · solo lectura
  *         archivos: sin parte (bloqueados) · subiendo · con fotos, vídeos o documentos
  *         agenda: cerrada · abierta · guardando · error; calendario oculto o visible; PDF cargando o visible
- * contrast: títulos ink (13.6:1 sobre vélin) · texto ink-secondary (9.6:1) · meta ink-muted (6.8:1)
+ * contrast: títulos ink (15.5:1 sobre vélin, 12.5 sobre la banda) · texto ink-secondary (7.8:1)
+ *           meta ink-muted (5.9:1) · rótulos de la banda ink-secondary (6.3:1 sobre lino oscuro)
  *           avisos success-ink / danger-ink sobre su fondo suave, siempre con icono y texto
- *           tomate: «Enregistrer le rapport du jour»; para el administrador con la obra al 100 %,
- *           «Compléter le contrat» (y entonces guardar va en abeto). Nunca los dos a la vez.
- * type: títulos 112 %; porcentajes, fechas, horas, importes y número al 75 % con tabular-nums
+ *           bronce (gráfico, 3:1 basta): barra de avance, etapas y fases hechas, iconos de dato
+ * relleno espresso: «Enregistrer le rapport du jour»; para el administrador con la obra al 100 %,
+ *           «Compléter le contrat» (y entonces guardar va con borde). Nunca los dos a la vez.
+ * type: títulos en Cormorant 600; número de dossier como etiqueta de la cabecera; rótulos de dato
+ *       en mayúsculas; porcentajes, fechas, horas e importes con lining-nums tabular-nums
  */
 
 .mon {
@@ -30,10 +33,12 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
+  font-variant-numeric: lining-nums;
   color: var(--ds-ink);
 }
+/* Grupo del formulario y subapartado (Photos, Vidéos…): Manrope también en los h3. */
 .mon-label {
   display: flex;
   flex-wrap: wrap;
@@ -41,6 +46,7 @@
   gap: var(--ds-space-2);
   margin: 0;
   padding: 0;
+  font-family: var(--ds-font-body);
   font-size: var(--ds-text-base);
   font-weight: var(--ds-weight-bold);
   color: var(--ds-ink);
@@ -80,6 +86,7 @@
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-xs);
 }
 @media (max-width: 575.98px) {
   .mon-card { padding: var(--ds-space-4); }
@@ -201,7 +208,7 @@
   gap: var(--ds-space-1);
   color: var(--ds-ink-secondary);
 }
-.mon-meta__item mat-icon { width: 18px; height: 18px; font-size: 18px; color: var(--ds-ink-muted); }
+.mon-meta__item mat-icon { width: 18px; height: 18px; font-size: 18px; color: var(--ds-accent); }
 
 /* ── Resumen: avance, cifras y etapas ───────────────────────────────────── */
 .mon-sum {
@@ -227,10 +234,15 @@
   justify-content: space-between;
   gap: var(--ds-space-1) var(--ds-space-4);
 }
+/* Rótulo de la banda: en mayúsculas y en Manrope (es un h2; el reboot pone Cormorant). */
 .mon-sum__label {
   margin: 0;
-  font-size: var(--ds-text-base);
-  font-weight: var(--ds-weight-semibold);
+  font-family: var(--ds-font-body);
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
   color: var(--ds-ink-secondary);
 }
 .mon-sum__pct {
@@ -250,11 +262,12 @@
   background: var(--ds-surface);
 }
 .mon-bar--thin { height: 6px; }
+/* El avance marca, no actúa: bronce. */
 .mon-bar__fill {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--ds-action);
+  background: var(--ds-accent);
   transition: width var(--ds-duration-slow) var(--ds-ease-out);
 }
 
@@ -274,19 +287,29 @@
   .mon-svc__row .mon-bar { grid-column: 1 / -1; grid-row: 2; }
 }
 
+/* Cifras: rótulo arriba y cifra abajo; con subgrid, un rótulo en dos líneas no las descuadra. */
 .mon-kpis {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
   gap: var(--ds-space-4);
   margin: 0;
 }
-.mon-kpis > div { display: flex; flex-direction: column-reverse; gap: 2px; min-width: 0; }
+.mon-kpis > div {
+  display: grid;
+  grid-row: span 2;
+  grid-template-rows: subgrid;
+  row-gap: var(--ds-space-1);
+  min-width: 0;
+}
 .mon-kpis dt {
-  font-size: var(--ds-text-sm);
+  align-self: end;
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
   color: var(--ds-ink-secondary);
 }
-/* Las claves llegan en minúscula («jours travaillés»): mayúscula inicial. */
-.mon-kpis dt::first-letter { text-transform: uppercase; }
 .mon-kpis dd {
   margin: 0;
   font-family: var(--ds-font-display);
@@ -295,9 +318,10 @@
   line-height: var(--ds-leading-tight);
   color: var(--ds-ink);
 }
-.mon-kpis dd.mon-kpis__date { font-size: var(--ds-text-lg); font-weight: var(--ds-weight-bold); }
+.mon-kpis dd.mon-kpis__date { font-size: var(--ds-text-xl); }
 
-/* Etapas: firmado → en curso → terminado. */
+/* Etapas: firmado → en curso → terminado. Como la stage-line: hechas en bronce,
+   la actual con un halo bronce suave. */
 .mon-steps {
   display: flex;
   gap: var(--ds-space-2);
@@ -316,7 +340,7 @@
   font-size: var(--ds-text-sm);
   font-weight: var(--ds-weight-medium);
 }
-/* Raya entre pasos: se rellena en abeto cuando el paso está hecho. */
+/* Raya entre pasos: en bronce cuando ya se llegó al siguiente (el paso está hecho y no es el actual). */
 .mon-step:not(:last-child)::after {
   content: '';
   flex: 1 1 auto;
@@ -325,7 +349,7 @@
   border-radius: var(--ds-radius-pill);
   background: var(--ds-border-strong);
 }
-.mon-step.is-done:not(:last-child)::after { background: var(--ds-action); }
+.mon-step.is-done:not(.is-current):not(:last-child)::after { background: var(--ds-accent); }
 .mon-step__dot {
   display: grid;
   flex-shrink: 0;
@@ -340,14 +364,12 @@
 .mon-step__label { white-space: nowrap; }
 .mon-step.is-done { color: var(--ds-ink); }
 .mon-step.is-done .mon-step__dot {
-  border-color: var(--ds-action);
-  background: var(--ds-action-faint);
-  color: var(--ds-action-ink);
+  border-color: var(--ds-accent);
+  background: var(--ds-accent);
+  color: var(--ds-ink-inverse);
 }
 .mon-step.is-current .mon-step__dot {
-  border-color: var(--ds-action);
-  background: var(--ds-action);
-  color: var(--ds-on-action);
+  box-shadow: 0 0 0 4px var(--ds-accent-soft);
 }
 .mon-step.is-current { font-weight: var(--ds-weight-bold); }
 .mon-step.is-cancelled .mon-step__label { text-decoration: line-through; }
@@ -493,7 +515,8 @@
   line-height: 1;
   color: var(--ds-ink);
 }
-/* La pista inactiva por defecto apenas se ve sobre vélin: kraft oscuro. */
+/* La pista inactiva por defecto apenas se ve sobre vélin: borde fuerte. La activa, espresso
+   (el tema): el control se mueve, no es una marca. */
 .mon-slider {
   --mat-slider-inactive-track-color: var(--ds-border-strong);
   --mat-slider-inactive-track-height: 6px;
@@ -513,7 +536,7 @@
 .mon-preview > div { display: flex; align-items: baseline; gap: var(--ds-space-2); }
 .mon-preview dd { margin: 0; font-weight: var(--ds-weight-bold); color: var(--ds-ink); }
 
-/* Fases: una secuencia real; la actual en abeto, las pasadas con marca. */
+/* Fases: una secuencia real. La elegida es una selección (espresso); las pasadas, marca bronce. */
 .mon-phases { display: grid; gap: var(--ds-space-1); margin: 0; padding: 0; list-style: none; }
 .mon-phase {
   display: flex;
@@ -546,9 +569,9 @@
 .mon-phase__dot mat-icon { width: 18px; height: 18px; font-size: 18px; }
 .mon-phase.is-done { color: var(--ds-ink); }
 .mon-phase.is-done .mon-phase__dot {
-  border-color: var(--ds-action);
-  background: var(--ds-action-faint);
-  color: var(--ds-action-ink);
+  border-color: var(--ds-accent);
+  background: var(--ds-accent);
+  color: var(--ds-ink-inverse);
 }
 .mon-phase.is-current {
   border-color: var(--ds-action);
@@ -645,7 +668,7 @@
   border-bottom: 1px solid var(--ds-border-subtle);
 }
 .mon-file:last-child { border-bottom: 0; }
-.mon-file__icon { flex-shrink: 0; margin-right: var(--ds-space-1); color: var(--ds-ink-muted); }
+.mon-file__icon { flex-shrink: 0; margin-right: var(--ds-space-1); color: var(--ds-accent); }
 .mon-file__name {
   flex: 1;
   min-width: 0;
@@ -696,11 +719,12 @@
 .mon-log__row { display: flex; align-items: baseline; gap: var(--ds-space-2); }
 .mon-log__row strong {
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-bold);
+  font-size: var(--ds-text-xl);
+  font-weight: var(--ds-weight-semibold);
   color: var(--ds-ink);
 }
-.mon-log__delta { font-size: var(--ds-text-sm); font-weight: var(--ds-weight-semibold); color: var(--ds-success-ink); }
+/* Lo que sumó ese día: avance, en bronce oscuro (texto pequeño). */
+.mon-log__delta { font-size: var(--ds-text-sm); font-weight: var(--ds-weight-semibold); color: var(--ds-accent-ink); }
 .mon-log__meta {
   display: flex;
   align-items: center;
@@ -708,7 +732,7 @@
   font-size: var(--ds-text-sm);
   color: var(--ds-ink-secondary);
 }
-.mon-log__meta mat-icon { flex-shrink: 0; width: 16px; height: 16px; font-size: 16px; color: var(--ds-ink-muted); }
+.mon-log__meta mat-icon { flex-shrink: 0; width: 16px; height: 16px; font-size: 16px; color: var(--ds-accent); }
 .mon-log__desc {
   display: -webkit-box;
   overflow: hidden;
@@ -805,7 +829,7 @@
   color: var(--ds-ink-secondary);
 }
 .mon-cal__day.is-empty { visibility: hidden; }
-/* Más que color: trabajado relleno y en negrita, inspección con anillo, hoy en abeto. */
+/* Más que color: trabajado relleno y en negrita, inspección con anillo, hoy en espresso. */
 .mon-cal__day.is-worked { background: var(--ds-action-faint); color: var(--ds-action-ink); font-weight: var(--ds-weight-bold); }
 .mon-cal__day.is-insp   { box-shadow: inset 0 0 0 2px var(--ds-ink-secondary); color: var(--ds-ink); font-weight: var(--ds-weight-bold); }
 .mon-cal__day.is-today  { background: var(--ds-action); color: var(--ds-on-action); font-weight: var(--ds-weight-bold); }
@@ -827,17 +851,29 @@
 .mon-cal__key.is-insp   { box-shadow: inset 0 0 0 2px var(--ds-ink-secondary); }
 
 /* ── Contrato y PDF ─────────────────────────────────────────────────────── */
+/* Rótulo arriba y valor abajo; con subgrid, un rótulo en dos líneas no descoloca al vecino. */
 .mon-facts {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 9rem), 1fr));
   gap: var(--ds-space-4) var(--ds-space-5);
   margin: 0;
 }
-.mon-facts > div { display: grid; gap: var(--ds-space-1); align-content: start; min-width: 0; }
+.mon-facts > div {
+  display: grid;
+  grid-row: span 2;
+  grid-template-rows: subgrid;
+  row-gap: var(--ds-space-1);
+  align-content: start;
+  min-width: 0;
+}
 .mon-facts > div.is-wide { grid-column: 1 / -1; }
 .mon-facts dt {
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
+  align-self: end;
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
   color: var(--ds-ink-muted);
 }
 .mon-facts dd {
@@ -849,7 +885,8 @@
 .mon-facts__price {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
+  line-height: var(--ds-leading-tight);
 }
 
 .mon-pdf-loading { display: flex; margin: 0; }

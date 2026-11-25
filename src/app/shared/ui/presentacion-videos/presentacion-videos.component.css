@@ -47,7 +47,7 @@
   gap: var(--ds-space-2);
 }
 .pv-btn { white-space: nowrap; }
-/* Icono de grabar en ladrillo: signo universal de grabación, no un error. */
+/* Icono de grabar en terracota: signo universal de grabación, no un error. */
 .pv-rec { color: var(--ds-danger); }
 
 /* ── Barra: búsqueda, orden y recuento ────────────────────────────────────── */
@@ -294,7 +294,7 @@
 }
 .pv-dialog__foot button { white-space: nowrap; }
 
-/* Eliminar es irreversible: relleno ladrillo, con icono y texto. */
+/* Eliminar es irreversible: relleno terracota (vélin encima 6.0:1), con icono y texto. */
 .pv-btn-danger {
   --mat-button-filled-container-color: var(--ds-danger);
   --mat-button-filled-label-text-color: var(--ds-surface);

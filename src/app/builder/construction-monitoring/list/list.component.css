@@ -1,5 +1,17 @@
-/* component: suivi de chantier, lista del constructor (Trait rouge)
- * Todo el aspecto viene de shared/construction-monitoring/obras-lista.css.
+/* component: suivi de chantier, lista del constructor (Lin et bronze)
+ * El aspecto viene de shared/construction-monitoring/obras-lista.css. Aquí solo cuándo cabe la
+ * tabla: ocho columnas piden unos 1100px de contenido. Se mide el hueco del componente (no la
+ * ventana), así cuenta también la barra lateral plegada; si no cabe, tarjetas y sin conmutador.
  */
 
-:host { display: block; }
+:host {
+  display: block;
+  container: obras / inline-size;
+}
+
+/* 1104px de tabla + 2 × 32px del .page-wrapper. */
+@container obras (max-width: 1167.98px) {
+  .cml-table-wrap,
+  .cml-view { display: none; }
+  .cml-grid.is-mobile-only { display: grid; }
+}

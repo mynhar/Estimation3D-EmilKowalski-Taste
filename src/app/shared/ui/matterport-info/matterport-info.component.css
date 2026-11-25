@@ -31,8 +31,9 @@
   gap: var(--ds-space-2);
   min-width: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-lg);
+  font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-semibold);
+  font-variant-numeric: lining-nums;
   color: var(--ds-ink);
 }
 .mpi-card__title mat-icon { flex-shrink: 0; color: var(--ds-accent); }

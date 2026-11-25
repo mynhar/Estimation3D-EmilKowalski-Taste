@@ -224,7 +224,7 @@
 }
 .rec-limit mat-icon { width: 18px; height: 18px; font-size: 18px; }
 
-/* Descartar la grabación es irreversible: relleno ladrillo, con icono y texto. */
+/* Descartar la grabación es irreversible: relleno terracota (vélin encima 6.0:1), con icono y texto. */
 .rec-btn-danger {
   --mat-button-filled-container-color: var(--ds-danger);
   --mat-button-filled-label-text-color: var(--ds-surface);

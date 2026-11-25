@@ -1,10 +1,10 @@
-/* Administración: seguimiento de obras (Trait rouge)
+/* Administración: seguimiento de obras (Lin et bronze)
  * Base en shared/construction-monitoring/obras-lista.css (la misma lista que ve el estimador);
  * aquí solo lo propio de la administración: la columna del constructor con sus datos de contacto
  * y una tabla más compacta.
  * states: cargando · error · sin obras · filtros sin resultados · tarjetas · tabla
  *         tarjeta cancelada o archivada atenuada (.is-out) · miniatura caída (marcador)
- * tomate: ninguno. La obra se consulta, no hay siguiente etapa desde la lista.
+ * Sin relleno espresso: la obra se consulta, no hay siguiente etapa desde la lista.
  */
 :host { display: block; }
 

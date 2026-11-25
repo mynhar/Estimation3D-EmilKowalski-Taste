@@ -503,7 +503,7 @@ Antes de cerrar un componente, verifica que:
 
 ### Armazón de la app (`app.component.*`)
 
-- Barra superior `.tb` fija en todos los anchos: `--ds-surface-overlay` + `backdrop-filter: blur(14px) saturate(1.1)`, filete `--ds-border-subtle`, alto `--tb-h` (64px; 56px en móvil). Marca (`app-brand-mark` + «Estimation3D» + espacio del rol en mayúsculas, `nav.espace_<rol>`; el espacio se oculta por debajo de 360px), idiomas (`app-lang-toggle` en escritorio, `mat-menu` en móvil) y la cuenta: un botón con nombre, rol y avatar que abre un `mat-menu` (perfil y salir).
+- Barra superior `.tb` fija en todos los anchos: `--ds-surface-overlay` + `backdrop-filter: blur(14px) saturate(1.1)`, filete `--ds-border-subtle`, alto `--tb-h` (64px; 56px en móvil). Marca (`app-brand-mark` + «Estimation3D» + espacio del rol en mayúsculas, `nav.espace_<rol>`; el espacio se oculta por debajo de 360px; en los roles internos, por debajo de 430px el disco se oculta y el tracking del espacio baja a 0.1em: la hamburguesa ocupa la izquierda y el disco sigue en la cabecera del cajón), idiomas (`app-lang-toggle` en escritorio, `mat-menu` en móvil) y la cuenta: un botón con nombre, rol y avatar que abre un `mat-menu` (perfil y salir).
 - Barra lateral `.sb` en `--ds-bg-alt` bajo la barra superior: títulos de grupo en mayúsculas; entrada de 40px, 14px, peso 500, `--ds-ink-secondary`; la activa en tarjeta vélin (`--ds-shadow-xs` + filete interior `--ds-border-subtle`), peso 700, icono en bronce y una barra bronce de 2px a la izquierda (`::before`). Plegable (`--sb-w` 248px / 76px).
 - Móvil (< 992px): cajón lateral para los roles internos; el cliente tiene `.tabs` abajo (crema translúcida con desenfoque; la elegida con el icono en una píldora `--ds-action-faint` / `--ds-action-ink`) y la hoja «Plus» (`mat-bottom-sheet`). Cada `NavItem` de las pestañas puede llevar `corta` (`nav.tab_*`): cuatro pestañas tienen que caber a 375px en los tres idiomas.
 - Un contenido fijo arriba bajo la barra (p. ej. una columna `sticky`) usa `top: calc(var(--tb-h) + …)`.
@@ -530,7 +530,7 @@ Antes de cerrar un componente, verifica que:
   .x-fact  { display: grid; grid-row: span 2; grid-template-rows: subgrid; row-gap: var(--ds-space-1); align-content: start; min-width: 0; }
   .x-fact dt { align-self: end; /* + etiqueta en mayúsculas */ }
   ```
-  Con rótulos largos en mayúsculas, columnas de 11rem como mínimo (a menos parten en tres líneas).
+  Con rótulos largos en mayúsculas, columnas de 11rem como mínimo (a menos parten en tres líneas). El `row-gap` del subgrid (4px) manda dentro del par y el del padre separa los pares: con varias filas de datos no hace falta margen. Sobre una banda `--ds-band`, rótulos en `--ds-ink-secondary` (6.3:1).
 - **Resumen de una lista** (contratos, obras): la tarjeta de cifras del dashboard (ver «Cabecera de pantalla y cifras»), 2 columnas en móvil y 4 desde 768px, celdas con `--ds-space-4` (5 desde 768px) y la cifra a `clamp(var(--ds-text-2xl), 1.5rem + 1.2vw, 2.5rem)`.
 - **Tablas**: `th` con la etiqueta en mayúsculas; filas separadas por `--ds-border-subtle`; el enlace de la fila a `--ds-text-lg`.
 - **Avance y pasos**: barra con pista `--ds-band` y relleno `--ds-accent`; paso hecho con punto bronce e icono crema (`--ds-ink-inverse`); el actual con halo `--ds-accent-soft`. Una oferta que espera respuesta lleva un filete superior bronce de 3px.
@@ -561,7 +561,11 @@ Antes de cerrar un componente, verifica que:
 - Tarjeta enlazada: el título es el único enlace y su `::after` (`position: absolute; inset: 0`) hace pulsable toda la tarjeta; el anillo de foco va en la tarjeta con `:has(a:focus-visible)`. Otros botones dentro de la tarjeta, con `position: relative; z-index: 1`.
 - Foto en una caja con `aspect-ratio`: la imagen `position: absolute; inset: 0; object-fit: cover`. Si la imagen va en el flujo, estira la caja y rompe el ratio.
 - Sin datos tras filtrar: un `app-empty-state` con «Effacer les filtres», distinto del vacío real.
-- Dato oculto o archivado: los servicios devuelven `'—'`; la plantilla lo filtra (`hay(valor)`) y no pinta la fila.
+- Dato oculto o archivado: los servicios devuelven `'—'`; la plantilla lo filtra (`hay(valor)`) y no pinta la fila. Lo mismo con la etiqueta de la cabecera: sin número, `null`.
+- **Acción repetida** en cada tarjeta o fila («Faire une offre»): `mat-stroked-button`. El relleno espresso queda para la acción única de la vista.
+- **Dos acciones que compiten por el relleno** (guardar el parte y, para el admin con la obra al 100 %, completar el contrato): la que no manda pasa a borde con `[matButton]="cond ? 'outlined' : 'filled'"` en lugar de `mat-flat-button`. Nunca dos rellenos a la vez.
+- **Tabla ancha del contratista** (obras, 8 columnas, unos 1100px): `:host { container: obras / inline-size; }` y `@container obras (max-width: …)` oculta la tabla y el conmutador y muestra las tarjetas. Se mide el hueco, no la ventana: cuenta la barra lateral plegada o desplegada.
+- **Pantallas de detalle** (hacer una oferta, mi oferta, seguimiento): `app-page-header [etiqueta]="numero"`; subapartados `h3` en Manrope 700 a 16px (como los grupos del formulario); iconos de archivo y de dato en `--ds-accent`; en el seguimiento, KPI con el rótulo arriba (subgrid), etapas como la stage-line (hechas en bronce, la actual con halo, la raya en bronce solo pasada la actual) y fases hechas en bronce; la fase elegida es una selección (espresso).
 
 ### Pantallas del estimador y del admin
 
