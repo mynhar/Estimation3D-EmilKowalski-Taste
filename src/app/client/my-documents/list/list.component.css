@@ -16,7 +16,6 @@
      del filtro y la página perdería el margen derecho en móvil. */
   grid-template-columns: minmax(0, 1fr);
   gap: var(--ds-space-5);
-  max-width: 1320px;
   min-width: 0;
 }
 

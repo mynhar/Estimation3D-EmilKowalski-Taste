@@ -40,6 +40,8 @@
     align-items: center;
     gap: var(--ds-space-9);
   }
+  /* A todo el ancho, la ficha va al margen derecho: bordes iguales a los dos lados. */
+  .en-hero__in > .doc { justify-self: end; }
 }
 
 .en-hero__copy { display: grid; justify-items: start; }

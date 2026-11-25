@@ -19,7 +19,6 @@
 .fi {
   display: grid;
   gap: var(--ds-space-5);
-  max-width: 1320px;
   min-width: 0;
 }
 

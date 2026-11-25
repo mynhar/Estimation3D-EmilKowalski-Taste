@@ -8,11 +8,9 @@
  *           un solo .button relleno principal a la vista; los demás, .button--outline
  */
 
-/* Contenedor: márgenes de 16 / 24 / 40 px. */
+/* Contenedor: todo el ancho de la ventana, con márgenes de 16 / 24 / 40 px. */
 .wrap {
   width: 100%;
-  max-width: 1280px;
-  margin-inline: auto;
   padding-inline: var(--ds-space-4);
 }
 @media (min-width: 768px) { .wrap { padding-inline: var(--ds-space-5); } }

@@ -14,7 +14,6 @@
 .fc {
   display: grid;
   gap: var(--ds-space-5);
-  max-width: 1320px;
   min-width: 0;
 }
 
@@ -442,7 +441,7 @@ mat-error mat-icon {
  * «Annuler» de texto y guardar en espresso relleno: crear o editar una persona no es una etapa.
  * contrast: foto vacía ink-muted sobre band (5.4:1) · aviso de confirmación warning-ink (5.8:1)
  */
-.fc--narrow { max-width: 60rem; }
+/* .fc--narrow: sin tope de ancho; la pantalla usa todo el hueco (las rejillas de campos ganan columnas). */
 .fc-canvas > .fc-card > .fc-h2:first-child { margin-bottom: calc(var(--ds-space-1) * -1); }
 
 .fc-subhead {

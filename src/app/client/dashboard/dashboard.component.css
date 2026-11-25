@@ -12,7 +12,6 @@
 .dash {
   display: grid;
   gap: var(--ds-space-5);
-  max-width: 1320px;
   min-width: 0;
 }
 @media (min-width: 768px) {
@@ -177,11 +176,12 @@
 }
 
 /* ── Selector de expedientes ────────────────────────────────────────────── */
-/* Fila con desplazamiento propio: no ensancha la página. */
+/* Fila con desplazamiento propio: no ensancha la página. Con pocos dossiers las tarjetas se
+   reparten el ancho (1fr); cuando no caben a 15rem, se desplaza. */
 .dash-switch {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: minmax(15rem, 18rem);
+  grid-auto-columns: minmax(15rem, 1fr);
   gap: var(--ds-space-3);
   margin-inline: calc(var(--ds-space-4) * -1);
   padding: 2px var(--ds-space-4) var(--ds-space-2);

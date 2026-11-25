@@ -202,6 +202,12 @@ La composición de cada pantalla se rehace en las fases 1–4; estos patrones t�
   a 375px en los tres idiomas. Los roles internos tienen cajón lateral.
 - Objetivos táctiles ≥ 44px, `safe-area-inset-*`, enlace «Aller au contenu».
 - `.page-wrapper`: 16px de margen lateral en móvil, 24px desde 768px, 32px desde 1200px.
+- Toda la aplicación usa el ancho de la ventana: sin `max-width` en el contenedor raíz de las
+  pantallas (antes 1320px) ni en el `.wrap` de las páginas públicas (antes 1280px). Las rejillas
+  ganan columnas con `auto-fill` y el selector de dossiers del cliente reparte el ancho entre sus
+  tarjetas (`minmax(15rem, 1fr)`); las especialidades públicas (`.svc`) van seis en una fila desde
+  1600px para que la sección quepa en una pantalla. Solo se limita lo que se lee (texto en `ch`,
+  estados vacíos a 44rem, formulario del login a 28rem).
 
 ## Dashboard del cliente (fase 1, hecho)
 - Cabecera: etiqueta «Tableau de bord», «Bonjour, *Marie*» (nombre de pila en cursiva bronce)

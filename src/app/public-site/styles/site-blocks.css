@@ -91,6 +91,11 @@
 @media (min-width: 1024px) {
   .svc { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ds-space-5); }
 }
+/* Página a todo el ancho: en pantallas grandes, las seis en una fila; a tres por fila, las
+   fotos crecerían tanto que la sección pasaría de una pantalla. */
+@media (min-width: 1600px) {
+  .svc { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}
 
 /* ── Formulario ─────────────────────────────────────────────────────────── */
 .fm {

@@ -474,7 +474,7 @@ Antes de cerrar un componente, verifica que:
 
 - Cada pantalla define sus secciones en su CSS; en la app, dentro de `.page-wrapper`. En las páginas públicas, `.sec` de `site-base.css` (`--band` para lino oscuro, `--dark` para la isla espresso).
 - Alterna la banda de lino oscuro con el lino para dar ritmo.
-- Limita el ancho con los tokens `--ds-container-*`.
+- **Todo el ancho de la ventana, en la app y en las páginas públicas.** El contenedor raíz de cada pantalla de la app (`.ls`, `.fi`, `.fc`, `.ed`, `.dash`…) y el `.wrap` de las páginas públicas (`site-base.css`) no llevan `max-width`: llegan hasta su margen lateral (`.page-wrapper` en la app; 16 / 24 / 40px en las públicas). Con más ancho, las rejillas ganan columnas (`repeat(auto-fill, minmax(…))`) o reparten el hueco (`minmax(15rem, 1fr)` en el selector de dossiers del cliente) en vez de dejarlo vacío. Las especialidades de las páginas públicas (`.svc`, `site-blocks.css`) pasan a seis en una fila desde 1600px para que la sección siga cabiendo en una pantalla, y la ficha del hero de Entrepreneurs se alinea al margen derecho. Solo se limita lo que se lee: párrafos y títulos en `ch`, estados vacíos y avisos a 44rem, buscador a 28rem, formulario del login a 28rem.
 
 ### Hero
 
