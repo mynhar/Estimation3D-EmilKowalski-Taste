@@ -1,10 +1,21 @@
-/* Administración: dossiers por estimar (Trait rouge)
+/* Administración: dossiers por estimar (Lin et bronze)
  * Base en shared/ui/lista/lista.css; aquí solo lo propio.
  * Filtrado en el cliente: la barra aparece cuando la lista ya está cargada.
- * states: cargando · error · sin dossiers · filtros sin resultados · tarjetas · tabla
- * tomate: ninguno. La acción de cada fila («Modifier l'estimation») va como icono abeto.
+ * states: cargando · error · sin dossiers · filtros sin resultados · tarjetas · tabla (si cabe)
+ * sin relleno espresso: la acción de cada fila («Modifier l'estimation») va como icono.
  */
-:host { display: block; }
+:host {
+  display: block;
+  container: por-estimar / inline-size;
+}
+
+/* Ocho columnas, unos 1076px de tabla + 2px de borde + 2 × 32px del .page-wrapper: se mide el hueco del componente (no la ventana), así cuenta también la barra lateral
+   plegada; si no cabe, tarjetas y sin conmutador. */
+@container por-estimar (max-width: 1149.98px) {
+  .ls-table-wrap,
+  .ls-view { display: none; }
+  .ls-grid.is-mobile-only { display: grid; }
+}
 
 .ate-real {
   display: inline-flex;

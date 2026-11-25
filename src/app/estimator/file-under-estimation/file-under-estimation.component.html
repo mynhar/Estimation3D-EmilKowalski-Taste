@@ -32,9 +32,9 @@
         <mat-icon>arrow_back</mat-icon>
         {{ 'common.back' | translate }}
       </button>
-      <app-page-header [titulo]="servicioNombre" />
+      <!-- El número de dossier, como etiqueta sobre el título («—» si el servicio no lo da). -->
+      <app-page-header [etiqueta]="d.numero !== '—' ? d.numero : null" [titulo]="servicioNombre" />
       <div class="fi-meta">
-        <span class="fi-fig">{{ d.numero }}</span>
         <span class="fi-meta__item">
           <mat-icon aria-hidden="true">person</mat-icon>{{ d.cliente_nombre }}
         </span>
@@ -554,7 +554,9 @@
                 <mat-icon>groups</mat-icon>
                 {{ 'admin_invite.all_builders_btn' | translate }}
               </button>
-              <button mat-flat-button type="button" (click)="enviarInvitacionYEstimacion()"
+              <!-- Camino alternativo (invitar a constructores concretos): con borde. El relleno es
+                   «Envoyer l'estimation», la acción de la vista. -->
+              <button mat-stroked-button type="button" (click)="enviarInvitacionYEstimacion()"
                       [disabled]="bloqueadoPorOferta || enviandoInvitacion() || guardando() || abriendoATodos()
                                   || confirmarAbrirATodos() || seleccionInvitados().size === 0">
                 @if (enviandoInvitacion() || guardando()) {

@@ -1,8 +1,19 @@
-/* component: dossiers à estimer (Trait rouge)
+/* component: dossiers à estimer (Lin et bronze)
  * Base en shared/ui/lista/lista.css; aquí solo lo propio.
  * states: cargando · sin dossiers · filtros sin resultados · tarjetas · tabla (escritorio)
- *         urgencia de la visita: vencida (ladrillo) · hoy (ámbar) · próxima (info), con icono y texto
- * tomate: «Prendre en estimation» del primer dossier de la lista; los demás, abeto relleno.
+ *         urgencia de la visita: vencida (terracota) · hoy (ámbar) · próxima (info), con icono y texto
+ * «Prendre en estimation» se repite en cada tarjeta y fila: con borde, sin relleno.
  *         Tomar un dossier lo asigna al estimador: solo lo hace el botón, nunca la tarjeta ni la fila.
  */
-:host { display: block; }
+:host {
+  display: block;
+  container: por-estimar / inline-size;
+}
+
+/* Cinco columnas, unos 880px de tabla + 2px de borde + 2 × 32px del .page-wrapper: se mide el hueco del componente (no la ventana), así cuenta también la barra
+   lateral plegada; si no cabe, tarjetas y sin conmutador. */
+@container por-estimar (max-width: 959.98px) {
+  .ls-table-wrap,
+  .ls-view { display: none; }
+  .ls-grid.is-mobile-only { display: grid; }
+}

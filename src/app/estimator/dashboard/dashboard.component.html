@@ -1,10 +1,12 @@
 ﻿<div class="page-wrapper ed">
 
   <app-page-header
-    [titulo]="bienvenida ? ('dashboard_client.welcome' | translate) + ', ' + bienvenida : ('dashboard_estimator.title' | translate)"
+    [etiqueta]="bienvenida ? ('dashboard_estimator.title' | translate) : null"
+    [titulo]="bienvenida ? ('dashboard_client.welcome' | translate) + ', ' : ('dashboard_estimator.title' | translate)"
+    [enfasis]="bienvenida || null"
     [contexto]="'dashboard_estimator.subtitle' | translate">
-    <!-- Sin estimación en curso, la siguiente etapa es tomar un dossier: tomate.
-         Con estimaciones en curso, el tomate es «Continuer» de la primera. -->
+    <!-- Sin estimación en curso, la acción de la vista es tomar un dossier: relleno
+         espresso. Con estimaciones en curso, el relleno es «Continuer» de la primera. -->
     @if (!cargando() && disponibles() > 0) {
       @if (activos().length === 0) {
         <a actions mat-flat-button class="ed-cta" routerLink="/estimator/files-to-be-estimated">
@@ -106,6 +108,7 @@
                   }
                 </p>
 
+                <!-- Solo la primera va rellena; las demás, con borde. -->
                 <div class="ed-work__foot">
                   @if (exp.id === primeraActiva()) {
                     <a mat-flat-button [routerLink]="['/estimator/file-under-estimation', exp.id]">
@@ -113,7 +116,7 @@
                       {{ 'common.continue' | translate }}
                     </a>
                   } @else {
-                    <a mat-flat-button [routerLink]="['/estimator/file-under-estimation', exp.id]">
+                    <a mat-stroked-button [routerLink]="['/estimator/file-under-estimation', exp.id]">
                       <mat-icon>edit_note</mat-icon>
                       {{ 'common.continue' | translate }}
                     </a>
@@ -298,13 +301,14 @@
           @for (o of obras(); track o.expedienteId) {
             <li>
               <a class="ed-obra" [routerLink]="['/estimator/estimated-file', o.expedienteId]">
+                <!-- El número, como etiqueta sobre el servicio; el cliente, debajo. -->
+                <span class="ed-obra__num">{{ o.numero }}</span>
                 <span class="ed-obra__top">
                   <span class="ed-obra__service">{{ servicioObra(o) }}</span>
                   <app-status-chip [estado]="o.estado" prefijo="seguimiento_estado." />
                 </span>
-                <span class="ed-obra__num">
-                  <span class="ed-fig">{{ o.numero }}</span>
-                  <span>{{ o.clienteNombre }}</span>
+                <span class="ed-obra__client">
+                  <mat-icon aria-hidden="true">person</mat-icon>{{ o.clienteNombre }}
                 </span>
                 <span class="ed-obra__avance">
                   <span class="ed-obra__pct">{{ o.avance }} %</span>

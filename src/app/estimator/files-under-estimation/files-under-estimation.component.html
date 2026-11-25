@@ -240,9 +240,10 @@
   }
 </ng-template>
 
-<!-- Continuar (tomate en el primero) y liberar en dos pasos: el segundo clic confirma. -->
+<!-- Continuar (acción repetida en cada tarjeta y fila: con borde) y liberar en dos
+     pasos: el segundo clic confirma. -->
 <ng-template #acciones let-exp let-ref="ref" let-icono="icono">
-  <button mat-flat-button type="button" class="fue-continue"
+  <button mat-stroked-button type="button" class="fue-continue"
           [attr.aria-describedby]="ref" (click)="estimar(exp.id)">
     @if (icono) { <mat-icon>edit_note</mat-icon> }
     {{ 'files_under_estimation.continue_btn' | translate }}

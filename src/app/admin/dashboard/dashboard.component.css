@@ -1,12 +1,13 @@
-/* component: tablero del administrador (Trait rouge)
+/* component: tablero del administrador (Lin et bronze)
  * Base compartida: shared/ui/lista/lista.css (ls-toggle, ls-view, ls-filter, ls-tag, ls-error, skel).
  * states: cargando · error · resumen + paneles · obras (si hay) · actividad cargando / vacía /
  *         lista / tarjetas; interactivos: default · hover (puntero fino) · focus-visible · active
- * contrast: títulos ink (11.8:1) · texto ink-secondary (8.7:1) · secundarios ink-muted (6.1:1)
- *           resumen sobre kraft: ink-secondary 7.7:1 · enlaces action (8.4:1)
- *           barras: abeto sobre kraft; anuladas/rechazadas en ink-muted (no son errores)
- * tomate: ninguno. El tablero resume; cada etapa se decide en su lista.
- * type: títulos 112 %; importes, recuentos, porcentajes, fechas y números de dossier 75 % tabular
+ * contrast: títulos ink (15.5:1 sobre vélin) · texto ink-secondary (7.8:1) · secundarios ink-muted (5.9:1)
+ *           resumen sobre banda: texto y rótulos ink-secondary 6.3:1 · enlaces action-ink (5.4:1)
+ *           barras en bronce sobre lino oscuro; anuladas/rechazadas en ink-muted (no son errores)
+ * sin relleno espresso: el tablero resume; cada etapa se decide en su lista.
+ * type: títulos y cifras en Cormorant 600 con lining-nums tabular-nums; rótulos del resumen y de
+ *       los KPI en etiqueta en mayúsculas
  */
 
 .ad {
@@ -34,7 +35,7 @@
   font-size: var(--ds-text-sm);
   color: var(--ds-ink-muted);
 }
-.ad-refresh__ts mat-icon { width: 18px; height: 18px; font-size: 18px; }
+.ad-refresh__ts mat-icon { width: 18px; height: 18px; font-size: 18px; color: var(--ds-accent); }
 
 .ad-error { display: grid; justify-items: start; gap: var(--ds-space-3); max-width: 44rem; }
 
@@ -44,7 +45,8 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
+  font-variant-numeric: lining-nums tabular-nums;
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
 }
@@ -55,7 +57,7 @@ ul.ad-tiles,
 ul.ad-evs,
 ul.ad-cards { margin: 0; padding: 0; list-style: none; }
 
-/* ── Resumen sobre banda kraft ──────────────────────────────────────────── */
+/* ── Resumen sobre banda de lino oscuro ─────────────────────────────────── */
 .ad-sum {
   display: grid;
   gap: var(--ds-space-5);
@@ -73,8 +75,16 @@ ul.ad-cards { margin: 0; padding: 0; list-style: none; }
 }
 .ad-sum dl,
 .ad-sum dd { margin: 0; }
-.ad-sum dt { font-size: var(--ds-text-sm); font-weight: var(--ds-weight-medium); }
-.ad-sum__lead { display: grid; gap: 2px; }
+/* Rótulos en etiqueta; sobre la banda, ink-secondary (6.3:1). */
+.ad-sum dt {
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
+  color: var(--ds-ink-secondary);
+}
+.ad-sum__lead { display: grid; gap: var(--ds-space-1); }
 .ad-sum__amount {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-3xl);
@@ -89,26 +99,55 @@ ul.ad-cards { margin: 0; padding: 0; list-style: none; }
 .ad-sum__counts {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--ds-space-3);
+  gap: var(--ds-space-4) var(--ds-space-3);
   padding-top: var(--ds-space-4);
   border-top: 1px solid var(--ds-border-strong);
 }
 @media (min-width: 900px) {
   .ad-sum__counts { padding: 0 0 0 var(--ds-space-6); border-top: 0; border-left: 1px solid var(--ds-border-strong); }
 }
-.ad-sum__counts > div { display: grid; gap: 2px; min-width: 0; }
+/* Rótulo y cifra en subgrid: las cifras se alinean aunque un rótulo parta en dos líneas.
+   El rótulo es el enlace; su ::after cubre también la cifra (más superficie de toque). */
+.ad-sum__counts > div {
+  position: relative;
+  display: grid;
+  grid-row: span 2;
+  grid-template-rows: subgrid;
+  row-gap: var(--ds-space-1);
+  min-width: 0;
+}
+.ad-sum__counts dt { align-self: end; }
+/* En móvil tres rótulos en mayúsculas no caben en fila: cada recuento es una línea,
+   rótulo a la izquierda y cifra a la derecha. */
+@media (max-width: 599.98px) {
+  .ad-sum__counts { grid-template-columns: minmax(0, 1fr); gap: var(--ds-space-2); }
+  .ad-sum__counts > div {
+    grid-row: auto;
+    grid-template-rows: none;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    column-gap: var(--ds-space-3);
+  }
+  .ad-sum__counts dt { align-self: baseline; }
+}
 .ad-sum__counts a {
-  color: var(--ds-action);
+  color: var(--ds-action-ink);
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
   border-radius: var(--ds-radius-sm);
+  transition: var(--ds-transition-color);
 }
-.ad-sum__counts a:focus-visible { outline: var(--ds-focus-outline); outline-offset: 2px; }
+.ad-sum__counts a::after { content: ''; position: absolute; inset: calc(var(--ds-space-1) * -1); border-radius: var(--ds-radius-sm); }
+.ad-sum__counts a:focus-visible { outline: none; }
+.ad-sum__counts a:focus-visible::after { outline: var(--ds-focus-outline); outline-offset: 2px; }
+@media (hover: hover) and (pointer: fine) {
+  .ad-sum__counts a:hover { color: var(--ds-ink); }
+}
 .ad-sum__counts dd {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-2xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-tight);
   color: var(--ds-ink);
 }
@@ -131,6 +170,7 @@ ul.ad-cards { margin: 0; padding: 0; list-style: none; }
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-xs);
 }
 
 /* Barras: etiqueta y recuento en una línea, la barra debajo. El recuento ya está
@@ -157,13 +197,17 @@ ul.ad-cards { margin: 0; padding: 0; list-style: none; }
 
 .ad-bar-row.is-link .ad-bar-row__label {
   justify-self: start;
-  color: var(--ds-action);
+  color: var(--ds-action-ink);
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
   border-radius: var(--ds-radius-sm);
+  transition: var(--ds-transition-color);
 }
 .ad-bar-row.is-link .ad-bar-row__label:focus-visible { outline: var(--ds-focus-outline); outline-offset: 2px; }
+@media (hover: hover) and (pointer: fine) {
+  .ad-bar-row.is-link .ad-bar-row__label:hover { color: var(--ds-ink); }
+}
 
 .ad-bar {
   display: block;
@@ -176,7 +220,7 @@ ul.ad-cards { margin: 0; padding: 0; list-style: none; }
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--ds-action);
+  background: var(--ds-accent);
 }
 
 /* Coste medio: pie del panel de estimaciones. */
@@ -190,8 +234,22 @@ ul.ad-cards { margin: 0; padding: 0; list-style: none; }
   padding-top: var(--ds-space-4);
   border-top: 1px solid var(--ds-border);
 }
-.ad-note dt { font-size: var(--ds-text-sm); font-weight: var(--ds-weight-medium); color: var(--ds-ink-secondary); }
-.ad-note dd { margin: 0; font-weight: var(--ds-weight-semibold); color: var(--ds-ink); }
+.ad-note dt {
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+.ad-note dd {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-xl);
+  font-weight: var(--ds-weight-semibold);
+  line-height: var(--ds-leading-snug);
+  color: var(--ds-ink);
+}
 
 /* Cifras que abren una lista filtrada. */
 .ad-tiles {
@@ -221,17 +279,26 @@ ul.ad-cards { margin: 0; padding: 0; list-style: none; }
 .ad-tile__n {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-2xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-tight);
 }
 .ad-tile__l {
   font-size: var(--ds-text-sm);
   font-weight: var(--ds-weight-medium);
   line-height: var(--ds-leading-snug);
-  color: var(--ds-action);
-  /* Manrope es más ancha: en la teja de 95 px «Entrepreneurs» no cabe; se parte con guion. */
-  hyphens: auto;
+  color: var(--ds-action-ink);
   overflow-wrap: anywhere;
+}
+/* En móvil la teja de un tercio (95 px) parte «Entrepreneurs» a media palabra: las tejas
+   pasan a filas, cifra y rótulo en la misma línea. */
+@media (max-width: 599.98px) {
+  .ad-tiles { grid-template-columns: minmax(0, 1fr); gap: var(--ds-space-2); }
+  .ad-tile {
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+    align-items: baseline;
+    column-gap: var(--ds-space-3);
+    padding: var(--ds-space-2) var(--ds-space-4);
+  }
 }
 
 /* ── Suivi de chantier ──────────────────────────────────────────────────── */
@@ -255,7 +322,14 @@ ul.ad-cards { margin: 0; padding: 0; list-style: none; }
   line-height: var(--ds-leading-tight);
   color: var(--ds-ink);
 }
-.ad-obra__lbl { font-size: var(--ds-text-sm); font-weight: var(--ds-weight-medium); color: var(--ds-ink-secondary); }
+.ad-obra__lbl {
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
+  color: var(--ds-ink-secondary);
+}
 .ad-obra__avg .ad-bar { margin-top: var(--ds-space-2); background: var(--ds-surface); }
 .ad-obra__detail { display: grid; gap: var(--ds-space-5); min-width: 0; }
 @media (min-width: 700px) {
@@ -287,6 +361,7 @@ ul.ad-cards { margin: 0; padding: 0; list-style: none; }
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-xs);
 }
 @media (min-width: 768px) {
   .ad-evs.is-mobile-only { display: none; }
@@ -300,7 +375,7 @@ ul.ad-cards { margin: 0; padding: 0; list-style: none; }
   padding: var(--ds-space-4) var(--ds-space-5);
   transition: var(--ds-transition-color);
 }
-.ad-ev + .ad-ev { border-top: 1px solid var(--ds-border); }
+.ad-ev + .ad-ev { border-top: 1px solid var(--ds-border-subtle); }
 .ad-ev.is-link:active { background: var(--ds-action-faint); }
 @media (hover: hover) and (pointer: fine) {
   .ad-ev.is-link:hover { background: var(--ds-action-faint); }
@@ -316,7 +391,7 @@ ul.ad-cards { margin: 0; padding: 0; list-style: none; }
   height: 40px;
   border-radius: var(--ds-radius-md);
   background: var(--ds-band);
-  color: var(--ds-ink-secondary);
+  color: var(--ds-accent);
 }
 @media (max-width: 599.98px) {
   .ad-ev__icon { width: 32px; height: 32px; }
@@ -335,10 +410,14 @@ ul.ad-cards { margin: 0; padding: 0; list-style: none; }
 .ad-ev__title { gap: 2px var(--ds-space-2); color: var(--ds-ink); }
 .ad-ev__ref { font-weight: var(--ds-weight-semibold); color: var(--ds-ink); }
 a.ad-ev__ref {
-  color: var(--ds-action);
+  color: var(--ds-action-ink);
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
+  transition: var(--ds-transition-color);
+}
+@media (hover: hover) and (pointer: fine) {
+  a.ad-ev__ref:hover { color: var(--ds-ink); }
 }
 /* La referencia es el enlace; su ::after cubre la fila o la tarjeta entera. */
 a.ad-ev__ref::after { content: ''; position: absolute; inset: 0; border-radius: inherit; }
@@ -356,7 +435,7 @@ a.ad-ev__ref:focus-visible::after { outline: var(--ds-focus-outline); outline-of
   color: var(--ds-ink-muted);
 }
 .ad-ev__meta span { display: inline-flex; align-items: center; gap: var(--ds-space-1); }
-.ad-ev__meta mat-icon { width: 16px; height: 16px; font-size: 16px; }
+.ad-ev__meta mat-icon { width: 16px; height: 16px; font-size: 16px; color: var(--ds-accent); }
 
 /* Tarjetas (solo escritorio) */
 .ad-cards { display: none; }
@@ -375,10 +454,12 @@ a.ad-ev__ref:focus-visible::after { outline: var(--ds-focus-outline); outline-of
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
-  transition: border-color var(--ds-duration-fast) var(--ds-ease-out);
+  box-shadow: var(--ds-shadow-xs);
+  transition: border-color var(--ds-duration-fast) var(--ds-ease-out),
+              box-shadow var(--ds-duration-fast) var(--ds-ease-out);
 }
 @media (hover: hover) and (pointer: fine) {
-  .ad-card.is-link:hover { border-color: var(--ds-action); }
+  .ad-card.is-link:hover { border-color: var(--ds-border-strong); box-shadow: var(--ds-shadow-md); }
 }
 .ad-card__media {
   position: relative;
@@ -386,7 +467,7 @@ a.ad-ev__ref:focus-visible::after { outline: var(--ds-focus-outline); outline-of
   place-items: center;
   aspect-ratio: 16 / 9;
   background: var(--ds-band);
-  color: var(--ds-ink-muted);
+  color: var(--ds-accent);
 }
 .ad-card__media mat-icon { width: 32px; height: 32px; font-size: 32px; }
 .ad-card__media img {

@@ -1,16 +1,19 @@
-/* component: avisos del asistente IA (administración, Trait rouge)
+/* component: avisos del asistente IA (administración, Lin et bronze)
  * Base en shared/ui/lista/lista.css (herramientas, marcas, tarjetas, tabla); aquí lo propio:
  * el filtro de tipo como lista desplegable (siete opciones largas), el resumen legible,
  * las filas resueltas en segundo plano y el botón de resolver / reabrir.
  *
  * states: cargando (esqueleto) · error · vacío · filtros sin resultados · pendiente · resuelto
- *         (fondo kraft claro, texto intacto) · actualizando (spinner en el botón)
- * contrast: resumen ink-secondary 9.6:1 · meta ink-muted 6.8:1 · «Résolu» success-ink ·
- *           marcas warning-ink/-soft 5.8:1 e info-ink/-soft
- * type: número de dossier y fechas al 75 % con tabular-nums
- * Sin tomate: revisar avisos no es una etapa del dossier.
+ *         (fondo lino claro, texto intacto) · actualizando (spinner en el botón)
+ * contrast: resumen ink 15.5:1 · meta ink-muted 5.9:1 · «Résolu» success-ink ·
+ *           marcas warning-ink/-soft e info-ink/-soft
+ * type: número de dossier y fechas con tabular-nums
+ * sin relleno espresso: revisar avisos no es una etapa del dossier.
  */
-:host { display: block; }
+:host {
+  display: block;
+  container: avisos / inline-size;
+}
 
 .aev-type { flex: 0 1 20rem; min-width: 0; }
 
@@ -40,9 +43,9 @@
   --mat-button-text-state-layer-color: var(--ds-success);
 }
 
-/* Cinco columnas con un resumen largo junto a la barra lateral: la tabla solo cabe desde 1400px;
-   antes, tarjetas. */
-@media (max-width: 1399.98px) {
+/* Cinco columnas con un resumen largo: unos 1015px de tabla. Se mide el hueco del componente (no
+   la ventana); si no cabe, tarjetas. 1015px + 2px de borde + 2 × 32px del .page-wrapper. */
+@container avisos (max-width: 1089.98px) {
   .ls-table-wrap { display: none; }
   .ls-grid.is-mobile-only { display: grid; }
 }

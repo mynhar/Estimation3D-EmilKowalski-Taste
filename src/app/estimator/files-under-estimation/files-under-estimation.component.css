@@ -1,12 +1,23 @@
-/* component: mis dossiers en estimación (Trait rouge)
+/* component: mis dossiers en estimación (Lin et bronze)
  * Base en shared/ui/lista/lista.css; aquí solo lo propio.
  * states: cargando · sin dossiers · filtros sin resultados · tarjetas · tabla (escritorio)
- *         liberar: reposo (icono) · confirmando (ladrillo, «Confirmer» + aviso) · liberando (spinner)
- * tomate: «Continuer l'estimation» del primer dossier; los demás, abeto relleno.
- * contrast: liberar en reposo ink-secondary (9.6:1) · confirmando danger (5.9:1 sobre vélin)
- *           aviso danger-ink sobre danger-soft, con icono
+ *         liberar: reposo (icono) · confirmando (terracota, «Confirmer» + aviso) · liberando (spinner)
+ * «Continuer l'estimation» se repite en cada tarjeta y fila: con borde, sin relleno.
+ * contrast: liberar en reposo ink-secondary (7.8:1) · confirmando danger (6.1:1 sobre vélin)
+ *           aviso danger-ink sobre danger-soft (5.0:1), con icono
  */
-:host { display: block; }
+:host {
+  display: block;
+  container: en-estimacion / inline-size;
+}
+
+/* Cinco columnas, unos 880px de tabla + 2px de borde + 2 × 32px del .page-wrapper: se mide el hueco del componente (no la ventana), así cuenta también la barra
+   lateral plegada; si no cabe, tarjetas y sin conmutador. */
+@container en-estimacion (max-width: 959.98px) {
+  .ls-table-wrap,
+  .ls-view { display: none; }
+  .ls-grid.is-mobile-only { display: grid; }
+}
 
 /* Al confirmar, «Confirmer» baja a su propia línea si no cabe junto a «Continuer». */
 .fue-card-actions {

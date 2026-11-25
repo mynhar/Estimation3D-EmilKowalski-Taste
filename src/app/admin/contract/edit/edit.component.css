@@ -1,4 +1,4 @@
-/* component: administración, detalle de un contrato (Trait rouge)
+/* component: administración, detalle de un contrato (Lin et bronze)
  * Base en shared/ui/ficha/ficha.css; aquí solo lo propio: acciones de la cabecera, partes,
  * importe, confirmación de anular y el visor del PDF.
  *
@@ -6,11 +6,11 @@
  *         ciclo: generado (firmar) · firmado (indicador de ejecución) · en ejecución (terminar)
  *                · cancelado · confirmar anular / firmar / terminar · procesando · error
  *         PDF: sin generar (elegir idioma) · generando · visible · ampliado · oculto
- * contrast: importe ink 13.6:1 · etiquetas ink-muted 6.8:1 sobre vélin · ladrillo danger-ink
- *           sobre danger-soft
- * type: importe, fechas y plazos al 75 % con tabular-nums
- * tomate: la siguiente etapa del contrato («Marquer comme signé» o «Marquer comme terminé»),
- *         nunca las dos a la vez. Anular en ladrillo, con icono y texto.
+ * contrast: importe ink 15.5:1 · rótulos ink-muted 5.9:1 sobre vélin · enlaces action-ink 6.7:1
+ *           terracota danger-ink sobre danger-soft
+ * type: importe en Cormorant 600; importe, fechas y plazos con lining-nums tabular-nums
+ * relleno espresso: la siguiente etapa del contrato («Marquer comme signé» o «Marquer comme
+ *         terminé»), nunca las dos a la vez. Anular en terracota, con icono y texto.
  */
 :host { display: block; }
 
@@ -34,7 +34,7 @@
 }
 .acd-inline-actions > button { min-height: 44px; }
 
-/* ── Anular: en ladrillo ────────────────────────────────────────────────── */
+/* ── Anular: en terracota ───────────────────────────────────────────────── */
 .acd-danger {
   display: grid;
   gap: var(--ds-space-3);
@@ -76,8 +76,11 @@
 .acd-party { display: grid; gap: var(--ds-space-1); align-content: start; min-width: 0; }
 .acd-party p { margin: 0; }
 .acd-party__label {
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
   color: var(--ds-ink-muted);
 }
 .acd-party__name {
@@ -93,13 +96,17 @@
   min-height: 32px;
   max-width: 100%;
   border-radius: var(--ds-radius-sm);
-  color: var(--ds-action);
+  color: var(--ds-action-ink);
   text-decoration: underline;
   text-underline-offset: 3px;
   overflow-wrap: anywhere;
+  transition: var(--ds-transition-color);
 }
-.acd-party__link mat-icon { flex-shrink: 0; width: 18px; height: 18px; font-size: 18px; }
+.acd-party__link mat-icon { flex-shrink: 0; width: 18px; height: 18px; font-size: 18px; color: var(--ds-accent); }
 .acd-party__link:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
+@media (hover: hover) and (pointer: fine) {
+  .acd-party__link:hover { color: var(--ds-ink); }
+}
 
 .acd-notes {
   max-width: 72ch;
@@ -110,16 +117,20 @@
 }
 
 /* ── Contrato: el importe manda ─────────────────────────────────────────── */
-.acd-price { display: grid; gap: 2px; }
+.acd-price { display: grid; gap: var(--ds-space-1); }
 .acd-price__label {
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
   color: var(--ds-ink-muted);
 }
 .acd-price__amount {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-3xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
+  font-variant-numeric: lining-nums tabular-nums;
   line-height: var(--ds-leading-tight);
   color: var(--ds-ink);
 }
@@ -170,7 +181,7 @@
   background: var(--ds-bg-alt);
   text-align: center;
 }
-.acd-pdf__prompt > mat-icon { width: 32px; height: 32px; font-size: 32px; color: var(--ds-action); }
+.acd-pdf__prompt > mat-icon { width: 32px; height: 32px; font-size: 32px; color: var(--ds-accent); }
 .acd-pdf__prompt p { margin: 0; color: var(--ds-ink-secondary); }
 .acd-pdf__prompt .acd-inline-actions { justify-content: center; }
 

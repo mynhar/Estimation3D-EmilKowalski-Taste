@@ -4,14 +4,24 @@
  * Complemento de shared/ui/lista/lista.css:
  *   styleUrls: ['…/shared/ui/lista/lista.css', '…/admin/_shared/catalogo-lista.css']
  *
- * states: cargando · error · sin elementos · filtros sin resultados · tabla (desde 768px) ·
- *         tarjetas (móvil) · inactivo atenuado (.is-off)
- * contrast: nombre ink 13.6:1 · texto de apoyo ink-secondary sobre vélin
- * type: el código al 75 % con tabular-nums
- * Sin tomate: crear un elemento del catálogo es configuración, no una etapa del dossier
- * (botón relleno abeto).
+ * states: cargando · error · sin elementos · filtros sin resultados · tabla (si cabe) ·
+ *         tarjetas (móvil y huecos estrechos) · inactivo atenuado (.is-off)
+ * contrast: nombre ink 15.5:1 · texto de apoyo ink-secondary 7.8:1 sobre vélin
+ * type: el código con tabular-nums
+ * relleno espresso: crear un elemento del catálogo, la única acción de la vista; editar cada
+ * fila va como icono.
  */
-:host { display: block; }
+:host {
+  display: block;
+  container: catalogo / inline-size;
+}
+
+/* Cinco columnas, unos 770px de tabla (imprevistos, la más ancha) + 2px de borde + 2 × 32px del
+   .page-wrapper: se mide el hueco del componente; si no cabe, tarjetas. */
+@container catalogo (max-width: 839.98px) {
+  .ls-table-wrap { display: none; }
+  .ls-grid.is-mobile-only { display: grid; }
+}
 
 .cl-name { min-width: 12rem; }
 .cl-name .ls-table__link { font-weight: var(--ds-weight-semibold); }

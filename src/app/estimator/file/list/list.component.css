@@ -1,6 +1,17 @@
-/* component: mis dossiers del estimador (Trait rouge)
+/* component: mis dossiers del estimador (Lin et bronze)
  * Base en shared/ui/lista/lista.css; aquí solo lo propio.
  * states: cargando · error de carga · sin dossiers · filtros sin resultados · tarjetas · tabla
- * tomate: «Nouveau dossier», el inicio del recorrido. «Modifier» va en contorno.
+ * relleno espresso: «Nouveau dossier», el inicio del recorrido. «Modifier» va con borde.
  */
-:host { display: block; }
+:host {
+  display: block;
+  container: dossiers / inline-size;
+}
+
+/* Seis columnas, unos 950px de tabla + 2px de borde + 2 × 32px del .page-wrapper: se mide el hueco del componente (no la ventana), así cuenta también la barra
+   lateral plegada; si no cabe, tarjetas y sin conmutador. */
+@container dossiers (max-width: 1029.98px) {
+  .ls-table-wrap,
+  .ls-view { display: none; }
+  .ls-grid.is-mobile-only { display: grid; }
+}

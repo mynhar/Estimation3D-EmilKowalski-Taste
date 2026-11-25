@@ -1,11 +1,11 @@
-/* Reparto en bloque de ofertas (Trait rouge), compartido
+/* Reparto en bloque de ofertas (Lin et bronze), compartido
  * Lo usan admin/offer/edit y admin/file/builder-bids; por eso el prefijo propio `rp-`.
  *
  * states: bloqueado (contrato vivo) · sin marcar · algunas marcadas (indeterminado) · todas
- *         confirmando · aplicando (spinner, aria-busy) · error (ladrillo, icono + texto)
+ *         confirmando · aplicando (spinner, aria-busy) · error (terracota, icono + texto)
  *         botones y casilla: los de Material (hover, focus-visible, active, disabled)
- * contrast: texto ink-secondary sobre band 8.0:1 · warning-ink sobre warning-soft 5.0:1
- * Rechazar es reversible (se puede reactivar): botón con borde, sin ladrillo.
+ * contrast: texto ink-secondary sobre banda de lino oscuro 6.3:1 · warning-ink sobre warning-soft
+ * Rechazar es reversible (se puede reactivar): botón con borde, sin terracota.
  */
 :host { display: block; }
 

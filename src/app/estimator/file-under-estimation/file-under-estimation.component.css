@@ -1,17 +1,18 @@
-/* component: dossier en estimation (Trait rouge)
+/* component: dossier en estimation (Lin et bronze)
  * Base en shared/ui/ficha/ficha.css; aquí solo lo propio. Misma ficha que «à estimer», con la
  * descripción del cliente, el teléfono enlazado, los tours desplegados de inicio y la ficha
  * Matterport con sincronización.
  * states: cargando · no encontrado · informe en curso / listo · subiendo · guardando · enviando
  *         tour: lista · plegado/desplegado · editando · añadiendo (aviso si no hay borrador) · vacío
  *         invitación: sin constructores · seleccionados (con contraseña opcional) · confirmar «tous»
- * tomate: «Envoyer l'estimation», la siguiente etapa. Todo lo demás en abeto o contorno.
+ * relleno espresso: «Envoyer l'estimation», la siguiente etapa; enviar la invitación va con borde.
+ *         Un formulario o confirmación en línea que abre el usuario lleva su propio relleno.
  */
 :host { display: block; }
 
 .fued-tel {
   border-radius: var(--ds-radius-sm);
-  color: var(--ds-action);
+  color: var(--ds-action-ink);
   text-decoration: underline;
   text-underline-offset: 3px;
 }

@@ -28,12 +28,13 @@
         <mat-icon>arrow_back</mat-icon>
         {{ 'common.back' | translate }}
       </button>
-      <app-page-header [titulo]="servicioNombre()" [contexto]="'admin_file_edit.full_subtitle' | translate">
+      <!-- El número de dossier, como etiqueta sobre el título. -->
+      <app-page-header [etiqueta]="numero() || null" [titulo]="servicioNombre()"
+                       [contexto]="'admin_file_edit.full_subtitle' | translate">
         <!-- Archivar / Desarchivar: la acción sale del estado. -->
         <app-boton-archivar actions [control]="archivo" />
       </app-page-header>
       <div class="fi-meta">
-        @if (numero()) { <span class="fi-fig afe-num">{{ numero() }}</span> }
         @if (estadoActual()) { <app-status-chip [estado]="estadoActual()" /> }
         @if (serviciosExtra() > 0) {
           <span class="fi-tag">
@@ -427,7 +428,7 @@
           </section>
 
           <!-- ═══ Guardar ═══════════════════════════════════════════════════
-               Guardar no cambia de etapa: abeto, no tomate. -->
+               Guardar: relleno espresso, la acción de la vista. -->
           <div class="fc-foot afe-foot">
             <app-campos-faltantes
               [formulario]="[expedienteForm, localizacionForm]"

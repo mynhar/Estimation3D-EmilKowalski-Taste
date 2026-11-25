@@ -1,14 +1,16 @@
-/* component: editar tipo de servicio (administración, Trait rouge)
+/* component: editar tipo de servicio (administración, Lin et bronze)
  * Base en shared/ui/alta/alta.css (identidad, tarjetas, campos, pie) y admin/_shared/catalogo-form.css
  * (código, textos en columna, interruptor); aquí lo propio: las dos listas editables (fases y
- * actividades), que se guardan una a una con su formulario en línea sobre banda kraft.
+ * actividades), que se guardan una a una con su formulario en línea sobre fondo lino claro.
  *
  * states: cargando · error (volver) · formulario: default · inválido (mat-error) · guardando
  *         fases / actividades: cargando · error (reintentar) · vacío · lista · inactiva (atenuada) ·
- *         en edición (borde abeto) · formulario abierto · confirmar baja (ladrillo) · borrando
- * contrast: nombres ink 13.6:1 · códigos y ayudas ink-muted 6.8:1 · baja danger-ink sobre vélin
- * type: orden y códigos al 75 % con tabular-nums
- * Sin tomate: configuración del catálogo, no una etapa del dossier.
+ *         en edición (borde espresso) · formulario abierto · confirmar baja (terracota) · borrando
+ * contrast: nombres ink 15.5:1 · códigos y ayudas ink-muted 5.9:1 · baja danger-ink sobre vélin
+ *           orden accent-ink sobre accent-soft 5.6:1
+ * type: orden y códigos con lining-nums tabular-nums
+ * relleno espresso: guardar el tipo de servicio; cada formulario en línea que abre el usuario
+ *         lleva su propio relleno. Configuración del catálogo, no una etapa del dossier.
  */
 :host { display: block; }
 
@@ -65,7 +67,7 @@
 }
 .ase-empty mat-icon { flex-shrink: 0; }
 
-/* Formulario en línea: banda kraft para separarlo de la lista. */
+/* Formulario en línea: fondo lino claro para separarlo de la lista. */
 .ase-subform {
   display: grid;
   gap: var(--ds-space-3);
@@ -116,9 +118,10 @@
   width: 36px;
   height: 36px;
   border-radius: var(--ds-radius-circle);
-  background: var(--ds-action-faint);
-  color: var(--ds-action-ink);
+  background: var(--ds-accent-soft);
+  color: var(--ds-accent-ink);
   font-weight: var(--ds-weight-bold);
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .ase-item__lead mat-icon { width: 20px; height: 20px; font-size: 20px; }
 .ase-item__main { display: grid; flex: 1 1 12rem; gap: 2px; min-width: 0; }
@@ -139,7 +142,7 @@
   overflow-wrap: anywhere;
 }
 .ase-item__phase { display: inline-flex; align-items: center; gap: var(--ds-space-1); }
-.ase-item__phase mat-icon { width: 16px; height: 16px; font-size: 16px; }
+.ase-item__phase mat-icon { width: 16px; height: 16px; font-size: 16px; color: var(--ds-accent); }
 .ase-item__actions {
   display: inline-flex;
   align-items: center;
@@ -151,7 +154,7 @@
   font-weight: var(--ds-weight-semibold);
   color: var(--ds-danger-ink);
 }
-/* Borrar: discreto en reposo (como .fi-del de las fichas), ladrillo al pasar y al confirmar. */
+/* Borrar: discreto en reposo (como .fi-del de las fichas), terracota al pasar y al confirmar. */
 .ase-del {
   --mat-icon-button-icon-color: var(--ds-ink-muted);
   --mat-icon-button-state-layer-color: var(--ds-danger);

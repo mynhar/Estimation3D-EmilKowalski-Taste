@@ -4,12 +4,12 @@
  *   styleUrls: ['…/shared/ui/alta/alta.css', '…/admin/_shared/catalogo-form.css']
  *
  * states: default · campo inválido (mat-error con icono) · qué falta (campos-faltantes) ·
- *         guardando · código en solo lectura (candado) · borrar: reposo (texto ladrillo) ·
- *         confirmar (recuadro ladrillo) · borrando
- * contrast: etiquetas y ayudas ink-muted 6.8:1 · interruptor abeto (tema) ·
- *           danger-ink sobre danger-soft 5.8:1 · vélin sobre danger 7.5:1
- * type: códigos y orden al 75 % con tabular-nums, sin monoespaciada
- * Sin tomate: configuración del catálogo, no una etapa del dossier (botón relleno abeto).
+ *         guardando · código en solo lectura (candado) · borrar: reposo (texto terracota) ·
+ *         confirmar (recuadro terracota) · borrando
+ * contrast: etiquetas y ayudas ink-muted 5.9:1 · interruptor espresso (tema) ·
+ *           danger-ink sobre danger-soft · vélin sobre danger 6.0:1
+ * type: códigos y orden con lining-nums tabular-nums, sin monoespaciada
+ * relleno espresso: guardar, la única acción de la vista (configuración del catálogo).
  */
 :host { display: block; }
 
@@ -52,7 +52,7 @@
 .cf-toggles { display: grid; gap: var(--ds-space-5); }
 
 /* ── Borrar ─────────────────────────────────────────────────────────────── */
-/* En reposo: botón de texto ladrillo, apartado a la izquierda del pie (abajo del todo en móvil). */
+/* En reposo: botón de texto terracota, apartado a la izquierda del pie (abajo del todo en móvil). */
 .cf-del {
   --mat-button-text-label-text-color: var(--ds-danger-ink);
   --mat-button-text-state-layer-color: var(--ds-danger);
@@ -60,7 +60,7 @@
   margin-right: auto;
 }
 
-/* Confirmación en línea: recuadro ladrillo con la pregunta y las dos salidas. */
+/* Confirmación en línea: recuadro terracota con la pregunta y las dos salidas. */
 .cf-danger {
   display: grid;
   gap: var(--ds-space-3);

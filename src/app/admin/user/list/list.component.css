@@ -1,9 +1,20 @@
-/* component: usuarios (administración, Trait rouge)
+/* component: usuarios (administración, Lin et bronze)
  * Todo el aspecto viene de shared/ui/lista/lista.css (búsqueda, filtros, tabla, tarjetas de persona),
- * como la lista de clientes y constructores del estimador; aquí, los cuatro roles.
- * states: cargando · error · sin usuarios · filtros sin resultados · tabla (desde 768px) ·
- *         tarjetas (móvil) · usuario inactivo atenuado (.is-off)
- * Sin tomate: crear un usuario no es una etapa del dossier (botón relleno abeto).
+ * como la lista de clientes y constructores del estimador; aquí, los cuatro roles y cuándo cabe la tabla.
+ * states: cargando · error · sin usuarios · filtros sin resultados · tabla (si cabe) ·
+ *         tarjetas (móvil y huecos estrechos) · usuario inactivo atenuado (.is-off)
+ * relleno espresso: «Créer un utilisateur», la única acción de la vista; editar cada fila va como icono.
  */
 
-:host { display: block; }
+:host {
+  display: block;
+  container: usuarios / inline-size;
+}
+
+/* Siete columnas: unos 1060px de tabla. Se mide el hueco del componente (no la ventana), así
+   cuenta también la barra lateral plegada; si no cabe, tarjetas.
+   1062px de tabla + 2px de borde + 2 × 32px del .page-wrapper. */
+@container usuarios (max-width: 1139.98px) {
+  .ls-table-wrap { display: none; }
+  .ls-grid.is-mobile-only { display: grid; }
+}

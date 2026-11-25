@@ -1,12 +1,23 @@
-/* component: mis estimaciones completadas (Trait rouge)
+/* component: mis estimaciones completadas (Lin et bronze)
  * Base en shared/ui/lista/lista.css; aquí solo lo propio.
  * states: cargando · sin estimaciones · filtros sin resultados · tarjetas · tabla (escritorio)
  *         cancelado o archivado (foto en gris) · obra terminada (marca ok con icono)
- *         borrar: reposo (icono) · confirmando (aviso + ladrillo relleno) · borrando (spinner) · error
- * tomate: ninguno; la siguiente etapa ya no depende del estimador.
- * contrast: aviso danger-ink sobre danger-soft (icono + texto) · botón ladrillo con texto vélin (6.5:1)
+ *         borrar: reposo (icono) · confirmando (aviso + terracota relleno) · borrando (spinner) · error
+ * Sin relleno espresso: la siguiente etapa ya no depende del estimador.
+ * contrast: aviso danger-ink sobre danger-soft (icono + texto) · botón terracota con texto vélin (6.0:1)
  */
-:host { display: block; }
+:host {
+  display: block;
+  container: estimados / inline-size;
+}
+
+/* Seis columnas, unos 1025px de tabla + 2px de borde + 2 × 32px del .page-wrapper: se mide el hueco del componente (no la ventana), así cuenta también la barra
+   lateral plegada; si no cabe, tarjetas y sin conmutador. */
+@container estimados (max-width: 1099.98px) {
+  .ls-table-wrap,
+  .ls-view { display: none; }
+  .ls-grid.is-mobile-only { display: grid; }
+}
 
 .ef-sort { display: inline-flex; align-items: center; gap: var(--ds-space-1); }
 .ef-sort mat-icon { width: 18px; height: 18px; font-size: 18px; }

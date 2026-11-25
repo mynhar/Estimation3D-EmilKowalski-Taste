@@ -1,5 +1,17 @@
 /* component: suivi de chantier, lista del estimador (Lin et bronze)
- * Todo el aspecto viene de shared/construction-monitoring/obras-lista.css (con la búsqueda).
+ * El aspecto viene de shared/construction-monitoring/obras-lista.css (con la búsqueda). Aquí solo
+ * cuándo cabe la tabla: se mide el hueco del componente (no la ventana), así cuenta también la barra
+ * lateral plegada; si no cabe, tarjetas y sin conmutador.
  */
 
-:host { display: block; }
+:host {
+  display: block;
+  container: obras / inline-size;
+}
+
+/* 1034px de tabla + 2px de borde + 2 × 32px del .page-wrapper. */
+@container obras (max-width: 1109.98px) {
+  .cml-table-wrap,
+  .cml-view { display: none; }
+  .cml-grid.is-mobile-only { display: grid; }
+}

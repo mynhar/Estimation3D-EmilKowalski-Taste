@@ -1,20 +1,24 @@
-/* Administración: contratos (Trait rouge)
+/* Administración: contratos (Lin et bronze)
  * Base en shared/ui/lista/lista.css; aquí solo lo propio.
- * states: cargando · error · sin contratos · filtros sin resultados · tarjetas · tabla
+ * states: cargando · error · sin contratos · filtros sin resultados · tarjetas · tabla (si cabe)
  *         tarjeta cancelada o archivada atenuada (.is-out)
- * tomate: ninguno. El contrato se consulta, no hay siguiente etapa desde la lista.
+ * sin relleno espresso: el contrato se consulta, no hay siguiente etapa desde la lista.
  */
-:host { display: block; }
+:host {
+  display: block;
+  container: contratos / inline-size;
+}
 
-/* Ocho columnas: la tabla solo desde 1200px; por debajo, siempre tarjetas. */
-@media (max-width: 1199.98px) {
+/* Ocho columnas, unos 1085px de tabla + 2px de borde + 2 × 32px del .page-wrapper: se mide el hueco del componente (no la ventana), así cuenta también la barra lateral
+   plegada; si no cabe, tarjetas y sin conmutador. */
+@container contratos (max-width: 1159.98px) {
   .ls-table-wrap,
   .ls-view { display: none; }
   .ls-grid.is-mobile-only { display: grid; }
 }
 
 .acl-price { font-weight: var(--ds-weight-semibold); color: var(--ds-ink); }
-.acl-client { min-width: 13rem; }
+.acl-client { min-width: 10rem; }
 
 .ls-table th.is-right,
 .ls-table td.is-right { text-align: right; white-space: nowrap; }

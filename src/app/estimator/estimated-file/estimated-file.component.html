@@ -33,14 +33,14 @@
         <mat-icon>arrow_back</mat-icon>
         {{ 'estimator_file.back_to_estimations' | translate }}
       </button>
-      <app-page-header [titulo]="servicioNombre">
+      <!-- El número de dossier, como etiqueta sobre el título («—» si el servicio no lo da). -->
+      <app-page-header [etiqueta]="d.numero !== '—' ? d.numero : null" [titulo]="servicioNombre">
         <button actions mat-stroked-button type="button" (click)="imprimir()">
           <mat-icon>print</mat-icon>
           {{ 'estimator_file.print' | translate }}
         </button>
       </app-page-header>
       <div class="fi-meta">
-        <span class="fi-fig">{{ d.numero }}</span>
         <app-status-chip [estado]="d.estado" />
         @if (d.estimador_nombre) {
           <span class="fi-meta__item">
@@ -418,7 +418,7 @@
       <!-- ══ Columna de la estimación ═════════════════════════════════════ -->
       <div class="fi-col">
 
-        <!-- Coste aproximado: la cifra que más se consulta, en banda kraft -->
+        <!-- Coste aproximado: la cifra que más se consulta, en banda de lino oscuro -->
         @if (est?.costo_estimado !== null && est?.costo_estimado !== undefined) {
           <section class="efd-cost" aria-labelledby="efd-cost-title">
             <h2 id="efd-cost-title" class="efd-cost__title">{{ 'estimator_file.cost_section' | translate }}</h2>

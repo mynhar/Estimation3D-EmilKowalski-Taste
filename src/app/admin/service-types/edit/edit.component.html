@@ -92,7 +92,7 @@
         <button mat-button type="button" class="fc-cancel" (click)="cancelar()" [disabled]="guardando()">
           {{ 'common.cancel' | translate }}
         </button>
-        <!-- Configuración del catálogo, no una etapa del dossier: abeto, no tomate. -->
+        <!-- Configuración del catálogo: guardar en relleno espresso, la acción de la vista. -->
         <button mat-flat-button type="submit" class="fc-save" [disabled]="guardando()">
           @if (guardando()) { <span class="fc-spinner" aria-hidden="true"></span> } @else { <mat-icon>save</mat-icon> }
           {{ (guardando() ? 'admin_service_types.saving' : 'admin_service_types.save_btn') | translate }}

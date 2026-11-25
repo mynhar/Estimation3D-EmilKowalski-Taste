@@ -6,18 +6,17 @@
       <mat-icon>arrow_back</mat-icon>
       {{ 'common.back' | translate }}
     </button>
-    <app-page-header [titulo]="'admin_file_edit.title' | translate"
+    <!-- El número de dossier, como etiqueta sobre el título; el estado, debajo. -->
+    <app-page-header [etiqueta]="numero() || null"
+                     [titulo]="'admin_file_edit.title' | translate"
                      [contexto]="'admin_file_edit.subtitle' | translate">
       <p actions class="fc-count" aria-live="polite">
         <span class="fc-count__num">{{ completedSteps() }}/4</span>
         {{ 'file_create.steps_label' | translate }}
       </p>
     </app-page-header>
-    @if (numero()) {
-      <p class="fc-meta">
-        <span class="fc-meta__num">{{ numero() }}</span>
-        @if (estado()) { <app-status-chip [estado]="estado()" /> }
-      </p>
+    @if (estado()) {
+      <p class="fc-meta"><app-status-chip [estado]="estado()" /></p>
     }
   </header>
 
@@ -369,7 +368,7 @@
         }
 
         <!-- Activo aunque falten datos: al pulsarlo, el resumen de abajo dice cuáles.
-             Guardar no cambia de etapa: abeto, no tomate. Un dossier archivado no se edita. -->
+             Guardar: relleno espresso, la acción de la vista. Un dossier archivado no se edita. -->
         <div class="fc-actions">
           <button mat-flat-button type="button" class="fc-submit" (click)="onSubmit()" [disabled]="enviando() || archivado()">
             @if (enviando()) { <span class="fc-spinner" aria-hidden="true"></span> } @else { <mat-icon>check_circle</mat-icon> }

@@ -1,4 +1,4 @@
-/* Listas de dossiers, clientes y obras (Trait rouge), compartida
+/* Listas de dossiers, clientes y obras (Lin et bronze), compartida
  * La incluyen las listas de los roles internos con
  *   styleUrls: ['…/shared/ui/lista/lista.css', './x.component.css']
  * y cada componente añade solo lo suyo. Mismo patrón que «Dossiers disponibles» del contratista:
@@ -7,9 +7,12 @@
  *
  * states: cargando (esqueleto) · vacío · filtros sin resultados · tarjetas · tabla · error
  *         interactivos: default · hover (puntero fino) · focus-visible · active · disabled
- * contrast: títulos ink (13.6:1 sobre vélin) · texto ink-secondary (9.6:1) · meta ink-muted (6.8:1)
- *           marcas: warning-ink/-soft 5.8:1 · success-ink/-soft · danger-ink/-soft · info-ink/-soft
- * type: títulos 112 %; números, recuentos y fechas al 75 % con tabular-nums
+ * contrast: títulos ink (15.5:1 sobre vélin) · texto ink-secondary (7.8:1) · meta ink-muted (5.9:1)
+ *           marcas: warning-ink/-soft 4.9:1 · success-ink/-soft 5.2:1 · danger-ink/-soft 5.0:1 · info
+ *           iconos de dato en bronce (4.6:1, gráfico) · enlaces action-ink (6.3:1 sobre lino)
+ * type: títulos en Cormorant 600; número del dossier, rótulos y cabeceras de tabla en mayúsculas
+ *       (12px); números, recuentos y fechas con lining-nums tabular-nums
+ * Una acción repetida en cada tarjeta o fila va con borde: el relleno espresso es de la vista.
  */
 
 .ls {
@@ -45,8 +48,11 @@
   min-width: 0;
 }
 .ls-filter__label {
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
   color: var(--ds-ink-muted);
 }
 .ls-toggle {
@@ -107,7 +113,7 @@
   color: var(--ds-ink-muted);
 }
 .ls-clear {
-  --mat-button-text-label-text-color: var(--ds-action);
+  --mat-button-text-label-text-color: var(--ds-action-ink);
   min-height: 44px;
 }
 
@@ -194,7 +200,9 @@
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
-  transition: border-color var(--ds-duration-fast) var(--ds-ease-out);
+  box-shadow: var(--ds-shadow-xs);
+  transition: border-color var(--ds-duration-fast) var(--ds-ease-out),
+              box-shadow var(--ds-duration-fast) var(--ds-ease-out);
 }
 .ls-card.is-plain { grid-template-rows: 1fr; }
 .ls-card:has(.ls-card__link:focus-visible) { box-shadow: var(--ds-focus-ring); }
@@ -224,7 +232,7 @@
 .ls-card.is-out .ls-card__photo img { filter: grayscale(1); opacity: 0.85; }
 
 @media (hover: hover) and (pointer: fine) {
-  .ls-card:hover { border-color: var(--ds-border-strong); }
+  .ls-card:hover { border-color: var(--ds-border-strong); box-shadow: var(--ds-shadow-md); }
   .ls-card:hover .ls-card__photo img { transform: scale(1.02); }
 }
 
@@ -239,9 +247,10 @@
 .ls-card__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-lg);
+  font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
+  font-variant-numeric: lining-nums;
   color: var(--ds-ink);
   overflow-wrap: anywhere;
 }
@@ -260,11 +269,19 @@
   position: absolute;
   inset: 0;
 }
+/* Número del dossier: etiqueta sobre el título. En el HTML va detrás (el enlace es el
+   título) y sube con order; las marcas, encima de todo. */
+.ls-card__body > .ls-tags { order: -2; margin-bottom: var(--ds-space-1); }
 .ls-card__num {
-  margin: calc(var(--ds-space-1) * -1) 0 0;
-  font-size: var(--ds-text-sm);
-  font-variant-numeric: lining-nums tabular-nums;
+  order: -1;
+  margin: 0 0 calc(var(--ds-space-1) * -1);
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
   color: var(--ds-ink-muted);
+  font-variant-numeric: lining-nums tabular-nums;
   overflow-wrap: anywhere;
 }
 .ls-card__line {
@@ -282,7 +299,7 @@
   height: 18px;
   font-size: 18px;
   margin-top: 3px;
-  color: var(--ds-ink-muted);
+  color: var(--ds-accent);
 }
 .ls-card__sub { display: block; font-size: var(--ds-text-sm); color: var(--ds-ink-muted); }
 
@@ -304,7 +321,7 @@
   align-items: center;
   gap: var(--ds-space-1);
 }
-.ls-card__foot mat-icon { width: 18px; height: 18px; font-size: 18px; }
+.ls-card__foot mat-icon { width: 18px; height: 18px; font-size: 18px; color: var(--ds-accent); }
 .ls-card__foot .is-late,
 .ls-card__foot .is-late mat-icon { color: var(--ds-danger-ink); }
 
@@ -317,7 +334,7 @@
   margin-top: var(--ds-space-2);
 }
 
-/* ── Acciones destructivas: borrar (icono) y confirmar (ladrillo relleno) ── */
+/* ── Acciones destructivas: borrar (icono) y confirmar (terracota relleno) ── */
 .ls-delete {
   --mat-icon-button-icon-color: var(--ds-ink-secondary);
   --mat-icon-button-state-layer-color: var(--ds-danger);
@@ -337,6 +354,7 @@
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-xs);
 }
 @media (min-width: 768px) {
   .ls-table-wrap { display: block; }
@@ -348,18 +366,23 @@
   width: 100%;
   border-collapse: collapse;
 }
+/* 12px por lado: las tablas de la administración tienen hasta nueve columnas. Cada lista decide
+   con una consulta de contenedor cuándo cabe la suya; si no, tarjetas. */
 .ls-table th {
-  padding: var(--ds-space-3) var(--ds-space-4);
+  padding: var(--ds-space-3);
   border-bottom: 1px solid var(--ds-border);
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-semibold);
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
   color: var(--ds-ink-muted);
   text-align: left;
   white-space: nowrap;
 }
 .ls-table td {
-  padding: var(--ds-space-3) var(--ds-space-4);
-  border-top: 1px solid var(--ds-border);
+  padding: var(--ds-space-3);
+  border-top: 1px solid var(--ds-border-subtle);
   vertical-align: middle;
   color: var(--ds-ink-secondary);
 }
@@ -387,7 +410,10 @@
   border-radius: var(--ds-radius-sm);
   color: var(--ds-ink);
   font-family: var(--ds-font-display);
+  font-size: var(--ds-text-lg);
   font-weight: var(--ds-weight-semibold);
+  line-height: var(--ds-leading-snug);
+  font-variant-numeric: lining-nums;
   text-decoration: none;
 }
 .ls-table__link:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
@@ -450,7 +476,7 @@
   gap: var(--ds-space-1);
   color: var(--ds-ink-secondary);
 }
-.ls-provider mat-icon { width: 18px; height: 18px; font-size: 18px; color: var(--ds-ink-muted); }
+.ls-provider mat-icon { width: 18px; height: 18px; font-size: 18px; color: var(--ds-accent); }
 
 /* Cuenta inactiva: la tarjeta pasa a segundo plano sin perder contraste de texto. */
 .ls-card.is-off { background: var(--ds-bg-alt); }

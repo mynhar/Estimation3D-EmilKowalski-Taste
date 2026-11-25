@@ -1,6 +1,17 @@
-/* component: clientes y constructores (estimador, Trait rouge)
- * Todo el aspecto viene de shared/ui/lista/lista.css (búsqueda, filtros, tabla, tarjetas de persona).
- * Sin tomate: crear una persona no es una etapa del dossier (botón relleno abeto).
+/* component: clientes y constructores (estimador, Lin et bronze)
+ * Todo el aspecto viene de shared/ui/lista/lista.css (búsqueda, filtros, tabla, tarjetas de persona);
+ * aquí solo cuándo cabe la tabla.
+ * relleno espresso: crear una persona, la única acción de la vista.
  */
 
-:host { display: block; }
+:host {
+  display: block;
+  container: personas / inline-size;
+}
+
+/* Seis columnas: unos 1045px de tabla. Se mide el hueco del componente (no la ventana); si no
+   cabe, tarjetas. 1045px de tabla + 2px de borde + 2 × 32px del .page-wrapper. */
+@container personas (max-width: 1119.98px) {
+  .ls-table-wrap { display: none; }
+  .ls-grid.is-mobile-only { display: grid; }
+}

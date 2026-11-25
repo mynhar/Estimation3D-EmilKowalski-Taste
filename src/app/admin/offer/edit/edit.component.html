@@ -32,14 +32,14 @@
         <mat-icon>arrow_back</mat-icon>
         {{ 'common.back' | translate }}
       </button>
-      <app-page-header [titulo]="servicioNombre()">
+      <!-- El número de dossier, como etiqueta sobre el título («—» si el servicio no lo da). -->
+      <app-page-header [etiqueta]="d.numero !== '—' ? d.numero : null" [titulo]="servicioNombre()">
         <!-- Archivar: desaparece una vez archivado. -->
         @if (!archivado()) {
           <app-boton-archivar actions [control]="archivo" />
         }
       </app-page-header>
       <div class="fi-meta">
-        <span class="fi-fig">{{ d.numero }}</span>
         <span class="fi-meta__item">
           <mat-icon aria-hidden="true">person</mat-icon>{{ d.cliente_nombre }}
         </span>

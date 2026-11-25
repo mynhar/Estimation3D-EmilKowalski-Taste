@@ -219,7 +219,7 @@
         <button mat-button type="button" class="fc-cancel" (click)="cancelar()" [disabled]="ocupado()">
           {{ 'common.cancel' | translate }}
         </button>
-        <!-- Crear una persona no es una etapa del dossier: abeto, no tomate. -->
+        <!-- Crear una persona: relleno espresso, la acción de la vista. -->
         <button mat-flat-button type="submit" class="fc-save" [disabled]="ocupado()">
           @if (guardando()) { <span class="fc-spinner" aria-hidden="true"></span> } @else { <mat-icon>person_add</mat-icon> }
           {{ (guardando() ? 'admin_users.creating' : 'admin_users.create_user') | translate }}

@@ -1,22 +1,28 @@
-/* Administración: dossiers archivados (Trait rouge)
+/* Administración: dossiers archivados (Lin et bronze)
  * Base en shared/ui/lista/lista.css; aquí solo lo propio: los datos del momento del archivado
  * (estado previo, ofertas, contratos) en la tarjeta y en la tabla.
  * states: cargando · error (reintentar) · sin archivados · búsqueda sin resultados · tarjetas · tabla
  * Todas las tarjetas están archivadas: la foto no se atenúa (no habría contraste que leer);
  * la etiqueta «Archivé le …» dice el estado.
- * contrast: etiquetas ink-muted 6.8:1 sobre vélin
- * tomate: ninguno. Desarchivar se hace desde la ficha del dossier.
+ * contrast: rótulos ink-muted 5.9:1 sobre vélin
+ * sin relleno espresso: desarchivar se hace desde la ficha del dossier.
  */
-:host { display: block; }
+:host {
+  display: block;
+  container: archivados / inline-size;
+}
 
-/* Ocho columnas: la tabla solo desde 1200px; por debajo, siempre tarjetas. */
-@media (max-width: 1199.98px) {
+/* Ocho columnas, unos 1075px de tabla + 2px de borde + 2 × 32px del .page-wrapper: se mide el hueco del componente (no la ventana), así cuenta también la barra lateral
+   plegada; si no cabe, tarjetas y sin conmutador. */
+@container archivados (max-width: 1149.98px) {
   .ls-table-wrap,
   .ls-view { display: none; }
   .ls-grid.is-mobile-only { display: grid; }
 }
 
-.aal-client { min-width: 13rem; }
+/* «Statut à l'archivage» y «Contrat à l'archivage»: los rótulos largos pueden partir en dos líneas. */
+.ls-table th { white-space: normal; }
+.aal-client { min-width: 10rem; }
 .ls-table .is-num { text-align: right; }
 
 /* Contratos al archivar: una etiqueta por estado, con el número si hay varios. */
@@ -51,8 +57,11 @@
   min-height: 28px;
 }
 .aal-facts dt {
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-regular);
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
   color: var(--ds-ink-muted);
 }
 .aal-facts dd {

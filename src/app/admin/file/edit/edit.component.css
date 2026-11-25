@@ -1,19 +1,17 @@
-/* Administración: ficha completa de un dossier (Trait rouge)
+/* Administración: ficha completa de un dossier (Lin et bronze)
  * Base compartida: ficha.css (cabecera, tarjetas, datos) y alta.css (formulario del dossier).
  * Aquí: avance (dossier + un bloque por contrato), pestañas de Material, columna de contratos.
  *
  * states: cargando (esqueleto) · error de carga (empty state) · dossier cerrado (cancelado/archivado)
- *         guardando (spinner) · guardado (ok) · error (ladrillo, icono + texto)
+ *         guardando (spinner) · guardado (ok) · error (terracota, icono + texto)
  *         pestañas: default · hover · focus-visible · activa (las da mat-tab-nav-bar)
- * contrast: títulos ink 13.6:1 sobre vélin · meta ink-muted 6.8:1 · pestaña activa abeto 8.4:1
- * type: número de dossier e importes al 75 % con tabular-nums
+ * contrast: títulos ink 15.5:1 sobre vélin · meta ink-muted 5.9:1 · pestaña activa espresso (tema)
+ * relleno espresso: «Enregistrer» de la pestaña abierta, la acción de la vista.
+ * type: el número de dossier va como etiqueta de la cabecera; importes en Cormorant 600 con
+ *       lining-nums tabular-nums
  */
 :host { display: block; }
 
-.afe-num {
-  font-weight: var(--ds-weight-semibold);
-  color: var(--ds-ink);
-}
 .afe .skel.afe-skel-stage { height: 168px; }
 
 /* ── Avance ─────────────────────────────────────────────────────────────── */
@@ -37,7 +35,7 @@
   color: var(--ds-ink);
   overflow-wrap: anywhere;
 }
-.afe-builder mat-icon { flex-shrink: 0; width: 20px; height: 20px; font-size: 20px; color: var(--ds-ink-muted); }
+.afe-builder mat-icon { flex-shrink: 0; width: 20px; height: 20px; font-size: 20px; color: var(--ds-accent); }
 
 /* Fuera del flujo: sin línea de etapas, el estado en una pastilla con icono. */
 .afe-closed {
@@ -48,8 +46,11 @@
   gap: var(--ds-space-2) var(--ds-space-3);
 }
 .afe-closed__title {
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
   color: var(--ds-ink-muted);
 }
 .afe-closed__state {
@@ -95,7 +96,8 @@
 .fi-fact dd.afe-price {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-2xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
+  font-variant-numeric: lining-nums tabular-nums;
   line-height: var(--ds-leading-tight);
 }
 .afe-stage.is-out .afe-price { color: var(--ds-ink-muted); }

@@ -31,7 +31,9 @@
         <mat-icon>arrow_back</mat-icon>
         {{ 'common.back' | translate }}
       </button>
-      <app-page-header [titulo]="'admin_contract_detail.title' | translate">
+      <!-- El número de dossier, como etiqueta sobre el título («—» si el servicio no lo da). -->
+      <app-page-header [etiqueta]="c.expediente_numero !== '—' ? c.expediente_numero : null"
+                       [titulo]="'admin_contract_detail.title' | translate">
         <div actions class="acd-actions">
           @if (puedeCancel) {
             <button mat-stroked-button type="button" class="acd-cancel"
@@ -63,7 +65,6 @@
         </div>
       </app-page-header>
       <div class="fi-meta">
-        <span class="fi-fig">{{ c.expediente_numero }}</span>
         <span class="fi-meta__item"><mat-icon aria-hidden="true">person</mat-icon>{{ c.cliente_nombre }}</span>
         <span class="fi-meta__item"><mat-icon aria-hidden="true">engineering</mat-icon>{{ c.constructor_nombre }}</span>
         <app-status-chip [estado]="c.estado" prefijo="admin_contract.contrato_" />

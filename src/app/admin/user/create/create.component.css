@@ -1,8 +1,8 @@
-/* component: crear usuario (administración, Trait rouge)
+/* component: crear usuario (administración, Lin et bronze)
  * Todo vive en shared/ui/alta/alta.css (tarjetas, campos, foto, invitación, especialidades, pie),
  * como el alta de clientes y constructores del estimador. Aquí la configuración de la cuenta va
  * primero: el rol decide si se piden los datos del constructor.
- * Sin tomate: crear una persona no es una etapa del dossier (botón relleno abeto).
+ * relleno espresso: «Créer», la única acción de la vista.
  */
 
 :host { display: block; }

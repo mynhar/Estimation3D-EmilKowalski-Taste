@@ -2,9 +2,9 @@
 
 > **Dirección aprobada: Lin et bronze** (23-nov-2026; sustituye a Trait rouge). Toma el
 > diseño, la paleta y la tipografía de `agencia-inmobiliaria` y los lleva a Estimation3D.
-> Se hace por fases (ver abajo): la 0, la 1, la 2 y la 3 están hechas (la app entera lleva la
-> piel nueva y el cliente, las páginas públicas y el contratista ya están recompuestos); la
-> fase 4 recompone el estimador y el admin. Este archivo resume el sistema: el
+> Se hizo por fases (ver abajo) y las cinco están hechas: la app entera lleva la piel nueva y
+> el cliente, las páginas públicas, el contratista, el estimador y el admin están
+> recompuestos. Este archivo resume el sistema: el
 > detalle está en `DESIGN_GUIDELINES.md` y los valores reales en `src/styles/tokens.css`.
 > Siguen vigentes el contrato de stack, el uso de tokens `--ds-*` (sin hex sueltos ni
 > nombres `--color-*`) y el contraste AA.
@@ -153,7 +153,8 @@ La composición de cada pantalla se rehace en las fases 1–4; estos patrones t�
   segmentado y la hoja con la etapa y «Voir le dossier»).
 - Cabecera de pantalla (`app-page-header`): `etiqueta` en mayúsculas bronce oscuro sobre el
   título, `titulo` en Cormorant 600, `contexto` como línea de metadatos con «·». `enfasis`
-  (palabra final en cursiva bronce) **solo** en el saludo del dashboard del cliente.
+  (nombre en cursiva bronce) **solo** en el saludo de los dashboards del cliente, el
+  estimador y el admin; con saludo, la etiqueta es «Tableau de bord».
 - Cifras (KPI): rótulo en mayúsculas `--ds-ink-muted` y la cifra en Cormorant 600 con
   `lining-nums tabular-nums`; la unidad («sur 6», «%») en Manrope 14px `--ds-ink-muted`.
 - Títulos `h1`–`h6`: el reboot ya pone `lining-nums` (Cormorant trae cifras de estilo antiguo
@@ -165,8 +166,11 @@ La composición de cada pantalla se rehace en las fases 1–4; estos patrones t�
 - Hojas compartidas (`styleUrls: ['…/hoja.css', './x.component.css']`): `lista.css` (`ls-`),
   `alta.css` (`fc-`), `ficha.css` (`fi-`), `obras-lista.css` (`cml-`), `catalogo-lista.css`
   (`cl-`), `catalogo-form.css` (`cf-`). Ver `DESIGN_GUIDELINES.md` §5.
-- Tablas anchas: desde 768px (1200px en ofertas, contratos, obras, archivados; 1400px en
-  eventos IA); texto largo de celda recortado en un `<span>` con `line-clamp`, nunca el `<td>`.
+- Tablas anchas: celdas con 12px de relleno; cada lista mide su hueco con un container query
+  en el `:host` (cuenta la barra lateral plegada) y solo muestra la tabla, y el conmutador, si
+  cabe; si no, tarjetas. El umbral es el ancho mínimo medido de la tabla + 2px de borde + 64px
+  del `.page-wrapper` (p. ej. ofertas del admin 1230px, contratos 1160px, dossiers 970px).
+  Texto largo de celda recortado en un `<span>` con `line-clamp`, nunca el `<td>`.
 - Borrar o archivar: botón de texto terracota que abre una confirmación en línea
   (`role="alertdialog"`, confirmar terracota relleno). Sin `confirm()` ni diálogos.
 - Campo con `[formControlName]` dinámico: añade `[attr.name]` para `app-campos-faltantes`.
@@ -349,6 +353,23 @@ cada rol `--mat-sys-*` apunta a un token `--ds-*`.
 - Segmento elegido de `mat-button-toggle`: espresso con texto crema (global, en el tema)
 - Tabla completa y reglas de uso: `DESIGN_GUIDELINES.md` §4.
 
+## Estimador y admin (fase 4, hecho)
+- Mismos patrones que el cliente y el contratista: número como etiqueta sobre el título en las
+  ocho fichas, datos con subgrid, rótulos en mayúsculas, tarjetas con `--ds-shadow-xs` y
+  `--ds-shadow-md` al pasar, iconos de metadatos en bronce, enlaces en `--ds-action-ink`
+  (`--ds-ink` al pasar), barras y pasos en bronce, cifras en Cormorant 600.
+- Un relleno espresso por vista: la acción que hace avanzar el dossier («Envoyer
+  l'estimation», adjudicar, «Marquer comme signé»…) o, si no hay etapa, la única acción
+  (crear, guardar). Lo repetido en cada tarjeta o fila («Prendre l'estimation», «Continuer»,
+  «Modifier») y los caminos alternativos (enviar la invitación, guardar el borrador o los
+  cambios de una oferta) van con borde. Un formulario o una confirmación en línea que abre el
+  usuario lleva su propio relleno mientras está abierto (terracota si borra o anula).
+- Tableros: saludo con el nombre en cursiva bronce; resumen en banda de lino oscuro con
+  rótulos en `--ds-ink-secondary`. En móvil, los recuentos y las tejas del admin pasan a filas
+  (rótulo y cifra en la misma línea): tres rótulos en mayúsculas no caben en un tercio.
+- Orden de un catálogo (fases y actividades del tipo de servicio): disco `--ds-accent-soft`
+  con la cifra en `--ds-accent-ink` (marca, no actúa).
+
 ## Fases del rediseño
 0. **Base Lin et bronze (hecho, 23-nov-2026)**: fuera los restos de Trait rouge (tomate,
    `--ds-mark`, `.ds-cta`, Archivo y sus anchos, la cota del hero y de la barra de etapas);
@@ -376,7 +397,13 @@ cada rol `--mat-sys-*` apunta a un token `--ds-*`.
    usan (vídeo del dossier, archivar, matterport-info). «Faire une offre» con borde en las
    listas; la tabla de obras se mide con un container query; en el seguimiento, la raya entre
    etapas solo se pinta pasada la actual. Sin claves de i18n nuevas.
-4. Estimador y admin.
+4. **Estimador y admin (hecho, 24-nov-2026)**: dashboards, listas (dossiers, por estimar, en
+   estimación, completados, clientes, usuarios, ofertas, contratos, obras, archivados,
+   catálogos, avisos IA), fichas (dossier, estimación, oferta, contrato, informe del
+   estimador, ofertas de los constructores) y altas; hojas compartidas `lista.css`,
+   `ficha.css`, `alta.css`, `catalogo-*.css` y el reparto de ofertas. Las tablas se miden con
+   container queries; acciones repetidas y caminos alternativos con borde; saludo en cursiva
+   bronce en los tres tableros. Sin claves de i18n nuevas.
 
 Historial: Clarté (6-nov-2026) → Trait rouge (20 al 23-nov-2026, cerrado en el commit
 `38ddb15` de `redesign/clarte`) → Lin et bronze (rama `redesign/lin-bronze`).

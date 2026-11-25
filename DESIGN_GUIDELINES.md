@@ -143,7 +143,7 @@ Dos familias, bien distintas:
 |-----|---------|------|-------|
 | Título | Cormorant Garamond (`--ds-font-display`) | `--ds-weight-semibold` (600) | `h1`–`h6`, títulos de pantalla, sección, tarjeta y diálogo |
 | Cifra | Cormorant Garamond | 500–600 | Precios, horas, porcentajes, KPI; siempre con `font-variant-numeric: lining-nums tabular-nums` |
-| Palabra en cursiva | Cormorant Garamond itálica | 500–600, `--ds-accent` | **Solo** el saludo del dashboard y los títulos de la landing; una palabra, ≥ 24px |
+| Palabra en cursiva | Cormorant Garamond itálica | 500–600, `--ds-accent` | **Solo** el saludo de los dashboards (el nombre) y los títulos de la landing; ≥ 24px |
 | Interfaz | Manrope (`--ds-font-body`) | 400 / 500 / 600 / 700 / 800 | Texto, botones, formularios, navegación |
 | Etiqueta en mayúsculas | Manrope | 700, `--ds-text-label` (12px), `--ds-tracking-label` (0.2em) | Grupos de navegación y de lista (meses, tipos), cabeceras de tabla, etiquetas de KPI y rótulos de datos (`dt`) en `--ds-ink-muted`; etiqueta sobre un título (número de dossier, categoría) en `--ds-accent-ink` |
 
@@ -510,7 +510,7 @@ Antes de cerrar un componente, verifica que:
 
 ### Cabecera de pantalla y cifras
 
-- `app-page-header`: `etiqueta` (mayúsculas, `--ds-accent-ink`, sobre el título), `titulo` (h1 Cormorant 600, 28–44px), `contexto` (línea de metadatos `--ds-ink-muted`, con «·» si junta datos) y las acciones proyectadas con `actions`. `enfasis` pinta una palabra final en cursiva bronce y es **solo** para el saludo del dashboard del cliente («Bonjour, *Marie*»).
+- `app-page-header`: `etiqueta` (mayúsculas, `--ds-accent-ink`, sobre el título), `titulo` (h1 Cormorant 600, 28–44px), `contexto` (línea de metadatos `--ds-ink-muted`, con «·» si junta datos) y las acciones proyectadas con `actions`. `enfasis` pinta el final del título en cursiva bronce y es **solo** para el saludo de los dashboards del cliente, del estimador y del admin («Bonjour, *Marie*»); con saludo, la `etiqueta` es «Tableau de bord».
 - Tarjeta de la siguiente etapa (dashboard del cliente): `--ds-dark-surface`, etiqueta en `--ds-accent-on-dark`, título Cormorant 28–36px en crema, texto `--ds-ink-inverse-muted`, `mat-flat-button` crema (`--mat-button-filled-container-color: var(--ds-ink-inverse)`, texto espresso) y `--ds-focus-ring: var(--ds-focus-ring-dark)` en el contenedor.
 - Cifras (KPI): rejilla en una tarjeta vélin, celdas separadas por `--ds-border-subtle`; rótulo en mayúsculas `--ds-ink-muted` arriba y la cifra abajo (`align-content: space-between`, para que dos rótulos de distinta altura no desalineen las cifras), Cormorant 600 a 40px con `lining-nums tabular-nums`; la unidad en Manrope 14px `--ds-ink-muted`.
 
@@ -532,9 +532,9 @@ Antes de cerrar un componente, verifica que:
   ```
   Con rótulos largos en mayúsculas, columnas de 11rem como mínimo (a menos parten en tres líneas). El `row-gap` del subgrid (4px) manda dentro del par y el del padre separa los pares: con varias filas de datos no hace falta margen. Sobre una banda `--ds-band`, rótulos en `--ds-ink-secondary` (6.3:1).
 - **Resumen de una lista** (contratos, obras): la tarjeta de cifras del dashboard (ver «Cabecera de pantalla y cifras»), 2 columnas en móvil y 4 desde 768px, celdas con `--ds-space-4` (5 desde 768px) y la cifra a `clamp(var(--ds-text-2xl), 1.5rem + 1.2vw, 2.5rem)`.
-- **Tablas**: `th` con la etiqueta en mayúsculas; filas separadas por `--ds-border-subtle`; el enlace de la fila a `--ds-text-lg`.
+- **Tablas**: `th` con la etiqueta en mayúsculas; celdas con 12px de relleno (`--ds-space-3`); filas separadas por `--ds-border-subtle`; el enlace de la fila a `--ds-text-lg`.
 - **Avance y pasos**: barra con pista `--ds-band` y relleno `--ds-accent`; paso hecho con punto bronce e icono crema (`--ds-ink-inverse`); el actual con halo `--ds-accent-soft`. Una oferta que espera respuesta lleva un filete superior bronce de 3px.
-- **Color**: enlaces en `--ds-action-ink` con hover a `--ds-ink`; iconos de sección, de lista y de dato en `--ds-accent`. Un solo botón relleno espresso por vista.
+- **Color**: enlaces en `--ds-action-ink` con hover a `--ds-ink`; iconos de sección, de lista y de dato en `--ds-accent`. Un solo botón relleno espresso por vista: la acción que hace avanzar el dossier o, si no hay etapa, la única acción. Un formulario o una confirmación en línea que abre el usuario lleva su propio relleno mientras está abierto (terracota si borra o anula).
 
 ### Visor de medios (`shared/ui/media-viewer`)
 
@@ -555,21 +555,22 @@ Antes de cerrar un componente, verifica que:
 - Un formato (código postal, licencia RBQ) va en una ayuda bajo el campo (`.fld__hint` o `mat-hint`), enlazada con `aria-describedby`; si hay error, el error la sustituye.
 - Solo quedan los placeholders que son instrucción («Décrivez la situation», «Quelques mots sur votre approche»).
 
-### Listas del contratista (y de los roles internos)
+### Listas del contratista, del estimador y del admin
 
 - Filtro de estado con `mat-button-toggle-group` (ver §4) en lugar de píldoras KPI; conmutador tarjetas / tabla con `[aria-label]` + `matTooltip`. La tabla solo desde 768px; por debajo, siempre tarjetas.
 - Tarjeta enlazada: el título es el único enlace y su `::after` (`position: absolute; inset: 0`) hace pulsable toda la tarjeta; el anillo de foco va en la tarjeta con `:has(a:focus-visible)`. Otros botones dentro de la tarjeta, con `position: relative; z-index: 1`.
 - Foto en una caja con `aspect-ratio`: la imagen `position: absolute; inset: 0; object-fit: cover`. Si la imagen va en el flujo, estira la caja y rompe el ratio.
 - Sin datos tras filtrar: un `app-empty-state` con «Effacer les filtres», distinto del vacío real.
 - Dato oculto o archivado: los servicios devuelven `'—'`; la plantilla lo filtra (`hay(valor)`) y no pinta la fila. Lo mismo con la etiqueta de la cabecera: sin número, `null`.
-- **Acción repetida** en cada tarjeta o fila («Faire une offre»): `mat-stroked-button`. El relleno espresso queda para la acción única de la vista.
+- **Acción repetida** en cada tarjeta o fila («Faire une offre», «Prendre l'estimation», «Continuer») y **camino alternativo** (enviar la invitación, guardar el borrador o los cambios de una oferta): `mat-stroked-button`. El relleno espresso queda para la acción única de la vista.
 - **Dos acciones que compiten por el relleno** (guardar el parte y, para el admin con la obra al 100 %, completar el contrato): la que no manda pasa a borde con `[matButton]="cond ? 'outlined' : 'filled'"` en lugar de `mat-flat-button`. Nunca dos rellenos a la vez.
 - **Tabla ancha del contratista** (obras, 8 columnas, unos 1100px): `:host { container: obras / inline-size; }` y `@container obras (max-width: …)` oculta la tabla y el conmutador y muestra las tarjetas. Se mide el hueco, no la ventana: cuenta la barra lateral plegada o desplegada.
 - **Pantallas de detalle** (hacer una oferta, mi oferta, seguimiento): `app-page-header [etiqueta]="numero"`; subapartados `h3` en Manrope 700 a 16px (como los grupos del formulario); iconos de archivo y de dato en `--ds-accent`; en el seguimiento, KPI con el rótulo arriba (subgrid), etapas como la stage-line (hechas en bronce, la actual con halo, la raya en bronce solo pasada la actual) y fases hechas en bronce; la fase elegida es una selección (espresso).
 
 ### Pantallas del estimador y del admin
 
-- **Tablas anchas**: `lista.css` muestra la tabla desde 768px. Una lista con muchas columnas la retrasa en su propio CSS y muestra tarjetas por debajo: 1200px en ofertas, contratos, obras y archivados; 1400px en eventos IA. Comprueba a 1280px que la tabla no desborda.
+- **Tablas anchas**: `lista.css` muestra la tabla desde 768px. Cada lista con tabla mide su hueco: `:host { container: nombre / inline-size; }` y `@container nombre (max-width: …)` oculta `.ls-table-wrap` y `.ls-view` y muestra `.ls-grid.is-mobile-only`. El umbral es el ancho mínimo de la tabla (mídelo con `table.style.width = 'min-content'`) + 2px de borde + 64px del `.page-wrapper`. Rótulos de cabecera muy largos («Statut à l'archivage») pueden partir (`th { white-space: normal }`). Comprueba a 1440, 1280 y 1000px que ninguna tabla desborda.
+- **Tableros**: resumen en banda de lino oscuro (rótulos en `--ds-ink-secondary`, cifras en Cormorant 600). En móvil, si tres rótulos en mayúsculas no caben en un tercio, los recuentos y las tejas pasan a filas (rótulo y cifra en la misma línea).
 - **Texto largo en una celda**: recorta un `<span>` dentro del `<td>` con `-webkit-line-clamp`, nunca el `<td>` (con `display: -webkit-box` deja de ser celda y rompe la tabla).
 - **Borrar o archivar** (irreversible): botón de texto terracota (`cf-del`, `--mat-button-text-label-text-color: var(--ds-danger-ink)`) que abre, en su sitio, un recuadro `cf-danger` con `role="alertdialog"`, la pregunta con icono y dos botones: cancelar de texto y confirmar terracota relleno con icono y texto. Mientras borra, guardar queda desactivado. Sin `confirm()` del navegador.
 - **Campo con `[formControlName]` dinámico** (un campo por idioma, una fila de tabla): añade `[attr.name]` con el mismo valor; `app-campos-faltantes` busca el campo por `name` para leer su etiqueta.

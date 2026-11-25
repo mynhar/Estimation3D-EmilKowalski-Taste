@@ -257,8 +257,9 @@
         } @else if (exitoOf()) {
           <p class="fi-feedback is-ok" role="status"><mat-icon aria-hidden="true">check_circle</mat-icon>{{ 'make_offer.success_updated' | translate }}</p>
         }
+        <!-- Con borde: el relleno espresso es adjudicar, la siguiente etapa del dossier. -->
         <div class="fi-actions">
-          <button mat-flat-button type="button" (click)="guardarOferta()" [disabled]="guardandoOf()">
+          <button mat-stroked-button type="button" (click)="guardarOferta()" [disabled]="guardandoOf()">
             @if (guardandoOf()) { <span class="fi-spinner" aria-hidden="true"></span> } @else { <mat-icon>save</mat-icon> }
             {{ (guardandoOf() ? 'common.saving' : 'admin_file_edit.save_constructor') | translate }}
           </button>

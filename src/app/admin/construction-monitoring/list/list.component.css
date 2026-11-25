@@ -6,11 +6,15 @@
  *         tarjeta cancelada o archivada atenuada (.is-out) · miniatura caída (marcador)
  * Sin relleno espresso: la obra se consulta, no hay siguiente etapa desde la lista.
  */
-:host { display: block; }
+:host {
+  display: block;
+  container: obras / inline-size;
+}
 
-/* Seis columnas (número, plazo y firma van como segunda línea): la tabla solo desde 1200px;
- * por debajo, siempre tarjetas. */
-@media (max-width: 1199.98px) {
+/* Seis columnas (número, plazo y firma van como segunda línea): unos 1070px de tabla. Se mide el
+ * hueco del componente (no la ventana), así cuenta también la barra lateral plegada; si no cabe,
+ * tarjetas y sin conmutador. 1070px + 2px de borde + 2 × 32px del .page-wrapper. */
+@container obras (max-width: 1149.98px) {
   .cml-table-wrap,
   .cml-view { display: none; }
   .cml-grid.is-mobile-only { display: grid; }

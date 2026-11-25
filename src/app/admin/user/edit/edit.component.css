@@ -1,9 +1,9 @@
-/* component: editar usuario (administración, Trait rouge)
+/* component: editar usuario (administración, Lin et bronze)
  * Todo vive en shared/ui/alta/alta.css (identidad, tarjetas, campos, foto, invitación,
  * especialidades, pie), como la edición de clientes y constructores del estimador. Aquí la
  * configuración de la cuenta va primero y, para estimadores y constructores, los videos de
  * presentación van entre la identidad y el formulario (se guardan al momento, fuera del <form>).
- * Sin tomate: guardar una persona no es una etapa del dossier (botón relleno abeto).
+ * relleno espresso: guardar, la única acción de la vista.
  */
 
 :host { display: block; }

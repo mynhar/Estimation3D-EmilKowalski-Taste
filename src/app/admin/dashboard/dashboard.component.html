@@ -1,9 +1,11 @@
 <div class="page-wrapper ad">
 
   <app-page-header
-    [titulo]="bienvenida ? ('dashboard_client.welcome' | translate) + ', ' + bienvenida : ('admin_dashboard.title' | translate)"
+    [etiqueta]="bienvenida ? ('admin_dashboard.title' | translate) : null"
+    [titulo]="bienvenida ? ('dashboard_client.welcome' | translate) + ', ' : ('admin_dashboard.title' | translate)"
+    [enfasis]="bienvenida || null"
     [contexto]="'admin_dashboard.subtitle' | translate">
-    <!-- Sin tomate: el tablero solo resume; cada etapa se decide en su lista. -->
+    <!-- Sin relleno espresso: el tablero solo resume; cada etapa se decide en su lista. -->
     <div actions class="ad-refresh">
       @if (refreshedAt()) {
         <span class="ad-refresh__ts">
@@ -42,7 +44,7 @@
 
   } @else if (stats(); as s) {
 
-    <!-- ── Resumen sobre banda kraft ─────────────────────────────────────── -->
+    <!-- ── Resumen sobre banda de lino oscuro ─────────────────────────────────────── -->
     <section class="ad-sum" [attr.aria-label]="'admin_dashboard.eyebrow' | translate">
       <dl class="ad-sum__lead">
         <dt>{{ 'admin_dashboard.mini_contract_value' | translate }}</dt>

@@ -46,18 +46,13 @@
   color: var(--ds-accent);
 }
 
-/* Edición: número del dossier y su estado bajo el título. */
+/* Edición: el estado bajo el título (el número va de etiqueta en app-page-header). */
 .fc-meta {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--ds-space-2) var(--ds-space-3);
   margin: 0;
-}
-.fc-meta__num {
-  font-weight: var(--ds-weight-semibold);
-  font-variant-numeric: lining-nums tabular-nums;
-  color: var(--ds-ink-secondary);
 }
 
 /* ── Cuerpo: secciones + raíl ───────────────────────────────────────────── */
@@ -388,7 +383,7 @@ mat-error mat-icon {
   color: var(--ds-ink-secondary);
   overflow-wrap: anywhere;
 }
-.fc-cli__meta mat-icon { flex-shrink: 0; width: 18px; height: 18px; font-size: 18px; color: var(--ds-ink-muted); }
+.fc-cli__meta mat-icon { flex-shrink: 0; width: 18px; height: 18px; font-size: 18px; color: var(--ds-accent); }
 
 /* ── Raíl ───────────────────────────────────────────────────────────────── */
 .fc-summary__list { display: grid; gap: var(--ds-space-3); margin: 0; padding: 0; list-style: none; }
@@ -467,14 +462,17 @@ mat-error mat-icon {
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-xs);
 }
 .fc-identity .fc-avatar { width: 56px; height: 56px; font-size: var(--ds-text-lg); }
 .fc-identity__text { display: grid; flex: 1 1 14rem; gap: 2px; min-width: 0; }
 .fc-identity__name {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-lg);
+  font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-semibold);
+  line-height: var(--ds-leading-snug);
+  font-variant-numeric: lining-nums;
   color: var(--ds-ink);
   overflow-wrap: anywhere;
 }
@@ -487,7 +485,7 @@ mat-error mat-icon {
   color: var(--ds-ink-muted);
 }
 .fc-identity__meta > span { display: inline-flex; align-items: center; gap: var(--ds-space-1); overflow-wrap: anywhere; }
-.fc-identity__meta mat-icon { flex-shrink: 0; width: 18px; height: 18px; font-size: 18px; }
+.fc-identity__meta mat-icon { flex-shrink: 0; width: 18px; height: 18px; font-size: 18px; color: var(--ds-accent); }
 .fc-avatar img { width: 100%; height: 100%; border-radius: inherit; object-fit: cover; }
 .fc-avatar:has(img) { overflow: hidden; }
 

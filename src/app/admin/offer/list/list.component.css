@@ -1,12 +1,16 @@
-/* Administración: dossiers con ofertas (Trait rouge)
+/* Administración: dossiers con ofertas (Lin et bronze)
  * Base en shared/ui/lista/lista.css; aquí solo lo propio.
- * states: cargando · error · sin dossiers · filtros sin resultados · tarjetas · tabla
- * tomate: ninguno. Se adjudica en la ficha de la oferta.
+ * states: cargando · error · sin dossiers · filtros sin resultados · tarjetas · tabla (si cabe)
+ * sin relleno espresso: se adjudica en la ficha de la oferta.
  */
-:host { display: block; }
+:host {
+  display: block;
+  container: ofertas / inline-size;
+}
 
-/* Nueve columnas: la tabla solo desde 1200px; por debajo, siempre tarjetas. */
-@media (max-width: 1199.98px) {
+/* Nueve columnas, unos 1150px de tabla + 2px de borde + 2 × 32px del .page-wrapper: se mide el hueco del componente (no la ventana), así cuenta también la barra lateral
+   plegada; si no cabe, tarjetas y sin conmutador. */
+@container ofertas (max-width: 1229.98px) {
   .ls-table-wrap,
   .ls-view { display: none; }
   .ls-grid.is-mobile-only { display: grid; }
@@ -14,7 +18,7 @@
 
 .aol-price { font-weight: var(--ds-weight-semibold); color: var(--ds-ink); }
 .aol-zero { color: var(--ds-ink-muted); }
-.aol-client { min-width: 13rem; }
+.aol-client { min-width: 10rem; }
 
 .ls-table th.is-right,
 .ls-table td.is-right { text-align: right; white-space: nowrap; }

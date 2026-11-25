@@ -128,8 +128,9 @@
                       <ng-container [ngTemplateOutlet]="urgenciaTag" [ngTemplateOutletContext]="{ $implicit: exp }" />
                     </span>
                   </td>
+                  <!-- Acción repetida en cada fila: con borde, el relleno es de la vista. -->
                   <td class="ls-table__action">
-                    <button mat-flat-button type="button"
+                    <button mat-stroked-button type="button"
                             [attr.aria-describedby]="'ftbe-t-' + exp.id" (click)="estimar(exp.id)">
                       {{ 'files_to_estimate.take_estimate' | translate }}
                     </button>
@@ -189,7 +190,8 @@
                 </span>
               </div>
 
-              <button mat-flat-button type="button" class="ls-card__cta"
+              <!-- Acción repetida en cada tarjeta: con borde, el relleno es de la vista. -->
+              <button mat-stroked-button type="button" class="ls-card__cta"
                       [attr.aria-describedby]="'ftbe-c-' + exp.id" (click)="estimar(exp.id)">
                 <mat-icon>edit_note</mat-icon>
                 {{ 'files_to_estimate.take_estimate' | translate }}

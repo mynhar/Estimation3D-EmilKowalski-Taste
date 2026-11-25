@@ -74,7 +74,7 @@
         <p class="fi-feedback is-ok" role="status"><mat-icon aria-hidden="true">check_circle</mat-icon>{{ 'estimator_form.success_estimation' | translate }}</p>
       }
 
-      <!-- Guardar el informe: abeto (la administración corrige; no es la siguiente etapa del dossier). -->
+      <!-- Guardar el informe: relleno espresso, la acción de la vista (la administración corrige). -->
       <div class="fi-actions">
         <button mat-flat-button type="button" [disabled]="guardandoEst()" (click)="guardarEstimacion()">
           @if (guardandoEst()) { <span class="fi-spinner" aria-hidden="true"></span> } @else { <mat-icon>save</mat-icon> }
@@ -196,8 +196,9 @@
               <mat-icon>groups</mat-icon>
               {{ 'admin_invite.all_builders_btn' | translate }}
             </button>
-            <!-- Envía el correo y además guarda y envía la estimación. -->
-            <button mat-flat-button type="button" (click)="enviarInvitacionYEstimacion()"
+            <!-- Envía el correo y además guarda y envía la estimación. Camino alternativo:
+                 con borde; el relleno es guardar el informe, arriba. -->
+            <button mat-stroked-button type="button" (click)="enviarInvitacionYEstimacion()"
                     [disabled]="bloqueadoPorOferta || enviandoInvitacion() || guardandoEst() || abriendoATodos()
                                 || confirmarAbrirATodos() || seleccionInvitados().size === 0">
               @if (enviandoInvitacion() || guardandoEst()) { <span class="fi-spinner" aria-hidden="true"></span> } @else { <mat-icon>forward_to_inbox</mat-icon> }

@@ -1,14 +1,20 @@
-/* component: tablero del estimador (Trait rouge)
+/* component: tablero del estimador (Lin et bronze)
  * states: cargando · sin dossiers · sin estimaciones en curso · con estimaciones · seguimiento
  *         post-estimación (tabla o tarjetas) · obras; interactivos: default · hover (puntero fino)
  *         · focus-visible · active
- * contrast: títulos ink (11.8:1) · texto ink-secondary (8.7:1) · secundarios ink-muted (6.1:1)
- *           resumen sobre kraft: ink-secondary 7.7:1 · enlaces action (8.4:1)
+ * contrast: títulos ink (15.5:1 sobre vélin) · texto ink-secondary (7.8:1) · secundarios ink-muted (5.9:1)
+ *           resumen sobre banda: texto y rótulos ink-secondary 6.3:1 · enlaces action-ink (6.3:1)
  *           urgencia: danger-ink sobre danger-soft, warning-ink sobre warning-soft, info-ink sobre
- *           info-soft, siempre con icono y texto
- * tomate: «Continuer» de la primera estimación en curso o, sin ninguna, «Voir les dossiers»
- * type: títulos 112 %; importes, porcentajes, recuentos y números de dossier 75 % tabular
+ *           info-soft, siempre con icono y texto · barras en bronce, con el porcentaje en texto
+ * relleno espresso: «Continuer» de la primera estimación en curso o, sin ninguna, «Voir les dossiers»
+ * type: títulos y cifras en Cormorant 600 con lining-nums tabular-nums; números de dossier y
+ *       rótulos del resumen en etiqueta en mayúsculas
  */
+
+:host {
+  display: block;
+  container: tablero / inline-size;
+}
 
 .ed {
   display: grid;
@@ -42,7 +48,7 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
 }
@@ -64,15 +70,34 @@
 .ed-link {
   margin-left: auto;
   border-radius: var(--ds-radius-sm);
-  color: var(--ds-action);
+  color: var(--ds-action-ink);
   font-weight: var(--ds-weight-bold);
   text-decoration: underline;
   text-underline-offset: 3px;
+  transition: var(--ds-transition-color);
 }
 .ed-link:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
 @media (hover: hover) and (pointer: fine) {
-  .ed-link:hover { color: var(--ds-action-hover); }
+  .ed-link:hover { color: var(--ds-ink); }
 }
+
+/* Etiquetas en mayúsculas: números de dossier y rótulos del resumen. */
+.ed-work__num,
+.ed-card__num,
+.ed-obra__num,
+.ed-sum dt,
+.ed-sum__rate-head > span {
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+/* Sobre la banda, rótulos en ink-secondary (6.3:1). */
+.ed-sum dt,
+.ed-sum__rate-head > span { color: var(--ds-ink-secondary); }
 
 .ed-fig {
   font-variant-numeric: lining-nums tabular-nums;
@@ -104,7 +129,7 @@
   width: 18px;
   height: 18px;
   font-size: 18px;
-  color: var(--ds-ink-muted);
+  color: var(--ds-accent);
 }
 .ed-meta .is-late,
 .ed-meta .is-late mat-icon { color: var(--ds-danger-ink); }
@@ -116,12 +141,12 @@
   border-radius: var(--ds-radius-pill);
   background: var(--ds-band);
 }
+/* El avance marca, no actúa: bronce. */
 .ed-bar__fill {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--ds-action-soft);
-  box-shadow: inset 0 0 0 1px var(--ds-action);
+  background: var(--ds-accent);
   transition: width var(--ds-duration-slow) var(--ds-ease-out);
 }
 
@@ -183,6 +208,7 @@
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-xs);
 }
 .ed-work__top {
   display: flex;
@@ -191,17 +217,13 @@
   justify-content: space-between;
   gap: var(--ds-space-2) var(--ds-space-3);
 }
-.ed-work__num {
-  font-size: var(--ds-text-sm);
-  font-variant-numeric: lining-nums tabular-nums;
-  color: var(--ds-ink-muted);
-}
 .ed-work__service {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-bold);
+  font-size: var(--ds-text-xl);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
+  font-variant-numeric: lining-nums;
   color: var(--ds-ink);
   overflow-wrap: anywhere;
 }
@@ -231,7 +253,7 @@
 .ed-urg.is-today { background: var(--ds-warning-soft); color: var(--ds-warning-ink); }
 .ed-urg.is-soon  { background: var(--ds-info-soft);    color: var(--ds-info-ink); }
 
-/* Resumen sobre banda kraft: se lee como el pie de la columna, no como otra tarjeta. */
+/* Resumen sobre banda de lino oscuro: se lee como el pie de la columna, no como otra tarjeta. */
 .ed-sum {
   display: grid;
   gap: var(--ds-space-5);
@@ -242,9 +264,7 @@
 }
 .ed-sum dl,
 .ed-sum dd { margin: 0; }
-.ed-sum dt { font-size: var(--ds-text-sm); font-weight: var(--ds-weight-medium); }
-
-.ed-sum__lead { display: grid; gap: 2px; }
+.ed-sum__lead { display: grid; gap: var(--ds-space-1); }
 .ed-sum__amount {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-3xl);
@@ -253,6 +273,7 @@
   line-height: var(--ds-leading-tight);
   color: var(--ds-ink);
 }
+/* Recuentos: rótulo arriba y cifra abajo; con subgrid, un rótulo en dos líneas no las descuadra. */
 .ed-sum__counts {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -260,11 +281,18 @@
   padding-top: var(--ds-space-4);
   border-top: 1px solid var(--ds-border-strong);
 }
-.ed-sum__counts > div { display: grid; gap: 2px; min-width: 0; }
+.ed-sum__counts > div {
+  display: grid;
+  grid-row: span 2;
+  grid-template-rows: subgrid;
+  row-gap: var(--ds-space-1);
+  min-width: 0;
+}
+.ed-sum__counts dt { align-self: end; }
 .ed-sum__counts dd {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-2xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-tight);
   color: var(--ds-ink);
 }
@@ -274,12 +302,11 @@
   align-items: baseline;
   justify-content: space-between;
   gap: var(--ds-space-3);
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
 }
 .ed-sum__rate-head .ed-fig {
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-xl);
+  font-weight: var(--ds-weight-semibold);
   color: var(--ds-ink);
 }
 .ed-sum .ed-bar { background: var(--ds-surface); }
@@ -308,6 +335,7 @@
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-xs);
 }
 @media (min-width: 768px) {
   .ed-table-wrap { display: block; }
@@ -316,15 +344,18 @@
 .ed-table th {
   padding: var(--ds-space-3) var(--ds-space-4);
   border-bottom: 1px solid var(--ds-border);
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-semibold);
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
   color: var(--ds-ink-muted);
   text-align: left;
   white-space: nowrap;
 }
 .ed-table td {
   padding: var(--ds-space-3) var(--ds-space-4);
-  border-top: 1px solid var(--ds-border);
+  border-top: 1px solid var(--ds-border-subtle);
   vertical-align: middle;
   color: var(--ds-ink-secondary);
 }
@@ -390,6 +421,13 @@
 @media (min-width: 768px) {
   .ed-cards.is-mobile-only { display: none; }
 }
+/* La tabla del seguimiento pide unos 910px (+ 2px de borde + 2 × 32px del .page-wrapper). Se mide
+   el hueco del componente (no la ventana); si no cabe, tarjetas y sin conmutador. */
+@container tablero (max-width: 989.98px) {
+  .ed-table-wrap,
+  .ed-view { display: none; }
+  .ed-cards.is-mobile-only { display: grid; }
+}
 .ed-card {
   position: relative;
   display: grid;
@@ -399,7 +437,9 @@
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
-  transition: border-color var(--ds-duration-fast) var(--ds-ease-out);
+  box-shadow: var(--ds-shadow-xs);
+  transition: border-color var(--ds-duration-fast) var(--ds-ease-out),
+              box-shadow var(--ds-duration-fast) var(--ds-ease-out);
 }
 .ed-card:has(.ed-card__link:focus-visible) { box-shadow: var(--ds-focus-ring); }
 .ed-card__photo {
@@ -431,7 +471,7 @@
 /* Cancelado o archivado: la foto pasa a segundo plano. */
 .ed-card.is-out .ed-card__photo img { filter: grayscale(1); opacity: 0.85; }
 @media (hover: hover) and (pointer: fine) {
-  .ed-card:hover { border-color: var(--ds-border-strong); }
+  .ed-card:hover { border-color: var(--ds-border-strong); box-shadow: var(--ds-shadow-md); }
   .ed-card:hover .ed-card__photo img { transform: scale(1.02); }
 }
 .ed-card__body {
@@ -445,9 +485,10 @@
 .ed-card__title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-bold);
+  font-size: var(--ds-text-xl);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
+  font-variant-numeric: lining-nums;
 }
 .ed-card__link {
   display: -webkit-box;
@@ -463,11 +504,9 @@
   position: absolute;
   inset: 0;
 }
-.ed-card__num {
-  margin: calc(var(--ds-space-1) * -1) 0 0;
-  font-size: var(--ds-text-sm);
-  color: var(--ds-ink-muted);
-}
+/* Número del dossier sobre el título (en el HTML va detrás: el enlace es el título). */
+.ed-card__body > app-status-chip { order: -2; margin-bottom: var(--ds-space-1); }
+.ed-card__num { order: -1; margin: 0 0 calc(var(--ds-space-1) * -1); }
 .ed-card__stage {
   align-self: stretch;
   margin-top: auto;
@@ -501,16 +540,18 @@
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-xs);
   color: var(--ds-ink);
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
   transition: border-color var(--ds-duration-fast) var(--ds-ease-out),
+              box-shadow var(--ds-duration-fast) var(--ds-ease-out),
               transform var(--ds-duration-fast) var(--ds-ease-out);
 }
 .ed-obra:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
 .ed-obra:active { transform: scale(0.99); }
 @media (hover: hover) and (pointer: fine) {
-  .ed-obra:hover { border-color: var(--ds-border-strong); }
+  .ed-obra:hover { border-color: var(--ds-border-strong); box-shadow: var(--ds-shadow-md); }
 }
 .ed-obra__top {
   display: flex;
@@ -521,19 +562,24 @@
 .ed-obra__service {
   min-width: 0;
   font-family: var(--ds-font-display);
-  font-size: var(--ds-text-lg);
-  font-weight: var(--ds-weight-bold);
+  font-size: var(--ds-text-xl);
+  font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
+  font-variant-numeric: lining-nums;
   overflow-wrap: anywhere;
 }
-.ed-obra__num {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 var(--ds-space-3);
-  margin-top: calc(var(--ds-space-2) * -1);
+/* El número va encima del servicio, pegado a él. */
+.ed-obra__num { margin-bottom: calc(var(--ds-space-2) * -1); }
+.ed-obra__client {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  margin-top: calc(var(--ds-space-1) * -1);
   font-size: var(--ds-text-sm);
-  color: var(--ds-ink-muted);
+  color: var(--ds-ink-secondary);
+  overflow-wrap: anywhere;
 }
+.ed-obra__client mat-icon { flex-shrink: 0; width: 18px; height: 18px; font-size: 18px; color: var(--ds-accent); }
 .ed-obra__avance {
   display: grid;
   grid-template-columns: 4.5rem minmax(0, 1fr);

@@ -1,10 +1,21 @@
-/* Administración: todos los dossiers (Trait rouge)
+/* Administración: todos los dossiers (Lin et bronze)
  * Base en shared/ui/lista/lista.css; aquí solo lo propio.
  * Búsqueda y estado van al servidor (paginado): la barra de filtros vive fuera del @if de carga.
- * states: cargando · error · sin dossiers · filtros sin resultados · tarjetas · tabla
- * tomate: «Nouveau dossier», el inicio del recorrido. «Modifier» va como icono.
+ * states: cargando · error · sin dossiers · filtros sin resultados · tarjetas · tabla (si cabe)
+ * relleno espresso: «Nouveau dossier», el inicio del recorrido. «Modifier» va como icono.
  */
-:host { display: block; }
+:host {
+  display: block;
+  container: dossiers / inline-size;
+}
+
+/* Siete columnas, unos 890px de tabla + 2px de borde + 2 × 32px del .page-wrapper: se mide el hueco del componente (no la ventana), así cuenta también la barra lateral
+   plegada; si no cabe, tarjetas y sin conmutador. */
+@container dossiers (max-width: 969.98px) {
+  .ls-table-wrap,
+  .ls-view { display: none; }
+  .ls-grid.is-mobile-only { display: grid; }
+}
 
 /* Ocho estados: el filtro no cabe junto a la búsqueda. Búsqueda arriba;
    filtro y vista comparten la fila de abajo. */

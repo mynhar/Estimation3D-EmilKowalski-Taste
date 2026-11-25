@@ -286,7 +286,7 @@
         <button mat-button type="button" class="fc-cancel" (click)="cancelar()" [disabled]="ocupado()">
           {{ 'common.cancel' | translate }}
         </button>
-        <!-- Guardar una persona no es una etapa del dossier: abeto, no tomate. -->
+        <!-- Guardar una persona: relleno espresso, la acción de la vista. -->
         <button mat-flat-button type="submit" class="fc-save" [disabled]="ocupado()">
           @if (guardando()) { <span class="fc-spinner" aria-hidden="true"></span> } @else { <mat-icon>check_circle</mat-icon> }
           {{ (guardando() ? 'admin_users.saving' : 'admin_users.save_changes') | translate }}

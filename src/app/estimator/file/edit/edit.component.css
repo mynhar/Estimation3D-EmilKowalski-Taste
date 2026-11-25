@@ -1,6 +1,7 @@
-/* component: editar dossier (estimador, Trait rouge)
- * Todo vive en shared/ui/alta/alta.css (estructura, campos, buscador de cliente, número y estado, raíl).
- * Sin tomate: guardar no cambia de etapa (botón relleno abeto); archivado → aviso y guardar deshabilitado.
+/* component: editar dossier (estimador, Lin et bronze)
+ * Todo vive en shared/ui/alta/alta.css (estructura, campos, buscador de cliente, estado y raíl);
+ * el número va de etiqueta en app-page-header.
+ * relleno espresso: guardar; archivado → aviso y guardar deshabilitado.
  */
 
 :host { display: block; }

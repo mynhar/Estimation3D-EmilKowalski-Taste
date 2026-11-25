@@ -1,12 +1,13 @@
-/* Informe del estimador, administración (Trait rouge)
+/* Informe del estimador, administración (Lin et bronze)
  * Base en shared/ui/ficha/ficha.css (tarjetas, formulario, fotos, archivos, invitación);
  * aquí: zona de subida con arrastrar y soltar, alta de tours, miniaturas 3D y visor de fotos.
  *
- * states: subiendo (spinner) · arrastrando encima (borde abeto) · guardando · error · éxito
+ * states: subiendo (spinner) · arrastrando encima (borde espresso) · guardando · error · éxito
  *         invitación: sin estimar · sin contratistas · seleccionados · confirmar «tous» · bloqueada
  *         visor: abierto (foco atrapado, Escape cierra)
- * contrast: textos ink / ink-secondary / ink-muted sobre vélin ≥ 6.8:1 · insignia 3D ink sobre vélin translúcido
- * Sin tomate: guardar el informe e invitar son acciones de la administración, en abeto.
+ * contrast: textos ink / ink-secondary / ink-muted sobre vélin ≥ 5.9:1 · insignia 3D ink sobre vélin translúcido
+ * relleno espresso: guardar el informe, la acción de la vista; enviar la invitación va con borde.
+ *         Una confirmación en línea que abre el usuario lleva su propio relleno.
  */
 :host { display: block; }
 
@@ -45,7 +46,7 @@
   cursor: pointer;
 }
 .ert-tour:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
-.ert-tour__icon { width: 32px; height: 32px; font-size: 32px; color: var(--ds-ink-muted); }
+.ert-tour__icon { width: 32px; height: 32px; font-size: 32px; color: var(--ds-accent); }
 .ert-tour__badge {
   position: absolute;
   bottom: var(--ds-space-1);

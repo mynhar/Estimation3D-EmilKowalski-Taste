@@ -1,7 +1,7 @@
-/* component: suivi de chantier del estimador, una obra (Trait rouge, solo lectura)
+/* component: suivi de chantier del estimador, una obra (Lin et bronze, solo lectura)
  * states: cargando · error · sin acceso · sin seguimiento · obra (la pinta app-obra-card)
- * contrast: error danger-ink sobre danger-soft (5.8:1) con icono
- *           tomate: ninguno (el estimador solo consulta)
+ * contrast: error danger-ink sobre danger-soft (5.0:1) con icono
+ *           sin relleno espresso: el estimador solo consulta
  */
 
 .ecm {

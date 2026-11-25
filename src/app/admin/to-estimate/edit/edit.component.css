@@ -1,11 +1,13 @@
-/* component: administración, estimación de un dossier (Trait rouge)
+/* component: administración, estimación de un dossier (Lin et bronze)
  * Base en shared/ui/ficha/ficha.css; aquí solo lo propio. Misma ficha que «dossier en
  * estimation» del estimador, más: lista de servicios, estimador asignable, archivo, subida
  * por arrastre y borrado de la estimación.
  * states: cargando · no encontrado · informe en curso / listo · subiendo (arrastrando) · guardando
  *         · enviando · invitación: requiere «estimé» · sin constructores · seleccionados ·
  *         confirmar «tous» · borrar: bloqueado · pedir · confirmar · borrando · error
- * tomate: «Envoyer l'estimation», la siguiente etapa. Borrar en ladrillo, con icono y texto.
+ * relleno espresso: «Envoyer l'estimation», la siguiente etapa; enviar la invitación va con borde.
+ *         Un formulario o confirmación en línea que abre el usuario lleva su propio relleno.
+ *         Borrar en terracota, con icono y texto.
  */
 :host { display: block; }
 
@@ -27,11 +29,15 @@
 
 .ate-tel {
   border-radius: var(--ds-radius-sm);
-  color: var(--ds-action);
+  color: var(--ds-action-ink);
   text-decoration: underline;
   text-underline-offset: 3px;
+  transition: var(--ds-transition-color);
 }
 .ate-tel:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
+@media (hover: hover) and (pointer: fine) {
+  .ate-tel:hover { color: var(--ds-ink); }
+}
 
 .ate-inline-actions {
   display: flex;
@@ -82,7 +88,7 @@
 }
 .ate-delete__title mat-icon { flex-shrink: 0; }
 .ate-delete__confirm .ate-inline-actions { justify-content: flex-end; }
-/* Irreversible: relleno ladrillo, con icono y texto. */
+/* Irreversible: relleno terracota, con icono y texto. */
 .ate-delete__ok {
   --mat-button-filled-container-color: var(--ds-danger);
   --mat-button-filled-label-text-color: var(--ds-surface);

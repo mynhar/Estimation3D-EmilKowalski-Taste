@@ -1,17 +1,19 @@
-/* component: administración, ofertas de un dossier (Trait rouge)
+/* component: administración, ofertas de un dossier (Lin et bronze)
  * Base en shared/ui/ficha/ficha.css; aquí solo lo propio: el orden de las tres piezas,
  * las tarjetas de oferta, la suma con varios servicios, los adjuntos y la baja.
  *
  * states: cargando (esqueleto) · no encontrado · archivado (aviso; crear y dar de baja bloqueados)
  *         ofertas: sin ofertas · error de lectura · default · hover (puntero fino) · abierta (borde
- *                  abeto) · marcada para el reparto · retirada (punteada) · confirmar adjudicar ·
+ *                  espresso) · marcada para el reparto · retirada (punteada) · confirmar adjudicar ·
  *                  confirmar baja · procesando (spinner)
  *         formulario: nueva · edición · campo inválido (mat-error) · arrastrando PDF · enviando ·
  *                     error · éxito · baja: bloqueada · pedir · confirmar · borrando
- * contrast: importes ink 13.6:1 · etiquetas ink-muted 6.8:1 sobre vélin · ladrillo danger-ink
+ * contrast: importes ink 15.5:1 · rótulos ink-muted 5.9:1 sobre vélin · terracota danger-ink
  *           sobre danger-soft
- * type: importes, plazos, fechas y el cupo al 75 % con tabular-nums
- * Sin tomate: crear, guardar y adjudicar son acciones de la administración, en abeto.
+ * type: importes en Cormorant 600; importes, plazos, fechas y el cupo con lining-nums tabular-nums
+ * relleno espresso: enviar la oferta del formulario, la acción de la vista. «Nouvelle offre»,
+ *         «Modifier» y adjudicar en cada tarjeta van con borde; las confirmaciones en línea que
+ *         abre el usuario llevan su propio relleno (terracota si dan de baja).
  */
 :host { display: block; }
 
@@ -70,7 +72,7 @@
   border-radius: var(--ds-radius-circle);
   background: var(--ds-border-strong);
 }
-.aoe-slots__bar > span.is-used { background: var(--ds-action); }
+.aoe-slots__bar > span.is-used { background: var(--ds-accent); }
 .aoe-new {
   min-height: 44px;
   margin-left: auto;
@@ -119,7 +121,8 @@
 .aoe-sum__row dt { color: var(--ds-ink-secondary); }
 .aoe-sum__row dd {
   margin: 0;
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--ds-ink);
 }
 .aoe-sum__row.is-sel dt { font-weight: var(--ds-weight-semibold); color: var(--ds-ink); }
@@ -143,12 +146,13 @@
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-xs);
   cursor: pointer;
   transition: border-color var(--ds-duration-fast) var(--ds-ease-out),
               box-shadow var(--ds-duration-fast) var(--ds-ease-out);
 }
 @media (hover: hover) and (pointer: fine) {
-  .aoe-card:hover:not(.is-out, .is-open) { border-color: var(--ds-border-strong); }
+  .aoe-card:hover:not(.is-out, .is-open) { border-color: var(--ds-border-strong); box-shadow: var(--ds-shadow-md); }
 }
 .aoe-card.is-marked { background: var(--ds-action-faint); }
 .aoe-card.is-open {
@@ -158,6 +162,7 @@
 }
 .aoe-card.is-out {
   border-style: dashed;
+  box-shadow: none;
   cursor: default;
 }
 .aoe-card.is-out .aoe-card__amount,
@@ -181,7 +186,8 @@
 
 .aoe-card__name {
   margin: 0;
-  font-size: var(--ds-text-base);
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
   color: var(--ds-ink);
@@ -191,7 +197,8 @@
   margin: calc(var(--ds-space-2) * -1) 0 0;
   font-family: var(--ds-font-display);
   font-size: var(--ds-text-2xl);
-  font-weight: var(--ds-weight-bold);
+  font-weight: var(--ds-weight-semibold);
+  font-variant-numeric: lining-nums tabular-nums;
   line-height: var(--ds-leading-tight);
   color: var(--ds-ink);
 }
@@ -208,7 +215,7 @@
   width: 18px;
   height: 18px;
   font-size: 18px;
-  color: var(--ds-ink-muted);
+  color: var(--ds-accent);
 }
 .aoe-card__facts {
   padding-top: var(--ds-space-3);
@@ -226,7 +233,6 @@
     grid-row: 2;
     grid-column: 1;
     align-self: center;
-    font-size: var(--ds-text-lg);
   }
   .aoe-card__amount {
     grid-row: 2;
@@ -248,7 +254,7 @@
 .aoe-card__award { --mat-button-text-horizontal-padding: var(--ds-space-3); }
 .aoe-card__del { margin-left: auto; }
 
-/* ── Baja: en ladrillo, con icono y texto ───────────────────────────────── */
+/* ── Baja: en terracota, con icono y texto ──────────────────────────────── */
 .aoe-danger {
   display: grid;
   gap: var(--ds-space-3);
@@ -352,7 +358,7 @@
   gap: var(--ds-space-2);
   min-width: 0;
 }
-.aoe-video__icon { flex-shrink: 0; color: var(--ds-ink-muted); }
+.aoe-video__icon { flex-shrink: 0; color: var(--ds-accent); }
 .aoe-video__icon.aoe-ok { color: var(--ds-success); }
 .aoe-video > button { min-height: 44px; }
 .aoe-video__pick { margin-left: auto; }

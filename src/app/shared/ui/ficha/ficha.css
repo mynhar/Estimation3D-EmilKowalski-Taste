@@ -1,16 +1,19 @@
-/* Fichas de dossier de los roles internos (Trait rouge), compartida
+/* Fichas de dossier de los roles internos (Lin et bronze), compartida
  * La incluyen las fichas del estimador y de administración con
  *   styleUrls: ['…/shared/ui/ficha/ficha.css', './x.component.css']
  * y cada componente añade solo lo suyo. Mismo patrón que «Faire une offre» del contratista:
- * volver + título + meta, dos columnas (el dossier | el informe) desde 1100px, tarjetas vélin,
- * datos en <dl>, fotos en rejilla, archivos en filas, formulario en mat-form-field.
+ * volver + etiqueta (número) + título + meta, dos columnas (el dossier | el informe) desde 1100px,
+ * tarjetas vélin, datos en <dl> con subgrid, fotos en rejilla, archivos en filas, formulario en
+ * mat-form-field.
  *
  * states: cargando (esqueleto) · no encontrado · vacío por bloque · subiendo/guardando (spinner)
  *         interactivos: default · hover (puntero fino) · focus-visible · active · disabled
- *         avisos: error (ladrillo, icono + texto) · éxito · info
- * contrast: títulos ink (13.6:1 sobre vélin) · texto ink-secondary (9.6:1) · meta ink-muted (6.8:1)
- *           marcas warning/success/danger/info -ink sobre su -soft
- * type: títulos 112 %; número de dossier, importes, fechas y recuentos al 75 % con tabular-nums
+ *         avisos: error (terracota, icono + texto) · éxito · info
+ * contrast: títulos ink (15.5:1 sobre vélin) · texto ink-secondary (7.8:1) · meta ink-muted (5.9:1)
+ *           marcas warning/success/danger/info -ink sobre su -soft · iconos de dato en bronce (4.6:1)
+ * type: títulos en Cormorant 600; rótulos de dato en mayúsculas (12px); número de dossier,
+ *       importes, fechas y recuentos con lining-nums tabular-nums
+ * Un solo relleno espresso por vista: la acción que hace avanzar el dossier.
  */
 
 .fi {
@@ -35,8 +38,10 @@
   font-size: var(--ds-text-xl);
   font-weight: var(--ds-weight-semibold);
   line-height: var(--ds-leading-snug);
+  font-variant-numeric: lining-nums;
   color: var(--ds-ink);
 }
+/* Grupo del formulario y subapartado: Manrope también en los h3 (el reboot pone Cormorant). */
 .fi-label {
   display: flex;
   flex-wrap: wrap;
@@ -44,6 +49,7 @@
   gap: var(--ds-space-2);
   margin: 0;
   padding: 0;
+  font-family: var(--ds-font-body);
   font-size: var(--ds-text-base);
   font-weight: var(--ds-weight-bold);
   color: var(--ds-ink);
@@ -109,6 +115,7 @@
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-xs);
 }
 @media (max-width: 575.98px) {
   .fi-card { padding: var(--ds-space-4); }
@@ -175,7 +182,7 @@
   min-width: 0;
   overflow-wrap: anywhere;
 }
-.fi-meta__item mat-icon { flex-shrink: 0; width: 18px; height: 18px; font-size: 18px; }
+.fi-meta__item mat-icon { flex-shrink: 0; width: 18px; height: 18px; font-size: 18px; color: var(--ds-accent); }
 
 /* ── Dos columnas: el dossier y el informe ──────────────────────────────── */
 .fi-layout {
@@ -198,17 +205,30 @@
 }
 
 /* ── Datos del dossier ──────────────────────────────────────────────────── */
+/* Rótulo arriba y valor abajo; con subgrid, un rótulo en dos líneas no descoloca al vecino.
+   El row-gap del subgrid (4px) manda dentro del dato; entre datos, el de la lista. */
 .fi-facts {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
   gap: var(--ds-space-4) var(--ds-space-5);
   margin: 0;
 }
-.fi-fact { display: grid; gap: var(--ds-space-1); align-content: start; min-width: 0; }
+.fi-fact {
+  display: grid;
+  grid-row: span 2;
+  grid-template-rows: subgrid;
+  row-gap: var(--ds-space-1);
+  align-content: start;
+  min-width: 0;
+}
 .fi-fact.is-wide { grid-column: 1 / -1; }
 .fi-fact dt {
-  font-size: var(--ds-text-sm);
-  font-weight: var(--ds-weight-medium);
+  align-self: end;
+  font-size: var(--ds-text-label);
+  font-weight: var(--ds-weight-bold);
+  line-height: 1.3;
+  letter-spacing: var(--ds-tracking-label);
+  text-transform: uppercase;
   color: var(--ds-ink-muted);
 }
 .fi-fact dd {
@@ -286,7 +306,7 @@
   border-bottom: 1px solid var(--ds-border-subtle);
 }
 .fi-file:last-child { border-bottom: 0; }
-.fi-file__icon { flex-shrink: 0; color: var(--ds-ink-muted); }
+.fi-file__icon { flex-shrink: 0; color: var(--ds-accent); }
 .fi-file__text { display: grid; flex: 1; min-width: 0; }
 .fi-file__name {
   font-weight: var(--ds-weight-medium);
@@ -366,7 +386,7 @@
   cursor: pointer;
 }
 .fi-tour__toggle:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
-.fi-tour__toggle > mat-icon { flex-shrink: 0; color: var(--ds-ink-muted); }
+.fi-tour__toggle > mat-icon { flex-shrink: 0; color: var(--ds-accent); }
 .fi-tour__text { display: grid; flex: 1; min-width: 0; }
 .fi-tour__name { font-weight: var(--ds-weight-semibold); }
 .fi-tour__url {
@@ -461,7 +481,7 @@
 }
 .fi-error mat-icon { flex-shrink: 0; width: 18px; height: 18px; font-size: 18px; margin-top: 1px; }
 
-/* Lista de comprobación: lo hecho en tinta con check verde. */
+/* Lista de comprobación: lo hecho en tinta con check bronce, como los pasos hechos. */
 .fi-check {
   display: flex;
   flex-wrap: wrap;
@@ -476,7 +496,7 @@
 .fi-check li { display: inline-flex; align-items: center; gap: var(--ds-space-1); }
 .fi-check mat-icon { width: 18px; height: 18px; font-size: 18px; }
 .fi-check li.is-done { color: var(--ds-ink); }
-.fi-check li.is-done mat-icon { color: var(--ds-success); }
+.fi-check li.is-done mat-icon { color: var(--ds-accent); }
 
 .fi-feedback {
   display: flex;
@@ -532,7 +552,7 @@
   color: var(--ds-ink-muted);
   overflow-wrap: anywhere;
 }
-.fi-pick__sub mat-icon { flex-shrink: 0; width: 16px; height: 16px; font-size: 16px; }
+.fi-pick__sub mat-icon { flex-shrink: 0; width: 16px; height: 16px; font-size: 16px; color: var(--ds-accent); }
 .fi-pick__extra { display: grid; gap: var(--ds-space-2); padding: 0 0 var(--ds-space-2) var(--ds-space-8); }
 @media (max-width: 479.98px) {
   .fi-pick__extra { padding-left: 0; }
